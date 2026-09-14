@@ -1,7 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { MoreHorizontal, RefreshCw, Search, Trash2, Undo2, UserRound } from 'lucide-react';
+import { MoreHorizontal, Plus, RefreshCw, Search } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { textoDe, transcriptionApi, type StoredTranscription } from '../../transcription/services/transcription.api';
+import { CerrarEntrevistaDialog } from './CerrarEntrevistaDialog';
+import { decisionEnPalabras, duracionEnPalabras } from '../entrevistaEnPantalla';
 
 /**
  * La lista de entrevistas. Se ordena por la DECISIÓN PENDIENTE, no por fecha.
@@ -12,12 +14,18 @@ import { textoDe, transcriptionApi, type StoredTranscription } from '../../trans
  * aparecen en ninguna lista ordenada por fecha, y son los que cuestan
  * clientes.
  *
- * DECLINAR TAMBIÉN SE REGISTRA, con su motivo de una lista corta. La firma
- * necesita saber qué está rechazando y por qué, y el consultante merece una
- * respuesta. El servidor rechaza un declinado sin motivo; la base también.
+ * DECLINAR TAMBIÉN SE REGISTRA, con su motivo. La firma necesita saber qué
+ * está rechazando y por qué, y el consultante merece una respuesta. El
+ * servidor rechaza un declinado sin motivo; la base también. El diálogo es el
+ * mismo del detalle (`CerrarEntrevistaDialog` en modo «declinar»), con la
+ * misma lista de motivos.
  *
  * LAS CUATRO CIFRAS DE ARRIBA son de gestión, no decoración: dicen si el
  * embudo de clientes está atascado. Todas salen de las filas — nada se estima.
+ *
+ * LA CARA NUEVA toma las filas de la lista de audiencias de la misma maqueta
+ * (`app-audiencias-entrevistas.html:449`): título de 17 px, una línea de datos
+ * debajo y el estado a la derecha, sin tarjeta ni contorno.
  */
 
 interface EntrevistasListProps {
@@ -26,31 +34,17 @@ interface EntrevistasListProps {
   onOpen: (item: StoredTranscription) => void;
   onDelete: (id: string) => void;
   onRefresh: () => void;
+  /** El vacío invita a la primera entrevista con un botón que la empieza de verdad. */
+  onNueva?: () => void;
 }
-
-/** Los motivos de la lista corta. «Otro» pide el texto. */
-const MOTIVOS = [
-  'Fuera de materia',
-  'Sin viabilidad',
-  'Conflicto de interés',
-  'Término vencido',
-  'El cliente no volvió',
-  'Otro'
-] as const;
 
 const fecha = (iso: string): string =>
   new Date(iso).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' });
 
-const duracion = (segundos: number | null): string => {
-  if (!segundos) return '';
-  const m = Math.round(segundos / 60);
-  return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${m % 60} min`;
-};
-
 const diasDesde = (iso: string): number =>
-  Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  Math.floor((Date.now() - new Date(iso).getTime()) / (24 * 60 * 60 * 1000));
 
-const nombreLegible = (title: string): string => title.replace(/^\d{10,}_/, '');
+export const nombreLegible = (title: string): string => title.replace(/^\d{10,}_/, '');
 const quien = (email?: string | null): string => (email ? email.split('@')[0] : '');
 
 export const EntrevistasList: React.FC<EntrevistasListProps> = ({
@@ -58,31 +52,24 @@ export const EntrevistasList: React.FC<EntrevistasListProps> = ({
   isLoading,
   onOpen,
   onDelete,
-  onRefresh
+  onRefresh,
+  onNueva
 }) => {
   const [busqueda, setBusqueda] = useState('');
   const [menuAbierto, setMenuAbierto] = useState<string | null>(null);
   const [porEliminar, setPorEliminar] = useState<StoredTranscription | null>(null);
   const [porDeclinar, setPorDeclinar] = useState<StoredTranscription | null>(null);
-  const [motivo, setMotivo] = useState<string>('');
-  const [motivoOtro, setMotivoOtro] = useState('');
   const [errorDecision, setErrorDecision] = useState('');
 
   /*
-   * La decisión se refleja al instante y el servidor confirma detrás. Si
-   * falla, onRefresh la devuelve a la verdad — nunca se queda una decisión
-   * pintada que el servidor no tiene.
+   * La decisión se escribe y la lista se relee. Si falla, onRefresh la
+   * devuelve a la verdad — nunca se queda una decisión pintada que el
+   * servidor no tiene.
    */
-  const decidir = async (
-    item: StoredTranscription,
-    decision: 'SIN_DECIDIR' | 'TOMADO' | 'DECLINADO',
-    razon?: string
-  ) => {
+  const decidir = async (item: StoredTranscription, decision: 'SIN_DECIDIR' | 'TOMADO') => {
     setErrorDecision('');
-    const r = await transcriptionApi.decidir(item.id, decision, razon);
-    if (!r.item) {
-      setErrorDecision(r.error ?? 'No se pudo registrar la decisión.');
-    }
+    const r = await transcriptionApi.decidir(item.id, decision);
+    if (!r.item) setErrorDecision(r.error ?? 'No se pudo registrar la decisión.');
     onRefresh();
   };
 
@@ -105,85 +92,66 @@ export const EntrevistasList: React.FC<EntrevistasListProps> = ({
 
   /* Las cifras, todas contadas de las filas. */
   const todasSinDecidir = items.filter((i) => (i.decision ?? 'SIN_DECIDIR') === 'SIN_DECIDIR');
-  const masAntigua = todasSinDecidir.length
-    ? Math.max(...todasSinDecidir.map((i) => diasDesde(i.transcribed_at)))
-    : 0;
+  const masAntigua = todasSinDecidir.length ? Math.max(...todasSinDecidir.map((i) => diasDesde(i.transcribed_at))) : 0;
   const tomadas = items.filter((i) => i.decision === 'TOMADO').length;
   const declinadas = items.filter((i) => i.decision === 'DECLINADO').length;
   const conDuracion = items.filter((i) => i.duration_seconds);
   const duracionMedia = conDuracion.length
-    ? Math.round(
-        conDuracion.reduce((s, i) => s + (i.duration_seconds ?? 0), 0) / conDuracion.length / 60
-      )
-    : 0;
-
-  const cerrarDeclinar = () => {
-    setPorDeclinar(null);
-    setMotivo('');
-    setMotivoOtro('');
-  };
+    ? conDuracion.reduce((s, i) => s + (i.duration_seconds ?? 0), 0) / conDuracion.length
+    : null;
 
   const Fila: React.FC<{ item: StoredTranscription }> = ({ item }) => {
     const estado = item.decision ?? 'SIN_DECIDIR';
     const dias = diasDesde(item.transcribed_at);
+    const enPalabras = decisionEnPalabras(item);
 
     return (
-      <div className="t-row flex items-center gap-3">
-        <button onClick={() => onOpen(item)} className="min-w-0 flex-1 text-left" title="Abrir la entrevista">
-          <span className="block truncate text-ui text-ink-900">{nombreLegible(item.title)}</span>
-          <span className="mt-0.5 block truncate font-mono text-[11px] text-ink-500">
-            {[fecha(item.transcribed_at), duracion(item.duration_seconds)].filter(Boolean).join(' · ')}
+      <li className="cn-ent-fila">
+        <button type="button" onClick={() => onOpen(item)} className="cn-ent-fila-abrir" title="Abrir la entrevista">
+          <span className="cn-ent-fila-titulo">{nombreLegible(item.title)}</span>
+          <span className="cn-ent-fila-meta">
+            {[fecha(item.transcribed_at), duracionEnPalabras(item.duration_seconds), quien(item.user_email)]
+              .filter(Boolean)
+              .join(' · ')}
           </span>
         </button>
 
-        <span className="hidden w-[120px] shrink-0 truncate text-meta text-ink-500 md:block">
-          {quien(item.user_email)}
-        </span>
-
-        <span className="w-[150px] shrink-0">
-          {estado === 'TOMADO' && <span className="chip-verified">Caso tomado</span>}
-          {estado === 'DECLINADO' && (
-            <>
-              <span className="chip-neutral">Declinado</span>
-              {item.decision_motivo && (
-                <span className="mt-0.5 block truncate text-[11px] text-ink-400">
-                  {item.decision_motivo}
-                </span>
-              )}
-            </>
-          )}
-          {estado === 'SIN_DECIDIR' && (
-            <>
-              <span className="chip-unverified">Sin decidir</span>
-              {/* Los días que la persona lleva esperando: el dato que empuja. */}
-              {dias > 0 && (
-                <span className="mt-0.5 block font-mono text-[11px] text-unverified">
-                  {dias} {dias === 1 ? 'día' : 'días'}
-                </span>
-              )}
-            </>
+        <span className="cn-ent-fila-estado">
+          <span
+            className={`cn-ent-chip ${
+              enPalabras.tono === 'ok' ? 'cn-ent-chip--ok' : enPalabras.tono === 'pendiente' ? 'cn-ent-chip--aviso' : 'cn-ent-chip--neutro'
+            }`}
+          >
+            {estado === 'SIN_DECIDIR' && dias > 0 ? `Sin decidir · ${dias} ${dias === 1 ? 'día' : 'días'}` : enPalabras.titulo}
+          </span>
+          {estado === 'DECLINADO' && item.decision_motivo && (
+            <span className="cn-ent-fila-motivo">{item.decision_motivo}</span>
           )}
         </span>
 
-        <span className="relative w-[28px] shrink-0">
+        <span className="cn-ent-fila-menu">
           <button
+            type="button"
             onClick={() => setMenuAbierto(menuAbierto === item.id ? null : item.id)}
             aria-label="Acciones"
-            className="flex h-[26px] w-[26px] items-center justify-center rounded-control text-ink-400 hover:bg-canvas hover:text-ink-900"
+            aria-expanded={menuAbierto === item.id}
+            className="cn-ent-icono"
           >
-            <MoreHorizontal className="h-4 w-4" />
+            <MoreHorizontal size={20} aria-hidden="true" />
           </button>
 
           {menuAbierto === item.id && (
             <>
-              <span className="fixed inset-0 z-30" onClick={() => setMenuAbierto(null)} />
-              <span className="surface-raised absolute right-0 top-full z-40 mt-1 flex w-[200px] flex-col overflow-hidden py-1">
+              <button type="button" className="cn-ent-menu-velo" aria-label="Cerrar el menú" onClick={() => setMenuAbierto(null)} />
+              <span className="cn-ent-menu" role="menu">
                 <button
+                  type="button"
+                  role="menuitem"
                   onClick={() => {
                     setMenuAbierto(null);
                     onOpen(item);
                   }}
-                  className="px-3 py-1.5 text-left text-ui text-ink-900 hover:bg-canvas"
+                  className="cn-ent-menu-item"
                 >
                   Abrir
                 </button>
@@ -191,231 +159,185 @@ export const EntrevistasList: React.FC<EntrevistasListProps> = ({
                 {estado === 'SIN_DECIDIR' && (
                   <>
                     <button
+                      type="button"
+                      role="menuitem"
                       onClick={() => {
                         setMenuAbierto(null);
                         void decidir(item, 'TOMADO');
                       }}
-                      className="px-3 py-1.5 text-left text-ui text-ink-900 hover:bg-canvas"
+                      className="cn-ent-menu-item"
                     >
                       Tomar el caso
                     </button>
                     <button
+                      type="button"
+                      role="menuitem"
                       onClick={() => {
                         setMenuAbierto(null);
                         setPorDeclinar(item);
                       }}
-                      className="px-3 py-1.5 text-left text-ui text-ink-900 hover:bg-canvas"
+                      className="cn-ent-menu-item"
                     >
-                      Declinar…
+                      Declinar con motivo…
                     </button>
                   </>
                 )}
 
                 {estado !== 'SIN_DECIDIR' && (
                   <button
+                    type="button"
+                    role="menuitem"
                     onClick={() => {
                       setMenuAbierto(null);
                       void decidir(item, 'SIN_DECIDIR');
                     }}
-                    className="flex items-center gap-2 px-3 py-1.5 text-left text-ui text-ink-900 hover:bg-canvas"
+                    className="cn-ent-menu-item"
                   >
-                    <Undo2 className="h-3.5 w-3.5 text-ink-400" />
                     Reabrir la decisión
                   </button>
                 )}
 
                 <button
+                  type="button"
+                  role="menuitem"
                   onClick={() => {
                     setMenuAbierto(null);
                     setPorEliminar(item);
                   }}
-                  className="flex items-center gap-2 border-t border-line-100 px-3 py-1.5 text-left text-ui text-danger hover:bg-canvas"
+                  className="cn-ent-menu-item cn-ent-menu-item--peligro"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
                   Eliminar
                 </button>
               </span>
             </>
           )}
         </span>
-      </div>
+      </li>
     );
   };
 
-  const motivoFinal = motivo === 'Otro' ? motivoOtro.trim() : motivo;
-
   return (
-    <div className="rounded-card border border-line-200 bg-surface">
-      <div className="flex flex-wrap items-center gap-2 border-b border-line-100 px-4 py-3">
-        <div>
-          <h4 className="text-ui font-semibold text-ink-900">Entrevistas de la firma</h4>
-          <p className="text-meta text-ink-500">
-            {items.length} {items.length === 1 ? 'entrevista' : 'entrevistas'}
-            {todasSinDecidir.length > 0 && (
-              <>
-                {' · '}
-                <span className="font-medium text-unverified">
-                  {todasSinDecidir.length} sin decidir
-                </span>
-              </>
-            )}
-          </p>
-        </div>
-
-        <div className="relative ml-auto">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-400" />
+    <section className="cn-ent-lista" aria-label="Entrevistas de la firma">
+      <div className="cn-ent-filtros">
+        <label className="cn-ent-filtro">
+          <span className="cn-ent-oculto">Buscar</span>
+          <Search size={18} className="cn-ent-filtro-icono" aria-hidden="true" />
           <input
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             placeholder="Por nombre, quién la atendió o lo que contó"
-            className="field w-[260px] max-w-full pl-8"
+            className="cn-ent-entrada cn-ent-entrada--con-icono"
           />
-        </div>
-
-        <button onClick={onRefresh} className="btn-neutral btn-sm" title="Actualizar la lista">
-          <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+        </label>
+        <button type="button" onClick={onRefresh} className="cn-ini-boton cn-ini-boton--suave cn-ent-boton" title="Actualizar la lista">
+          <RefreshCw size={16} className={isLoading ? 'cn-ent-girando' : undefined} aria-hidden="true" />
+          Actualizar
         </button>
       </div>
 
       {/* ─── LAS CUATRO CIFRAS DE GESTIÓN ──────────────────────────────────── */}
       {items.length > 0 && (
-        <div className="grid grid-cols-2 gap-px border-b border-line-100 bg-line-100 sm:grid-cols-4">
-          <div className="bg-surface px-4 py-2.5">
-            <p className="font-mono text-[18px] font-semibold text-ink-900">{todasSinDecidir.length}</p>
-            <p className="text-meta text-ink-500">
-              Sin decidir
-              {masAntigua > 0 && ` · la más antigua, ${masAntigua} ${masAntigua === 1 ? 'día' : 'días'}`}
-            </p>
+        <dl className="cn-ent-cifras">
+          <div className="cn-ent-cifra">
+            <dt className="cn-ent-cifra-rotulo">Sin decidir</dt>
+            <dd className="cn-ent-cifra-valor">{todasSinDecidir.length}</dd>
+            {masAntigua > 0 && (
+              <dd className="cn-ent-cifra-detalle">
+                La más antigua, {masAntigua} {masAntigua === 1 ? 'día' : 'días'}
+              </dd>
+            )}
           </div>
-          <div className="bg-surface px-4 py-2.5">
-            <p className="font-mono text-[18px] font-semibold text-ink-900">{tomadas}</p>
-            <p className="text-meta text-ink-500">Casos tomados</p>
+          <div className="cn-ent-cifra">
+            <dt className="cn-ent-cifra-rotulo">Casos tomados</dt>
+            <dd className="cn-ent-cifra-valor">{tomadas}</dd>
           </div>
-          <div className="bg-surface px-4 py-2.5">
-            <p className="font-mono text-[18px] font-semibold text-ink-900">{declinadas}</p>
-            <p className="text-meta text-ink-500">Declinados · con motivo registrado</p>
+          <div className="cn-ent-cifra">
+            <dt className="cn-ent-cifra-rotulo">Declinados</dt>
+            <dd className="cn-ent-cifra-valor">{declinadas}</dd>
+            <dd className="cn-ent-cifra-detalle">Con motivo registrado</dd>
           </div>
-          <div className="bg-surface px-4 py-2.5">
-            <p className="font-mono text-[18px] font-semibold text-ink-900">
-              {duracionMedia > 0 ? `${duracionMedia} min` : '—'}
-            </p>
-            <p className="text-meta text-ink-500">Duración media</p>
+          <div className="cn-ent-cifra">
+            <dt className="cn-ent-cifra-rotulo">Duración media</dt>
+            {/* Sin duraciones medidas no hay media: una raya, no «0 min». */}
+            <dd className="cn-ent-cifra-valor">{duracionEnPalabras(duracionMedia) ?? '—'}</dd>
           </div>
-        </div>
+        </dl>
       )}
 
-      {errorDecision && <p className="notice-unverified mx-4 mt-3">{errorDecision}</p>}
+      {errorDecision && <p className="cn-ent-aviso cn-ent-aviso--peligro">{errorDecision}</p>}
+
+      {isLoading && items.length === 0 && (
+        <p className="cn-ent-cargando">
+          <span className="cn-ent-giro" aria-hidden="true" />
+          Cargando las entrevistas de la firma…
+        </p>
+      )}
 
       {items.length === 0 && !isLoading && (
-        <div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
-          <UserRound className="h-7 w-7 text-ink-400" />
-          <p className="text-ui text-ink-900">Aún no hay entrevistas guardadas.</p>
-          <p className="max-w-sm text-meta text-ink-500">
-            Grabe la conversación con el cliente: se transcribe, se revisa, y termina en una
-            decisión — tomar el caso o declinarlo con motivo.
+        <div className="cn-ent-vacio">
+          <p className="cn-ent-vacio-titulo">Todavía no hay entrevistas</p>
+          <p className="cn-ent-vacio-texto">
+            Grabe la conversación con quien consulta: se transcribe, se revisa, y termina en una decisión — tomar
+            el caso o declinarlo con motivo.
           </p>
+          {onNueva && (
+            <button type="button" onClick={onNueva} className="cn-ini-boton cn-ini-boton--primario cn-ent-boton">
+              <Plus size={16} aria-hidden="true" />
+              Nueva entrevista
+            </button>
+          )}
         </div>
       )}
 
       {visibles.length === 0 && items.length > 0 && (
-        <p className="px-4 py-6 text-center text-meta text-ink-500">
-          Ninguna coincide con esa búsqueda.
-        </p>
+        <p className="cn-ent-nota cn-ent-nota--caja">Ninguna coincide con esa búsqueda.</p>
       )}
 
       {sinDecidir.length > 0 && (
-        <>
-          <p className="t-head flex items-center gap-2">
+        <div className="cn-ent-grupo">
+          <h2 className="cn-ent-grupo-titulo">
             Esperan decisión · {sinDecidir.length}
-            <span className="font-sans text-[11px] font-normal normal-case tracking-normal text-ink-400">
-              — al frente hay una persona esperando respuesta
-            </span>
-          </p>
-          {sinDecidir.map((i) => (
-            <Fila key={i.id} item={i} />
-          ))}
-        </>
+            <span className="cn-ent-grupo-nota">Al frente hay una persona esperando respuesta.</span>
+          </h2>
+          <ul className="cn-ent-filas">
+            {sinDecidir.map((i) => (
+              <Fila key={i.id} item={i} />
+            ))}
+          </ul>
+        </div>
       )}
 
       {decididas.length > 0 && (
-        <>
-          <p className="t-head">Decididas · {decididas.length}</p>
-          {decididas.map((i) => (
-            <Fila key={i.id} item={i} />
-          ))}
-        </>
+        <div className="cn-ent-grupo">
+          <h2 className="cn-ent-grupo-titulo">Decididas · {decididas.length}</h2>
+          <ul className="cn-ent-filas">
+            {decididas.map((i) => (
+              <Fila key={i.id} item={i} />
+            ))}
+          </ul>
+        </div>
       )}
 
       {items.length > 0 && (
-        <p className="border-t border-line-100 px-4 py-2.5 text-meta text-ink-500">
-          Declinar también se registra, con su motivo en una línea: la firma necesita saber qué
-          está rechazando, y el consultante merece una respuesta.
+        <p className="cn-ent-nota">
+          Declinar también se registra, con su motivo en una línea: la firma necesita saber qué está rechazando, y
+          el consultante merece una respuesta.
         </p>
       )}
 
-      {/* ─── DECLINAR · el motivo es obligatorio ───────────────────────────── */}
-      <Dialog
-        abierto={Boolean(porDeclinar)}
-        onCerrar={cerrarDeclinar}
-        tamano="S"
-        titulo="Declinar el caso"
-        subtitulo={porDeclinar ? nombreLegible(porDeclinar.title) : undefined}
-        acciones={
-          <>
-            <button onClick={cerrarDeclinar} className="btn-neutral btn-sm">
-              Cancelar
-            </button>
-            <button
-              onClick={() => {
-                if (porDeclinar && motivoFinal) {
-                  void decidir(porDeclinar, 'DECLINADO', motivoFinal);
-                  cerrarDeclinar();
-                }
-              }}
-              className="btn-primary btn-sm"
-              disabled={!motivoFinal}
-            >
-              Declinar
-            </button>
-          </>
-        }
-      >
-        <div className="flex flex-col gap-1.5">
-          {MOTIVOS.map((m) => (
-            <label key={m} className="flex cursor-pointer items-center gap-2 rounded-control px-2 py-1.5 hover:bg-canvas">
-              <input
-                type="radio"
-                name="motivo"
-                checked={motivo === m}
-                onChange={() => setMotivo(m)}
-              />
-              <span className="text-ui text-ink-900">{m}</span>
-            </label>
-          ))}
+      {/* ─── DECLINAR · el mismo diálogo del detalle ───────────────────────── */}
+      {porDeclinar && (
+        <CerrarEntrevistaDialog
+          abierto
+          modo="declinar"
+          onCerrar={() => setPorDeclinar(null)}
+          transcriptionId={porDeclinar.id}
+          titulo={nombreLegible(porDeclinar.title)}
+          onDecidido={onRefresh}
+        />
+      )}
 
-          {motivo === 'Otro' && (
-            <input
-              value={motivoOtro}
-              onChange={(e) => setMotivoOtro(e.target.value)}
-              placeholder="El motivo, en una línea"
-              autoFocus
-              className="field mt-1"
-            />
-          )}
-
-          {/*
-            El riesgo profesional real: un término que venció mientras el
-            consultante esperaba respuesta. Ahí conviene dejar constancia.
-          */}
-          {motivo === 'Término vencido' && (
-            <p className="notice mt-1">
-              Si el motivo es un término vencido, conviene decírselo al consultante por escrito y
-              conservar constancia.
-            </p>
-          )}
-        </div>
-      </Dialog>
-
+      {/* ─── ELIMINAR · confirmación destructiva (app-dialogos-y-estados.html:232) ─── */}
       <Dialog
         abierto={Boolean(porEliminar)}
         onCerrar={() => setPorEliminar(null)}
@@ -423,26 +345,27 @@ export const EntrevistasList: React.FC<EntrevistasListProps> = ({
         titulo="¿Eliminar esta entrevista?"
         acciones={
           <>
-            <button onClick={() => setPorEliminar(null)} className="btn-neutral btn-sm">
-              Conservar
+            <button type="button" onClick={() => setPorEliminar(null)} className="cn-ini-boton cn-ini-boton--texto cn-ent-boton">
+              No, conservarla
             </button>
             <button
+              type="button"
               onClick={() => {
                 if (porEliminar) onDelete(porEliminar.id);
                 setPorEliminar(null);
               }}
-              className="btn-danger btn-sm"
+              className="cn-ini-boton cn-ent-boton cn-ent-boton--peligro"
             >
-              Eliminar
+              Sí, eliminarla
             </button>
           </>
         }
       >
-        <p className="text-ui text-ink-900">
-          «{porEliminar ? nombreLegible(porEliminar.title) : ''}» se borra para toda la firma, con
-          su decisión y su motivo. No se puede recuperar.
+        <p className="cn-ent-dlg-texto">
+          «{porEliminar ? nombreLegible(porEliminar.title) : ''}» se borra para toda la firma, con su decisión y su
+          motivo. No se puede recuperar.
         </p>
       </Dialog>
-    </div>
+    </section>
   );
 };

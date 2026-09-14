@@ -1,102 +1,82 @@
 import React from 'react';
-import { Lightbulb, Quote, ShieldAlert } from 'lucide-react';
-import { ROLE_LABELS, type RoleProposal, type SpeakerRole } from '../types';
-
-interface RoleProposalsProps {
-  proposals: RoleProposal[];
-  /** Roles already applied, so a confirmed voice stops being offered. */
-  assigned: Record<string, SpeakerRole>;
-  onAccept: (speakerLabel: string, role: SpeakerRole) => void;
-}
-
-const atMinute = (seconds: number | null): string => {
-  if (seconds === null) return '';
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return ` · min ${m}:${String(s).padStart(2, '0')}`;
-};
+import { ROLE_LABELS, type RoleProposal } from '../types';
+import { marcaDeTiempo } from '../audienciaEnPantalla';
 
 /**
- * Shows what the app THINKS each voice is, and the phrase it read to think it.
+ * Lo que la aplicación CREE que es una voz, y la frase que leyó para creerlo.
  *
- * The evidence is not decoration. Diarization returns speaker_0 and speaker_1
- * and never names them; these roles are inferred from procedural formulas in
- * the transcript, and a quotation or counsel reading the judge's order aloud
- * will trip the same marker. Printing "JUEZ" alone would look exactly like a
- * verified fact — so the quote travels with it and the lawyer confirms from
- * what was actually said, not from our confidence.
+ * La evidencia no es adorno. La diarización devuelve speaker_0 y speaker_1 y
+ * nunca los nombra; estos roles se deducen de fórmulas procesales del
+ * transcrito, y una cita o un apoderado leyendo el auto en voz alta disparan el
+ * mismo marcador. Pintar «JUEZ» solo se vería exactamente como un hecho
+ * verificado — por eso la frase viaja con la sugerencia y el abogado confirma
+ * desde lo que se dijo, no desde nuestra confianza.
  *
- * Voices with no marker are absent from this panel rather than listed as
- * uncertain: there is nothing to propose, and the role selector on each
- * intervention is already where they get assigned by hand.
+ * VA DENTRO DE LA TARJETA DE CADA VOZ (artboard :287, «Rol sugerido: juez») y
+ * no en un panel aparte: la decisión se toma donde está el selector del rol.
+ * La maqueta la pinta en verde; aquí va en el azul suave de lo propuesto,
+ * porque en este sistema el verde dice «comprobado» y una sugerencia es
+ * justamente lo contrario.
  */
-export const RoleProposals: React.FC<RoleProposalsProps> = ({ proposals, assigned, onAccept }) => {
-  const pending = proposals.filter(
-    (proposal) => proposal.matches > 0 && proposal.proposedRole !== 'DESCONOCIDO' && !assigned[proposal.speakerLabel]
-  );
-
-  if (pending.length === 0) return null;
-
+export const SugerenciaDeRol: React.FC<{ propuesta: RoleProposal; onConfirmar: () => void }> = ({
+  propuesta,
+  onConfirmar
+}) => {
+  const evidencia = propuesta.evidence[0];
   return (
-    <div className="bg-[rgb(var(--unverified-surf))]/50 border border-[rgb(var(--unverified-line))]/70 rounded-card p-4 space-y-3">
-      <div className="flex items-start gap-2">
-        <Lightbulb className="w-4 h-4 text-unverified flex-shrink-0 mt-0.5" />
-        <div>
-          <p className="text-[12px] font-semibold text-ink-900">Roles sugeridos</p>
-          <p className="text-[11px] text-ink-500 leading-snug mt-0.5">
-            Deducidos de lo que dijo cada voz. Revise la frase antes de aceptar: la aplicación no
-            estuvo en la audiencia.
-          </p>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        {pending.map((proposal) => (
-          <div
-            key={proposal.speakerLabel}
-            className="bg-surface border border-line-200 rounded-control p-3 space-y-2"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-[12px] text-ink-700">
-                <span className="font-mono text-[11px] text-ink-500">{proposal.speakerLabel}</span>
-                <span className="mx-1.5 text-ink-400">→</span>
-                <b className="text-ink-900">{ROLE_LABELS[proposal.proposedRole]}</b>
-              </span>
-
-              <button
-                onClick={() => onAccept(proposal.speakerLabel, proposal.proposedRole)}
-                className="px-2.5 py-1 bg-brand-700 hover:bg-brand-800 text-white rounded-md text-[11px] font-semibold flex-shrink-0"
-              >
-                Confirmar
-              </button>
-            </div>
-
-            {proposal.evidence.map((evidence, index) => (
-              <p
-                key={index}
-                className="text-[11px] text-ink-500 leading-snug flex items-start gap-1.5 bg-canvas rounded p-2"
-              >
-                <Quote className="w-3 h-3 text-ink-400 flex-shrink-0 mt-0.5" />
-                <span>
-                  {evidence.phrase}
-                  <span className="text-ink-400">{atMinute(evidence.atSeconds)}</span>
-                </span>
-              </p>
-            ))}
-          </div>
-        ))}
-      </div>
+    <div className="cn-aud-sugerencia">
+      <span className="cn-aud-pildora cn-aud-pildora--sugerida">
+        Rol sugerido: {ROLE_LABELS[propuesta.proposedRole].toLowerCase()}
+      </span>
+      {evidencia && (
+        <p className="cn-aud-sugerencia-frase">
+          «{evidencia.phrase}»
+          {evidencia.atSeconds !== null && <span className="cn-aud-mono"> · {marcaDeTiempo(evidencia.atSeconds)}</span>}
+        </p>
+      )}
+      <button type="button" className="cn-aud-accion cn-aud-accion--marca" onClick={onConfirmar}>
+        Confirmar el rol
+      </button>
     </div>
   );
 };
 
-/** Warns that a transcript exists only in this tab. */
-export const NotPersistedWarning: React.FC = () => (
-  <div className="bg-[rgb(var(--danger)/0.06)] border border-[rgb(var(--danger)/0.35)] rounded-card p-3 flex items-start gap-2">
-    <ShieldAlert className="w-4 h-4 text-danger flex-shrink-0 mt-0.5" />
-    <p className="text-[11.5px] text-danger leading-snug">
-      <b>Este transcrito no se guardó.</b> La transcripción se completó, pero no pudo almacenarse:
-      si cierra esta pestaña lo pierde. Copie el texto ahora.
+/**
+ * Avisa que un transcrito existe solo en esta pestaña. Artboard :248, «No se
+ * pudo guardar el transcrito».
+ *
+ * SIN «INTENTAR GUARDAR DE NUEVO»: no hay reintento. La maqueta lo ofrece y el
+ * servidor no tiene ruta para volver a guardar lo que ya respondió; un botón
+ * que no hace nada en el único momento en que el abogado puede perder dos
+ * horas de audiencia es la peor promesa de esta pantalla. Lo que sí sirve está
+ * aquí: copiar el texto y exportar el acta, que no necesitan el guardado.
+ *
+ * Abre su propio alcance `.cara-nueva` porque la entrevista también lo monta.
+ */
+export const NotPersistedWarning: React.FC<{ onCopiar?: () => void; onExportar?: () => void }> = ({
+  onCopiar,
+  onExportar
+}) => (
+  <div className="cara-nueva cn-aud-aviso cn-aud-aviso--no-guardado" role="alert">
+    <p className="cn-aud-aviso-titulo">No se pudo guardar el transcrito</p>
+    <p className="cn-aud-aviso-texto">
+      La transcripción se completó y está en pantalla, pero no pudo almacenarse: si cierra esta pestaña la pierde.{' '}
+      <span className="cn-aud-fuerte">Copie el texto ahora{onExportar ? ' o exporte el acta' : ''}.</span> Mientras no
+      esté guardado no se puede corregir ni dividir.
     </p>
+    {(onCopiar || onExportar) && (
+      <div className="cn-aud-aviso-botones">
+        {onCopiar && (
+          <button type="button" className="cn-ini-boton cn-aud-boton cn-aud-boton--peligro" onClick={onCopiar}>
+            Copiar el texto
+          </button>
+        )}
+        {onExportar && (
+          <button type="button" className="cn-ini-boton cn-ini-boton--texto cn-aud-boton" onClick={onExportar}>
+            Exportar el acta
+          </button>
+        )}
+      </div>
+    )}
   </div>
 );

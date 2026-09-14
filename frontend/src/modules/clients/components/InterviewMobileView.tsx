@@ -1,79 +1,62 @@
 import React from 'react';
+import { Check, FileText } from 'lucide-react';
 import { AudioRecorder } from './AudioRecorder';
 import { ClientPicker } from './ClientPicker';
 import type { Client } from '../clients.api';
-import {
-  RAZON_AUTORIZACION,
-  TEXTO_AUTORIZACION,
-  useAutorizacionDeGrabacion
-} from '../useAutorizacionDeGrabacion';
+import { RAZON_AUTORIZACION, TEXTO_AUTORIZACION, useAutorizacionDeGrabacion } from '../useAutorizacionDeGrabacion';
 import { useTranscription } from '../../transcription/hooks/useTranscription';
 import { clientsApi } from '../clients.api';
 import { CerrarEntrevistaDialog } from './CerrarEntrevistaDialog';
-import {
-  GUION_BASE,
-  cubiertasEnEntrevistasPrevias,
-  estadoDelGuion,
-  preguntasCubiertas
-} from '../guionDeEntrevista';
-import { IconoDocumento, IconoSinVerificar } from '../../../design/ArtboardIcons';
+import { GUION_BASE, cubiertasEnEntrevistasPrevias, estadoDelGuion, preguntasCubiertas } from '../guionDeEntrevista';
+import { buildSpeakerNames } from '../../transcription/speakerNames';
+import { ROLE_LABELS } from '../../transcription/types';
 import { useFuncionHabilitada } from '../../subscriptions/PlanContext';
 import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
-
+import { horaEnPalabras, puedeEmpezarAGrabar } from '../entrevistaEnPantalla';
 
 /**
- * La entrevista en móvil. Artboard 4d, tercera pantalla.
+ * La entrevista en el teléfono (por debajo de `lg`).
  *
  * ─── POR QUÉ ESTE MÓDULO ES EL QUE MÁS GANA EN EL TELÉFONO ──────────────────
  *
- * Lo dice la nota del artboard y es cierto: **el teléfono ES la grabadora
- * real**. Una audiencia llega como archivo de cincuenta megas que alguien sube
- * después; una entrevista ocurre con el cliente enfrente, y el aparato que está
- * sobre la mesa es este. Por eso el cronómetro es el elemento más grande de la
- * pantalla y por eso se avisa que sigue grabando con la pantalla apagada — dos
- * cosas que en el escritorio no hacen falta.
+ * **El teléfono ES la grabadora real**. Una audiencia llega como archivo que
+ * alguien sube después; una entrevista ocurre con el cliente enfrente, y el
+ * aparato que está sobre la mesa es este. Por eso el cronómetro es el elemento
+ * más grande de la pantalla.
  *
  * ─── UNA SOLA GRABADORA Y UN SOLO CONSENTIMIENTO ────────────────────────────
  *
  * `MediaRecorder`, los permisos del micrófono y el cronómetro viven en
  * `AudioRecorder`, que aquí se pide con `variante="movil"`: cambia el tamaño y
- * la disposición, nunca la lógica. Y la autorización de grabación viene de
- * `useAutorizacionDeGrabacion`, compartida con la pantalla de escritorio.
+ * la disposición, nunca la lógica. La autorización viene de
+ * `useAutorizacionDeGrabacion` y la regla de cuándo se puede grabar de
+ * `puedeEmpezarAGrabar`, las dos compartidas con el escritorio. Dos copias de
+ * un consentimiento se desincronizan sin hacer ruido.
  *
- * Eso segundo no es aseo: la voz es un dato biométrico (Ley 1581 de 2012) y la
- * hora del clic viaja a `transcriptions.autorizo_grabacion_el` como constancia
- * demostrable. Dos copias del consentimiento se desincronizan sin hacer ruido
- * —una sella la hora, la otra la olvida— y el día que alguien la pida existiría
- * solo para la mitad de las entrevistas.
+ * ─── DE DÓNDE SALE LA FORMA ─────────────────────────────────────────────────
  *
- * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ───────────────────
+ * La maqueta no dibuja la entrevista en 375 px. La pantalla es DERIVADA: la
+ * cabecera de 56 px y el pie con el primario anclado abajo salen del detalle
+ * móvil de audiencia (`app-audiencias-entrevistas.html:535`); la casilla de
+ * autorización, de «Nueva entrevista» (:89); la banda de grabación, de :108; y
+ * el cierre, de la hoja inferior del sistema de diálogos
+ * (`app-dialogos-y-estados.html:310`), que el diálogo compartido ya dibuja.
  *
- * · «Asignar Voz 3 → familiar» sobre la intervención en curso. La asignación de
- *   roles existe y funciona, pero DESPUÉS de transcribir: durante la grabación
- *   no hay intervenciones todavía, porque la transcripción ocurre al terminar.
- *   La maqueta dibuja un producto que transcribe en vivo, y este no lo hace.
+ * ─── LO QUE NO ESTÁ, con la razón ───────────────────────────────────────────
  *
- * ─── DOS AUSENCIAS QUE SE DECLARARON Y ERAN FALSAS ──────────────────────────
- *
- * Aquí se dijo que la ONDA no se podía pintar «porque `MediaRecorder` entrega
- * trozos de audio, no amplitud», y que PAUSAR partiría la entrevista en dos
- * archivos. Las dos afirmaciones eran mías y las dos eran incorrectas:
- *
- * · La amplitud no la da `MediaRecorder`, la da el navegador. El mismo
- *   `MediaStream` se conecta a un `AnalyserNode` de Web Audio y el RMS del
- *   dominio del tiempo ES el volumen. La onda ahora mide de verdad.
- * · `pause()` no es `stop()`. Suspende la MISMA grabación y `resume()` la
- *   continúa sobre los mismos trozos, así que `onstop` sigue armando un único
- *   blob. La entrevista no se parte.
- *
- * Queda escrito porque el error tiene forma reconocible: **confundir el límite
- * de una API con el límite de la plataforma**. Antes de declarar que algo no se
- * puede, hay que preguntarse si lo que no puede es esa pieza o el navegador.
+ * · Asignar roles, dividir o corregir intervenciones: son ajustes finos sobre
+ *   una transcripción larga y se hacen en la pantalla grande. La pantalla lo
+ *   dice al pie del transcrito.
+ * · La lista de entrevistas guardadas: el teléfono se usa para grabar la que
+ *   está ocurriendo; volver sobre las anteriores es trabajo de escritorio.
  */
 
 interface InterviewMobileViewProps {
   onDraft?: (hechos: string) => void;
 }
+
+const minuto = (s: number): string =>
+  `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
 export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
   const {
@@ -86,40 +69,42 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
     error,
     transcribe,
     transcriptionId,
-    stored
+    stored,
+    reset
   } = useTranscription('ENTREVISTA');
   const { autorizado, autorizadoEl, marcar } = useAutorizacionDeGrabacion();
 
   /*
-   * CON QUIEN ES LA ENTREVISTA. Faltaba, y no era un detalle: 4d pone la ficha
-   * del consultante como CABECERA de la pantalla —avatar con iniciales, nombre
-   * y cedula—, y el acta (14b) imprime «Consultante: nombre — C.C. documento»
-   * con su linea de firma. Una entrevista sin consultante se archiva sin poder
-   * encontrarla despues por la persona, que es como se busca.
-   *
-   * Se guarda la FICHA y no solo el id, por la misma razon que en escritorio:
-   * el acta necesita el nombre y el documento, y volver a pedirlos por id seria
-   * un viaje de red por algo que ya esta en memoria.
+   * CON QUIEN ES LA ENTREVISTA. La ficha del consultante es la CABECERA de la
+   * pantalla, y el acta (14b) imprime «Consultante: nombre — C.C. documento»
+   * con su linea de firma. Se guarda la FICHA y no solo el id: el acta
+   * necesita el nombre y el documento, y volver a pedirlos por id seria un
+   * viaje de red por algo que ya esta en memoria.
    */
   const [clienteId, setClienteId] = React.useState<string | null>(null);
   const [cliente, setCliente] = React.useState<Client | null>(null);
 
+  const trabajando = isUploading || isTranscribing;
+  const permiso = puedeEmpezarAGrabar({
+    hayFirma: hasFirm,
+    autorizado,
+    exigeCliente: true,
+    hayCliente: Boolean(clienteId)
+  });
+
   const empezar = (file: File) => {
     /*
-     * El segundo parametro es `contextPrompt`, NO el cliente. Se paso el id por
-     * ahi durante un momento y habria viajado al proveedor como contexto de
-     * transcripcion — vocabulario inventado que empeora el transcrito. El
-     * cliente se asocia como en escritorio, despues de transcribir.
+     * El segundo parametro es `contextPrompt`, NO el cliente. Pasar el id por
+     * ahi lo mandaria al proveedor como contexto de transcripcion —
+     * vocabulario inventado que empeora el transcrito.
      */
     void transcribe(file, undefined, autorizadoEl ?? undefined);
   };
 
   /*
    * SE ATA EL CLIENTE EN CUANTO HAY TRANSCRITO AL QUE ATARLO. La eleccion se
-   * hace ANTES de grabar y el transcrito nace despues; sin este efecto, lo que
-   * el abogado escogio se perderia entre los dos momentos. Es el mismo enlace
-   * que hace la pantalla de escritorio, y falla en silencio a proposito: el
-   * transcrito ya esta a salvo y el vinculo se puede rehacer.
+   * hace ANTES de grabar y el transcrito nace despues; falla en silencio a
+   * proposito: el transcrito ya esta a salvo y el vinculo se puede rehacer.
    */
   React.useEffect(() => {
     if (!transcriptionId || !clienteId) return;
@@ -127,15 +112,11 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
   }, [transcriptionId, clienteId]);
 
   const [cerrarAbierto, setCerrarAbierto] = React.useState(false);
-  const trabajando = isUploading || isTranscribing;
 
   /*
-   * EL GUION, SOLO DESPUES DE TRANSCRIBIR. El artboard 4d no lo dibuja en la
-   * pantalla de grabacion y tiene razon: el telefono ES la grabadora, sobre la
-   * mesa, y nadie lee una lista mientras graba. Lo que si se perdia era la
-   * comprobacion al terminar — el abogado que entrevisto con el telefono no
-   * veia que falto la fecha del hecho hasta ir a redactar. Misma funcion pura
-   * que en escritorio, mismos tres estados, sin tocar nada de la grabacion.
+   * EL GUION, SOLO DESPUES DE TRANSCRIBIR. El telefono ES la grabadora, sobre la
+   * mesa, y nadie lee una lista mientras graba. Lo que si importa es la
+   * comprobacion al terminar, antes de que el cliente se levante de la mesa.
    */
   const cubiertasHoy = React.useMemo(() => preguntasCubiertas(result?.segments ?? []), [result]);
   const previas = React.useMemo(
@@ -156,12 +137,7 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
   const fechaCorta = (iso: string | null): string =>
     iso ? new Date(iso).toLocaleDateString('es-CO', { day: 'numeric', month: 'long' }) : 'una entrevista anterior';
 
-  /*
-   * EL ACTA CON DATOS REALES Y SIN RED, igual que en escritorio: todo sale de
-   * la fila que la lista ya tiene en memoria — la hora de autorizacion, quien
-   * reviso, el resumen y el consultante—. Exportar no debe pagar el arranque en
-   * frio de una funcion por datos que ya estan aqui.
-   */
+  /* EL ACTA CON DATOS REALES Y SIN RED, igual que en escritorio. */
   const armarActa = () => {
     if (!transcriptionId) return undefined;
     const fila = stored.find((i) => i.id === transcriptionId);
@@ -185,29 +161,39 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
     );
   };
 
-  if (!isAvailable) {
+  const otra = () => {
+    marcar(false);
+    reset();
+  };
+
+  /*
+   * `=== false`: `null` es «todavía no se sabe». Con la negación simple la
+   * pantalla parpadeaba «no está configurado» en cada visita durante el viaje
+   * de ida y vuelta, que es justo el defecto que el escritorio ya había
+   * corregido.
+   */
+  if (isAvailable === false) {
     return (
-      <div className="flex h-full min-h-0 flex-1 flex-col bg-canvas p-4">
-        <p className="flex items-start gap-2 rounded-[8px] border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-3.5 py-3 text-[12.5px] leading-snug text-unverified text-justify">
-          <IconoSinVerificar className="mt-0.5 h-4 w-4 shrink-0" />
-          El motor de transcripción no está configurado en el servidor.
-        </p>
+      <div data-visita="vista-entrevistas" className="cara-nueva cn-ent cn-ent-movil">
+        <div className="cn-ent-movil-cuerpo">
+          <div className="cn-ent-vacio cn-ent-vacio--aviso">
+            <p className="cn-ent-vacio-titulo">El motor de transcripción no está configurado</p>
+            <p className="cn-ent-vacio-texto">Sin él no se puede grabar ni transcribir una entrevista.</p>
+          </div>
+        </div>
       </div>
     );
   }
 
+  const hora = horaEnPalabras(autorizadoEl);
+  const nombres = result ? buildSpeakerNames(result.segments, ROLE_LABELS) : {};
+
   return (
-    <div data-visita="vista-entrevistas" className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-y-auto bg-canvas">
-      {/*
-        LA CABECERA DE 4d, CITADA: `padding:10px 16px 12px`, avatar de 34px
-        circular sobre `#EAF0F5` con las iniciales en mono 600 12px `#17456B`,
-        nombre `600 14px` y cedula `400 11px` MONO `#667487`. Todos esos colores
-        son tokens: brand-50, brand-700, ink-900, ink-500.
-      */}
-      <header className="shrink-0 border-b border-line-200 bg-surface px-4 pb-3 pt-2.5">
+    <div data-visita="vista-entrevistas" className="cara-nueva cn-ent cn-ent-movil">
+      <header className="cn-ent-movil-cabeza">
         {cliente ? (
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full bg-brand-50 font-mono text-[12px] font-semibold text-brand-700">
+          <div className="cn-ent-movil-persona">
+            <span className="cn-ent-avatar" aria-hidden="true">
               {cliente.fullName
                 .split(/\s+/)
                 .slice(0, 2)
@@ -215,31 +201,29 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
                 .join('')
                 .toUpperCase()}
             </span>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-[14px] font-semibold leading-tight text-ink-900">
-                {cliente.fullName}
-              </p>
-              <p className="truncate font-mono text-[11px] leading-tight text-ink-500">
-                C.C. {cliente.documentId}
+            <div className="cn-ent-movil-persona-textos">
+              <p className="cn-ent-movil-nombre">{cliente.fullName}</p>
+              <p className="cn-ent-nota">
+                <span className="cn-ent-mono">C.C. {cliente.documentId}</span>
                 {cliente.interviews === 0 ? ' · cliente nuevo' : ` · ${cliente.interviews} entrevistas`}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                setClienteId(null);
-                setCliente(null);
-              }}
-              className="shrink-0 text-[12px] font-medium text-brand-700"
-            >
-              Cambiar
-            </button>
+            {!result && !trabajando && (
+              <button
+                type="button"
+                onClick={() => {
+                  setClienteId(null);
+                  setCliente(null);
+                }}
+                className="cn-ini-boton cn-ini-boton--texto cn-ent-boton"
+              >
+                Cambiar
+              </button>
+            )}
           </div>
         ) : (
           <>
-            <p className="mb-2 text-[13px] font-semibold text-ink-900 text-justify">
-              ¿Con quién es la entrevista?
-            </p>
+            <p className="cn-ent-movil-titulo">¿Con quién es la entrevista?</p>
             <ClientPicker
               value={clienteId}
               onChange={(id, ficha) => {
@@ -247,226 +231,167 @@ export const InterviewMobileView: React.FC<InterviewMobileViewProps> = () => {
                 setCliente(ficha);
               }}
             />
-            <p className="mt-2 text-justify text-[11.5px] leading-snug text-ink-500 [text-wrap:pretty]">
-              Para encontrar esta conversación por la persona, no por el nombre del archivo. El
-              acta imprime su nombre y su cédula.
-            </p>
           </>
         )}
       </header>
 
-      <div className="flex flex-col gap-2.5 px-4 py-3.5">
-        {/*
-          LA AUTORIZACION VA PRIMERO Y BLOQUEA. No es una casilla de tramite: sin
-          ella el grabador esta deshabilitado y el audio no se envia. Se pinta en
-          ambar mientras no este marcada — el mismo lenguaje que el resto del
-          producto usa para «esto todavia no esta comprobado».
-        */}
-        <label
-          className={`flex cursor-pointer items-start gap-2.5 rounded-[8px] border px-3.5 py-3 ${
-            autorizado
-              ? 'border-line-200 bg-surface'
-              : 'border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))]'
-          }`}
-        >
-          <input
-            type="checkbox"
-            checked={autorizado}
-            onChange={(e) => marcar(e.target.checked)}
-            className="mt-0.5 h-4 w-4 shrink-0"
-          />
-          <span className="min-w-0">
-            <span className="block text-[13px] font-semibold leading-snug text-ink-900">
-              {TEXTO_AUTORIZACION}
-            </span>
-            <span className="mt-1 block text-justify text-[11.5px] leading-snug text-ink-500 [text-wrap:pretty]">
-              {RAZON_AUTORIZACION}
-            </span>
-            {autorizadoEl && (
-              <span className="mt-1 block font-mono text-[11px] text-verified">
-                Registrada a las{' '}
-                {new Date(autorizadoEl).toLocaleTimeString('es-CO', {
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
+      <div className="cn-ent-movil-cuerpo">
+        {!result && (
+          <>
+            {/*
+              LA AUTORIZACION VA PRIMERO Y BLOQUEA. No es una casilla de tramite:
+              sin ella el grabador esta deshabilitado y el audio no se envia. En
+              ámbar mientras no este marcada — el lenguaje del producto para
+              «esto todavía no está».
+            */}
+            <label className={`cn-ent-autorizacion ${autorizado ? 'cn-ent-autorizacion--hecha' : 'cn-ent-autorizacion--pendiente'}`}>
+              <span className="cn-ent-casilla">
+                <input type="checkbox" checked={autorizado} onChange={(e) => marcar(e.target.checked)} disabled={trabajando} />
+                <Check size={14} strokeWidth={3} aria-hidden="true" />
               </span>
-            )}
-          </span>
-        </label>
+              <span className="cn-ent-autorizacion-texto">
+                <span className="cn-ent-autorizacion-titulo">{TEXTO_AUTORIZACION}</span>
+                <span className="cn-ent-autorizacion-razon">{RAZON_AUTORIZACION}</span>
+                {hora && (
+                  <span className="cn-ent-autorizacion-hora">
+                    Registrada a las <span className="cn-ent-mono">{hora}</span>
+                  </span>
+                )}
+              </span>
+            </label>
 
-        <AudioRecorder
-          variante="movil"
-          onRecorded={empezar}
-          disabled={!hasFirm || !autorizado || !clienteId || trabajando}
-        />
+            {!permiso.puede && permiso.razon && !trabajando && <p className="cn-ent-nota">{permiso.razon}</p>}
 
-        {!hasFirm && (
-          <p className="text-[12px] leading-snug text-ink-500 text-justify">
-            Sin una firma activa no se puede guardar la entrevista.
-          </p>
+            <div hidden={trabajando}>
+              <AudioRecorder
+                variante="movil"
+                onRecorded={empezar}
+                disabled={!permiso.puede || trabajando}
+              />
+            </div>
+          </>
         )}
 
         {trabajando && (
-          <p className="rounded-[8px] border border-line-200 bg-surface px-3.5 py-3 text-[12.5px] text-ink-700 text-justify">
-            {isUploading
-                    ? uploadProgress > 0
-                      ? `Subiendo la grabación · ${uploadProgress}%`
-                      : 'Subiendo la grabación…'
-                    : 'Transcribiendo…'} No cierre la aplicación.
-          </p>
-        )}
-
-        {error && (
-          <p className="rounded-[8px] border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-3.5 py-3 text-[12.5px] leading-snug text-danger text-justify">
-            {error}
-          </p>
-        )}
-
-        {/*
-          LAS INTERVENCIONES, EN EL FORMATO DE 4d: interlocutor y hora arriba,
-          texto debajo, ancho completo. La de escritorio usa tres columnas y en
-          375px eso deja el texto en una franja de cuatro palabras por renglon.
-        */}
-        {/*
-          SIN TARJETA. La nota de 4d es explicita: «la unica fila con tarjeta y
-          borde es la que se esta editando». Encuadrar todas las intervenciones
-          convierte la transcripcion en una lista de fichas y le quita al borde
-          su significado — si todo esta enmarcado, el marco no señala nada. Aqui
-          no hay edicion en curso, asi que ninguna la lleva.
-        */}
-        {result?.segments?.map((s, i) => (
-          <div key={i}>
-            <div className="flex items-center gap-1.5">
-              <span className="h-2 w-2 shrink-0 rounded-[2px] bg-brand-700" />
-              <span className="text-[12px] font-semibold text-ink-900">
-                {s.speakerName ?? s.speakerLabel}
-              </span>
-              {/*
-                mm:ss desde el inicio de la grabacion. `null` cuando el proveedor
-                no marco tiempo: se deja el hueco en vez de escribir 00:00, que
-                situaria la intervencion en un minuto donde no ocurrio.
-              */}
-              {s.startSeconds !== null && (
-                <span className="ml-auto font-mono text-[11px] text-ink-400">
-                  {String(Math.floor(s.startSeconds / 60)).padStart(2, '0')}:
-                  {String(Math.floor(s.startSeconds % 60)).padStart(2, '0')}
-                </span>
-              )}
+          <div className="cn-ent-banda cn-ent-banda--movil cn-ent-banda--trabajando" aria-live="polite">
+            <span className="cn-ent-giro" aria-hidden="true" />
+            <div className="cn-ent-banda-texto">
+              <p className="cn-ent-banda-titulo">
+                {isUploading
+                  ? uploadProgress > 0
+                    ? `Subiendo la grabación · ${uploadProgress} %`
+                    : 'Subiendo la grabación…'
+                  : 'Transcribiendo…'}
+              </p>
+              <p className="cn-ent-banda-linea">No cierre la aplicación hasta que termine.</p>
             </div>
-            <p className="mt-1 text-justify text-[13.5px] leading-[1.65] text-ink-900 [text-wrap:pretty]">
-              {s.text}
-            </p>
-          </div>
-        ))}
-
-        {/*
-          LO QUE NO PUEDE QUEDARSE SIN PREGUNTAR, como comprobacion y no como
-          guion: aparece cuando ya hay transcrito, en el idioma del pie de 4d
-          (rotulo en mono versales, sin tarjeta). Tres estados: dicho hoy, dicho
-          en una entrevista anterior con este cliente, y pendiente — que es el
-          que importa ver ANTES de que el cliente se levante de la mesa.
-        */}
-        {result && (
-          <div className="border-t border-line-200 pt-3">
-            <p className="mb-2 font-mono text-[9.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-              Lo que no puede quedarse sin preguntar
-            </p>
-            {!guionHabilitado ? (
-              <p className="notice text-[12px] leading-[1.5] [text-wrap:pretty] text-justify">{AVISO_FUNCION_DESHABILITADA}</p>
-            ) : (
-            <ul className="space-y-2">
-              {GUION_BASE.map((p) => {
-                const estado = estadosGuion.get(p.id) ?? { estado: 'pendiente' as const };
-                const hoy = estado.estado === 'hoy';
-                const antes = estado.estado === 'antes';
-                return (
-                  <li key={p.id} className="flex items-start gap-2.5">
-                    <span
-                      className={`mt-[3px] h-3.5 w-3.5 shrink-0 rounded-[3px] border ${
-                        hoy
-                          ? 'border-verified bg-[rgb(var(--verified-surf))]'
-                          : antes
-                            ? 'border-[rgb(var(--brand-line))] bg-brand-50'
-                            : 'border-line-200'
-                      }`}
-                    />
-                    <span className="min-w-0">
-                      <span
-                        className={`block text-[13px] leading-snug ${
-                          hoy ? 'text-ink-400 line-through' : antes ? 'text-ink-500' : 'text-ink-900'
-                        }`}
-                      >
-                        {p.texto}
-                      </span>
-                      {estado.estado === 'antes' && (
-                        <span className="mt-0.5 block text-[11px] leading-snug text-brand-700">
-                          Ya se habló de esto en la entrevista del {fechaCorta(estado.origen.transcribedAt)}.
-                        </span>
-                      )}
-                      {estado.estado === 'pendiente' && p.loQueCuesta && (
-                        <span className="mt-0.5 block text-[11px] leading-snug text-ink-500">{p.loQueCuesta}</span>
-                      )}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-            )}
           </div>
         )}
 
+        {error && <p className="cn-ent-aviso cn-ent-aviso--peligro">{error}</p>}
+
+        {/*
+          LAS INTERVENCIONES: interlocutor y minuto arriba, texto debajo, ancho
+          completo y SIN TARJETA — en 375 px tres columnas dejan cuatro palabras
+          por renglón, y si todo está enmarcado el marco no señala nada.
+        */}
         {result && (
-          <p className="text-justify text-[11.5px] leading-snug text-ink-500 [text-wrap:pretty]">
-            Asignar roles, dividir intervenciones y corregir el texto se hacen en la pantalla
-            grande: son ajustes finos sobre una transcripción larga, y de pie se revisa, no se
-            edita.
-          </p>
+          <section className="cn-ent-seccion" aria-label="Transcrito">
+            <ol className="cn-ent-intervenciones">
+              {result.segments.map((s, i) => (
+                <li key={i} className="cn-ent-intervencion">
+                  <p className="cn-ent-intervencion-cabeza">
+                    <span className="cn-ent-intervencion-quien">{nombres[s.speakerLabel] ?? s.speakerLabel}</span>
+                    {/*
+                      `null` cuando el proveedor no marco tiempo: se deja el
+                      hueco en vez de escribir 00:00, que situaria la
+                      intervencion en un minuto donde no ocurrio.
+                    */}
+                    {s.startSeconds !== null && <span className="cn-ent-mono cn-ent-nota">{minuto(s.startSeconds)}</span>}
+                  </p>
+                  <p className="cn-ent-intervencion-texto">{s.text}</p>
+                </li>
+              ))}
+            </ol>
+            <p className="cn-ent-nota">
+              Asignar roles, dividir intervenciones y corregir el texto se hacen en la pantalla grande: son ajustes
+              finos sobre una transcripción larga.
+            </p>
+          </section>
+        )}
+
+        {result && (
+          <section className="cn-ent-seccion" aria-labelledby="cn-ent-guion-movil">
+            <h2 id="cn-ent-guion-movil" className="cn-ent-h2">
+              Lo que no puede quedar sin preguntar
+            </h2>
+            {!guionHabilitado ? (
+              <p className="cn-ent-aviso cn-ent-aviso--info">{AVISO_FUNCION_DESHABILITADA}</p>
+            ) : (
+              <ul className="cn-ent-guion">
+                {GUION_BASE.map((p) => {
+                  const estado = estadosGuion.get(p.id) ?? { estado: 'pendiente' as const };
+                  const clase =
+                    estado.estado === 'hoy'
+                      ? 'cn-ent-pregunta--hoy'
+                      : estado.estado === 'antes'
+                        ? 'cn-ent-pregunta--antes'
+                        : 'cn-ent-pregunta--falta';
+                  return (
+                    <li key={p.id} className={`cn-ent-pregunta ${clase}`}>
+                      <span className="cn-ent-pregunta-marca" aria-hidden="true">
+                        {estado.estado !== 'pendiente' && <Check size={16} strokeWidth={2.4} />}
+                      </span>
+                      <span className="cn-ent-pregunta-cuerpo">
+                        <span className="cn-ent-pregunta-texto">{p.texto}</span>
+                        {estado.estado === 'hoy' && <span className="cn-ent-pregunta-nota">Quedó dicha en la conversación.</span>}
+                        {estado.estado === 'antes' && (
+                          <span className="cn-ent-pregunta-nota">
+                            Ya se habló de esto en la entrevista del {fechaCorta(estado.origen.transcribedAt)}.
+                          </span>
+                        )}
+                        {estado.estado === 'pendiente' && (
+                          <span className="cn-ent-pregunta-nota">
+                            {p.loQueCuesta ? `Sin cubrir · ${p.loQueCuesta}` : 'Sin cubrir'}
+                          </span>
+                        )}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </section>
         )}
       </div>
 
       {/*
-        EL PIE DE 4d, TRASPLANTADO: `background:#fff; border-top:1px solid
-        #E3E7EC; padding:12px 16px`. Primero la fila del ACTA —rótulo en mono
-        versales y los dos formatos como botones de 44px del mismo peso, porque
-        el .docx se sigue editando y el PDF se anexa—, y debajo «Cerrar y usar»
-        de 52px.
-
-        Solo aparece CUANDO HAY TRANSCRITO. Un pie fijo con Word, PDF y «cerrar»
+        EL PIE, SOLO CUANDO HAY TRANSCRITO. Un pie fijo con Word, PDF y «cerrar»
         sobre una pantalla que todavía no ha grabado nada son tres botones que
-        no pueden hacer nada — y ocupando el borde inferior, que es el sitio más
-        alcanzable de la pantalla.
+        no pueden hacer nada — y ocupando el sitio más alcanzable de la pantalla.
       */}
       {result && (
-        <div className="shrink-0 border-t border-line-200 bg-surface px-4 pb-3.5 pt-3">
-          <div className="mb-2.5 flex items-center gap-2">
-            <span className="shrink-0 font-mono text-[9.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-              Acta
-            </span>
-            <button
-              type="button"
-              onClick={() => exportar('word')}
-              className="flex h-11 flex-1 items-center justify-center gap-[7px] rounded-[6px] border border-[rgb(var(--brand-line))] bg-surface text-[13px] font-medium text-brand-700"
-            >
-              <IconoDocumento className="h-3.5 w-3.5" />
-              Word
+        <div className="cn-ent-movil-pie">
+          <div className="cn-ent-movil-pie-fila">
+            <button type="button" onClick={() => exportar('word')} className="cn-ini-boton cn-ini-boton--suave cn-ent-boton cn-ent-boton--alto">
+              <FileText size={16} aria-hidden="true" />
+              Acta en Word
             </button>
-            <button
-              type="button"
-              onClick={() => exportar('pdf')}
-              className="flex h-11 flex-1 items-center justify-center gap-[7px] rounded-[6px] border border-[rgb(var(--brand-line))] bg-surface text-[13px] font-medium text-brand-700"
-            >
-              <IconoDocumento className="h-3.5 w-3.5" />
+            <button type="button" onClick={() => exportar('pdf')} className="cn-ini-boton cn-ini-boton--suave cn-ent-boton cn-ent-boton--alto">
+              <FileText size={16} aria-hidden="true" />
               PDF
             </button>
           </div>
-
           <button
             type="button"
             onClick={() => setCerrarAbierto(true)}
             disabled={!transcriptionId}
-            className="h-[52px] w-full rounded-[8px] bg-brand-700 text-[13.5px] font-semibold text-on-brand disabled:opacity-50"
+            className="cn-ini-boton cn-ini-boton--primario cn-ent-boton cn-ent-boton--alto cn-ent-boton--ancho"
           >
             Cerrar y usar
+          </button>
+          <button type="button" onClick={otra} className="cn-ini-boton cn-ini-boton--texto cn-ent-boton cn-ent-boton--ancho">
+            Otra entrevista
           </button>
         </div>
       )}

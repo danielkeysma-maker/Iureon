@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Headphones, Pause, Play, Square } from 'lucide-react';
 import { OndaDeAudio, useNivelesDeAudio } from '../../../design/OndaDeAudio';
 
 interface AudioPreviewProps {
@@ -11,6 +10,12 @@ interface AudioPreviewProps {
    * un reproductor que se va con el scroll obliga a elegir entre oir y leer.
    */
   anclado?: boolean;
+  /**
+   * Salta al segundo pedido y reproduce. `vez` cambia en cada pedido para que
+   * dos clics seguidos sobre la misma intervención vuelvan a saltar: con solo
+   * los segundos, el segundo clic no cambiaría nada y el efecto no correría.
+   */
+  saltarA?: { segundos: number; vez: number } | null;
 }
 
 /**
@@ -22,12 +27,10 @@ interface AudioPreviewProps {
  * lawyer picked, and an object URL turns it into audio at no cost: no request,
  * no storage, no change to what the server keeps.
  *
- * It follows that playback lasts exactly as long as the tab does. That matches
- * what it is for — checking a word against what was actually said while reading
- * the transcript — and the component says so rather than letting someone
- * discover it after a reload.
+ * It follows that playback lasts exactly as long as the tab does, and the
+ * component says so rather than letting someone discover it after a reload.
  */
-export const AudioPreview: React.FC<AudioPreviewProps> = ({ file, anclado = false }) => {
+export const AudioPreview: React.FC<AudioPreviewProps> = ({ file, anclado = false, saltarA = null }) => {
   const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -45,40 +48,36 @@ export const AudioPreview: React.FC<AudioPreviewProps> = ({ file, anclado = fals
   }, [file]);
 
   /*
-   * LA ONDA TAMBIEN AL ESCUCHAR (1g y 2a). El navegador ya trae controles, pero
-   * no dicen si HAY SONIDO: una pista muda se reproduce igual que una buena, y
-   * la barra avanza en las dos. Quien vuelve a escuchar una audiencia lo hace
-   * porque duda de una palabra — necesita ver dónde el micrófono captó algo.
-   *
-   * Se mide sobre el propio `<audio>` con `createMediaElementSource`, la misma
-   * técnica que el grabador usa sobre el micrófono. Al enrutarlo por el
-   * analizador hay que RECONECTAR la salida al destino: sin eso se ve la onda y
-   * no se oye nada — lo hace `useNivelesDeAudio`.
+   * LA ONDA TAMBIEN AL ESCUCHAR. El navegador ya trae controles, pero no dicen
+   * si HAY SONIDO: una pista muda se reproduce igual que una buena. Se mide
+   * sobre el propio `<audio>` con `createMediaElementSource`; al enrutarlo por
+   * el analizador hay que RECONECTAR la salida al destino, o se ve la onda y no
+   * se oye nada — lo hace `useNivelesDeAudio`.
    */
   const audioRef = React.useRef<HTMLAudioElement>(null);
   const [sonando, setSonando] = React.useState(false);
   const { niveles, conectar, soltar } = useNivelesDeAudio();
   const conectadoRef = React.useRef(false);
 
+  const reproducir = (el: HTMLAudioElement) => {
+    /*
+     * `createMediaElementSource` solo se puede llamar UNA VEZ por elemento: la
+     * segunda lanza. Por eso el guardia — y por eso se conecta al primer play y
+     * no al montar, cuando el navegador todavía puede bloquear el contexto por
+     * falta de gesto del usuario.
+     */
+    if (!conectadoRef.current) {
+      conectar(el);
+      conectadoRef.current = true;
+    }
+    void el.play();
+  };
+
   const alternar = () => {
     const el = audioRef.current;
     if (!el) return;
-
-    if (el.paused) {
-      /*
-       * `createMediaElementSource` solo se puede llamar UNA VEZ por elemento:
-       * la segunda lanza. Por eso el guardia — y por eso se conecta al primer
-       * play y no al montar, cuando el navegador todavía puede bloquear el
-       * contexto por falta de gesto del usuario.
-       */
-      if (!conectadoRef.current) {
-        conectar(el);
-        conectadoRef.current = true;
-      }
-      void el.play();
-    } else {
-      el.pause();
-    }
+    if (el.paused) reproducir(el);
+    else el.pause();
   };
 
   const detener = () => {
@@ -92,94 +91,97 @@ export const AudioPreview: React.FC<AudioPreviewProps> = ({ file, anclado = fals
     conectadoRef.current = false;
   };
 
+  /*
+   * «VOLVER A ESCUCHAR DESDE 00:03:08». Salta al inicio de la intervención y
+   * suena, sin que el abogado busque el minuto en la barra. Corre dentro de la
+   * activación del clic que lo pidió, así que el navegador deja reproducir.
+   */
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!saltarA || !el) return;
+    el.currentTime = Math.max(0, saltarA.segundos);
+    reproducir(el);
+    // `reproducir` cambia en cada render; lo que decide el salto es el pedido.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saltarA, url]);
+
   if (!url) return null;
 
   if (anclado) {
     return (
-      <div
-        className="flex items-center gap-2.5 rounded-card border border-line-200 bg-surface px-3 py-2 shadow-e2"
-        title="Se reproduce desde este navegador; la grabación se borra del servidor al transcribirse y dura lo que esta pestaña."
-      >
-        <Headphones className="h-3.5 w-3.5 shrink-0 text-ink-400" />
+      <div className="cn-aud-reproductor">
+        <div className="cn-aud-reproductor-botones">
+          <button type="button" onClick={alternar} className="cn-ini-boton cn-ini-boton--suave cn-aud-boton">
+            {sonando ? 'Pausar' : 'Escuchar'}
+          </button>
+          <button type="button" onClick={detener} className="cn-ini-boton cn-ini-boton--texto cn-aud-boton">
+            Detener
+          </button>
+        </div>
 
-        <button type="button" onClick={alternar} className="btn-neutral btn-sm shrink-0">
-          {sonando ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
-          {sonando ? 'Pausar' : 'Escuchar'}
-        </button>
-        <button type="button" onClick={detener} className="btn-ghost btn-sm shrink-0">
-          <Square className="h-3 w-3" />
-          Detener
-        </button>
-
-        <OndaDeAudio
-          niveles={niveles}
-          activa={sonando}
-          tono="reproduciendo"
-          alto={22}
-          vacio="Sin reproducir"
-        />
+        <span className="cn-aud-reproductor-onda">
+          <OndaDeAudio niveles={niveles} activa={sonando} tono="reproduciendo" alto={22} vacio="Sin reproducir" />
+        </span>
 
         {/*
-          EL REPRODUCTOR NATIVO SE QUEDA, con su barra de posición: los botones
-          de arriba resuelven escuchar, pausar y detener, pero saltar al minuto
-          14 sigue siendo suyo. Sustituirlo entero obligaría a reconstruir la
-          barra, el volumen y la velocidad — y la velocidad es justo lo que usa
-          quien transcribe a mano.
+          EL REPRODUCTOR NATIVO SE QUEDA, con su barra de posición y su
+          velocidad: la velocidad es justo lo que usa quien transcribe a mano, y
+          reconstruirla no le agrega nada.
         */}
         <audio
           ref={audioRef}
           controls
           src={url}
-          className="h-8 min-w-0 flex-1"
+          className="cn-aud-reproductor-nativo"
           preload="metadata"
           onPlay={() => setSonando(true)}
           onPause={() => setSonando(false)}
           onEnded={() => setSonando(false)}
         />
+
+        <p className="cn-aud-reproductor-nota">
+          Desde la copia de este equipo: la grabación no se conserva y esto dura lo que esta pestaña.
+        </p>
       </div>
     );
   }
 
+  /*
+   * LA VERSIÓN SUELTA, la que la entrevista monta para escuchar antes de mandar
+   * a transcribir. Vive dentro de la cara nueva de Entrevistas, así que usa las
+   * mismas piezas que la anclada y no la letra de 11 px de la cara anterior.
+   */
   return (
-    <div className="bg-surface border border-line-200 rounded-card p-3 space-y-2">
-      <div className="flex items-center gap-2">
-        <Headphones className="w-3.5 h-3.5 text-ink-400" />
-        <span className="text-[11px] font-semibold text-ink-700">Escuchar la grabación</span>
-      </div>
+    <div className="cn-aud-reproductor cn-aud-reproductor--suelto">
+      <p className="cn-aud-reproductor-titulo">Escuchar la grabación</p>
 
-      <div className="flex items-center gap-2">
-        <button type="button" onClick={alternar} className="btn-neutral btn-sm shrink-0">
-          {sonando ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+      <div className="cn-aud-reproductor-botones">
+        <button type="button" onClick={alternar} className="cn-ini-boton cn-ini-boton--suave cn-aud-boton">
           {sonando ? 'Pausar' : 'Escuchar'}
         </button>
-        <button type="button" onClick={detener} className="btn-ghost btn-sm shrink-0">
-          <Square className="h-3 w-3" />
+        <button type="button" onClick={detener} className="cn-ini-boton cn-ini-boton--texto cn-aud-boton">
           Detener
         </button>
-        <OndaDeAudio
-          niveles={niveles}
-          activa={sonando}
-          tono="reproduciendo"
-          alto={22}
-          vacio="Sin reproducir"
-        />
       </div>
+
+      <span className="cn-aud-reproductor-onda">
+        <OndaDeAudio niveles={niveles} activa={sonando} tono="reproduciendo" alto={22} vacio="Sin reproducir" />
+      </span>
 
       <audio
         ref={audioRef}
         controls
         src={url}
-        className="h-9 w-full"
+        className="cn-aud-reproductor-nativo"
         preload="metadata"
         onPlay={() => setSonando(true)}
         onPause={() => setSonando(false)}
         onEnded={() => setSonando(false)}
       />
 
-      <p className="text-[10.5px] text-ink-500 leading-snug">
-        Se reproduce desde este navegador, no desde el servidor: la grabación se borra del
-        almacenamiento al terminar de transcribirse. Estará disponible mientras no cierres esta
-        pestaña.
+      <p className="cn-aud-reproductor-nota">
+        Se reproduce desde este navegador, no desde el servidor: la grabación se borra del almacenamiento al
+        terminar de transcribirse. Estará disponible mientras no cierre esta pestaña.
       </p>
     </div>
   );

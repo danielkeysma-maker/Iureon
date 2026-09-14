@@ -26,7 +26,7 @@ const validate = (file: File, limit: number): string | null => {
   const extension = (file.name.split('.').pop() ?? '').toLowerCase();
 
   if (!SUPPORTED_AUDIO_EXTENSIONS.includes(extension)) {
-    return `Formato "${extension || 'desconocido'}" no soportado. Usa: ${SUPPORTED_AUDIO_EXTENSIONS.join(', ')}.`;
+    return `El formato "${extension || 'desconocido'}" no se puede transcribir. Use uno de estos: ${SUPPORTED_AUDIO_EXTENSIONS.join(', ')}.`;
   }
 
   if (file.size === 0) {
@@ -34,7 +34,7 @@ const validate = (file: File, limit: number): string | null => {
   }
 
   if (file.size > limit) {
-    return `El audio pesa ${megabytes(file.size)} MB y el límite es ${megabytes(limit)} MB. Divide la grabación en partes y súbelas por separado.`;
+    return `El audio pesa ${megabytes(file.size)} MB y el límite es ${megabytes(limit)} MB. Divida la grabación en partes y súbalas por separado.`;
   }
 
   return null;

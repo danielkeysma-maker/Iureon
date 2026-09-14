@@ -5,6 +5,7 @@ import {
   Check,
   Download,
   Eraser,
+  Expand,
   Eye,
   FileOutput,
   History,
@@ -37,6 +38,7 @@ import { VisorDelOriginal, type SuperficieDeSeleccion } from './VisorDelOriginal
 import { LecturaDelDocumentoRecibido } from './LecturaDelDocumentoRecibido';
 import { MarcasDelHallazgo } from './ComprobacionAutomatica';
 import { InformeDelEscritoPropio } from './InformeDelEscritoPropio';
+import { LecturaAmpliaDelInforme } from './LecturaAmpliaDelInforme';
 import { normalizarInforme } from '../services/comprobaciones';
 import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
 
@@ -778,6 +780,12 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
    */
   const [descargando, setDescargando] = React.useState<'pdf' | 'word' | null>(null);
   const [errorDescarga, setErrorDescarga] = React.useState('');
+  /*
+   * EL INFORME EN GRANDE. No se persiste: es una forma de leer, no un estado
+   * del trabajo. El panel sigue montado detrás, así que al cerrar el abogado
+   * vuelve al mismo renglón donde lo dejó.
+   */
+  const [lecturaAmplia, setLecturaAmplia] = React.useState(false);
   const descargar = async (formato: 'pdf' | 'word') => {
     if (!descargarInforme || descargando) return;
     setDescargando(formato);
@@ -1296,16 +1304,9 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
    * que el abogado no podía archivar de ninguna otra manera.
    */
   const hayInforme = Boolean(datos.informeRecibido || informe || informeLibre);
-  const DescargaDelInforme = () =>
-    !descargarInforme || !hayInforme ? null : (
-      <div className="cn-tal-descarga">
-        {/*
-          EN EL TELÉFONO EL AVISO OCUPA LA LÍNEA ENTERA y los botones bajan
-          solos. Con `flex-1` a secas se quedaría en la treintena de píxeles que
-          sobran junto a «Word» y «PDF», que no encogen: el mismo recorte que ya
-          se corrigió en la cinta de autorización de «Revisiones».
-        */}
-        <span className="cn-tal-descarga-texto">Descargue el informe con la letra de su firma, para archivarlo con el expediente.</span>
+  /* Los botones de descarga, los mismos en el panel y en la lectura en grande. */
+  const BotonesDeDescarga = () =>
+    !descargarInforme ? null : (
         <div className="cn-tal-segmentos" role="group" aria-label="Descargar el informe">
           {(['word', 'pdf'] as const).map((f) => (
             <button
@@ -1321,18 +1322,106 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
             </button>
           ))}
         </div>
+    );
+
+  /*
+   * LA BARRA DEL INFORME: «Leer en grande» y las descargas. Existe siempre que
+   * haya informe, aunque quien monta el taller no ofrezca descargarlo, porque
+   * leerlo en grande no depende de poder archivarlo.
+   *
+   * Es la barra del panel, y el panel es el mismo en la columna del computador
+   * y en la pestaña «Informe» del teléfono: un solo botón sirve a los dos.
+   */
+  const BarraDelInforme = () =>
+    !hayInforme ? null : (
+      <div className="cn-tal-descarga cn-tal-descarga--con-ampliar">
+        {/*
+          EN EL TELÉFONO EL AVISO OCUPA LA LÍNEA ENTERA y los botones bajan
+          solos. Con `flex-1` a secas se quedaría en la treintena de píxeles que
+          sobran junto a «Word» y «PDF», que no encogen: el mismo recorte que ya
+          se corrigió en la cinta de autorización de «Revisiones». Con el botón
+          de leer en grande la línea entera vale también en la columna del
+          computador, que es igual de estrecha.
+        */}
+        {descargarInforme && <span className="cn-tal-descarga-texto">Descargue el informe con la letra de su firma, para archivarlo con el expediente.</span>}
+        <button type="button" onClick={() => setLecturaAmplia(true)} className="cn-tal-boton cn-tal-boton--marca cn-tal-ampliar" aria-haspopup="dialog">
+          <Expand className="cn-tal-boton-icono" aria-hidden="true" />
+          Leer en grande
+        </button>
+        {BotonesDeDescarga()}
       </div>
     );
 
+  /*
+   * LO QUE EL INFORME DICE, UNA SOLA VEZ. Lo pintan el panel y la lectura en
+   * grande; si fueran dos copias, la próxima sección nueva llegaría a una sola.
+   * El pie del documento recibido (el puente al ataque) se monta en los dos
+   * sitios con su comportamiento entero: cada uno lleva su propia elección.
+   *
+   * Nada de aquí edita el escrito. «Aplicar reemplazo» vive sobre el papel, en
+   * la cita marcada, y el panel lista solo las correcciones con advertencia; la
+   * lectura en grande hereda esa decisión en vez de abrir una segunda forma de
+   * cambiar el texto desde un diálogo que tapa el papel que cambia.
+   */
+  const ContenidoDelInforme = () => (
+    <>
+      {/*
+        TRES FORMAS DE INFORME, NO UNA. El del escrito propio; el del documento
+        recibido, que tiene otras secciones y otra promesa; y el texto libre de
+        cuando el revisor no devolvió algo ordenable. Antes solo se leía la
+        primera, así que un documento recibido —o un informe sin secciones—
+        abría esta pestaña diciendo «no tiene informe de revisión» encima de un
+        informe que la firma ya había pagado.
+      */}
+      {datos.informeRecibido ? (
+        <>
+          <p className="cn-inf-nota">
+            Lectura de un <span className="cn-inf-seleccionado">documento recibido</span>. Todo lo de abajo sale del texto del propio documento y va citado:
+            ninguna ficha del catálogo respalda estas líneas.{' '}
+            {/*
+              DÓNDE ESTÁ LA RESPUESTA, DICHO DONDE TOCA. Esta línea mandaba al
+              abogado de vuelta a «Revisiones» porque aquí no había pie; con el
+              pie montado, mandarlo a otra pantalla sería enseñarle a no ver el
+              bloque que tiene debajo.
+            */}
+            {pieDelInformeRecibido
+              ? 'Qué actuación procede lo responde el catálogo, en el bloque que cierra esta lectura.'
+              : 'Qué actuación procede lo responden la guía de actuaciones y la agenda de términos, desde «Revisiones».'}
+          </p>
+          <LecturaDelDocumentoRecibido informe={datos.informeRecibido} pie={pieDelInformeRecibido} />
+        </>
+      ) : !informe || !normal ? (
+        informeLibre ? (
+          <>
+            <p className="cn-inf-aviso">El revisor respondió en un formato que no se pudo ordenar por secciones; abajo está su texto completo.</p>
+            <pre className="cn-inf-libre">{informeLibre}</pre>
+          </>
+        ) : (
+          <p className="cn-tal-vacio-texto">Este escrito no tiene informe de revisión. Puede pedir uno con «Revisión completa» o conversar con la guía.</p>
+        )
+      ) : (
+        /*
+          LOS DOS ESTRATOS, EN LA PIEZA QUE COMPARTE CON EL DIÁLOGO. Aquí las
+          correcciones viven sobre el papel; el informe lista solo las que
+          traen advertencia, para que ninguna se pierda si su cita ya no está.
+        */
+        <InformeDelEscritoPropio normal={normal} correcciones="solo-con-advertencia" />
+      )}
+    </>
+  );
+
+  const ErrorDeDescarga = () =>
+    errorDescarga ? (
+      <p className="cn-error cn-tal-error" role="alert">
+        <AlertTriangle className="h-4 w-4" />
+        <span className="min-w-0 [overflow-wrap:anywhere]">{errorDescarga}</span>
+      </p>
+    ) : null;
+
   const InformePanel = () => (
     <div className="flex min-h-0 flex-1 flex-col">
-      <DescargaDelInforme />
-      {errorDescarga && (
-        <p className="cn-error cn-tal-error" role="alert">
-          <AlertTriangle className="h-4 w-4" />
-          <span className="min-w-0 [overflow-wrap:anywhere]">{errorDescarga}</span>
-        </p>
-      )}
+      {BarraDelInforme()}
+      {ErrorDeDescarga()}
       {/*
         `overflow-wrap: anywhere` EN LA RAÍZ DEL INFORME, no en cada párrafo: el
         informe cita artículos, correos y URLs de fuentes oficiales, y una URL es
@@ -1343,48 +1432,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       */}
       <div className="cn-tal-panel-cuerpo min-h-0 flex-1 overflow-y-auto">
         <div className="cn-inf" data-informe>
-          {/*
-            TRES FORMAS DE INFORME, NO UNA. El del escrito propio; el del documento
-            recibido, que tiene otras secciones y otra promesa; y el texto libre de
-            cuando el revisor no devolvió algo ordenable. Antes solo se leía la
-            primera, así que un documento recibido —o un informe sin secciones—
-            abría esta pestaña diciendo «no tiene informe de revisión» encima de un
-            informe que la firma ya había pagado.
-          */}
-          {datos.informeRecibido ? (
-            <>
-              <p className="cn-inf-nota">
-                Lectura de un <span className="cn-inf-seleccionado">documento recibido</span>. Todo lo de abajo sale del texto del propio documento y va citado:
-                ninguna ficha del catálogo respalda estas líneas.{' '}
-                {/*
-                  DÓNDE ESTÁ LA RESPUESTA, DICHO DONDE TOCA. Esta línea mandaba al
-                  abogado de vuelta a «Revisiones» porque aquí no había pie; con el
-                  pie montado, mandarlo a otra pantalla sería enseñarle a no ver el
-                  bloque que tiene debajo.
-                */}
-                {pieDelInformeRecibido
-                  ? 'Qué actuación procede lo responde el catálogo, en el bloque que cierra esta lectura.'
-                  : 'Qué actuación procede lo responden la guía de actuaciones y la agenda de términos, desde «Revisiones».'}
-              </p>
-              <LecturaDelDocumentoRecibido informe={datos.informeRecibido} pie={pieDelInformeRecibido} />
-            </>
-          ) : !informe || !normal ? (
-            informeLibre ? (
-              <>
-                <p className="cn-inf-aviso">El revisor respondió en un formato que no se pudo ordenar por secciones; abajo está su texto completo.</p>
-                <pre className="cn-inf-libre">{informeLibre}</pre>
-              </>
-            ) : (
-              <p className="cn-tal-vacio-texto">Este escrito no tiene informe de revisión. Puede pedir uno con «Revisión completa» o conversar con la guía.</p>
-            )
-          ) : (
-            /*
-              LOS DOS ESTRATOS, EN LA PIEZA QUE COMPARTE CON EL DIÁLOGO. Aquí las
-              correcciones viven sobre el papel; el informe lista solo las que
-              traen advertencia, para que ninguna se pierda si su cita ya no está.
-            */
-            <InformeDelEscritoPropio normal={normal} correcciones="solo-con-advertencia" />
-          )}
+          {ContenidoDelInforme()}
         </div>
       </div>
     </div>
@@ -1523,6 +1571,16 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       </div>
       {Cinta()}
       <ConfirmarDialog confirmacion={confirmacion} onCerrar={() => setConfirmacion(null)} />
+      <LecturaAmpliaDelInforme
+        abierto={lecturaAmplia && hayInforme}
+        onCerrar={() => setLecturaAmplia(false)}
+        titulo={datos.informeRecibido ? 'Lectura del documento recibido' : 'Informe de revisión'}
+        detalle={[datos.titulo, datos.subtitulo].filter(Boolean).join(' · ')}
+        acciones={BotonesDeDescarga()}
+        aviso={ErrorDeDescarga()}
+      >
+        {ContenidoDelInforme()}
+      </LecturaAmpliaDelInforme>
       {error && (
         <p className="cn-error cn-tal-error" role="alert">
           <AlertTriangle className="h-4 w-4" />

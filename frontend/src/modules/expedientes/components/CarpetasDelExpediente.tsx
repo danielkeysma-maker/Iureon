@@ -1,21 +1,20 @@
 import React from 'react';
 import {
   AlertCircle,
-  ArrowRight,
   ChevronRight,
+  EllipsisVertical,
   FileText,
   Folder,
   LayoutGrid,
   ListTree,
-  Pencil,
   Plus,
   Rows3,
-  Search,
-  Trash2
+  Search
 } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { LeerDocumentoIndexado } from './LeerDocumentoIndexado';
+import { MenuDeAcciones, type AccionDelMenu, type PosicionDelMenu } from './MenuDeAcciones';
 import { expedientesApi, type Carpeta, type DocumentoIndexado } from '../services/expedientes.api';
 import {
   MOTIVO_EN_PALABRAS,
@@ -111,7 +110,11 @@ type DialogoAbierto =
   | { tipo: 'nueva' }
   | { tipo: 'renombrar'; carpeta: Carpeta }
   | { tipo: 'moverCarpeta'; carpeta: Carpeta }
-  | { tipo: 'moverDocumento'; documento: DocumentoIndexado };
+  | { tipo: 'moverDocumento'; documento: DocumentoIndexado }
+  | { tipo: 'renombrarDocumento'; documento: DocumentoIndexado };
+
+/* El servidor rechaza un nombre de documento de más de 160 caracteres. */
+const LARGO_MAXIMO_DEL_NOMBRE = 160;
 
 export const CarpetasDelExpediente: React.FC<{
   expediente: ExpedienteConDetalle;
@@ -216,7 +219,7 @@ export const CarpetasDelExpediente: React.FC<{
 
   const abrirDialogo = (d: DialogoAbierto): void => {
     setErrorDialogo('');
-    setNombre(d.tipo === 'renombrar' ? d.carpeta.nombre : '');
+    setNombre(d.tipo === 'renombrar' ? d.carpeta.nombre : d.tipo === 'renombrarDocumento' ? d.documento.titulo : '');
     setDestino(undefined);
     setDialogo(d);
   };
@@ -226,6 +229,25 @@ export const CarpetasDelExpediente: React.FC<{
     setOcupado(true);
     setErrorDialogo('');
     try {
+      if (dialogo.tipo === 'renombrarDocumento') {
+        const limpio = nombre.trim();
+        if (!limpio || limpio.length > LARGO_MAXIMO_DEL_NOMBRE) return;
+        /*
+         * SE PINTA EL NOMBRE QUE DEVUELVE EL SERVIDOR, no el que se escribió:
+         * él recorta y normaliza, y es el que verán los demás. Se cambia en su
+         * sitio, sin recargar el caso, y se avisa hacia arriba para que la
+         * columna derecha no se quede con el nombre viejo. El lector no
+         * necesita aviso: vuelve a pedir el título cada vez que se abre.
+         * Un nombre repetido, largo o con barras vuelve con el mensaje del
+         * servidor y se queda DENTRO del diálogo (ver el `catch`).
+         */
+        const r = await expedientesApi.renombrarDocumento(expediente.id, dialogo.documento.documentId, limpio);
+        const nuevos = documentos.map((x) => (x.documentId === r.documentId ? { ...x, titulo: r.titulo } : x));
+        setDocumentos(nuevos);
+        onCargadoRef.current?.(carpetas, nuevos);
+        setDialogo(null);
+        return;
+      }
       if (dialogo.tipo === 'nueva') {
         if (!nombre.trim()) return;
         await expedientesApi.crearCarpeta(expediente.id, { nombre: nombre.trim(), padreId: aqui });
@@ -372,77 +394,146 @@ export const CarpetasDelExpediente: React.FC<{
 
   /* ─── PIEZAS ────────────────────────────────────────────────────────────── */
 
-  const accionesDeCarpeta = (c: Carpeta): React.ReactNode => (
-    <span className="cn-exp-fila-acciones">
-      <button
-        type="button"
-        className="cn-exp-icono"
-        onClick={() => abrirDialogo({ tipo: 'renombrar', carpeta: c })}
-        aria-label={`Renombrar ${c.nombre}`}
-        title="Renombrar"
-      >
-        <Pencil className="h-4 w-4" aria-hidden="true" />
-      </button>
-      <button
-        type="button"
-        className="cn-exp-icono"
-        onClick={() => abrirDialogo({ tipo: 'moverCarpeta', carpeta: c })}
-        aria-label={`Mover ${c.nombre}`}
-        title="Mover"
-      >
-        <ArrowRight className="h-4 w-4" aria-hidden="true" />
-      </button>
-      <button
-        type="button"
-        className="cn-exp-icono cn-exp-icono--peligro"
-        onClick={() => void pedirBorrado(c)}
-        disabled={ocupado}
-        aria-label={`Borrar la carpeta ${c.nombre}`}
-        /* En una lista densa el cursor se equivoca de fila: el aviso va en el propio icono. */
-        title="Borrar · se va con su contenido"
-      >
-        <Trash2 className="h-4 w-4" aria-hidden="true" />
-      </button>
-    </span>
-  );
+  /*
+   * ─── «MÁS ACCIONES»: BORRAR, MOVER Y RENOMBRAR SIN ABRIR EL ARCHIVO ──────
+   *
+   * El dueño pidió poder borrar documentos y carpetas sin entrar al lector.
+   * Cada tarjeta y cada fila, en las TRES vistas, lleva un «⋮» que abre el
+   * mismo menú; el clic derecho y la tecla de menú (o Mayús+F10) lo abren
+   * también, como camino secundario. Antes el árbol y el detalle traían tres
+   * iconos sueltos por fila —con la papelera roja a un dedo del lápiz— y las
+   * tarjetas no traían ninguno: un solo menú deja las mismas acciones en las
+   * tres vistas y aparta lo destructivo.
+   *
+   * Solo operaciones que ya existen, y lo destructivo pasa por los mismos
+   * diálogos de confirmación: «Eliminar carpeta» abre el borrado que cuenta
+   * el contenido (y que dice «no se pudo contar» si la cuenta falla), y
+   * «Quitar del caso» abre el diálogo que dice que se borra el archivo.
+   * «Renombrar» un documento usa la ruta PATCH del servidor, que solo cambia el
+   * nombre visible y no el archivo guardado.
+   */
+  type ObjetivoDelMenu = { tipo: 'carpeta'; carpeta: Carpeta } | { tipo: 'documento'; documento: DocumentoIndexado };
+  const [menu, setMenu] = React.useState<{
+    objetivo: ObjetivoDelMenu;
+    posicion: PosicionDelMenu;
+    disparador: HTMLElement | null;
+  } | null>(null);
 
-  const accionesDeDocumento = (d: DocumentoIndexado): React.ReactNode => (
-    <span className="cn-exp-fila-acciones">
-      <button
-        type="button"
-        className="cn-exp-icono"
-        onClick={() => abrirDialogo({ tipo: 'moverDocumento', documento: d })}
-        aria-label={`Mover ${d.titulo} a otra carpeta`}
-        title="Mover"
-      >
-        <ArrowRight className="h-4 w-4" aria-hidden="true" />
-      </button>
-      <button
-        type="button"
-        className="cn-exp-icono cn-exp-icono--peligro"
-        onClick={() => setPorQuitar(d)}
-        aria-label={`Quitar ${d.titulo} del expediente`}
-        title="Quitar del caso"
-      >
-        <Trash2 className="h-4 w-4" aria-hidden="true" />
-      </button>
-    </span>
+  const idDe = (o: ObjetivoDelMenu): string => (o.tipo === 'carpeta' ? `c-${o.carpeta.id}` : `d-${o.documento.documentId}`);
+  const nombreDe = (o: ObjetivoDelMenu): string => (o.tipo === 'carpeta' ? o.carpeta.nombre : o.documento.titulo);
+
+  const abrirMenuDesdeBoton = (objetivo: ObjetivoDelMenu, e: React.MouseEvent<HTMLButtonElement>): void => {
+    const r = e.currentTarget.getBoundingClientRect();
+    setMenu({
+      objetivo,
+      posicion: { x: r.right, y: r.bottom + 4, yArriba: r.top - 4, alinearDerecha: true },
+      disparador: e.currentTarget
+    });
+  };
+
+  /** Clic derecho en la tarjeta o la fila. El foco vuelve a su botón principal. */
+  const abrirMenuContextual = (objetivo: ObjetivoDelMenu, e: React.MouseEvent<HTMLElement>): void => {
+    e.preventDefault();
+    const principal = e.currentTarget.querySelector<HTMLElement>('button');
+    /*
+     * La tecla de menú dispara `contextmenu` sin puntero (0, 0): el menú se
+     * coloca bajo el elemento con foco y no en la esquina de la ventana.
+     */
+    if (e.clientX === 0 && e.clientY === 0) {
+      const ancla = (document.activeElement instanceof HTMLElement && e.currentTarget.contains(document.activeElement)
+        ? document.activeElement
+        : principal ?? e.currentTarget
+      ).getBoundingClientRect();
+      setMenu({
+        objetivo,
+        posicion: { x: ancla.left, y: ancla.bottom + 4, yArriba: ancla.top - 4, alinearDerecha: false },
+        disparador: principal
+      });
+      return;
+    }
+    setMenu({
+      objetivo,
+      posicion: { x: e.clientX, y: e.clientY, yArriba: e.clientY, alinearDerecha: false },
+      disparador: principal
+    });
+  };
+
+  /** Mayús+F10 y la tecla de menú, para quien no usa el ratón. */
+  const alTeclearMenu = (objetivo: ObjetivoDelMenu, e: React.KeyboardEvent<HTMLElement>): void => {
+    if (e.key !== 'ContextMenu' && !(e.shiftKey && e.key === 'F10')) return;
+    e.preventDefault();
+    const foco = e.target instanceof HTMLElement ? e.target : e.currentTarget;
+    const r = foco.getBoundingClientRect();
+    setMenu({
+      objetivo,
+      posicion: { x: r.left, y: r.bottom + 4, yArriba: r.top - 4, alinearDerecha: false },
+      disparador: foco
+    });
+  };
+
+  const accionesDelMenu = (o: ObjetivoDelMenu): AccionDelMenu[] => {
+    if (o.tipo === 'carpeta') {
+      const c = o.carpeta;
+      return [
+        { etiqueta: 'Abrir', onElegir: () => onAqui(c.id) },
+        { etiqueta: 'Renombrar', onElegir: () => abrirDialogo({ tipo: 'renombrar', carpeta: c }) },
+        { etiqueta: 'Mover', onElegir: () => abrirDialogo({ tipo: 'moverCarpeta', carpeta: c }) },
+        { etiqueta: 'Eliminar carpeta', peligro: true, deshabilitado: ocupado, onElegir: () => void pedirBorrado(c) }
+      ];
+    }
+    const d = o.documento;
+    return [
+      { etiqueta: 'Abrir', onElegir: () => setLeyendoDoc(d.documentId) },
+      { etiqueta: 'Renombrar', onElegir: () => abrirDialogo({ tipo: 'renombrarDocumento', documento: d }) },
+      { etiqueta: 'Mover a otra carpeta', onElegir: () => abrirDialogo({ tipo: 'moverDocumento', documento: d }) },
+      { etiqueta: 'Quitar del caso', peligro: true, onElegir: () => setPorQuitar(d) }
+    ];
+  };
+
+  /** Lo que cuelga de cada tarjeta y fila: el clic derecho y la tecla de menú. */
+  const conMenu = (objetivo: ObjetivoDelMenu) => ({
+    onContextMenu: (e: React.MouseEvent<HTMLElement>) => abrirMenuContextual(objetivo, e),
+    onKeyDown: (e: React.KeyboardEvent<HTMLElement>) => alTeclearMenu(objetivo, e)
+  });
+
+  const botonMas = (objetivo: ObjetivoDelMenu): React.ReactNode => (
+    <button
+      type="button"
+      className="cn-exp-icono cn-exp-mas"
+      aria-haspopup="menu"
+      aria-expanded={menu !== null && idDe(menu.objetivo) === idDe(objetivo)}
+      aria-label={`Más acciones para «${nombreDe(objetivo)}»`}
+      title="Más acciones"
+      onClick={(e) => abrirMenuDesdeBoton(objetivo, e)}
+    >
+      <EllipsisVertical className="h-5 w-5" aria-hidden="true" />
+    </button>
   );
 
   const filaDeCarpeta = (c: Carpeta, nivel: number): React.ReactNode => (
-    <li key={`c-${c.id}`} className="cn-exp-fila" style={{ ['--nivel' as string]: nivel }}>
+    <li
+      key={`c-${c.id}`}
+      className="cn-exp-fila"
+      style={{ ['--nivel' as string]: nivel }}
+      {...conMenu({ tipo: 'carpeta', carpeta: c })}
+    >
       <button type="button" className="cn-exp-fila-nombre" onClick={() => onAqui(c.id)}>
         <Folder className="cn-exp-fila-icono h-5 w-5" aria-hidden="true" />
         <span className={`[overflow-wrap:anywhere] ${nivel === 0 ? 'cn-exp-fuerte' : ''}`}>{c.nombre}</span>
       </button>
       <span className="cn-exp-fila-dato">{enPalabrasElResumen(resumenDeCarpeta(c.id, carpetas, documentos))}</span>
       <span className="cn-exp-fila-dato" aria-hidden="true" />
-      {accionesDeCarpeta(c)}
+      <span className="cn-exp-fila-acciones">{botonMas({ tipo: 'carpeta', carpeta: c })}</span>
     </li>
   );
 
   const filaDeDocumento = (d: DocumentoIndexado, nivel: number): React.ReactNode => (
-    <li key={`d-${d.documentId}`} className="cn-exp-fila" style={{ ['--nivel' as string]: nivel }}>
+    <li
+      key={`d-${d.documentId}`}
+      className="cn-exp-fila"
+      style={{ ['--nivel' as string]: nivel }}
+      {...conMenu({ tipo: 'documento', documento: d })}
+    >
       <button
         type="button"
         className="cn-exp-fila-nombre"
@@ -458,7 +549,7 @@ export const CarpetasDelExpediente: React.FC<{
       */}
       <span className="cn-exp-fila-dato">{d.fragmentos.toLocaleString('es-CO')} fragmentos</span>
       <span className="cn-exp-fila-dato">{d.indexadoEl ? d.indexadoEl.slice(0, 10) : ''}</span>
-      {accionesDeDocumento(d)}
+      <span className="cn-exp-fila-acciones">{botonMas({ tipo: 'documento', documento: d })}</span>
     </li>
   );
 
@@ -638,7 +729,7 @@ export const CarpetasDelExpediente: React.FC<{
       {modo === 'tarjetas' && !vacio && cargado && (
         <ul className="cn-exp-rejilla">
           {subcarpetas.map((c) => (
-            <li key={c.id}>
+            <li key={c.id} className="cn-exp-tarjeta-celda" {...conMenu({ tipo: 'carpeta', carpeta: c })}>
               <button type="button" onClick={() => onAqui(c.id)} className="cn-exp-tarjeta cn-exp-tarjeta--carpeta">
                 <Folder className="cn-exp-fila-icono h-6 w-6" aria-hidden="true" />
                 <span className="cn-exp-tarjeta-nombre [overflow-wrap:anywhere]">{c.nombre}</span>
@@ -646,10 +737,11 @@ export const CarpetasDelExpediente: React.FC<{
                   {enPalabrasElResumen(resumenDeCarpeta(c.id, carpetas, documentos))}
                 </span>
               </button>
+              {botonMas({ tipo: 'carpeta', carpeta: c })}
             </li>
           ))}
           {archivos.map((d) => (
-            <li key={d.documentId}>
+            <li key={d.documentId} className="cn-exp-tarjeta-celda" {...conMenu({ tipo: 'documento', documento: d })}>
               <button
                 type="button"
                 onClick={() => setLeyendoDoc(d.documentId)}
@@ -662,6 +754,7 @@ export const CarpetasDelExpediente: React.FC<{
                   <span className="cn-exp-tarjeta-dato">{d.fragmentos.toLocaleString('es-CO')} fragmentos buscables</span>
                 </span>
               </button>
+              {botonMas({ tipo: 'documento', documento: d })}
             </li>
           ))}
           <li>
@@ -714,7 +807,9 @@ export const CarpetasDelExpediente: React.FC<{
                 ? `Mover «${dialogo.carpeta.nombre}»`
                 : dialogo?.tipo === 'moverDocumento'
                   ? `Mover «${dialogo.documento.titulo}»`
-                  : ''
+                  : dialogo?.tipo === 'renombrarDocumento'
+                    ? `Renombrar «${dialogo.documento.titulo}»`
+                    : ''
         }
         acciones={
           <>
@@ -732,7 +827,9 @@ export const CarpetasDelExpediente: React.FC<{
               onClick={() => void guardarDialogo()}
               disabled={
                 ocupado ||
-                ((dialogo?.tipo === 'nueva' || dialogo?.tipo === 'renombrar') && !nombre.trim()) ||
+                ((dialogo?.tipo === 'nueva' || dialogo?.tipo === 'renombrar' || dialogo?.tipo === 'renombrarDocumento') &&
+                  !nombre.trim()) ||
+                (dialogo?.tipo === 'renombrarDocumento' && nombre.trim().length > LARGO_MAXIMO_DEL_NOMBRE) ||
                 ((dialogo?.tipo === 'moverCarpeta' || dialogo?.tipo === 'moverDocumento') && destino === undefined)
               }
             >
@@ -740,7 +837,7 @@ export const CarpetasDelExpediente: React.FC<{
                 ? 'Un momento…'
                 : dialogo?.tipo === 'nueva'
                   ? 'Crear'
-                  : dialogo?.tipo === 'renombrar'
+                  : dialogo?.tipo === 'renombrar' || dialogo?.tipo === 'renombrarDocumento'
                     ? 'Guardar el nombre'
                     : 'Mover aquí'}
             </button>
@@ -748,6 +845,35 @@ export const CarpetasDelExpediente: React.FC<{
         }
       >
         <div className="cn-exp-dlg">
+          {dialogo?.tipo === 'renombrarDocumento' && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                void guardarDialogo();
+              }}
+              className="cn-exp-dlg"
+            >
+              <div className="cn-exp-campo">
+                <label className="cn-exp-rotulo" htmlFor="nombre-documento">
+                  Nombre del documento
+                </label>
+                <input
+                  id="nombre-documento"
+                  className="cn-exp-entrada"
+                  value={nombre}
+                  onChange={(e) => setNombre(e.target.value)}
+                  maxLength={LARGO_MAXIMO_DEL_NOMBRE}
+                  autoComplete="off"
+                  autoFocus
+                />
+                <p className="cn-exp-ayuda">
+                  Solo cambia el nombre que se ve en el caso; el archivo guardado no se toca. Hasta{' '}
+                  {LARGO_MAXIMO_DEL_NOMBRE} caracteres, sin barras.
+                </p>
+              </div>
+            </form>
+          )}
+
           {(dialogo?.tipo === 'nueva' || dialogo?.tipo === 'renombrar') && (
             <form
               onSubmit={(e) => {
@@ -837,6 +963,17 @@ export const CarpetasDelExpediente: React.FC<{
         }}
       />
       <ConfirmarDialog confirmacion={confirmacionDeQuitar} onCerrar={() => setPorQuitar(null)} />
+
+      {menu && (
+        <MenuDeAcciones
+          key={idDe(menu.objetivo)}
+          titulo={nombreDe(menu.objetivo)}
+          posicion={menu.posicion}
+          acciones={accionesDelMenu(menu.objetivo)}
+          disparador={menu.disparador}
+          onCerrar={() => setMenu(null)}
+        />
+      )}
 
       <LeerDocumentoIndexado
         expedienteId={expediente.id}

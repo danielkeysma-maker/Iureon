@@ -1,7 +1,13 @@
 import React from 'react';
-import { AlertTriangle, Mic, Pause, Play, Square, Trash2 } from 'lucide-react';
+import { Pause, Play, Square } from 'lucide-react';
 
 import { usePlanSoloLectura } from '../../subscriptions/PlanContext';
+import { cronometro } from '../entrevistaEnPantalla';
+import { OndaDeAudio } from '../../../design/OndaDeAudio';
+import { AudioPreview } from '../../transcription/components/AudioPreview';
+
+export type EstadoDeGrabadora = 'inactiva' | 'grabando' | 'lista';
+
 interface AudioRecorderProps {
   /** Called with the finished recording, ready to transcribe. */
   onRecorded: (file: File) => void;
@@ -12,11 +18,20 @@ interface AudioRecorderProps {
    * `MediaRecorder`, los permisos del micrófono, el formato y el cronómetro son
    * la parte delicada de este módulo: una segunda copia para el teléfono
    * significaría dos sitios donde arreglar el día que un navegador cambie de
-   * códec. La móvil (4d) solo cambia el TAMAÑO y la disposición — el
-   * cronómetro pasa a ser el elemento más grande de la pantalla, porque el
-   * teléfono es la grabadora real y de pie eso es lo único que se mira.
+   * códec. La móvil solo cambia el TAMAÑO y la disposición.
    */
   variante?: 'escritorio' | 'movil';
+  /**
+   * Empieza sola al montarse. El escritorio la monta DESPUÉS de «Empezar a
+   * grabar» en el diálogo de nueva entrevista, y pedir un segundo clic en la
+   * pantalla de grabación sería preguntar dos veces lo mismo. Solo arranca si
+   * no está deshabilitada: la autorización sigue mandando.
+   */
+  iniciarAlMontar?: boolean;
+  /** La línea bajo el cronómetro: con quién y a qué hora se autorizó. */
+  linea?: React.ReactNode;
+  /** Para que la pantalla sepa si salir perdería una grabación. */
+  onEstado?: (estado: EstadoDeGrabadora) => void;
 }
 
 /**
@@ -39,13 +54,12 @@ interface AudioRecorderProps {
  * WHY THE RECORDING NEVER LEAVES THE BROWSER UNTIL IT IS SENT. The chunks live
  * in memory; nothing is written to disk and nothing is uploaded until the
  * lawyer presses transcribe. Stopping and discarding leaves nothing behind.
+ *
+ * LA CARA NUEVA (maqueta `app-audiencias-entrevistas.html:107`): la BANDA de
+ * arriba con el cronómetro grande, el estado y los dos controles — pausar y
+ * terminar. Lo que la maqueta pone debajo (el guion, el panel lateral) es de la
+ * pantalla, no de la grabadora.
  */
-
-const formatElapsed = (seconds: number): string => {
-  const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
-  const ss = String(seconds % 60).padStart(2, '0');
-  return `${mm}:${ss}`;
-};
 
 /** The first container this browser will actually record. */
 const pickMimeType = (): string | undefined => {
@@ -53,13 +67,13 @@ const pickMimeType = (): string | undefined => {
   return candidates.find((type) => MediaRecorder.isTypeSupported(type));
 };
 
-import { OndaDeAudio } from '../../../design/OndaDeAudio';
-import { AudioPreview } from '../../transcription/components/AudioPreview';
-
 export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   onRecorded,
   disabled,
-  variante = 'escritorio'
+  variante = 'escritorio',
+  iniciarAlMontar = false,
+  linea,
+  onEstado
 }) => {
   /*
    * Con el plan vencido no se graba: el transcrito nuevo lo rechazaria el
@@ -75,7 +89,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   /*
    * NIVELES MEDIDOS DE VERDAD, no una animacion.
    *
-   * Se dijo antes que la onda de 4d no se podia pintar porque `MediaRecorder`
+   * Se dijo antes que la onda no se podia pintar porque `MediaRecorder`
    * entrega trozos de audio y no amplitud. Eso es cierto de `MediaRecorder` y
    * FALSO del navegador: el mismo `MediaStream` se conecta a un `AnalyserNode`
    * de Web Audio, que devuelve el dominio del tiempo y de ahi sale el volumen
@@ -89,6 +103,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   const audioCtxRef = React.useRef<AudioContext | null>(null);
   const analyserRef = React.useRef<AnalyserNode | null>(null);
   const rafRef = React.useRef<number | null>(null);
+  const yaInicio = React.useRef(false);
 
   /*
    * The microphone is released when this unmounts, and the preview URL revoked.
@@ -118,11 +133,15 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     return () => window.clearInterval(id);
   }, [grabando, pausado]);
 
+  React.useEffect(() => {
+    onEstado?.(listo ? 'lista' : grabando ? 'grabando' : 'inactiva');
+  }, [listo, grabando, onEstado]);
+
   const empezar = async () => {
     setError('');
 
     if (typeof MediaRecorder === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
-      setError('Este navegador no permite grabar. Puedes subir un archivo de audio.');
+      setError('Este navegador no permite grabar. Puede subir un archivo de audio.');
       return;
     }
 
@@ -143,10 +162,9 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
       /*
        * EL MEDIDOR DE NIVEL, sobre el MISMO stream que graba. `AnalyserNode`
        * con `fftSize` pequeño basta: no hace falta espectro, solo el volumen
-       * instantaneo. Se guardan las ultimas 25 muestras porque son las que
-       * caben en los 26px de alto que pide 4d, y se toma una cada 100ms — mas
-       * seguido no se distingue y gasta bateria en un telefono que ademas esta
-       * grabando.
+       * instantaneo. Se guardan las ultimas 25 muestras y se toma una cada
+       * 100ms — mas seguido no se distingue y gasta bateria en un telefono que
+       * ademas esta grabando.
        */
       const AudioCtx =
         window.AudioContext ??
@@ -218,11 +236,21 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     } catch {
       // The browser does not say why in a way worth repeating; what the lawyer
       // needs is the way forward.
-      setError(
-        'No se pudo acceder al micrófono. Revisa el permiso del navegador, o sube un archivo de audio.'
-      );
+      setError('No se pudo acceder al micrófono. Revise el permiso del navegador, o suba un archivo de audio.');
     }
   };
+
+  /*
+   * EL ARRANQUE AUTOMÁTICO, UNA SOLA VEZ. La ref sobrevive al doble montaje de
+   * `StrictMode` en desarrollo; sin ella se pedirían dos micrófonos y el
+   * primero quedaría grabando sin nadie que lo detenga.
+   */
+  React.useEffect(() => {
+    if (!iniciarAlMontar || deshabilitado || yaInicio.current) return;
+    yaInicio.current = true;
+    void empezar();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const detener = () => {
     recorderRef.current?.stop();
@@ -234,8 +262,6 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   /*
    * PAUSAR Y REANUDAR PRODUCEN UN SOLO ARCHIVO.
    *
-   * Se dijo antes que no se podia porque «detener y reanudar produce dos
-   * archivos que nadie une». Eso describe `stop()` + `start()`, no `pause()`:
    * `MediaRecorder.pause()` SUSPENDE la misma grabacion y `resume()` la
    * continua sobre los mismos trozos, asi que `onstop` sigue armando un unico
    * blob. La entrevista no se parte.
@@ -263,193 +289,115 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     setSegundos(0);
   };
 
+  const movil = variante === 'movil';
+  const base = `cn-ent-banda ${movil ? 'cn-ent-banda--movil' : ''}`;
+  const aviso = error ? <p className="cn-ent-aviso cn-ent-aviso--aviso cn-ent-banda-ancho">{error}</p> : null;
+  const soloLecturaAviso = soloLectura ? (
+    <p className="cn-ent-nota cn-ent-banda-ancho">
+      Con el plan vencido no se graban entrevistas nuevas: el servidor no guardaría el transcrito.
+    </p>
+  ) : null;
+
+  /* ─── LISTA: escucharla antes de mandarla a transcribir ─────────────────── */
   if (listo) {
     return (
-      <div className="border border-line-200 rounded-card p-4 space-y-3">
-        <div className="flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <p className="text-xs font-bold text-ink-900">Grabación lista</p>
-            <p className="text-[11px] text-ink-500">
-              {formatElapsed(segundos)} · escúchala antes de transcribir
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={descartar}
-            className="text-[11px] text-ink-500 hover:text-danger flex items-center gap-1 shrink-0"
-          >
-            <Trash2 className="w-3 h-3" />
-            Descartar
-          </button>
+      <div className={`${base} cn-ent-banda--lista`}>
+        <div className="cn-ent-banda-texto">
+          <p className="cn-ent-banda-titulo">
+            Grabación lista · <span className="cn-ent-mono">{cronometro(segundos)}</span>
+          </p>
+          <p className="cn-ent-banda-linea">
+            Escúchela antes de transcribir: es el último momento para repetirla sin volver a citar al cliente.
+          </p>
         </div>
-
         {/*
           ESCUCHAR ANTES DE MANDAR A TRANSCRIBIR, con la misma onda de la
-          grabacion. Aqui importa mas que en ningun otro sitio: es el ULTIMO
-          momento en que se puede repetir la entrevista sin volver a citar al
-          cliente. Una pista muda se reproduce igual que una buena y la barra
-          avanza en las dos — la onda es lo unico que distingue las dos cosas
-          antes de gastar la transcripcion.
+          grabacion. Una pista muda se reproduce igual que una buena y la barra
+          avanza en las dos — la onda es lo unico que distingue las dos cosas.
         */}
-        <AudioPreview file={listo.file} />
-
-        <button
-          type="button"
-          onClick={() => onRecorded(listo.file)}
-          disabled={deshabilitado}
-          className="w-full py-2 bg-brand-700 hover:bg-brand-800 disabled:opacity-50 text-on-brand rounded-control text-[11px] font-semibold"
-        >
-          Transcribir esta entrevista
-        </button>
+        <div className="cn-ent-banda-ancho">
+          <AudioPreview file={listo.file} />
+        </div>
+        <div className="cn-ent-banda-acciones">
+          <button type="button" onClick={descartar} className="cn-ini-boton cn-ini-boton--texto cn-ent-boton">
+            Descartar
+          </button>
+          <button
+            type="button"
+            onClick={() => onRecorded(listo.file)}
+            disabled={deshabilitado}
+            className={`cn-ini-boton cn-ini-boton--primario cn-ent-boton ${movil ? 'cn-ent-boton--alto' : ''}`}
+          >
+            Transcribir esta entrevista
+          </button>
+        </div>
+        {soloLecturaAviso}
       </div>
     );
   }
 
-  return (
-    <div className="border border-line-200 rounded-card p-4 space-y-3">
-      {error && (
-        <div className="bg-[rgb(var(--unverified-surf))] border border-[rgb(var(--unverified-line))] rounded-control p-2 flex items-start gap-2">
-          <AlertTriangle className="w-3.5 h-3.5 text-unverified shrink-0 mt-0.5" />
-          <p className="text-[11px] text-ink-900">{error}</p>
-        </div>
-      )}
-
-      {grabando && variante === 'movil' ? (
-        /*
-          LA BANDA DE 4d, CITADA: padding 10px 12px, fondo #FBEDEB —el rojo del
-          sistema al 8%—, borde #E5C6C2, radio 8; punto de 9px, «GRABANDO» en
-          mono versales con tracking .07em, y el cronómetro en `600 16px MONO`
-          alineado a la derecha. Es el dato más grande de la pantalla.
-        */
-        <div className="space-y-2.5">
-          <div className="flex items-center gap-2 rounded-[8px] border border-[rgb(var(--danger-line))] bg-[rgb(var(--danger)/0.08)] px-3 py-2.5">
-            <span
-              className={`h-[9px] w-[9px] shrink-0 rounded-full ${
-                pausado ? 'bg-ink-400' : 'bg-danger'
-              }`}
-            />
-            <span
-              className={`font-mono text-[11px] font-semibold uppercase tracking-[0.07em] ${
-                pausado ? 'text-ink-500' : 'text-danger'
-              }`}
-            >
-              {pausado ? 'En pausa' : 'Grabando'}
-            </span>
-            <span className="ml-auto font-mono text-[16px] font-semibold text-ink-900">
-              {formatElapsed(segundos)}
-            </span>
-          </div>
-
-          {/*
-            LA ONDA DE 4d: `height:26px`, barras de 3px con 2px de separacion,
-            las pasadas en gris `#CFD6E0` —el token `neutral-line`— y las
-            recientes en rojo. Cada barra es una medida REAL de volumen (RMS del
-            `AnalyserNode`), tomada cada 100ms.
-
-            EN PAUSA SE QUEDA QUIETA Y EN GRIS, que es lo unico honesto: una onda
-            moviendose mientras no se graba diria que sigue capturando.
-          */}
-          <OndaDeAudio niveles={niveles} activa={!pausado} tono="grabando" alto={26} />
-
-          {/*
-            LOS TRES CONTROLES DE 4d: el circulo rojo de 52px que detiene,
-            «Pausar» y «Cerrar y usar». Aqui los dos primeros — cerrar pertenece
-            a la pantalla, que es la que sabe si hay transcrito.
-          */}
-          <div className="flex gap-[9px]">
-            <button
-              type="button"
-              onClick={detener}
-              aria-label="Detener y transcribir"
-              className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-danger text-white"
-            >
-              <Square className="h-[18px] w-[18px] fill-current" />
-            </button>
-            <button
-              type="button"
-              onClick={alternarPausa}
-              className="h-[52px] flex-1 rounded-[8px] border border-line-200 bg-canvas text-[13.5px] font-medium text-ink-700"
-            >
-              {pausado ? 'Reanudar' : 'Pausar'}
-            </button>
-          </div>
-
-          <p className="text-center font-mono text-[11px] text-ink-400">
-            Sigue grabando con la pantalla apagada
+  /* ─── GRABANDO o EN PAUSA ───────────────────────────────────────────────── */
+  if (grabando) {
+    return (
+      <div className={`${base} ${pausado ? 'cn-ent-banda--pausa' : 'cn-ent-banda--grabando'}`}>
+        <span className={`cn-ent-punto ${pausado ? 'cn-ent-punto--pausa' : ''}`} aria-hidden="true" />
+        <div className="cn-ent-banda-texto">
+          <p className="cn-ent-banda-fila" aria-live="polite">
+            <span className="cn-ent-cronometro">{cronometro(segundos)}</span>
+            <span className="cn-ent-banda-estado">{pausado ? 'En pausa · el tiempo no corre' : 'Grabando'}</span>
           </p>
+          {linea && <p className="cn-ent-banda-linea">{linea}</p>}
         </div>
-      ) : !grabando && variante === 'movil' ? (
+        <div className="cn-ent-banda-acciones">
+          <button
+            type="button"
+            onClick={alternarPausa}
+            className={`cn-ini-boton cn-ini-boton--blanco cn-ent-boton ${movil ? 'cn-ent-boton--alto' : ''}`}
+          >
+            {pausado ? <Play size={16} aria-hidden="true" /> : <Pause size={16} aria-hidden="true" />}
+            {pausado ? 'Reanudar' : 'Pausar'}
+          </button>
+          <button
+            type="button"
+            onClick={detener}
+            className={`cn-ini-boton cn-ent-boton cn-ent-boton--tinta ${movil ? 'cn-ent-boton--alto' : ''}`}
+          >
+            <Square size={14} aria-hidden="true" />
+            Terminar
+          </button>
+        </div>
+        {/*
+          EN PAUSA LA ONDA SE QUEDA QUIETA Y EN GRIS, que es lo unico honesto:
+          una onda moviendose mientras no se graba diria que sigue capturando.
+        */}
+        <div className="cn-ent-banda-ancho cn-ent-onda">
+          <OndaDeAudio niveles={niveles} activa={!pausado} tono="grabando" alto={movil ? 26 : 22} />
+        </div>
+      </div>
+    );
+  }
+
+  /* ─── ANTES DE EMPEZAR ──────────────────────────────────────────────────── */
+  return (
+    <div className={`${base} cn-ent-banda--inactiva`}>
+      <div className="cn-ent-banda-texto">
+        <p className="cn-ent-banda-titulo">Lista para grabar</p>
+        <p className="cn-ent-banda-linea">
+          {linea ?? 'Se graba en este navegador y no sale de aquí hasta que pulse transcribir.'}
+        </p>
+      </div>
+      <div className="cn-ent-banda-acciones">
         <button
           type="button"
           onClick={() => void empezar()}
           disabled={deshabilitado}
-          className="flex h-[52px] w-full items-center justify-center gap-2 rounded-[8px] bg-brand-700 text-[13.5px] font-semibold text-on-brand disabled:opacity-50"
+          className={`cn-ini-boton cn-ini-boton--primario cn-ent-boton ${movil ? 'cn-ent-boton--alto cn-ent-boton--ancho' : ''}`}
         >
-          <Mic className="h-4 w-4 text-on-brand" />
-          Grabar la entrevista
+          {error ? 'Intentar de nuevo' : movil ? 'Grabar la entrevista' : 'Empezar a grabar'}
         </button>
-      ) : grabando ? (
-        /*
-          LA ONDA Y LA PAUSA TAMBIEN EN ESCRITORIO. Estaban solo en la piel
-          movil, y no habia razon: el abogado que graba desde el portatil
-          necesita las mismas dos cosas — ver si el microfono esta captando algo
-          antes de confiarle dos horas, y poder parar cuando el cliente atiende
-          el telefono. El punto que parpadeaba decia «esto esta corriendo», no
-          «esto esta oyendo», que es otra cosa.
-        */
-        <div className="space-y-2.5">
-          <div className="flex items-center gap-3">
-            <span
-              className={`h-[9px] w-[9px] shrink-0 rounded-full ${
-                pausado ? 'bg-ink-400' : 'bg-danger'
-              }`}
-            />
-
-            <div className="min-w-0 flex-1">
-              <p className="font-mono text-xs font-bold text-ink-900">{formatElapsed(segundos)}</p>
-              <p className="text-[11px] text-ink-500">
-                {pausado ? 'En pausa · el tiempo no corre' : 'Grabando la entrevista…'}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={alternarPausa}
-              className="btn-neutral btn-sm shrink-0"
-            >
-              {pausado ? <Play className="h-3 w-3" /> : <Pause className="h-3 w-3" />}
-              {pausado ? 'Reanudar' : 'Pausar'}
-            </button>
-
-            <button
-              type="button"
-              onClick={detener}
-              className="flex shrink-0 items-center gap-1.5 rounded-control bg-danger px-3 py-1.5 text-[11px] font-semibold text-white hover:brightness-110"
-            >
-              <Square className="h-3 w-3 fill-current" />
-              Detener
-            </button>
-          </div>
-
-          <OndaDeAudio niveles={niveles} activa={!pausado} tono="grabando" alto={22} />
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={() => void empezar()}
-          disabled={deshabilitado}
-          className="w-full py-3 bg-brand-700 hover:bg-brand-800 disabled:opacity-50 text-on-brand rounded-card text-xs font-bold flex items-center justify-center gap-2"
-        >
-          <Mic className="w-4 h-4 text-on-brand" />
-          Grabar la entrevista
-        </button>
-      )}
-
-      <p className="text-[11px] text-ink-500">
-        Se graba en este navegador y no sale de aquí hasta que pulses transcribir. Avisa al cliente
-        antes de empezar.
-      </p>
+      </div>
+      {aviso}
+      {soloLecturaAviso}
     </div>
   );
 };

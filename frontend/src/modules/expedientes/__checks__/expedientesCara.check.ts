@@ -291,5 +291,105 @@ check(
 );
 check('las zonas ocultas con `hidden` no se encienden desde el CSS', bloque.includes('.cn-exp-zona:not([hidden])') && !/\.cn-exp-zona\s*\{[^}]*display/.test(bloque));
 
+/* ─── 13. LA CABECERA DEL CASO NO SE COME LA PANTALLA ────────────────────── */
+/*
+ * El 14 de septiembre el dueño vio en producción la carátula de 34 px en dos
+ * renglones, el despacho en otros dos, la cabecera fija y las carpetas
+ * desplazándose en una franja por debajo de las pestañas.
+ */
+const reglas = new Map<string, string>();
+for (const m of bloque.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+  const cabeza = m[1].replace(/@media[^{]*\{/g, '').trim();
+  for (const sel of cabeza.split(',').map((s) => s.trim()).filter(Boolean)) {
+    reglas.set(sel, `${reglas.get(sel) ?? ''}${m[2]}`);
+  }
+}
+const regla = (sel: string): string => reglas.get(sel) ?? '';
+const nombreDelCaso = regla('.cara-nueva .cn-exp-caso-nombre');
+check(
+  'la carátula va en un renglón con puntos suspensivos',
+  /white-space:\s*nowrap/.test(nombreDelCaso) && /text-overflow:\s*ellipsis/.test(nombreDelCaso) && /overflow:\s*hidden/.test(nombreDelCaso)
+);
+check('y el texto completo va en `title`', VISTA.includes('className="cn-exp-caso-nombre" title={abierto.caratula}'));
+check(
+  'la bajada del caso también se corta y lleva `title`',
+  VISTA.includes('className="cn-exp-caso-bajada" title={bajadaDelCaso}') &&
+    /text-overflow:\s*ellipsis/.test(regla('.cara-nueva .cn-exp-caso-bajada'))
+);
+check('la carátula ya no usa el título grande de la lista', !/<h1 className="cn-exp-h1[^"]*">\{abierto\.caratula\}/.test(VISTA));
+const tamanoCarátula = Number(/font-size:\s*(\d+)px/.exec(nombreDelCaso)?.[1] ?? 0);
+check('la carátula mide entre 24 y 28 px en escritorio', tamanoCarátula >= 24 && tamanoCarátula <= 28, `${tamanoCarátula}`);
+check('la cabecera no queda fija', !/sticky|fixed/.test(regla('.cara-nueva .cn-exp-caso-cabeza')));
+check('la columna del caso no esconde lo que desborda', !/overflow:\s*hidden/.test(regla('.cara-nueva .cn-exp-caso-trabajo')));
+check(
+  'las zonas no traen su propio desplazamiento interior',
+  !/overflow/.test(regla('.cara-nueva .cn-exp-caso-trabajo > .cn-exp-zona:not([hidden])') + regla('.cara-nueva .cn-exp-zona:not([hidden])'))
+);
+const pegadasArriba = [...reglas.entries()].filter(([, cuerpo]) => /position:\s*sticky/.test(cuerpo) && /top:/.test(cuerpo));
+check(
+  'lo que queda pegado arriba tiene fondo opaco',
+  pegadasArriba.length > 0 && pegadasArriba.every(([, cuerpo]) => /background:\s*var\(--canvas\)/.test(cuerpo)),
+  pegadasArriba.map(([s]) => s).join(' · ')
+);
+
+/* ─── 14. BORRAR, MOVER Y RENOMBRAR SIN ABRIR EL ARCHIVO ─────────────────── */
+const MENU = leer(`${COMP}MenuDeAcciones.tsx`);
+const tramo = (desde: string, hasta: string): string => {
+  const i = CARPETAS.indexOf(desde);
+  const j = CARPETAS.indexOf(hasta, i + 1);
+  return i === -1 || j === -1 ? '' : CARPETAS.slice(i, j);
+};
+const enTarjetas = tramo("modo === 'tarjetas' && !vacio", "modo === 'detalle' && !vacio");
+check(
+  'las tarjetas de carpeta y de documento llevan «⋮»',
+  enTarjetas.includes("botonMas({ tipo: 'carpeta', carpeta: c })") && enTarjetas.includes("botonMas({ tipo: 'documento', documento: d })")
+);
+check('la fila de carpeta lleva «⋮»', tramo('const filaDeCarpeta', 'const filaDeDocumento').includes("botonMas({ tipo: 'carpeta', carpeta: c })"));
+check('la fila de documento lleva «⋮»', tramo('const filaDeDocumento', 'const arbol').includes("botonMas({ tipo: 'documento', documento: d })"));
+check(
+  'el detalle y el árbol pintan esas filas',
+  tramo("modo === 'detalle' && !vacio", "modo === 'lista' && cargado").includes('filaDeCarpeta(c, 0)') &&
+    tramo("modo === 'detalle' && !vacio", "modo === 'lista' && cargado").includes('filaDeDocumento(d, 0)') &&
+    tramo('const arbol', 'const vacio').includes('filaDeCarpeta(c, nivel)') &&
+    tramo('const arbol', 'const vacio').includes('filaDeDocumento(d, nivel)')
+);
+check(
+  'el «⋮» se anuncia como menú y nombra lo que toca',
+  CARPETAS.includes('aria-haspopup="menu"') && CARPETAS.includes('aria-label={`Más acciones para «${nombreDe(objetivo)}»`}')
+);
+check('el clic derecho abre el mismo menú en tarjetas y filas', (CARPETAS.match(/\{\.\.\.conMenu\(/g) ?? []).length === 4 && CARPETAS.includes('onContextMenu:'));
+check('y la tecla de menú o Mayús+F10 también', CARPETAS.includes("e.key !== 'ContextMenu'") && CARPETAS.includes("e.key === 'F10'"));
+check(
+  'eliminar una carpeta pasa por el diálogo que cuenta el contenido',
+  /etiqueta: 'Eliminar carpeta', peligro: true[^}]*pedirBorrado\(c\)/.test(CARPETAS)
+);
+check('quitar un documento pasa por su diálogo', /etiqueta: 'Quitar del caso', peligro: true[^}]*setPorQuitar\(d\)/.test(CARPETAS));
+check('el documento se renombra por la ruta que existe', API.includes('async renombrarDocumento(') && CARPETAS.includes('expedientesApi.renombrarDocumento('));
+check(
+  'el menú del documento va en el orden Abrir · Renombrar · Mover · Quitar',
+  (() => {
+    const t = tramo('const accionesDelMenu', 'const conMenu');
+    const d = t.slice(t.indexOf('const d = o.documento'));
+    const orden = ["'Abrir'", "'Renombrar'", "'Mover a otra carpeta'", "'Quitar del caso'"].map((x) => d.indexOf(x));
+    return orden.every((i) => i !== -1) && orden.every((i, k) => k === 0 || i > orden[k - 1]);
+  })()
+);
+check(
+  'y «Renombrar» abre el diálogo del documento',
+  /etiqueta: 'Renombrar', onElegir: \(\) => abrirDialogo\(\{ tipo: 'renombrarDocumento', documento: d \}\)/.test(CARPETAS)
+);
+check('se pinta el nombre que devolvió el servidor', /titulo: r\.titulo/.test(CARPETAS));
+check('el nombre del documento tiene tope de 160 y no se guarda vacío', CARPETAS.includes('LARGO_MAXIMO_DEL_NOMBRE = 160') && CARPETAS.includes('maxLength={LARGO_MAXIMO_DEL_NOMBRE}'));
+check('el error del servidor se queda dentro del diálogo', CARPETAS.includes('setErrorDialogo((err as Error).message)'));
+check('ya no quedan iconos sueltos de borrar y renombrar en las filas', !/\b(Trash2|Pencil)\b/.test(CARPETAS));
+for (const [nombre, codigo] of Object.entries({ ...MODULO, 'MenuDeAcciones.tsx': MENU })) {
+  check(`${nombre} no pregunta con el diálogo del navegador`, !/\bconfirm\(/.test(codigo));
+}
+check('el menú se pinta fuera de la columna que se desplaza', MENU.includes('createPortal(') && MENU.includes('className="cara-nueva cn-exp-flotante"'));
+check('el menú cierra con Escape y devuelve el foco', MENU.includes("e.key === 'Escape'") && MENU.includes('disparador?.focus()'));
+check('lo destructivo va al final y separado', MENU.includes('role="separator"') && MENU.indexOf('comunes.map(item)') < MENU.indexOf('peligrosas.map(item)'));
+check('el menú se coloca dentro de la ventana', MENU.includes('window.innerHeight') && MENU.includes('posicion.yArriba - height'));
+check('y la vista lo monta', CARPETAS.includes('<MenuDeAcciones'));
+
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

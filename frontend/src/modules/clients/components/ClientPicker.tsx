@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, IdCard, Plus, UserRound } from 'lucide-react';
+import { Plus, UserRound } from 'lucide-react';
 import { clientsApi, type Client } from '../clients.api';
 
 interface ClientPickerProps {
@@ -25,12 +25,18 @@ interface ClientPickerProps {
  * Registering happens here rather than on a screen of its own because this is
  * the moment the client exists for the firm. Sending somebody to a directory,
  * fill a form and come back is how the link ends up never being made.
+ *
+ * LA CARA NUEVA (maqueta «Nueva entrevista», campo «Quién consulta»): campo
+ * sobre gris sin contorno y botones sin borde. Las clases `cn-ent-*` solo
+ * pintan dentro de `.cara-nueva`, y las dos pantallas que montan este
+ * componente la llevan en su raíz.
  */
 export const ClientPicker: React.FC<ClientPickerProps> = ({ value, onChange }) => {
   const [clients, setClients] = React.useState<Client[]>([]);
   const [cargando, setCargando] = React.useState(true);
   const [error, setError] = React.useState('');
   const [creando, setCreando] = React.useState(false);
+  const [guardando, setGuardando] = React.useState(false);
   const [nuevo, setNuevo] = React.useState({
     fullName: '',
     documentId: '',
@@ -58,6 +64,7 @@ export const ClientPicker: React.FC<ClientPickerProps> = ({ value, onChange }) =
   const crear = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setGuardando(true);
 
     try {
       const client = await clientsApi.create(nuevo);
@@ -70,6 +77,8 @@ export const ClientPicker: React.FC<ClientPickerProps> = ({ value, onChange }) =
       setCreando(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo registrar el cliente.');
+    } finally {
+      setGuardando(false);
     }
   };
 
@@ -83,115 +92,119 @@ export const ClientPicker: React.FC<ClientPickerProps> = ({ value, onChange }) =
    * component that assumes its own chrome can only ever be placed one way.
    */
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-[11px] text-ink-500">
-          Para encontrar esta conversación por la persona, no por el nombre del archivo.
-        </p>
+    <div className="cn-ent-picker">
+      <div className="cn-ent-picker-fila">
+        <label className="cn-ent-picker-select">
+          <span className="cn-ent-oculto">Quién consulta</span>
+          <UserRound className="cn-ent-picker-icono" aria-hidden="true" size={18} />
+          <select
+            value={value ?? ''}
+            onChange={(e) => {
+              const id = e.target.value || null;
+              onChange(id, clients.find((c) => c.id === id) ?? null);
+            }}
+            disabled={cargando}
+            className="cn-ent-entrada cn-ent-entrada--con-icono"
+          >
+            <option value="">{cargando ? 'Cargando clientes…' : 'Sin cliente asignado'}</option>
+            {clients.map((client) => (
+              <option key={client.id} value={client.id}>
+                {client.fullName} · {client.documentId}
+              </option>
+            ))}
+          </select>
+        </label>
 
         <button
           type="button"
           onClick={() => setCreando((v) => !v)}
-          className="px-2.5 py-1 bg-brand-700 hover:bg-brand-800 text-white rounded-control text-[11px] font-semibold flex items-center gap-1.5 shrink-0"
+          aria-expanded={creando}
+          className="cn-ini-boton cn-ini-boton--suave cn-ent-boton"
         >
-          <Plus className="w-3 h-3" />
-          <span>Nuevo cliente</span>
+          <Plus size={16} aria-hidden="true" />
+          Nuevo cliente
         </button>
       </div>
 
-      {error && (
-        <div className="bg-[rgb(var(--danger)/0.06)] border border-[rgb(var(--danger)/0.35)] rounded-control p-2 flex items-start gap-2">
-          <AlertCircle className="w-3.5 h-3.5 text-danger shrink-0 mt-0.5" />
-          <p className="text-[11px] text-danger">{error}</p>
-        </div>
+      {error && <p className="cn-ent-aviso cn-ent-aviso--peligro">{error}</p>}
+
+      {/*
+        LA FICHA ELEGIDA, con lo que tiene y nada más: un rótulo con una raya
+        al lado no informa de nada. La cédula va en mono porque es lo citable
+        de la persona; el resto en la letra de interfaz.
+      */}
+      {seleccionado && !creando && (
+        <p className="cn-ent-ficha">
+          <span className="cn-ent-mono">C.C. {seleccionado.documentId}</span>
+          {seleccionado.phone && <span>{seleccionado.phone}</span>}
+          {seleccionado.email && <span className="cn-ent-ficha-correo">{seleccionado.email}</span>}
+          <span>
+            {seleccionado.interviews === 0
+              ? 'Cliente nuevo'
+              : `${seleccionado.interviews} ${seleccionado.interviews === 1 ? 'entrevista previa' : 'entrevistas previas'}`}
+          </span>
+        </p>
       )}
 
       {creando && (
-        <form onSubmit={crear} className="space-y-2 border-t border-line-100 pt-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <input
-              value={nuevo.fullName}
-              onChange={(e) => setNuevo({ ...nuevo, fullName: e.target.value })}
-              placeholder="Nombre completo"
-              className="bg-canvas border border-line-200 rounded-control px-2.5 py-1.5 text-[11px] focus:outline-none focus:border-brand-700"
-              required
-            />
-            <input
-              value={nuevo.documentId}
-              onChange={(e) => setNuevo({ ...nuevo, documentId: e.target.value })}
-              placeholder="Cédula"
-              className="bg-canvas border border-line-200 rounded-control px-2.5 py-1.5 text-[11px] font-mono focus:outline-none focus:border-brand-700"
-              required
-            />
-            <input
-              type="email"
-              value={nuevo.email}
-              onChange={(e) => setNuevo({ ...nuevo, email: e.target.value })}
-              placeholder="Correo (opcional)"
-              className="bg-canvas border border-line-200 rounded-control px-2.5 py-1.5 text-[11px] focus:outline-none focus:border-brand-700"
-            />
-            <input
-              value={nuevo.phone}
-              onChange={(e) => setNuevo({ ...nuevo, phone: e.target.value })}
-              placeholder="Celular (opcional)"
-              className="bg-canvas border border-line-200 rounded-control px-2.5 py-1.5 text-[11px] font-mono focus:outline-none focus:border-brand-700"
-            />
+        <form onSubmit={crear} className="cn-ent-picker-nuevo">
+          <p className="cn-ent-ayuda">
+            Para encontrar esta conversación por la persona, no por el nombre del archivo. El acta
+            imprime su nombre y su cédula.
+          </p>
+          <div className="cn-ent-campos-2">
+            <label className="cn-ent-campo">
+              <span className="cn-ent-rotulo">Nombre completo</span>
+              <input
+                value={nuevo.fullName}
+                onChange={(e) => setNuevo({ ...nuevo, fullName: e.target.value })}
+                className="cn-ent-entrada"
+                required
+              />
+            </label>
+            <label className="cn-ent-campo">
+              <span className="cn-ent-rotulo">Cédula</span>
+              <input
+                value={nuevo.documentId}
+                onChange={(e) => setNuevo({ ...nuevo, documentId: e.target.value })}
+                inputMode="numeric"
+                className="cn-ent-entrada cn-ent-mono"
+                required
+              />
+            </label>
+            <label className="cn-ent-campo">
+              <span className="cn-ent-rotulo">
+                Correo <span className="cn-ent-opcional">(opcional)</span>
+              </span>
+              <input
+                type="email"
+                value={nuevo.email}
+                onChange={(e) => setNuevo({ ...nuevo, email: e.target.value })}
+                className="cn-ent-entrada"
+              />
+            </label>
+            <label className="cn-ent-campo">
+              <span className="cn-ent-rotulo">
+                Celular <span className="cn-ent-opcional">(opcional)</span>
+              </span>
+              <input
+                value={nuevo.phone}
+                onChange={(e) => setNuevo({ ...nuevo, phone: e.target.value })}
+                inputMode="tel"
+                className="cn-ent-entrada cn-ent-mono"
+              />
+            </label>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              type="submit"
-              className="px-2.5 py-1 bg-brand-700 hover:bg-brand-800 text-white rounded-control text-[11px] font-semibold"
-            >
-              Registrar y usar
-            </button>
-            <button
-              type="button"
-              onClick={() => setCreando(false)}
-              className="text-[11px] text-ink-500 hover:text-ink-700"
-            >
+          <div className="cn-ent-botones">
+            <button type="button" onClick={() => setCreando(false)} className="cn-ini-boton cn-ini-boton--texto cn-ent-boton">
               Cancelar
+            </button>
+            <button type="submit" disabled={guardando} className="cn-ini-boton cn-ini-boton--primario cn-ent-boton">
+              {guardando ? 'Registrando…' : 'Registrar y usar'}
             </button>
           </div>
         </form>
-      )}
-
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-line-100 flex items-center justify-center shrink-0">
-          <UserRound className="w-4 h-4 text-ink-500" />
-        </div>
-
-        <select
-          value={value ?? ''}
-          onChange={(e) => {
-            const id = e.target.value || null;
-            onChange(id, clients.find((c) => c.id === id) ?? null);
-          }}
-          disabled={cargando}
-          className="flex-1 min-w-0 bg-canvas border border-line-200 rounded-control px-2 py-1.5 text-[11px] text-ink-900 focus:outline-none focus:border-brand-700 disabled:opacity-60"
-        >
-          <option value="">{cargando ? 'Cargando clientes…' : 'Sin cliente asignado'}</option>
-          {clients.map((client) => (
-            <option key={client.id} value={client.id}>
-              {client.fullName} · {client.documentId}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {seleccionado && (
-        <p className="text-[11px] text-ink-500 flex flex-wrap items-center gap-x-3 gap-y-1 pl-10">
-          <span className="flex items-center gap-1">
-            <IdCard className="w-3 h-3 text-ink-400" />
-            {seleccionado.documentId}
-          </span>
-          {seleccionado.phone && <span>{seleccionado.phone}</span>}
-          {seleccionado.email && <span className="truncate">{seleccionado.email}</span>}
-          <span className="text-ink-400">
-            {seleccionado.interviews}{' '}
-            {seleccionado.interviews === 1 ? 'entrevista' : 'entrevistas'}
-          </span>
-        </p>
       )}
     </div>
   );

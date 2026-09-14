@@ -16,7 +16,11 @@ import { exportarInformeAPdf, exportarInformeAWord } from '../services/informeEx
 import type { DatosDeExportacion } from '../services/informeLayout';
 import type { DatosDelTaller } from './TallerDeRevision';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
-import { Combobox, type OpcionCombobox } from './Combobox';
+import type { OpcionEnCascada } from './SelectorEnCascada';
+import { EstadoDeLaFicha } from './SelectorEnCascada';
+import { SelectorDelFormulario } from './SelectorDelFormulario';
+import { estadoDeLaFicha, ordenarParaLaLista } from '../services/fichaEnLaLista';
+import { esTituloDeTrabajo } from '../../catalog/tituloDeTrabajo';
 import { useCatalogBranchesState } from '../../catalog/hooks/useCatalogBranches';
 import { useBranchActuacionesState } from '../../catalog/hooks/useBranchActuaciones';
 import { BRANCH_LABELS } from '../../catalog/branchLabels';
@@ -304,33 +308,54 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
   /** La guía de este diálogo es la del escrito PROPIO; la del modo recibido la lleva `PuenteAlAtaque`. */
   const ramaDeLaGuia = rama;
 
-  const opcionesRama: OpcionCombobox[] = React.useMemo(
+  const opcionesRama: OpcionEnCascada[] = React.useMemo(
     () => ramasEstado.ramas.map((b) => ({ valor: b, etiqueta: BRANCH_LABELS[b] ?? b })),
     [ramasEstado.ramas]
   );
 
   /*
-   * Cada actuación con su término a la vista, como en el selector de Redacción:
-   * el abogado tiene que poder ver ANTES de elegir si el plazo está verificado
-   * contra la norma, si no caduca o si nadie lo comprobó. Un visto verde en
-   * todas afirmaría una verificación que el catálogo no respalda.
+   * Cada actuación con su estado y su término a la vista, como en el selector
+   * de Redacción: el abogado tiene que poder ver ANTES de elegir si el plazo
+   * está verificado contra la norma, si no caduca o si nadie lo comprobó. Un
+   * visto verde en todas afirmaría una verificación que el catálogo no respalda.
+   *
+   * EL MISMO ORDEN Y LOS MISMOS BLOQUES DE LA BARRA: alfabético español, y lo
+   * prestado por remisión debajo, con su advertencia dicha UNA vez en la
+   * cabecera del bloque y no repetida en cada fila. Este diálogo no tiene
+   * salidas de servicio en la lista: la guía es el botón de abajo.
    */
-  const opcionesTipo: OpcionCombobox[] = React.useMemo(
+  const opcionesTipo: OpcionEnCascada[] = React.useMemo(
     () =>
-      catalogoDeLaRama.actuaciones.map((a) => ({
-        valor: a.exactName,
-        etiqueta: a.exactName,
-        detalle: a.porRemision
-          ? a.porRemision.marca
-          : a.firmDefined
-          ? 'de su firma · sin norma verificada'
-          : a.term.status === 'NO_CADUCA'
-          ? 'No caduca'
-          : a.term.status === 'NO_VERIFICADO'
-          ? 'sin dato'
-          : a.term.description ?? ''
-      })),
+      ordenarParaLaLista(catalogoDeLaRama.actuaciones).map((a): OpcionEnCascada => {
+        if (a.porRemision) {
+          return {
+            valor: a.exactName,
+            etiqueta: a.exactName,
+            detalleTexto: a.porRemision.marca,
+            grupo: { titulo: a.porRemision.marca, aviso: a.porRemision.aviso }
+          };
+        }
+        const estado = estadoDeLaFicha(a, esTituloDeTrabajo(a.exactName));
+        const termino = a.term.status === 'VERIFICADO' ? a.term.description ?? '' : '';
+        return {
+          valor: a.exactName,
+          etiqueta: a.exactName,
+          detalle: (
+            <>
+              <EstadoDeLaFicha estado={estado} />
+              {termino && <span className="cn-red-fila-termino">{termino}</span>}
+            </>
+          ),
+          detalleTexto: [estado.articulo, estado.texto, termino].filter(Boolean).join(' · ')
+        };
+      }),
     [catalogoDeLaRama.actuaciones]
+  );
+
+  /* La posición es una lista corta y fija: sin lupa, y con la misma fuente en las dos formas. */
+  const opcionesPosicion: OpcionEnCascada[] = React.useMemo(
+    () => PAPELES_REPRESENTABLES.map((p) => ({ valor: p, etiqueta: COMO_SE_REPRESENTA[p] })),
+    []
   );
 
   /*
@@ -834,10 +859,21 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
       hayCambiosSinGuardar={ocupado}
       onIntentoDeCerrarConCambios={() => undefined}
       pieIzquierda={
-        <span className="cn-inf-precio">
-          {respuesta
-            ? `Cobrado ${pesos(respuesta.cobradoCop)}${Number.isFinite(respuesta.saldoCop) ? ` · saldo ${pesos(respuesta.saldoCop)}` : ''}${respuesta.guardada === false ? ' · no se pudo guardar' : ''}`
-            : `Cuesta ${pesos(precioCop)}`}
+        /*
+          «DESDE», NO «CUESTA». La revisión se cobra por el mayor entre el piso
+          y lo que midió (`precioDeOperacion` en billing.service): un documento
+          largo cuesta más que el piso, y «Cuesta $2.000» prometía un precio
+          fijo que el cobro no respeta. Sin mono: un precio no es un dato que
+          se cite en un escrito.
+        */
+        <span className="cn-inf-costo">
+          {respuesta ? (
+            `Cobrado ${pesos(respuesta.cobradoCop)}${Number.isFinite(respuesta.saldoCop) ? ` · saldo ${pesos(respuesta.saldoCop)}` : ''}${respuesta.guardada === false ? ' · no se pudo guardar' : ''}`
+          ) : (
+            <>
+              Desde <span className="cn-inf-costo-cifra">{pesos(precioCop)}</span> de su saldo
+            </>
+          )}
         </span>
       }
       acciones={
@@ -928,7 +964,7 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
               className="cn-tal-boton cn-tal-boton--primario"
             >
               <ClipboardCheck className="h-3.5 w-3.5" />
-              {ocupado ? (subiendo !== null ? `Enviando · ${subiendo}%` : 'Revisando…') : `Revisar · ${pesos(precioCop)}`}
+              {ocupado ? (subiendo !== null ? `Enviando · ${subiendo}%` : 'Revisando…') : 'Revisar'}
             </button>
           </>
         )
@@ -1017,14 +1053,12 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
             Va ENCIMA de la posición porque es lo que la deduce: escoger el
             caso contesta la pregunta de abajo sin que nadie la responda.
 
-            Solo se pinta si la firma tiene expedientes. Un desplegable vacío
-            con «— sin expediente —» y nada más no ofrece nada y enseña que
-            sobra un campo. */}
-          {/* ─── DE QUÉ CASO ES ──────────────────────────────────────────
-            Va ENCIMA de la posición porque es lo que la deduce: escoger el
-            caso contesta la pregunta de abajo sin que nadie la responda. */}
+            Solo se pinta si la firma tiene expedientes. Con la cara nueva: el
+            selector compartido la trae detrás de `cara="nueva"`, para no
+            cambiarles la pantalla a la agenda, el triaje ni las audiencias. */}
           {esRecibido && (
             <SelectorDeExpediente
+              cara="nueva"
               valor={expedienteId}
               onCambio={(id) => void eligeExpediente(id)}
               id="expediente-de-la-revision"
@@ -1034,28 +1068,18 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
 
           {esRecibido && (
             <div className="cn-inf-bloque">
-              <p className="cn-inf-etiqueta" aria-hidden="true">
-                A quién representa en este proceso
-              </p>
-              <label className="sr-only" htmlFor="posicion-procesal">
-                A quién representa en este proceso
-              </label>
-              <select
+              <SelectorDelFormulario
                 id="posicion-procesal"
-                className="cn-inf-campo"
-                value={posicion}
-                onChange={(e) => {
-                  setPosicion(e.target.value as PapelEnElExpediente);
+                etiqueta="A quién representa en este proceso"
+                valor={posicion}
+                opciones={opcionesPosicion}
+                conBusqueda={false}
+                onChange={(v) => {
+                  setPosicion(v as PapelEnElExpediente);
                   /* Escogida a mano: cambiar de caso ya no la pisa. */
                   setPosicionDeducida(false);
                 }}
-              >
-                {PAPELES_REPRESENTABLES.map((p) => (
-                  <option key={p} value={p}>
-                    {COMO_SE_REPRESENTA[p]}
-                  </option>
-                ))}
-              </select>
+              />
               <p className="cn-inf-ayuda">
                 {posicionDeducida
                   ? 'Tomado del expediente, de quien registró como su cliente. Cámbielo si no es así.'
@@ -1160,9 +1184,15 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                 —que es lo normal cuando el escrito viene de otro—, la guía la propone leyendo el archivo, con el término, el artículo y
                 la autoridad a la vista, y usted escoge.
               </p>
-              <div className="mt-2 flex flex-col gap-2 sm:flex-row">
-                <div className="min-w-0 flex-1">
-                  <Combobox
+              {/*
+                UNO DEBAJO DEL OTRO, también en escritorio. Las listas se abren
+                en línea, empujando lo de abajo: en dos columnas, la lista de la
+                rama abría un hueco bajo la actuación y la dejaba colgando.
+              */}
+              <div className="mt-2 grid gap-3">
+                <div className="min-w-0">
+                  <SelectorDelFormulario
+                    id="rama-de-la-revision"
                     etiqueta="Rama"
                     valor={rama}
                     opciones={opcionesRama}
@@ -1172,7 +1202,6 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                       setTipoPropio('');
                     }}
                     vacio="Elegir rama…"
-                    anchoBoton="max-w-full"
                     cargando={ramasEstado.estado === 'CARGANDO'}
                     pie={
                       ramasEstado.estado === 'ERROR'
@@ -1183,14 +1212,14 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
                     }
                   />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <Combobox
+                <div className="min-w-0">
+                  <SelectorDelFormulario
+                    id="actuacion-de-la-revision"
                     etiqueta="Actuación"
                     valor={tipo}
                     opciones={opcionesTipo}
                     onChange={setTipoPropio}
                     vacio={rama ? 'Elegir actuación…' : 'Elija primero la rama'}
-                    anchoBoton="max-w-full"
                     cargando={Boolean(rama) && catalogoDeLaRama.estado === 'CARGANDO'}
                     pie={
                       !rama

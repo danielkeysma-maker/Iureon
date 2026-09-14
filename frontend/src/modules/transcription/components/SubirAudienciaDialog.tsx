@@ -1,28 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { AlertTriangle, Cpu, FileAudio, Upload } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { billingApi } from '../../billing/billing.api';
 import { SUPPORTED_AUDIO_EXTENSIONS } from '../types';
 import { SelectorDeExpediente } from '../../expedientes/components/SelectorDeExpediente';
+import { esperaDeTranscripcion, limiteDeSubida, megabytesEnPalabras } from '../audienciaEnPantalla';
 
 /**
- * Subir audio de audiencia. Diálogo tipo 2 —formulario— en tamaño M.
+ * Subir una grabación. Artboard `app-audiencias-entrevistas.html`:158.
  *
- * ─── «QUÉ VA A PASAR» PROMETE SOLO LO QUE SE CUMPLE ─────────────────────────
+ * ─── LO QUE SE ADOPTA Y LO QUE NO ──────────────────────────────────────────
  *
- * La lista de cuatro puntos es la promesa central del producto aplicada al
- * audio: las voces se separan y se numeran, el abogado les pone nombre una
- * sola vez, los fragmentos poco claros SE MARCAN Y NO SE INVENTAN, y la
- * transcripción queda «Por revisar» hasta que alguien la lea. Cada punto es
- * verificable en la pantalla siguiente; ninguno es publicidad.
+ * Se adopta la forma: la franja de soltar el archivo con «Elegir archivo», dos
+ * campos lado a lado y el pie con la línea de estado a la izquierda. No se
+ * adopta nada que el producto no haga:
+ *   · «Hasta 500 MB · mp3, m4a, wav, mp4» → el límite que manda el SERVIDOR y
+ *     los formatos de `SUPPORTED_AUDIO_EXTENSIONS`, que incluyen webm y mpga;
+ *   · «Cómo la llama» y las fichas de «Quiénes intervienen» → no existen; el
+ *     campo real es el CONTEXTO en texto libre, que viaja al motor;
+ *   · «Se cobra por duración… $6.000» → transcribir no se cobra. El pie lo dice
+ *     solo cuando el servidor informa precio cero, y calla si no responde.
  *
- * ─── EL COSTO SE DICE ANTES, Y VIENE DEL SERVIDOR ───────────────────────────
+ * ─── LA ESPERA ES ESTE MISMO DIÁLOGO ───────────────────────────────────────
  *
- * En una plataforma de saldo prepagado, una hora de audio no puede procesarse
- * sin decir cuánto cuesta. El precio se pide a /billing/summary y no se
- * escribe aquí: este archivo ya vivió la lección del «máximo 25 MB» que siguió
- * anunciando el límite del proveedor viejo meses después del cambio. Si el
- * servidor no responde, no se muestra un número inventado — se muestra nada.
+ * Artboard :248 pinta «Transcribiendo» con pasos y avance parcial. Transcribir
+ * es una sola llamada: aquí se ven los dos estados reales del gancho —enviando
+ * con su porcentaje, transcribiendo sin cifra— en el lugar donde se pidió, y
+ * el diálogo no se deja cerrar mientras dura, porque cerrarlo no cancela nada.
  */
 
 interface SubirAudienciaDialogProps {
@@ -38,8 +41,6 @@ interface SubirAudienciaDialogProps {
   onTranscribir: (archivo: File, contexto: string, expedienteId: string) => void;
 }
 
-const megabytes = (bytes: number): string => (bytes / (1024 * 1024)).toFixed(1);
-
 export const SubirAudienciaDialog: React.FC<SubirAudienciaDialogProps> = ({
   abierto,
   onCerrar,
@@ -52,177 +53,192 @@ export const SubirAudienciaDialog: React.FC<SubirAudienciaDialogProps> = ({
 }) => {
   const [archivo, setArchivo] = useState<File | null>(null);
   const [contexto, setContexto] = useState('');
-  const [precio, setPrecio] = useState<number | null>(null);
-
-  const trabajando = isUploading || isTranscribing;
-
   /*
-   * El precio, del servidor y solo cuando el diálogo se abre.
-   *
-   * CERO SE TRATA COMO «SIN PRECIO», NO COMO «$0». Transcribir dejó de
-   * cobrarse, y pintar «Costo: $0» dejaría en pantalla un renglón de cobro para
-   * decir que no hay cobro — ruido donde antes hubo una promesa. Si algún día
-   * vuelve a tener precio, el servidor lo manda y el rótulo reaparece solo: la
-   * pantalla sigue al servidor, no al revés.
-   */
-  /*
-   * DE QUE CASO ES LA GRABACION. Una audiencia pertenece a un proceso, asi que
-   * puede nacer atada en vez de jalarse despues desde Expedientes.
+   * DE QUÉ CASO ES LA GRABACIÓN. Una audiencia pertenece a un proceso, así que
+   * puede nacer atada en vez de jalarse después desde Expedientes.
    */
   const [expedienteId, setExpedienteId] = useState('');
+  const [precio, setPrecio] = useState<number | null>(null);
+  /*
+   * Si hubo un envío APARTE de la transcripción. Por la ruta de almacenamiento
+   * el archivo viaja primero y luego se transcribe; por la directa las dos
+   * cosas son la misma petición, y pintar «Enviar la grabación» como un paso
+   * cumplido sería afirmar algo que no se observó.
+   */
+  const [huboEnvio, setHuboEnvio] = useState(false);
 
+  const trabajando = isUploading || isTranscribing;
+  const espera = esperaDeTranscripcion({ subiendo: isUploading, progreso: uploadProgress, transcribiendo: isTranscribing });
+
+  useEffect(() => {
+    if (isUploading) setHuboEnvio(true);
+    if (!trabajando && !isUploading) setHuboEnvio(false);
+  }, [isUploading, trabajando]);
+
+  /*
+   * EL PRECIO, DEL SERVIDOR, Y SOLO PARA DECIR QUE NO HAY. Transcribir dejó de
+   * cobrarse; «Transcribir no consume saldo» se escribe únicamente cuando el
+   * servidor lo confirma con un cero. Si no responde, el pie calla: una cifra
+   * o una gratuidad supuestas son la misma clase de mentira.
+   */
   useEffect(() => {
     if (!abierto || precio !== null) return;
     billingApi
       .summary()
-      .then((r) => setPrecio(r.prices?.TRANSCRIPCION || null))
+      .then((r) => setPrecio(typeof r.prices?.TRANSCRIPCION === 'number' ? r.prices.TRANSCRIPCION : null))
       .catch(() => setPrecio(null));
   }, [abierto, precio]);
 
+  const pesaDemasiado = Boolean(archivo && archivo.size > maxAudioBytes);
+
   return (
-    <Dialog
-      abierto={abierto}
-      onCerrar={trabajando ? () => undefined : onCerrar}
-      tamano="M"
-      titulo="Subir audio de audiencia"
-      subtitulo={`${SUPPORTED_AUDIO_EXTENSIONS.join(', ').toUpperCase()} · máximo ${megabytes(maxAudioBytes)} MB`}
-      hayCambiosSinGuardar={Boolean(archivo) || trabajando}
-      onIntentoDeCerrarConCambios={() => undefined}
-      pieIzquierda={
-        precio !== null ? (
-          <span className="font-mono text-[11px]">
-            Costo: ${precio.toLocaleString('es-CO')}
-            {/* El piso, no una tarifa plana: un audio muy largo cuesta lo que consumió. */}
-            <span className="text-ink-400"> · más si el audio es muy largo</span>
-          </span>
-        ) : undefined
-      }
-      acciones={
-        <>
-          <button onClick={onCerrar} className="btn-neutral btn-sm" disabled={trabajando}>
-            Cancelar
-          </button>
-          {/* Lleva la cifra solo si la hay: transcribir no se cobra desde el 29/08/2026. */}
-          <button
-            onClick={() => archivo && onTranscribir(archivo, contexto, expedienteId)}
-            disabled={!archivo || trabajando}
-            className="btn-primary btn-sm"
-          >
-            {isUploading ? (
-              <>
-                <Upload className="h-3.5 w-3.5 animate-pulse" />
-                {/*
-                  * La cifra solo aparece cuando de verdad la hay. Con el
-                  * porcentaje en cero no se sabe si es que va en cero o si el
-                  * navegador no puede medirlo, y un contador clavado en 0% dice
-                  * menos que no poner ninguno.
-                  */}
-                {uploadProgress > 0 ? `Enviando · ${uploadProgress}%` : 'Enviando la grabación…'}
-              </>
-            ) : isTranscribing ? (
-              <>
-                <Cpu className="h-3.5 w-3.5 animate-spin" />
-                Transcribiendo…
-              </>
-            ) : (
-              <>Transcribir{precio !== null ? ` · $${precio.toLocaleString('es-CO')}` : ''}</>
+    <div className="cn-aud-dialogos">
+      <Dialog
+        abierto={abierto}
+        onCerrar={trabajando ? () => undefined : onCerrar}
+        tamano="M"
+        titulo="Subir una grabación"
+        subtitulo="La del despacho o la suya. Iureon separa a cada interlocutor y propone su rol."
+        hayCambiosSinGuardar={Boolean(archivo) || trabajando}
+        onIntentoDeCerrarConCambios={() => undefined}
+        pieIzquierda={!trabajando && precio === 0 ? <span className="cn-aud-pie-nota">Transcribir no consume saldo.</span> : <span />}
+        acciones={
+          <>
+            <button type="button" onClick={onCerrar} className="cn-ini-boton cn-ini-boton--texto cn-aud-boton" disabled={trabajando}>
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={() => archivo && onTranscribir(archivo, contexto, expedienteId)}
+              disabled={!archivo || trabajando || pesaDemasiado}
+              className="cn-ini-boton cn-ini-boton--primario cn-aud-boton"
+            >
+              {trabajando ? 'Un momento…' : 'Subir y transcribir'}
+            </button>
+          </>
+        }
+      >
+        {espera ? (
+          <div className="cn-aud-espera" role="status" aria-live="polite">
+            <div className="cn-aud-espera-cabeza">
+              <span className="cn-aud-giro" aria-hidden="true" />
+              <div>
+                <p className="cn-aud-espera-titulo">{espera.titulo}</p>
+                {archivo && (
+                  <p className="cn-aud-nota">
+                    {archivo.name} · {megabytesEnPalabras(archivo.size)}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {huboEnvio ? (
+              <ol className="cn-aud-pasos">
+                <li className={espera.paso === 'enviando' ? 'cn-aud-paso cn-aud-paso--actual' : 'cn-aud-paso cn-aud-paso--hecho'}>
+                  {espera.paso === 'enviando' ? `Enviando la grabación · ${espera.detalle}` : 'Grabación enviada'}
+                </li>
+                <li className={espera.paso === 'transcribiendo' ? 'cn-aud-paso cn-aud-paso--actual' : 'cn-aud-paso'}>
+                  Transcribir y separar las voces
+                </li>
+              </ol>
+            ) : null}
+
+            {espera.paso === 'transcribiendo' && <p className="cn-aud-nota">{espera.detalle}</p>}
+            <p className="cn-aud-nota">
+              Al terminar, la grabación se borra del almacenamiento y se abre el transcrito.
+            </p>
+          </div>
+        ) : (
+          <div className="cn-aud-dlg">
+            {/* ─── EL ARCHIVO ──────────────────────────────────────────────── */}
+            <div className={`cn-aud-soltar${archivo ? ' cn-aud-soltar--lleno' : ''}`}>
+              <input
+                type="file"
+                aria-label="Elegir la grabación"
+                accept={SUPPORTED_AUDIO_EXTENSIONS.map((e) => `.${e}`).join(',')}
+                onChange={(e) => setArchivo(e.target.files?.[0] ?? null)}
+                className="cn-aud-soltar-entrada"
+              />
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="cn-aud-soltar-icono">
+                <path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3" />
+                <polyline points="8 9 12 5 16 9" />
+                <line x1="12" y1="5" x2="12" y2="16" />
+              </svg>
+              <div className="cn-aud-soltar-textos">
+                <p className="cn-aud-soltar-titulo">
+                  {archivo ? `${archivo.name} · ${megabytesEnPalabras(archivo.size)}` : 'Suelte aquí el audio o el video de la audiencia'}
+                </p>
+                <p className="cn-aud-nota">{limiteDeSubida(maxAudioBytes, SUPPORTED_AUDIO_EXTENSIONS)}</p>
+              </div>
+              <span className="cn-ini-boton cn-ini-boton--blanco cn-aud-boton cn-aud-soltar-boton" aria-hidden="true">
+                {archivo ? 'Cambiar' : 'Elegir archivo'}
+              </span>
+            </div>
+
+            {pesaDemasiado && archivo && (
+              <p className="cn-aud-nota cn-aud-nota--aviso">
+                Este archivo pesa {megabytesEnPalabras(archivo.size)} y el límite es {megabytesEnPalabras(maxAudioBytes)}.
+                Divida la grabación en partes y súbalas por separado.
+              </p>
             )}
-          </button>
-        </>
-      }
-    >
-      <div className="space-y-4">
-        {/* ─── EL ARCHIVO ──────────────────────────────────────────────────── */}
-        <div className="relative flex flex-col items-center rounded-card border-2 border-dashed border-line-200 bg-canvas p-6 text-center transition-colors hover:border-brand-700">
-          <input
-            type="file"
-            accept={SUPPORTED_AUDIO_EXTENSIONS.map((e) => `.${e}`).join(',')}
-            onChange={(e) => setArchivo(e.target.files?.[0] ?? null)}
-            disabled={trabajando}
-            className="absolute inset-0 cursor-pointer opacity-0 disabled:cursor-not-allowed"
-          />
-          <FileAudio className="mb-2 h-7 w-7 text-brand-700" />
-          {archivo ? (
-            <>
-              <span className="block font-mono text-[12px] font-semibold text-ink-900">
-                {archivo.name}
-              </span>
-              <span className="font-mono text-[11px] text-verified">
-                {megabytes(archivo.size)} MB
-              </span>
-            </>
-          ) : (
-            <>
-              <span className="text-ui font-medium text-ink-900">Arrastre el archivo aquí</span>
-              <span className="text-meta text-ink-500">o haga clic para buscarlo en su equipo</span>
-            </>
-          )}
-        </div>
 
-        {/* ─── EL PROCESO ──────────────────────────────────────────────────── */}
-        <label className="block">
-          <span className="field-label">Proceso al que pertenece</span>
-          <input
-            value={contexto}
-            onChange={(e) => setContexto(e.target.value)}
-            placeholder="Juzgado 18 Laboral de Bogotá · Mosquera vs. Colpensiones · rad. 2026-00904"
-            disabled={trabajando}
-            className="field mt-1 w-full"
-          />
-          <span className="mt-1 block text-meta text-ink-500">
-            Partes, juzgado y radicado. No es adorno: con ese contexto los términos jurídicos se
-            transcriben bien.
-          </span>
-        </label>
+            <div className="cn-aud-campos">
+              {/* ─── EL CONTEXTO ─────────────────────────────────────────── */}
+              <div className="cn-aud-campo">
+                <label className="cn-aud-rotulo" htmlFor="contexto-de-la-audiencia">
+                  Proceso al que pertenece <span className="cn-aud-opcional">(opcional)</span>
+                </label>
+                <input
+                  id="contexto-de-la-audiencia"
+                  value={contexto}
+                  onChange={(e) => setContexto(e.target.value)}
+                  placeholder="Juzgado 00 Civil Municipal · Demandante vs. Demandado · rad. 00000-00-00-000-0000-00000-00"
+                  className="cn-aud-entrada"
+                />
+                <p className="cn-aud-nota">
+                  Partes, juzgado y radicado. Con ese contexto los nombres y los términos jurídicos se transcriben
+                  mejor.
+                </p>
+              </div>
 
-        {/*
-          EL CASO VA DEBAJO DEL CONTEXTO, y son cosas distintas aunque lo
-          parezcan. El contexto es TEXTO que viaja al motor para que reconozca
-          los nombres y el radicado; el expediente es la ATADURA, y no cambia
-          una sola palabra del transcrito. Juntarlos en un campo haría que
-          escoger el caso pareciera mejorar la transcripción, que no.
-        */}
-        <SelectorDeExpediente
-          valor={expedienteId}
-          onCambio={setExpedienteId}
-          id="expediente-de-la-audiencia"
-          pie="La audiencia queda contada dentro del caso, y desde ahí se prepara el interrogatorio."
-        />
+              {/*
+                EL CASO VA APARTE DEL CONTEXTO, y son cosas distintas aunque lo
+                parezcan. El contexto es TEXTO que viaja al motor; el expediente
+                es la ATADURA, y no cambia una sola palabra del transcrito.
+                Juntarlos haría que escoger el caso pareciera mejorar la
+                transcripción, que no.
+              */}
+              <div className="cn-aud-campo">
+                <SelectorDeExpediente
+                  cara="nueva"
+                  valor={expedienteId}
+                  onCambio={setExpedienteId}
+                  etiqueta="Caso (opcional)"
+                  id="expediente-de-la-audiencia"
+                  pie="La audiencia queda contada dentro del caso, y desde ahí se prepara el interrogatorio."
+                />
+              </div>
+            </div>
 
-        {/* ─── QUÉ VA A PASAR ──────────────────────────────────────────────── */}
-        <div className="rounded-card border border-line-200 bg-canvas px-4 py-3">
-          <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-            Qué va a pasar
-          </p>
-          <ul className="mt-2 space-y-1.5 text-ui leading-[1.5] text-ink-900">
-            <li>· Se separan las voces y se numeran.</li>
-            <li>· Usted les pone nombre una sola vez.</li>
-            <li>
-              · El audio de sala suele traer fragmentos poco claros:{' '}
-              <span className="font-medium">se marcan, no se inventan</span>.
-            </li>
-            <li>· Queda «Por revisar» hasta que alguien la lea.</li>
-          </ul>
-        </div>
+            {/*
+              LO QUE PASA CON EL MATERIAL, dicho donde se decide y no en una
+              página legal. La maqueta dice que el audio se guarda en la cuenta
+              de la firma; el servidor lo borra antes de responder.
+            */}
+            <p className="cn-aud-nota cn-aud-nota--caja">
+              <span className="cn-aud-fuerte">La grabación no se guarda:</span> se borra del almacenamiento apenas
+              termina de transcribirse. El texto queda en su firma y puede borrarlo cuando quiera.
+            </p>
 
-        {/*
-          LO QUE PASA CON EL MATERIAL, dicho donde se decide y no en una página
-          legal: el texto queda en la cuenta de la firma y se puede borrar; la
-          grabación se borra apenas termina de transcribirse.
-        */}
-        <p className="text-meta leading-[1.6] text-ink-500">
-          El texto de la transcripción queda guardado en su firma y puede borrarlo cuando quiera.{' '}
-          <span className="font-medium text-ink-700">La grabación no se guarda</span>: se borra del
-          almacenamiento apenas termina de transcribirse.
-        </p>
-
-        {error && (
-          <p className="flex items-start gap-2 rounded-control border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] p-2.5 text-ui text-danger">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-            {error}
-          </p>
+            {error && (
+              <div className="cn-aud-aviso cn-aud-aviso--peligro" role="alert">
+                <p className="cn-aud-aviso-titulo">No se pudo transcribir</p>
+                <p className="cn-aud-aviso-texto">{error}</p>
+              </div>
+            )}
+          </div>
         )}
-      </div>
-    </Dialog>
+      </Dialog>
+    </div>
   );
 };

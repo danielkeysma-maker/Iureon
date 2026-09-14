@@ -1,5 +1,13 @@
 import React from 'react';
 import { rotuloDeExpediente, useExpedientes } from '../useExpedientes';
+import { SelectorDelFormulario } from '../../workspace/components/SelectorDelFormulario';
+
+/*
+ * El tipo de la opción se deduce del componente que se compone, en vez de
+ * importarlo del archivo de otro módulo: la frontera de módulos prohíbe traer
+ * tipos de componentes ajenos (scripts/check-module-boundaries.sh), no usarlos.
+ */
+type OpcionEnCascada = React.ComponentProps<typeof SelectorDelFormulario>['opciones'][number];
 
 /**
  * «DE QUÉ CASO ES», UNA SOLA VEZ.
@@ -43,10 +51,53 @@ export const SelectorDeExpediente: React.FC<{
   /** Debajo. Qué gana el abogado por atarlo aquí. */
   pie?: React.ReactNode;
   id?: string;
-}> = ({ valor, onCambio, etiqueta = 'De qué caso es', pie, id = 'expediente-del-trabajo' }) => {
+  /**
+   * LA CARA NUEVA ES OPT-IN, POR PANTALLA. La agenda, el triaje y el diálogo de
+   * subir audiencias todavía llevan la cara vieja y se rediseñan por su lado:
+   * cambiarla aquí para todos les movería pantallas que nadie pidió tocar. La
+   * lista, el «sin expediente» y la regla de no pintarse sin casos siguen
+   * siendo UNA sola, que es la razón de ser de este componente.
+   */
+  cara?: 'vieja' | 'nueva';
+}> = ({ valor, onCambio, etiqueta = 'De qué caso es', pie, id = 'expediente-del-trabajo', cara = 'vieja' }) => {
   const expedientes = useExpedientes();
 
+  /*
+   * El radicado va aparte y en mono: es lo único citable de la fila. Y cuenta
+   * para el filtro, porque es lo que el abogado escribe al buscar un caso.
+   */
+  const opciones: OpcionEnCascada[] = React.useMemo(
+    () => [
+      { valor: '', etiqueta: 'Sin expediente' },
+      ...expedientes.map((e) => ({
+        valor: e.id,
+        etiqueta: e.caratula,
+        detalle: e.radicado ? <span className="cn-red-mono">{e.radicado}</span> : undefined,
+        detalleTexto: e.radicado ?? undefined,
+        busqueda: e.radicado ?? undefined
+      }))
+    ],
+    [expedientes]
+  );
+
   if (expedientes.length === 0) return null;
+
+  if (cara === 'nueva') {
+    return (
+      <div className="cn-inf-bloque">
+        <SelectorDelFormulario
+          id={id}
+          etiqueta={etiqueta}
+          valor={valor}
+          opciones={opciones}
+          onChange={onCambio}
+          vacio="Sin expediente"
+          pie={`${expedientes.length} ${expedientes.length === 1 ? 'caso' : 'casos'} de la firma. Busque por la carátula o por el radicado.`}
+        />
+        {pie && <p className="cn-inf-ayuda">{pie}</p>}
+      </div>
+    );
+  }
 
   return (
     <div>

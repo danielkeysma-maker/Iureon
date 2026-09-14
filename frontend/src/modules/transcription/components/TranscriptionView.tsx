@@ -1,19 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Upload, AlertTriangle, Copy, CheckCircle2, RotateCcw, FileText } from 'lucide-react';
 import { useTranscription } from '../hooks/useTranscription';
-import { TranscriptSegments } from './TranscriptSegments';
+import { QuienHabla, Intervenciones } from './TranscriptSegments';
 import { TranscriptSummary } from './TranscriptSummary';
 import { AudioPreview } from './AudioPreview';
-import { NotPersistedWarning, RoleProposals } from './RoleProposals';
+import { NotPersistedWarning } from './RoleProposals';
 import { AudienciasList } from './AudienciasList';
 import { SubirAudienciaDialog } from './SubirAudienciaDialog';
+import { Dialog } from '../../../design/Dialog';
 import { usePlanSoloLectura } from '../../subscriptions/PlanContext';
 import { transcriptionApi } from '../services/transcription.api';
 import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
-// Carga diferida: el acta embebe Plus Jakarta Sans (~500 KB) y solo la paga quien exporta.
 import { buildSpeakerNames } from '../speakerNames';
 import { toPlainText } from '../toPlainText';
-import { ROLE_LABELS, type SpeakerRole, type TranscriptionKind } from '../types';
+import {
+  conPocaCerteza,
+  duracionEnPalabras,
+  intervencionesEnPalabras,
+  nombreLegible,
+  vocesEnPalabras,
+  certezaDeIntervencion
+} from '../audienciaEnPantalla';
+import { ROLE_LABELS, SUPPORTED_AUDIO_EXTENSIONS, type SpeakerRole, type TranscriptionKind } from '../types';
 
 interface TranscriptionViewProps {
   kind?: TranscriptionKind;
@@ -21,44 +28,76 @@ interface TranscriptionViewProps {
    * Lleva la transcripcion al panel de redaccion como hechos del caso.
    *
    * ES EL PRIMARIO DE ESTA PANTALLA, no exportar: lo que un juez dijo en
-   * audiencia es exactamente el material del proximo escrito, y hasta ahora el
-   * unico camino era copiar al portapapeles y pegar a mano.
+   * audiencia es exactamente el material del proximo escrito.
    */
   onUsarEnRedaccion?: (texto: string) => void;
 }
 
+type Pestana = 'transcrito' | 'voces' | 'resumen';
+
 /**
- * Hearing transcription.
+ * Audiencias, con la cara nueva. `public/handoff/app-audiencias-entrevistas.html`:
+ * lista :438, subir :158, estados :248, transcrito :287, teléfono :535.
  *
  * The recording is uploaded — a court publishes it and the lawyer downloads it
- * afterwards — separated by speaker, and the lawyer assigns the procedural role
- * of each voice. Context (party names, court, radicado) is offered up front
- * because Colombian legal vocabulary is frequently mis-transcribed without it.
+ * afterwards — separated by speaker, and the lawyer names each voice. Client
+ * interviews are their own screen (modules/clients/InterviewView): they share
+ * this engine and nothing of the flow, because a hearing arrives as a file and
+ * an interview happens in the room.
  *
- * Client interviews are their own screen: see modules/clients/InterviewView.
- * They share this engine and nothing of the flow, because a hearing arrives as
- * a file and an interview happens in the room.
+ * ─── UNA SOLA VISTA PARA ESCRITORIO Y TELÉFONO ─────────────────────────────
+ *
+ * El escritorio tiene «Quién habla» como columna fija y dos pestañas
+ * (Transcrito · Resumen y hechos); el teléfono pone las voces como TERCERA
+ * pestaña y el acta como botón anclado abajo. Es la misma información en otra
+ * disposición, así que la decide el CSS con `data-pestana` y no un segundo
+ * componente que se desincronice del primero.
  */
-export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
-  kind = 'AUDIENCIA',
-  onUsarEnRedaccion
-}) => {
-  const { hasFirm, isAvailable, isUploading, uploadProgress, isTranscribing, result, error, roleProposals, persisted, maxAudioBytes, transcribe,
+export const TranscriptionView: React.FC<TranscriptionViewProps> = ({ kind = 'AUDIENCIA', onUsarEnRedaccion }) => {
+  const {
+    hasFirm,
+    isAvailable,
+    isUploading,
+    uploadProgress,
+    isTranscribing,
+    result,
+    error,
+    roleProposals,
+    persisted,
+    maxAudioBytes,
+    transcribe,
     marcarRevisada,
-    marcarHechoClave, assignRole, editSegment, splitSegment, reassignSpeaker, voiceConflicts, nameProposals, assignSpeakerName, stored, isLoadingStored, loadStored, openStored, deleteStored, canEdit, reset, transcriptionId } =
-    useTranscription(kind);
+    marcarHechoClave,
+    assignRole,
+    editSegment,
+    splitSegment,
+    reassignSpeaker,
+    voiceConflicts,
+    nameProposals,
+    assignSpeakerName,
+    stored,
+    isLoadingStored,
+    loadStored,
+    openStored,
+    deleteStored,
+    canEdit,
+    reset,
+    transcriptionId
+  } = useTranscription(kind);
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   /**
-   * Which voices the lawyer has confirmed. A suggestion disappears once
-   * accepted so the panel shows only what still needs a decision.
+   * El archivo que el abogado eligió, mientras siga en esta pestaña. Es lo único
+   * que permite escuchar: la grabación se borra del almacenamiento al
+   * transcribirse.
    */
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  /** Voces confirmadas en esta sesión: su sugerencia deja de ofrecerse. */
   const [confirmed, setConfirmed] = useState<Record<string, SpeakerRole>>({});
-  const [, setContextPrompt] = useState('');
-  /*
-   * Loaded on entry, because the whole point is that the lawyer does not have
-   * to be told their hearings are stored — they see them.
-   */
+  const [saltarA, setSaltarA] = useState<{ segundos: number; vez: number } | null>(null);
+  const [pestana, setPestana] = useState<Pestana>('transcrito');
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  const [exportarAbierto, setExportarAbierto] = useState(false);
+
   useEffect(() => {
     void loadStored();
   }, [loadStored]);
@@ -67,21 +106,20 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
   const soloLectura = usePlanSoloLectura();
   const [copied, setCopied] = useState(false);
   const [subirAbierto, setSubirAbierto] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   /*
-   * The name the export carries.
-   *
-   * The uploaded file while one is in hand, the stored title after reopening —
-   * a transcript exported from the saved list must not be called "grabación".
+   * EL NOMBRE QUE LLEVA EL ACTA. El título guardado cuando se reabrió desde la
+   * lista, y el nombre del archivo tras transcribir. El título va primero: si
+   * el abogado abre su copia local para escuchar, el acta no debe pasar a
+   * llamarse como ese archivo.
    */
   const [openedTitle, setOpenedTitle] = useState('');
-  const exportTitle = selectedFile?.name || openedTitle || 'transcripcion';
+  const exportTitle = openedTitle || selectedFile?.name || 'transcripcion';
 
   /*
-   * After a reload the hearing that was open comes back, through the same
-   * path as a click on its row — once the list is here, once per mount, and
-   * only if it is still in the list; otherwise the list is what stays.
+   * After a reload the hearing that was open comes back, through the same path
+   * as a click on its row — once the list is here, once per mount, and only if
+   * it is still in the list.
    */
   const restaurada = useRef(false);
   useEffect(() => {
@@ -100,23 +138,35 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
   }, [stored, result, kind, openStored]);
 
   /*
-   * LAS VARIANTES DEL ACTA (1g). Por defecto CON minutos: el minuto es lo que
-   * hace citable una intervencion —«a partir del 14:02»— y quitarlo produce un
-   * texto mas comodo de leer y mas dificil de verificar. Se puede quitar; no se
-   * quita solo.
+   * EL DIÁLOGO DE SUBIR SE CIERRA CUANDO HAY TRANSCRITO, NO CUANDO LA PROMESA
+   * TERMINA. `transcribe` atrapa su propio error y resuelve igual: cerrarlo en
+   * el `.then` escondía el mensaje de fallo justo cuando había que leerlo.
    */
-  const [conMarcasDeTiempo, setConMarcasDeTiempo] = React.useState(true);
-  const [soloClave, setSoloClave] = React.useState(false);
+  useEffect(() => {
+    if (result && subirAbierto) setSubirAbierto(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result]);
+
+  /* Otra audiencia empieza en su transcrito, no en la pestaña que dejó la anterior. */
+  useEffect(() => {
+    setPestana('transcrito');
+    setMenuAbierto(false);
+  }, [transcriptionId]);
+
+  /*
+   * LAS VARIANTES DEL ACTA. Por defecto CON minutos: el minuto es lo que hace
+   * citable una intervención. «Solo las marcadas» no se ofrece mientras nadie
+   * haya marcado nada: saldría un acta vacía.
+   */
+  const [conMarcasDeTiempo, setConMarcasDeTiempo] = useState(true);
+  const [soloClave, setSoloClave] = useState(false);
   const hayClaves = (result?.segments ?? []).some((s) => s.hechoClave);
   const variante = { conMarcasDeTiempo, soloClave: soloClave && hayClaves };
 
-
   /*
    * El ACTA con datos reales — y SIN RED. Todo sale de la fila que la lista ya
-   * tiene en memoria: la hora de autorizacion, quien reviso, y el resumen si
-   * alguna vez se genero. La version anterior hacia un POST al exportar y el
-   * clic pagaba el arranque en frio de la funcion: segundos de boton mudo por
-   * datos que ya estaban aqui.
+   * tiene en memoria: la hora de autorización, quién revisó, y el resumen si
+   * alguna vez se generó.
    */
   const armarActa = () => {
     if (!transcriptionId) return undefined;
@@ -131,300 +181,458 @@ export const TranscriptionView: React.FC<TranscriptionViewProps> = ({
     };
   };
 
+  const textoPlano = (): string =>
+    result ? toPlainText(result.segments, buildSpeakerNames(result.segments, ROLE_LABELS)) : '';
+
   const handleCopy = async () => {
     if (!result) return;
-
-    await navigator.clipboard.writeText(
-      toPlainText(result.segments, buildSpeakerNames(result.segments, ROLE_LABELS))
-    );
+    await navigator.clipboard.writeText(textoPlano());
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const exportar = (formato: 'word' | 'pdf') => {
+    if (!result) return;
+    void import('../transcriptExport').then((m) =>
+      formato === 'word'
+        ? m.exportTranscriptToWord(result, exportTitle, armarActa(), variante)
+        : m.exportTranscriptToPdf(result, exportTitle, armarActa(), variante)
+    );
+    setExportarAbierto(false);
   };
 
   const handleStartOver = () => {
     reset();
     setSelectedFile(null);
+    setOpenedTitle('');
+    setSaltarA(null);
     // Cleared too, or the next recording opens with the previous hearing's
     // confirmations already applied and its suggestions hidden.
     setConfirmed({});
-    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  return (
-    /*
-      `min-w-0` ES LO QUE IMPIDE QUE EL LISTADO SE CORTE POR LA DERECHA.
+  const modulo = kind === 'AUDIENCIA' ? 'Audiencias' : 'Entrevistas';
 
-      La fila de una audiencia ya está pensada para el teléfono —envuelve en dos
-      renglones—, pero su ancho MÍNIMO no baja de 973px: el nombre del archivo
-      lleva `truncate`, que es `white-space: nowrap`, y un nombre de audiencia es
-      una frase larga. Esta columna es un ítem flex, así que nace con
-      `min-width: auto` y se niega a bajar de ese mínimo: medida en un teléfono
-      de 375px, ocupaba 1015 y la raíz recortaba los 640 restantes. Con `min-w-0`
-      la columna cede, la fila envuelve como estaba previsto y nada sobresale.
-      Por encima de 1024px el contenido cabe y el mínimo no llega a aplicarse.
-    */
-    <div data-visita={`vista-${kind === 'AUDIENCIA' ? 'audiencias' : 'entrevistas'}`} className="flex h-full min-h-0 min-w-0 flex-1 flex-col bg-canvas font-sans">
-      <header className="flex shrink-0 flex-wrap items-end gap-3 border-b border-line-200 bg-surface px-5 py-3.5">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-title text-ink-900">
-            {kind === 'AUDIENCIA' ? 'Audiencias' : 'Entrevistas'}
-          </h1>
-          <p className="mt-0.5 text-meta text-ink-500 text-justify">
-            {result
-              ? `${result.segments.length} intervenciones · ${result.speakerLabels.length} interlocutores`
-              : 'La grabación, separada por interlocutor y con cada voz nombrada.'}
+  /* ─── LA LISTA ───────────────────────────────────────────────────────── */
+  const lista = (
+    <div className="cn-aud-pantalla">
+      <div className="cn-aud-marco">
+        <header className="cn-aud-cabeza">
+          <div className="cn-aud-cabeza-textos">
+            <h1 className="cn-aud-h1">{modulo}</h1>
+            <p className="cn-aud-bajada">Suba la grabación y reciba el transcrito con cada interlocutor separado.</p>
+          </div>
+          {/*
+            El primario del módulo: la audiencia es un archivo que LLEGA — el
+            juzgado la publica y el abogado la trae —, no un evento que se
+            inicia. Por eso aquí se sube, y en Entrevistas se graba.
+          */}
+          {!soloLectura && (
+            <button
+              type="button"
+              onClick={() => {
+                reset();
+                setSubirAbierto(true);
+              }}
+              className="cn-ini-boton cn-ini-boton--primario cn-aud-boton cn-aud-subir"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3" />
+                <polyline points="8 9 12 5 16 9" />
+                <line x1="12" y1="5" x2="12" y2="16" />
+              </svg>
+              Subir una grabación
+            </button>
+          )}
+        </header>
+
+        {/*
+          Dos problemas distintos, dos mensajes. Uno solo nombraba el
+          equivocado: sin firma el estado volvía 401 y la pantalla pedía
+          configurar una llave que ya estaba bien.
+        */}
+        {isAvailable === false && (
+          <div className="cn-aud-aviso cn-aud-aviso--advertencia" role="status">
+            <p className="cn-aud-aviso-titulo">El motor de transcripción no está configurado en el servidor</p>
+            <p className="cn-aud-aviso-texto">
+              Falta la variable <span className="cn-aud-mono">DEEPGRAM_API_KEY</span>. Puede preparar el envío, pero la
+              transcripción fallará hasta que se configure.
+            </p>
+          </div>
+        )}
+        {isAvailable && !hasFirm && (
+          <div className="cn-aud-aviso cn-aud-aviso--advertencia" role="status">
+            <p className="cn-aud-aviso-titulo">Todavía no hay una firma registrada</p>
+            <p className="cn-aud-aviso-texto">
+              El motor está listo, pero la transcripción necesita una firma para guardarse: regístrela desde el menú
+              lateral.
+            </p>
+          </div>
+        )}
+        {error && !subirAbierto && (
+          <div className="cn-aud-aviso cn-aud-aviso--peligro" role="alert">
+            <p className="cn-aud-aviso-texto">{error}</p>
+          </div>
+        )}
+
+        <AudienciasList
+          items={stored}
+          isLoading={isLoadingStored}
+          onOpen={(item) => {
+            setOpenedTitle(item.title);
+            /* La copia local era de otra grabación: escucharla aquí sonaría a otra audiencia. */
+            setSelectedFile(null);
+            setSaltarA(null);
+            openStored(item);
+          }}
+          onDelete={deleteStored}
+          onRefresh={() => void loadStored()}
+          onMarcarRevision={(id, estado) => {
+            void transcriptionApi.marcarRevision(id, estado).then(() => void loadStored());
+          }}
+          onSubir={
+            soloLectura
+              ? undefined
+              : () => {
+                  reset();
+                  setSubirAbierto(true);
+                }
+          }
+        />
+      </div>
+    </div>
+  );
+
+  /* ─── EL TRANSCRITO ──────────────────────────────────────────────────── */
+  const pocas = result ? conPocaCerteza(result.segments) : 0;
+  const irALaPrimeraDudosa = () => {
+    if (!result) return;
+    const i = result.segments.findIndex((s) => certezaDeIntervencion(s).baja);
+    setPestana('transcrito');
+    window.setTimeout(() => document.getElementById(`intervencion-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 0);
+  };
+
+  const pestanaBoton = (id: Pestana, texto: string, soloMovil = false) => (
+    <button
+      key={id}
+      type="button"
+      role="tab"
+      aria-selected={pestana === id}
+      onClick={() => setPestana(id)}
+      className={`cn-aud-pestana${soloMovil ? ' cn-aud-pestana--movil' : ''}`}
+    >
+      {texto}
+    </button>
+  );
+
+  const detalle = result ? (
+    <div className="cn-aud-detalle">
+      <header className="cn-aud-barra">
+        <button type="button" onClick={handleStartOver} className="cn-aud-volver" aria-label={`Volver a ${modulo}`}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          <span className="cn-aud-volver-texto">{modulo}</span>
+        </button>
+
+        <div className="cn-aud-barra-titulos">
+          <p className="cn-aud-barra-titulo">{nombreLegible(exportTitle)}</p>
+          <p className="cn-aud-barra-meta">
+            <span className="cn-aud-solo-escritorio">
+              {[
+                new Date(result.transcribedAt).toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' }),
+                duracionEnPalabras(result.durationSeconds),
+                intervencionesEnPalabras(result.segments.length)
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+            </span>
+            <span className="cn-aud-solo-movil">
+              {vocesEnPalabras(result.speakerLabels.length)} · {intervencionesEnPalabras(result.segments.length)}
+            </span>
           </p>
         </div>
 
-        {!result && !soloLectura && (
-          /*
-            El primario del modulo: la audiencia es un archivo que LLEGA — el
-            juzgado la publica y el abogado la trae — no un evento que se
-            inicia. Por eso aqui se sube, y en Entrevistas se graba.
-          */
-          <button onClick={() => setSubirAbierto(true)} className="btn-primary btn-sm">
-            <Upload className="h-3.5 w-3.5" />
-            Subir audio
-          </button>
-        )}
-
-        {result && (
-          <>
-            <button onClick={handleCopy} className="btn-neutral btn-sm">
-              {copied ? (
-                <CheckCircle2 className="h-3.5 w-3.5 text-verified" />
-              ) : (
-                <Copy className="h-3.5 w-3.5" />
-              )}
-              {copied ? 'Copiado' : 'Copiar'}
-            </button>
-
-            {/*
-              LAS VARIANTES DEL ACTA (1g). Van ANTES de los formatos porque
-              deciden QUE se lleva; el formato decide en qué papel. Elegir el
-              papel primero y el contenido después es el orden inverso al que
-              tiene el abogado en la cabeza.
-
-              «Solo las marcadas» queda DESHABILITADA mientras nadie haya
-              marcado nada: un acta «solo clave» de un transcrito sin marcas
-              saldría vacía, y quien la abriera pensaría que se perdió la
-              audiencia.
-            */}
-            <div className="flex items-center gap-2">
-              <label className="inline-flex cursor-pointer items-center gap-1.5 text-[11px] text-ink-700">
-                <input
-                  type="checkbox"
-                  checked={conMarcasDeTiempo}
-                  onChange={(e) => setConMarcasDeTiempo(e.target.checked)}
-                />
-                Con minutos
-              </label>
-              <label
-                className={`inline-flex items-center gap-1.5 text-[11px] ${
-                  hayClaves ? 'cursor-pointer text-ink-700' : 'text-ink-400'
-                }`}
-                title={
-                  hayClaves
-                    ? 'Solo las intervenciones que alguien marcó como decisivas'
-                    : 'Marque alguna intervención como hecho clave para poder exportar solo esas'
-                }
-              >
-                <input
-                  type="checkbox"
-                  checked={soloClave && hayClaves}
-                  disabled={!hayClaves}
-                  onChange={(e) => setSoloClave(e.target.checked)}
-                />
-                Solo las marcadas
-              </label>
-            </div>
-
-            {/* Word y PDF unidos, como en el taller: un formato, no dos decisiones. */}
-            <div className="flex">
-              <button
-                onClick={() =>
-                  result &&
-                  void import('../transcriptExport').then((m) =>
-                    m.exportTranscriptToWord(result, exportTitle, armarActa(), variante)
-                  )
-                }
-                className="btn-secondary btn-sm rounded-r-none"
-                title="El .docx es el que se edita para el acta"
-              >
-                <FileText className="h-3 w-3" />
-                Word
-              </button>
-              <button
-                onClick={() =>
-                  result &&
-                  void import('../transcriptExport').then((m) =>
-                    m.exportTranscriptToPdf(result, exportTitle, armarActa(), variante)
-                  )
-                }
-                className="btn-secondary btn-sm -ml-px rounded-l-none"
-                title="El PDF es el que se anexa al expediente"
-              >
-                PDF
-              </button>
-            </div>
-
-            <button onClick={handleStartOver} className="btn-neutral btn-sm">
-              <RotateCcw className="h-3.5 w-3.5" />
-              Otra grabación
-            </button>
-
-            {/*
-              EL PRIMARIO: exportar no es el objetivo de esta pantalla. Lo que
-              se dijo en audiencia es el material del proximo escrito.
-            */}
-            {onUsarEnRedaccion && (
-              <button
-                onClick={() =>
-                  onUsarEnRedaccion(
-                    toPlainText(result.segments, buildSpeakerNames(result.segments, ROLE_LABELS))
-                  )
-                }
-                className="btn-primary btn-sm"
-              >
-                Usar en redacción
-              </button>
-            )}
-          </>
-        )}
-      </header>
-
-      <div className="min-h-0 flex-1 overflow-y-auto p-5">
-        <div className="mx-auto max-w-6xl space-y-4">
-
-        {/*
-          Two different problems, two different messages. One banner used to
-          cover both, and it named the wrong one: with no firm registered the
-          status request came back 401, the client read that as "unavailable",
-          and the screen told the user to configure an API key that was already
-          correct. Telling someone to fix the wrong thing costs more than saying
-          nothing.
-        */}
-        {isAvailable === false && (
-          <div className="p-3 bg-[rgb(var(--unverified-surf))] border border-[rgb(var(--unverified-line))] rounded-card text-ink-900 text-xs flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 text-unverified shrink-0 mt-0.5" />
-            <span>
-              El motor de transcripción no está configurado en el servidor. Falta la variable
-              <b className="font-mono"> DEEPGRAM_API_KEY</b>. Puedes preparar el envío, pero la
-              transcripción fallará hasta que se configure.
-            </span>
-          </div>
-        )}
-
-        {isAvailable && !hasFirm && (
-          <div className="p-3 bg-[rgb(var(--unverified-surf))] border border-[rgb(var(--unverified-line))] rounded-card text-ink-900 text-xs flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 text-unverified shrink-0 mt-0.5" />
-            <span>
-              El motor de transcripción está listo, pero todavía no hay una firma registrada.
-              La transcripción necesita una firma para guardarse: regístrala desde el menú lateral.
-            </span>
-          </div>
-        )}
-
-        {!result && (
-          <AudienciasList
-            items={stored}
-            isLoading={isLoadingStored}
-            onOpen={(item) => {
-              setOpenedTitle(item.title);
-              openStored(item);
-            }}
-            onDelete={deleteStored}
-            onRefresh={() => void loadStored()}
-            onMarcarRevision={(id, estado) => {
-              void transcriptionApi.marcarRevision(id, estado).then(() => void loadStored());
-            }}
-          />
-        )}
-
-        <SubirAudienciaDialog
-          abierto={subirAbierto}
-          onCerrar={() => setSubirAbierto(false)}
-          maxAudioBytes={maxAudioBytes}
-          isUploading={isUploading}
-          uploadProgress={uploadProgress}
-          isTranscribing={isTranscribing}
-          error={error}
-          onTranscribir={(archivo, contexto, expedienteId) => {
-            setSelectedFile(archivo);
-            setContextPrompt(contexto);
-            void transcribe(archivo, contexto, undefined, expedienteId || undefined).then(() =>
-              setSubirAbierto(false)
-            );
-          }}
-        />
-
-        {result && (
-          <>
-            {!persisted && <NotPersistedWarning />}
-
-
-            {/*
-              The mutation errors, IN the result view. The only other error
-              display lives inside the upload panel, which unmounts the moment a
-              transcript exists — so a failed correction, cut, move or role
-              assignment set an error nobody could ever see. The edit stayed on
-              screen looking saved while the server still had the old text: a
-              silent lie in a legal transcript editor. Reported by review, not
-              by a user, but reachable by any transient network failure.
-            */}
-            {error && (
-              <div className="bg-[rgb(var(--danger)/0.06)] border border-[rgb(var(--danger)/0.35)] rounded-card p-3 flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-danger shrink-0 mt-0.5" />
-                <p className="text-[11px] text-danger text-justify">
-                  {error} La pantalla se devolvió a lo último que sí quedó guardado.
-                </p>
-              </div>
-            )}
-
-            <RoleProposals
-              proposals={roleProposals}
-              assigned={confirmed}
-              onAccept={(speakerLabel, role) => {
-                assignRole(speakerLabel, role);
-                setConfirmed((current) => ({ ...current, [speakerLabel]: role }));
-              }}
-            />
-
-            {/* The recording plays from the browser's own copy of the file, so
-                a doubtful word can be checked against what was actually said —
-                the audio itself is deleted from storage once transcribed. */}
-            {/* Lo esencial sin releer dos horas: mismo componente que en Entrevistas. */}
-            {transcriptionId && (
-              <TranscriptSummary transcriptionId={transcriptionId} kind="AUDIENCIA" />
-            )}
-
-            <TranscriptSegments
-              result={result}
-              kind={kind}
-              onAssignRole={assignRole}
-              onEditSegment={canEdit ? editSegment : undefined}
-              onSplitSegment={canEdit ? splitSegment : undefined}
-              onReassignSpeaker={canEdit ? reassignSpeaker : undefined}
-              onMarcarRevisada={canEdit ? marcarRevisada : undefined}
-              onMarcarHechoClave={marcarHechoClave}
-              voiceConflicts={voiceConflicts}
-              nameProposals={nameProposals}
-              onAssignSpeakerName={canEdit ? assignSpeakerName : undefined}
-            />
-          </>
-        )}
+        <div className="cn-aud-pestanas" role="tablist" aria-label="Vista del transcrito">
+          {pestanaBoton('transcrito', 'Transcrito')}
+          {pestanaBoton('voces', `Quién habla · ${result.speakerLabels.length}`, true)}
+          {pestanaBoton('resumen', 'Resumen y hechos')}
         </div>
 
-        {/*
-          EL REPRODUCTOR, ANCLADO ABAJO. No se mueve con el scroll: comprobar
-          la palabra dudosa del minuto 44 exige oir y leer a la vez.
-        */}
-        {result && selectedFile && (
-          <div className="sticky bottom-0 z-20 mx-auto max-w-6xl px-0 pb-2 pt-1">
-            <AudioPreview file={selectedFile} anclado />
+        <div className="cn-aud-barra-acciones">
+          <button type="button" onClick={() => void handleCopy()} className="cn-ini-boton cn-ini-boton--suave cn-aud-boton">
+            {copied ? 'Copiado' : 'Copiar el texto'}
+          </button>
+          <button type="button" onClick={() => setExportarAbierto(true)} className="cn-ini-boton cn-ini-boton--suave cn-aud-boton">
+            Exportar acta
+          </button>
+          {onUsarEnRedaccion && (
+            <button
+              type="button"
+              onClick={() => onUsarEnRedaccion(textoPlano())}
+              className="cn-ini-boton cn-ini-boton--primario cn-aud-boton"
+            >
+              Usar en redacción
+            </button>
+          )}
+        </div>
+
+        <div className="cn-aud-mas">
+          <button
+            type="button"
+            className="cn-aud-icono"
+            aria-label="Más opciones"
+            aria-expanded={menuAbierto}
+            onClick={() => setMenuAbierto((v) => !v)}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <circle cx="12" cy="5" r="1.7" />
+              <circle cx="12" cy="12" r="1.7" />
+              <circle cx="12" cy="19" r="1.7" />
+            </svg>
+          </button>
+          {menuAbierto && (
+            <>
+              <button type="button" className="cn-aud-menu-velo" aria-label="Cerrar el menú" onClick={() => setMenuAbierto(false)} />
+              <span className="cn-aud-menu" role="menu">
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="cn-aud-menu-item"
+                  onClick={() => {
+                    setMenuAbierto(false);
+                    void handleCopy();
+                  }}
+                >
+                  {copied ? 'Copiado' : 'Copiar el texto'}
+                </button>
+                {onUsarEnRedaccion && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="cn-aud-menu-item"
+                    onClick={() => {
+                      setMenuAbierto(false);
+                      onUsarEnRedaccion(textoPlano());
+                    }}
+                  >
+                    Usar en redacción
+                  </button>
+                )}
+              </span>
+            </>
+          )}
+        </div>
+      </header>
+
+      <div className="cn-aud-cuerpo">
+        <aside className="cn-aud-voces" aria-label="Quién habla">
+          <QuienHabla
+            result={result}
+            kind={kind}
+            onAssignRole={assignRole}
+            nameProposals={nameProposals}
+            onAssignSpeakerName={canEdit ? assignSpeakerName : undefined}
+            roleProposals={roleProposals}
+            rolesConfirmados={confirmed}
+            onConfirmarRol={(speakerLabel, role) => {
+              assignRole(speakerLabel, role);
+              setConfirmed((current) => ({ ...current, [speakerLabel]: role }));
+            }}
+          />
+        </aside>
+
+        <div className="cn-aud-principal">
+          <section className="cn-aud-zona cn-aud-zona--transcrito" aria-label="Transcrito">
+            {/*
+              LA ADVERTENCIA VA ENCIMA DEL TEXTO, no al pie: se lee antes de
+              citar, no después de haber citado.
+            */}
+            <div className="cn-aud-franja">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="8.5" />
+                <line x1="12" y1="8" x2="12" y2="13" />
+                <circle cx="12" cy="16.4" r=".7" fill="currentColor" />
+              </svg>
+              <p>
+                Transcripción automática. <span className="cn-aud-fuerte">No sustituye el acta oficial del despacho ni la grabación</span>, que prevalecen. Lo subrayado con onda es una intervención que el motor entendió con poca certeza: vuelva a escucharla antes de citarla.
+              </p>
+            </div>
+
+            <div className="cn-aud-zona-cuerpo">
+              {!persisted && <NotPersistedWarning onCopiar={() => void handleCopy()} onExportar={() => setExportarAbierto(true)} />}
+
+              {/*
+                LOS ERRORES DE UNA CORRECCIÓN, UN CORTE O UN ROL, AQUÍ. El único
+                otro lugar donde se pintaban era el diálogo de subir, que no
+                existe con un transcrito abierto: la edición quedaba en pantalla
+                con cara de guardada mientras el servidor tenía el texto viejo.
+              */}
+              {error && (
+                <div className="cn-aud-aviso cn-aud-aviso--peligro" role="alert">
+                  <p className="cn-aud-aviso-texto">{error} La pantalla se devolvió a lo último que sí quedó guardado.</p>
+                </div>
+              )}
+
+              {/*
+                POCA CERTEZA, CONTADA (artboard :248, «El audio está demasiado
+                bajo»). Sin «tramos ininteligibles» —el motor no los produce— y
+                sin «se le cobró la duración procesada» —no se cobra—.
+              */}
+              {pocas > 0 && (
+                <div className="cn-aud-aviso cn-aud-aviso--advertencia">
+                  <p className="cn-aud-aviso-titulo">
+                    {pocas === 1 ? '1 intervención quedó con poca certeza' : `${pocas} intervenciones quedaron con poca certeza`}
+                  </p>
+                  <p className="cn-aud-aviso-texto">
+                    Están subrayadas con onda y llevan su porcentaje. Vuelva a escucharlas antes de citarlas.
+                  </p>
+                  <div className="cn-aud-aviso-botones">
+                    <button type="button" className="cn-ini-boton cn-ini-boton--blanco cn-aud-boton" onClick={irALaPrimeraDudosa}>
+                      Ir a la primera
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <Intervenciones
+                result={result}
+                kind={kind}
+                onEditSegment={canEdit ? editSegment : undefined}
+                onSplitSegment={canEdit ? splitSegment : undefined}
+                onReassignSpeaker={canEdit ? reassignSpeaker : undefined}
+                onMarcarRevisada={canEdit ? marcarRevisada : undefined}
+                onMarcarHechoClave={marcarHechoClave}
+                voiceConflicts={voiceConflicts}
+                onEscucharDesde={selectedFile ? (segundos) => setSaltarA({ segundos, vez: Date.now() }) : undefined}
+              />
+            </div>
+          </section>
+
+          <section className="cn-aud-zona cn-aud-zona--resumen" aria-label="Resumen y hechos">
+            <div className="cn-aud-zona-cuerpo">
+              {transcriptionId ? (
+                <TranscriptSummary transcriptionId={transcriptionId} kind={kind} />
+              ) : (
+                <p className="cn-aud-nota cn-aud-nota--caja">
+                  El resumen se genera sobre el transcrito guardado, y este no se pudo guardar.
+                </p>
+              )}
+            </div>
+          </section>
+        </div>
+      </div>
+
+      {/*
+        EL REPRODUCTOR, ANCLADO ABAJO, solo con la copia local. Sin ella se dice
+        que la grabación no se conserva y se ofrece abrir el archivo de este
+        equipo, que se reproduce aquí y no se sube a ninguna parte.
+      */}
+      <div className="cn-aud-escucha">
+        {selectedFile ? (
+          <AudioPreview file={selectedFile} anclado saltarA={saltarA} />
+        ) : (
+          <div className="cn-aud-sin-grabacion">
+            <p className="cn-aud-nota">
+              La grabación no se conserva: se borró al transcribirse. Si tiene el archivo en este equipo, ábralo para
+              escucharlo mientras revisa; no se sube a ninguna parte.
+            </p>
+            <label className="cn-ini-boton cn-ini-boton--texto cn-aud-boton">
+              Abrir el archivo de este equipo
+              <input
+                type="file"
+                className="cn-aud-sr"
+                accept={SUPPORTED_AUDIO_EXTENSIONS.map((e) => `.${e}`).join(',')}
+                onChange={(e) => setSelectedFile(e.target.files?.[0] ?? null)}
+              />
+            </label>
           </div>
         )}
       </div>
+
+      <div className="cn-aud-pie-movil">
+        <button type="button" onClick={() => setExportarAbierto(true)} className="cn-ini-boton cn-ini-boton--primario cn-aud-boton cn-aud-boton--ancho">
+          Exportar acta
+        </button>
+      </div>
+
+      {/* ─── EXPORTAR EL ACTA (derivada de las variantes que ya existían) ─── */}
+      <div className="cn-aud-dialogos">
+        <Dialog
+          abierto={exportarAbierto}
+          onCerrar={() => setExportarAbierto(false)}
+          tamano="S"
+          titulo="Exportar el acta"
+          subtitulo="Word para editarla; PDF para anexarla al expediente."
+          acciones={
+            <>
+              <button type="button" className="cn-ini-boton cn-ini-boton--suave cn-aud-boton" onClick={() => exportar('word')}>
+                Word
+              </button>
+              <button type="button" className="cn-ini-boton cn-ini-boton--primario cn-aud-boton" onClick={() => exportar('pdf')}>
+                PDF
+              </button>
+            </>
+          }
+        >
+          <div className="cn-aud-dlg">
+            <label className="cn-aud-casilla">
+              <input type="checkbox" checked={conMarcasDeTiempo} onChange={(e) => setConMarcasDeTiempo(e.target.checked)} />
+              <span>
+                <span className="cn-aud-casilla-titulo">Con minutos</span>
+                <span className="cn-aud-nota">El minuto es lo que hace citable cada intervención.</span>
+              </span>
+            </label>
+            <label className={`cn-aud-casilla${hayClaves ? '' : ' cn-aud-casilla--apagada'}`}>
+              <input type="checkbox" checked={soloClave && hayClaves} disabled={!hayClaves} onChange={(e) => setSoloClave(e.target.checked)} />
+              <span>
+                <span className="cn-aud-casilla-titulo">Solo los hechos clave</span>
+                <span className="cn-aud-nota">
+                  {hayClaves
+                    ? 'Solo las intervenciones que alguien marcó como decisivas.'
+                    : 'Marque alguna intervención como hecho clave para poder exportar solo esas.'}
+                </span>
+              </span>
+            </label>
+          </div>
+        </Dialog>
+      </div>
+    </div>
+  ) : null;
+
+  const contenido = (
+    <>
+      {result ? detalle : lista}
+      <SubirAudienciaDialog
+        abierto={subirAbierto}
+        onCerrar={() => setSubirAbierto(false)}
+        maxAudioBytes={maxAudioBytes}
+        isUploading={isUploading}
+        uploadProgress={uploadProgress}
+        isTranscribing={isTranscribing}
+        error={error}
+        onTranscribir={(archivo, contexto, expedienteId) => {
+          setSelectedFile(archivo);
+          setOpenedTitle('');
+          void transcribe(archivo, contexto, undefined, expedienteId || undefined);
+        }}
+      />
+    </>
+  );
+
+  /*
+   * LA VISITA GUIADA BUSCA EL ATRIBUTO LITERAL. Con una plantilla —
+   * `vista-${…}`— el marcado servido es el mismo, pero ningún check puede leer
+   * en el código qué pantalla lleva qué ancla, y un renombre la rompería sin
+   * que nada lo dijera. Dos raíces con el valor escrito.
+   */
+  return kind === 'AUDIENCIA' ? (
+    <div data-visita="vista-audiencias" className="cara-nueva cn-aud" data-pestana={pestana} data-con-transcrito={result ? 'si' : 'no'}>
+      {contenido}
+    </div>
+  ) : (
+    <div data-visita="vista-entrevistas" className="cara-nueva cn-aud" data-pestana={pestana} data-con-transcrito={result ? 'si' : 'no'}>
+      {contenido}
     </div>
   );
 };

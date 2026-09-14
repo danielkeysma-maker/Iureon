@@ -33,6 +33,7 @@ import { fileURLToPath } from 'node:url';
 import type { ComprobacionesDelInforme } from '../services/review.api';
 import { marcasDelHallazgo } from '../services/comprobaciones';
 import { primerLugarMarcado } from '../components/ComprobacionAutomatica';
+import { destinoDelTabulador } from '../components/LecturaAmpliaDelInforme';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const SRC = join(AQUI, '..', '..', '..');
@@ -62,6 +63,7 @@ const PUENTE = leer(`${C}PuenteAlAtaque.tsx`);
 const DIALOGO = leer(`${C}RevisarEscritoDialog.tsx`);
 const BANDA = leer(`${C}ComprobacionAutomatica.tsx`);
 const INFORME = leer(`${C}InformeDelEscritoPropio.tsx`);
+const AMPLIA = leer(`${C}LecturaAmpliaDelInforme.tsx`);
 const API = readFileSync(join(SRC, 'modules/workspace/services/review.api.ts'), 'utf8');
 
 const PANTALLAS: Record<string, string> = {
@@ -73,7 +75,8 @@ const PANTALLAS: Record<string, string> = {
   'PuenteAlAtaque.tsx': PUENTE,
   'RevisarEscritoDialog.tsx': DIALOGO,
   'ComprobacionAutomatica.tsx': BANDA,
-  'InformeDelEscritoPropio.tsx': INFORME
+  'InformeDelEscritoPropio.tsx': INFORME,
+  'LecturaAmpliaDelInforme.tsx': AMPLIA
 };
 
 /* ─── 1. LAS RAÍCES LLEVAN LA CARA NUEVA ────────────────────────────────── */
@@ -238,6 +241,40 @@ check(
   'el selector de rama del puente es el de la cara nueva, en línea, y no el Combobox viejo',
   PUENTE.includes('<SelectorEnCascada') && PUENTE.includes('enLinea') && !PUENTE.includes('<Combobox') && !PUENTE.includes("from './Combobox'")
 );
+/*
+ * LOS SELECTORES DEL DIÁLOGO «REVISAR UN DOCUMENTO». En producción (14/09/2026)
+ * seguía la interfaz vieja: el `<select>` del sistema con su lista azul para el
+ * caso y la posición, el `Combobox` viejo para la rama y la actuación, rótulos
+ * en mayúsculas mono y «Cuesta $2.000» en mono. En escritorio va
+ * `SelectorEnCascada` en línea; el `<select>` nativo solo existe en la rama de
+ * teléfono de `SelectorDelFormulario`, vestido con `cn-red-select`.
+ */
+{
+  const FORMULARIO = leer(`${C}SelectorDelFormulario.tsx`);
+  const DE_EXPEDIENTE = leer('modules/expedientes/components/SelectorDeExpediente.tsx');
+  const inicioNueva = DE_EXPEDIENTE.indexOf("if (cara === 'nueva')");
+  const caraNueva = inicioNueva === -1 ? '' : DE_EXPEDIENTE.slice(inicioNueva, DE_EXPEDIENTE.indexOf('\n  return (', inicioNueva));
+  /* La rama de escritorio: desde `if (ancha)` hasta donde empieza la del teléfono. */
+  const desdeAncha = FORMULARIO.indexOf('if (ancha)');
+  const hastaTelefono = FORMULARIO.indexOf('const bloques');
+  const antesDelTelefono = desdeAncha !== -1 && hastaTelefono > desdeAncha ? FORMULARIO.slice(desdeAncha, hastaTelefono) : '';
+  check('el diálogo de revisión no pinta ningún <select> nativo propio', !/<select\b/.test(DIALOGO));
+  check('el diálogo de revisión no usa el Combobox viejo', !DIALOGO.includes('<Combobox') && !DIALOGO.includes("from './Combobox'"));
+  check(
+    'rama, actuación y posición del diálogo van por el selector del formulario; el caso, con la cara nueva',
+    cuenta(DIALOGO, '<SelectorDelFormulario') === 3 && DIALOGO.includes('cara="nueva"') && DIALOGO.includes('conBusqueda={false}') && DIALOGO.includes('ordenarParaLaLista(')
+  );
+  check(
+    'en escritorio el selector del formulario es SelectorEnCascada en línea, y el nativo del teléfono lleva cn-red-select',
+    FORMULARIO.includes('useVentanaAncha()') && /if \(ancha\)[\s\S]*<SelectorEnCascada[\s\S]*enLinea/.test(antesDelTelefono) && !/<select\b/.test(antesDelTelefono) && FORMULARIO.includes('className="cn-red-select"')
+  );
+  check(
+    'la cara nueva del caso usa el selector del formulario, sin rótulo en mayúsculas mono ni «— sin expediente —»',
+    caraNueva.includes('<SelectorDelFormulario') && !/uppercase|font-mono|<select\b|— sin expediente —/.test(caraNueva)
+  );
+  check('ningún rótulo del diálogo va en mayúsculas mono', !/uppercase|font-mono/.test(DIALOGO) && !/uppercase|font-mono/.test(FORMULARIO));
+  check('el pie del diálogo dice «Desde» el piso, sin mono', DIALOGO.includes('Desde <span className="cn-inf-costo-cifra">{pesos(precioCop)}</span> de su saldo') && !DIALOGO.includes('Cuesta ${pesos('));
+}
 check(
   'el puente conserva la casilla «No sé la rama» y su advertencia de costo',
   PUENTE.includes('No sé la rama: buscar en todo el catálogo.') && PUENTE.includes('{LO_QUE_CUESTA_BUSCAR_EN_TODO}')
@@ -248,6 +285,40 @@ check(
   ['Esta carga no es suya.', ': le corresponde a usted.', 'El documento no anuncia plazo para esta carga.', 'Qué le exige y para cuándo', 'Qué exige el documento y para cuándo'].every((t) => LECTURA.includes(t))
 );
 check('el ejemplo del cliente es un molde a la vista', DIALOGO.includes('placeholder="Nombre del cliente · asunto · rad. 00000-00-00-000-0000-00000-00"'));
+
+/* ─── 6b. EL INFORME, LEÍDO FUERA DE LA COLUMNA ─────────────────────────── */
+{
+  /* La barra y el panel del informe, como texto: el botón tiene que vivir ahí y no en otra pestaña. */
+  const desde = TALLER.indexOf('const BarraDelInforme');
+  const hasta = TALLER.indexOf('const ComentariosPanel');
+  const panelDelInforme = desde !== -1 && hasta > desde ? TALLER.slice(desde, hasta) : '';
+  check('«Leer en grande» vive en la barra del panel del informe, y una sola vez', panelDelInforme.includes('Leer en grande') && cuenta(TALLER, 'Leer en grande') === 1);
+  check('el panel del informe monta la barra', /const InformePanel = \(\) => \([\s\S]{0,120}\{BarraDelInforme\(\)\}/.test(TALLER));
+  check(
+    'el mismo panel es el de la pestaña «Informe» del teléfono (no hay una segunda vista del informe)',
+    /vistaMovil === 'revisor' \? 'flex' : 'hidden'[\s\S]{0,1600}panel === 'informe' \? InformePanel\(\)/.test(TALLER) && cuenta(TALLER, 'InformePanel()') === 1
+  );
+  check(
+    'la lectura amplia pinta el MISMO contenido: una función, dos llamadas, y cada pieza del informe una sola vez',
+    cuenta(TALLER, '{ContenidoDelInforme()}') === 2 && cuenta(TALLER, '<InformeDelEscritoPropio') === 1 && cuenta(TALLER, '<LecturaDelDocumentoRecibido') === 1 && TALLER.includes('<LecturaAmpliaDelInforme')
+  );
+  check('el diálogo amplio no copia marcado del informe', !/InformeDelEscritoPropio|LecturaDelDocumentoRecibido|cn-inf-h2|cn-inf-estrato|Lo que exige la norma/.test(AMPLIA));
+  check('es un diálogo modal rotulado por su título', AMPLIA.includes('role="dialog" aria-modal="true" aria-labelledby={idDelTitulo}') && AMPLIA.includes('id={idDelTitulo}'));
+  check('Esc cierra, y solo cuando no hay otro diálogo encima', AMPLIA.includes("e.key === 'Escape'") && AMPLIA.includes('hayOtroDialogoEncima('));
+  check('bloquea el desplazamiento del fondo y devuelve el foco a quien lo abrió', AMPLIA.includes("document.body.style.overflow = 'hidden'") && AMPLIA.includes('invocador?.focus'));
+  check('se monta en el cuerpo del documento con su propio alcance de la cara nueva', AMPLIA.includes('createPortal(') && AMPLIA.includes('className="cara-nueva cn-inf-amplio"'));
+  check(
+    '«Ir al punto» queda dentro del diálogo: el cuerpo es su propio ancla de informe',
+    AMPLIA.includes('className="cn-inf cn-inf--amplio" data-informe') && BANDA.includes("closest('[data-informe]')")
+  );
+  check('ningún diálogo nativo', !/window\.(confirm|alert|prompt)\(/.test(AMPLIA + TALLER));
+  /* La trampa del tabulador, como función pura. */
+  check('Tab desde el último vuelve al primero', destinoDelTabulador(5, 4, false) === 0);
+  check('Mayús+Tab desde el primero va al último', destinoDelTabulador(5, 0, true) === 4);
+  check('con el foco fuera de lo enfocable, Tab entra al primero y Mayús+Tab al último', destinoDelTabulador(3, -1, false) === 0 && destinoDelTabulador(3, -1, true) === 2);
+  check('en medio se deja al navegador', destinoDelTabulador(5, 2, false) === -1 && destinoDelTabulador(5, 2, true) === -1);
+  check('sin nada enfocable no se mueve nada', destinoDelTabulador(0, -1, false) === -1);
+}
 
 /* ─── 7. LA ESCALA EMPIEZA EN 14 ────────────────────────────────────────── */
 for (const [nombre, codigo] of Object.entries(PANTALLAS)) {
@@ -295,6 +366,10 @@ check('ningún tamaño del bloque baja de 14 px', chicos.length === 0, chicos.jo
 check(
   'el bloque trae su modo oscuro por los dos caminos',
   bloque.includes(":root:not([data-theme='light']) .cara-nueva") && bloque.includes(":root[data-theme='dark'] .cara-nueva")
+);
+check(
+  'la lectura en grande vive en este bloque: hoja completa en el teléfono, diálogo centrado desde 768 px, prosa a 16 px',
+  bloque.includes('.cara-nueva.cn-inf-amplio {') && bloque.includes('height: 100dvh;') && /@media \(min-width: 768px\)[\s\S]{0,400}max-width: 920px;/.test(bloque) && /\.cara-nueva \.cn-inf--amplio \{[^}]*font-size: 16px;/.test(bloque)
 );
 for (const id of ['amarillo', 'verde', 'azul', 'rosa', 'tachado']) {
   check(`el bloque pinta «${id}»`, bloque.includes(`.cara-nueva .cn-tal-capa--${id} {`));

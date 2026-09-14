@@ -254,6 +254,9 @@ export const ExpedientesView: React.FC<{
     const cuentaDocumentos =
       typeof abierto.documentos === 'number' ? abierto.documentos : cargado ? cargado.documentos.length : null;
     const carpetasRaiz = cargado ? cargado.carpetas.filter((c) => c.padreId === null) : [];
+    const bajadaDelCaso = [abierto.despacho, abierto.contraparte && `contra ${abierto.contraparte}`]
+      .filter(Boolean)
+      .join(' · ');
 
     return (
       /*
@@ -268,14 +271,22 @@ export const ExpedientesView: React.FC<{
               <ChevronLeft className="h-5 w-5" aria-hidden="true" />
               Todos los expedientes
             </button>
+            {/*
+              LA CARÁTULA EN UNA SOLA LÍNEA, DENTRO DE UNA FICHA. Con 34 px y
+              dos renglones de título y dos de despacho, la cabecera se comía
+              casi media pantalla de escritorio y las carpetas quedaban en una
+              franja. Ahora el título y la bajada se cortan con puntos
+              suspensivos y el texto completo va en `title`; el nombre accesible
+              del encabezado sigue siendo la carátula entera, porque el corte es
+              solo visual. El despacho y la contraparte se pintan como el
+              servidor los guardó: si vienen en mayúsculas, así se leen.
+            */}
             <div className="cn-exp-caso-titulo">
-              <div className="min-w-0">
-                <h1 className="cn-exp-h1 [overflow-wrap:anywhere]">{abierto.caratula}</h1>
-                {(abierto.despacho || abierto.contraparte) && (
-                  <p className="cn-exp-bajada [overflow-wrap:anywhere]">
-                    {[abierto.despacho, abierto.contraparte && `contra ${abierto.contraparte}`]
-                      .filter(Boolean)
-                      .join(' · ')}
+              <div className="min-w-0 flex-1">
+                <h1 className="cn-exp-caso-nombre" title={abierto.caratula}>{abierto.caratula}</h1>
+                {bajadaDelCaso && (
+                  <p className="cn-exp-caso-bajada" title={bajadaDelCaso}>
+                    {bajadaDelCaso}
                   </p>
                 )}
               </div>
@@ -354,8 +365,12 @@ export const ExpedientesView: React.FC<{
           </header>
 
           {/*
-            EL TÉRMINO NO SE DESPLAZA NUNCA (README-app §2): va en la cabecera y
-            antes de las pestañas. Ámbar con peso si vence en tres días o ya
+            EL TÉRMINO VA ANTES DE LAS PESTAÑAS, lo primero que se lee al abrir el
+            caso. Ya no queda quieto al desplazarse (README-app §2 lo quería
+            fijo): una cabecera fija con término se comía media pantalla y el
+            dueño pidió el espacio para leer. Solo las pestañas quedan pegadas,
+            y la columna derecha sigue contando los términos pendientes.
+            Ámbar con peso si vence en tres días o ya
             venció; el borde discontinuo es solo para el término que la agenda
             no tiene verificado, que es la única señal que se lee en gris.
           */}

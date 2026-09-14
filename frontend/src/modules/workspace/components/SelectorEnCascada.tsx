@@ -45,6 +45,12 @@ export interface OpcionEnCascada {
   icono?: React.ReactNode;
   /** Filas consecutivas con el mismo grupo comparten una sola cabecera. */
   grupo?: GrupoDeOpciones;
+  /**
+   * Texto que también encuentra la fila al filtrar, además del nombre. Es para
+   * el radicado de un caso: va como detalle en mono, pero es justamente lo que
+   * el abogado escribe al buscar. Sin él, la fila se filtra solo por su nombre.
+   */
+  busqueda?: string;
 }
 
 interface SelectorEnCascadaProps {
@@ -91,7 +97,7 @@ export const SelectorEnCascada: React.FC<SelectorEnCascadaProps> = ({
   const visibles = useMemo(() => {
     const q = filtro.trim().toLowerCase();
     if (!q) return opciones;
-    return opciones.filter((o) => o.etiqueta.toLowerCase().includes(q));
+    return opciones.filter((o) => o.etiqueta.toLowerCase().includes(q) || Boolean(o.busqueda?.toLowerCase().includes(q)));
   }, [opciones, filtro]);
 
   useEffect(() => {

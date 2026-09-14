@@ -1,6 +1,7 @@
 import React from 'react';
-import { BookOpen, ExternalLink, Lightbulb, RefreshCw } from 'lucide-react';
+import { ExternalLink, RefreshCw } from 'lucide-react';
 import { clientsApi, type InterviewSuggestion } from '../clients.api';
+import { cercaniaEnPalabras } from '../entrevistaEnPantalla';
 
 interface InterviewInsightsProps {
   transcriptionId: string;
@@ -25,6 +26,10 @@ interface InterviewInsightsProps {
  * WHAT IS ABSENT, SAID OUT LOUD: doctrine. The corpus holds 62 providencias and
  * no doctrinal work, so a "doctrina" tab here would be labelling one thing as
  * another.
+ *
+ * LA CERCANÍA VA EN PALABRAS Y NO EN PORCENTAJE (cara nueva). «64 %» se lee
+ * como la probabilidad de que la providencia aplique; es parecido de lenguaje,
+ * y la pantalla no debe sugerir más que eso.
  */
 export const InterviewInsights: React.FC<InterviewInsightsProps> = ({ transcriptionId }) => {
   const [suggestions, setSuggestions] = React.useState<InterviewSuggestion[]>([]);
@@ -49,89 +54,76 @@ export const InterviewInsights: React.FC<InterviewInsightsProps> = ({ transcript
   };
 
   return (
-    <div className="bg-surface border border-line-200 rounded-card p-4 space-y-3">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <Lightbulb className="w-4 h-4 text-unverified shrink-0" />
-          <div>
-            <h4 className="font-bold text-ink-900 text-xs">Jurisprudencia relacionada</h4>
-            <p className="text-[11px] text-ink-500">
-              Busca en el corpus a partir de lo que dijo el cliente, no de tus preguntas.
-            </p>
-          </div>
+    <section className="cn-ent-sugerencias" aria-labelledby="cn-ent-sugerencias-titulo">
+      <div className="cn-ent-seccion-cabeza">
+        <div className="cn-ent-seccion-textos">
+          <h2 id="cn-ent-sugerencias-titulo" className="cn-ent-h2">Jurisprudencia relacionada</h2>
+          <p className="cn-ent-texto">Se busca en el corpus a partir de lo que dijo el cliente, no de sus preguntas.</p>
         </div>
 
         <button
           type="button"
           onClick={() => void consultar()}
           disabled={cargando}
-          className="px-2.5 py-1 bg-canvas hover:bg-line-100 text-ink-700 border border-line-200 rounded-control text-[11px] font-semibold flex items-center gap-1.5 shrink-0 disabled:opacity-60"
+          className="cn-ini-boton cn-ini-boton--suave cn-ent-boton"
         >
-          <RefreshCw className={`w-3 h-3 ${cargando ? 'animate-spin' : ''}`} />
-          <span>{consultado ? 'Buscar de nuevo' : 'Buscar'}</span>
+          <RefreshCw size={16} className={cargando ? 'cn-ent-girando' : undefined} aria-hidden="true" />
+          {cargando ? 'Buscando…' : consultado ? 'Buscar de nuevo' : 'Buscar'}
         </button>
       </div>
 
-      {reason && <p className="text-[11px] text-ink-500 bg-canvas border border-line-200 rounded-control p-2">{reason}</p>}
+      {reason && <p className="cn-ent-nota cn-ent-nota--caja">{reason}</p>}
 
       {consultado && !cargando && suggestions.length === 0 && !reason && (
-        <p className="text-[11px] text-ink-500">
+        <p className="cn-ent-nota cn-ent-nota--caja">
           El corpus no tiene nada suficientemente cercano a lo que narró el cliente. Eso es una
           respuesta, no un fallo: son 62 providencias, no toda la jurisprudencia colombiana.
         </p>
       )}
 
       {suggestions.length > 0 && (
-        <div className="space-y-2">
-          {suggestions.map((s, i) => (
-            <div key={`${s.providencia}-${i}`} className="border border-line-200 rounded-control p-3 space-y-1.5">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="text-[11px] font-bold text-ink-900 flex items-center gap-1.5">
-                    <BookOpen className="w-3 h-3 text-ink-400 shrink-0" />
-                    {s.providencia ?? 'Providencia sin identificar'}
-                  </p>
-                  <p className="text-[10px] text-ink-500">
-                    {[s.corporacion, s.ponente].filter(Boolean).join(' · ')}
-                  </p>
+        <>
+          <ul className="cn-ent-sugerencia-lista">
+            {suggestions.map((s, i) => (
+              <li key={`${s.providencia}-${i}`} className="cn-ent-sugerencia">
+                <div className="cn-ent-sugerencia-cabeza">
+                  <div className="cn-ent-sugerencia-id">
+                    <span className="cn-ent-sugerencia-titulo cn-ent-mono">
+                      {s.providencia ?? 'Providencia sin identificar'}
+                    </span>
+                    {(s.corporacion || s.ponente) && (
+                      <span className="cn-ent-nota">{[s.corporacion, s.ponente].filter(Boolean).join(' · ')}</span>
+                    )}
+                  </div>
+                  <span className="cn-ent-chip cn-ent-chip--neutro" title="Cercanía de lenguaje, no aplicabilidad">
+                    {cercaniaEnPalabras(s.similarity)}
+                  </span>
                 </div>
 
-                <span className="text-[10px] font-mono text-ink-400 shrink-0" title="Cercanía semántica, no aplicabilidad">
-                  {(s.similarity * 100).toFixed(0)}%
-                </span>
-              </div>
+                <p className="cn-ent-texto">{s.excerpt}</p>
 
-              <p className="text-[11px] text-ink-700 leading-relaxed">{s.excerpt}</p>
+                {/*
+                  What the client said that produced this. Without it the card is
+                  an assertion; with it the lawyer can dismiss it in a second.
+                */}
+                <p className="cn-ent-cita">Sale de: «{s.fromClient}»</p>
 
-              {/*
-                What the client said that produced this. Without it the card is
-                an assertion; with it the lawyer can dismiss it in a second.
-              */}
-              <p className="text-[10px] text-ink-500 border-l-2 border-line-200 pl-2">
-                Sale de: «{s.fromClient}»
-              </p>
+                {s.sourceUrl && (
+                  <a href={s.sourceUrl} target="_blank" rel="noopener noreferrer" className="cn-ent-enlace">
+                    Ver la providencia
+                    <ExternalLink size={14} aria-hidden="true" />
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
 
-              {s.sourceUrl && (
-                <a
-                  href={s.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[10px] font-semibold text-brand-700 hover:underline flex items-center gap-1"
-                >
-                  Ver la providencia
-                  <ExternalLink className="w-2.5 h-2.5" />
-                </a>
-              )}
-            </div>
-          ))}
-
-          <p className="text-[10px] text-ink-500">
-            Son sugerencias por cercanía de lenguaje, no dictámenes de aplicabilidad: los hechos
-            pueden parecerse y la providencia no gobernar el caso. Verifica cada una antes de
-            citarla.
+          <p className="cn-ent-nota">
+            Son sugerencias por cercanía de lenguaje, no dictámenes de aplicabilidad: los hechos pueden
+            parecerse y la providencia no gobernar el caso. Verifique cada una antes de citarla.
           </p>
-        </div>
+        </>
       )}
-    </div>
+    </section>
   );
 };
