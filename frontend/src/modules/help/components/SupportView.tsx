@@ -1,216 +1,139 @@
 import React from 'react';
-import { AlertTriangle, BookOpen, Check, ChevronRight, MessageSquare } from 'lucide-react';
-import {
-  ANTES_DE_ESCRIBIR,
-  CANALES,
-  QUE_INCLUIR,
-  WHATSAPP_CONFIGURADO,
-  enlaceWhatsapp,
-  whatsappLegible
-} from '../content/support';
+import { BookOpen } from 'lucide-react';
+import { ANTES_DE_ESCRIBIR, WHATSAPP_CONFIGURADO, enlaceWhatsapp, whatsappLegible } from '../content/support';
 import { entradaPorId } from '../content/manual';
+import { useEsEscritorio } from '../useEsEscritorio';
 import { ChatDeSoporte } from './ChatDeSoporte';
-import type { SupportChannel } from '../types';
 
 /**
- * Support: the two routes out of a stuck screen, told apart honestly.
+ * Soporte con la cara nueva: sus conversaciones arriba, y lo demás debajo.
  *
- * ─── THE TWO CARDS ARE NOT TWINS, AND NOT FOR THE ARTBOARD'S REASON ─────────
+ * ─── DE DÓNDE SALE LA FORMA ─────────────────────────────────────────────────
  *
- * The 9b artboard separates them by first-response time — four minutes against
- * twelve. Nobody measures either number, and this is the one screen a reader
- * reaches after something already went wrong, so a reassuring invention here is
- * worse than silence. What actually separates them today is simpler and true:
- * WhatsApp is a link that leaves Iureon and works the moment a number is
- * configured; the in-app chat stays inside the firm's account, is answered by
- * the platform operator and keeps its history here. Each card says which it is.
+ * `public/handoff/app-manual-y-soporte.html`: la lista (:530) —«Soporte» de 30,
+ * «Sus conversaciones y las de su firma», el primario arriba a la derecha, una
+ * tarjeta por conversación con su estado y la última respuesta citada, y la
+ * nota de WhatsApp al pie— y «Escribir a soporte» (:491) como diálogo. El hilo
+ * abierto y la pantalla del teléfono no tienen artboard: se derivan de la
+ * lista y del artículo del manual (:451), con el mismo «‹ Soporte» para volver.
  *
- * ─── THE WARNING IS THE POINT OF THE WHATSAPP CARD ──────────────────────────
+ * ─── LAS DOS TARJETAS DE CANAL SE FUERON, Y NO SE PERDIÓ NADA ───────────────
  *
- * Client data must not travel through WhatsApp: it sits outside the processing
- * agreement the firm signed. That goes in the card, at reading size, above the
- * button — never in fine print underneath it.
+ * La pantalla vieja abría con dos tarjetas —WhatsApp y el chat— que explicaban
+ * los canales antes de dejar escribir. La maqueta pone primero lo que el lector
+ * vino a hacer: ver si le respondieron y escribir. Lo que esas tarjetas decían
+ * y es verdad sigue aquí: quién atiende y que no hay tiempo garantizado va
+ * arriba de la lista y dentro del diálogo; lo de WhatsApp, en la nota del pie,
+ * con su advertencia al lado del enlace y no en letra menuda.
+ *
+ * ─── UNA PÁGINA, DOS ANCHOS, UN SOLO SONDEO ─────────────────────────────────
+ *
+ * El teléfono monta ESTA página con `movil`. Cada envoltorio la pinta solo en
+ * su ancho: con las dos montadas, el chat sondearía dos veces cada 30 s.
+ *
+ * ─── LO QUE LA MAQUETA PIDE Y AQUÍ NO ESTÁ, con la razón ─────────────────────
+ *
+ * · «Le responden al correo»: la respuesta del operador no sale por correo.
+ *   Queda en la conversación y, si el aparato tiene avisos activos, llega como
+ *   notificación.
+ * · «Adjuntar lo que estaba haciendo» y «Captura de pantalla»: el chat no
+ *   recibe adjuntos ni registra la pantalla de origen. Además, una caja de
+ *   subida invita justo a lo que no debe viajar por aquí: material del caso.
+ * · «Responden en horario de oficina» como compromiso: se dice quién atiende y
+ *   que no hay tiempo de respuesta garantizado.
+ * · «Qué incluir en su mensaje», la lista de la pantalla vieja: su consejo más
+ *   útil —el término que vence, en la primera línea— va en el propio campo; su
+ *   último punto recomendaba enviar una captura que el chat no puede recibir.
  */
 
-interface SupportViewProps {
+interface PaginaDeSoporteProps {
+  movil: boolean;
   /** Firm name and account e-mail, to pre-fill the WhatsApp greeting. */
+  firma: string;
+  correo: string;
+  onManual: (articuloId?: string) => void;
+}
+
+export const PaginaDeSoporte: React.FC<PaginaDeSoporteProps> = ({ movil, firma, correo, onManual }) => (
+  <div data-visita="vista-soporte" className={`cara-nueva cn-sop${movil ? ' cn-sop--movil' : ''}`}>
+    <div className="cn-sop-pagina">
+      <ChatDeSoporte
+        firma={firma}
+        correo={correo}
+        pie={
+          <div className="cn-sop-pie">
+            <section className="cn-sop-antes" aria-labelledby="soporte-antes-de-escribir">
+              <h2 id="soporte-antes-de-escribir" className="cn-sop-h3">
+                Antes de escribir
+              </h2>
+              {/* Se ofrece, no se impone: obligar a leer antes de preguntar es la forma más rápida de que nadie use el manual. */}
+              <ul className="cn-sop-antes-lista">
+                {ANTES_DE_ESCRIBIR.filter((a) => entradaPorId(a.id)).map((atajo) => (
+                  <li key={atajo.id}>
+                    <button type="button" className="cn-sop-enlace" onClick={() => onManual(atajo.id)}>
+                      <BookOpen className="cn-sop-icono-linea" aria-hidden="true" />
+                      {atajo.pregunta}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            {/*
+              WHATSAPP, COMO NOTA Y NO COMO CANAL PRINCIPAL. Lo que se escriba por
+              allá no queda en Iureon, y decirlo evita que alguien busque aquí una
+              conversación que tuvo por teléfono. Sin número configurado, se dice
+              en vez de pintar un botón que no abre nada.
+            */}
+            <div className="cn-sop-nota">
+              {WHATSAPP_CONFIGURADO ? (
+                <>
+                  <p>
+                    También puede escribir por WhatsApp. No envíe por allá datos de sus clientes ni
+                    documentos del caso: queda fuera del acuerdo de tratamiento de datos. Lo que se
+                    responda por WhatsApp no queda aquí; si necesita el registro, escriba desde la
+                    aplicación.
+                  </p>
+                  <a
+                    className="cn-sop-boton cn-sop-boton--suave"
+                    href={enlaceWhatsapp(firma, correo)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Abrir WhatsApp · <span className="cn-sop-mono">{whatsappLegible()}</span>
+                  </a>
+                </>
+              ) : (
+                <p>
+                  El número de WhatsApp de soporte no está configurado en esta instalación. Por ahora
+                  se escribe desde esta pantalla, y la conversación queda guardada en su cuenta.
+                </p>
+              )}
+            </div>
+          </div>
+        }
+      />
+    </div>
+  </div>
+);
+
+interface SupportViewProps {
   firma: string;
   correo: string;
   onManual: (articuloId: string) => void;
 }
 
-const Punto: React.FC<{ tono: 'hecho' | 'advertencia'; children: React.ReactNode }> = ({
-  tono,
-  children
-}) => (
-  <li className="flex gap-2.5">
-    {tono === 'advertencia' ? (
-      <AlertTriangle size={14} strokeWidth={2.3} className="mt-[3px] shrink-0 text-unverified" />
-    ) : (
-      <Check size={14} strokeWidth={2.6} className="mt-[3px] shrink-0 text-verified" />
-    )}
-    <span className="text-ui leading-[1.6] text-ink-700 [text-wrap:pretty]">{children}</span>
-  </li>
-);
-
-const TarjetaCanal: React.FC<{ canal: SupportChannel; accion: React.ReactNode }> = ({
-  canal,
-  accion
-}) => (
-  <section className="flex flex-1 flex-col rounded-card border border-line-200 bg-surface px-5 py-4">
-    <header className="flex items-start gap-3">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-control border border-line-200 bg-canvas">
-        {canal.id === 'whatsapp' ? (
-          <MessageSquare size={16} strokeWidth={2.1} className="text-ink-700" />
-        ) : (
-          <MessageSquare size={16} strokeWidth={2.1} className="text-ink-400" />
-        )}
-      </div>
-      <div className="min-w-0">
-        <h2 className="text-subtitle text-ink-900">{canal.nombre}</h2>
-        <p className="mt-0.5 text-meta text-ink-500 [text-wrap:pretty]">{canal.paraQue}</p>
-      </div>
-      <span
-        className={`ml-auto shrink-0 ${canal.disponible ? 'chip-curated' : 'chip-auto'}`}
-      >
-        {canal.disponible ? 'Disponible' : 'Todavía no'}
-      </span>
-    </header>
-
-    {!canal.disponible && (
-      <p className="mt-3.5 rounded-control border border-line-200 bg-canvas px-3 py-2.5 text-ui leading-[1.6] text-ink-700 text-justify [text-wrap:pretty]">
-        {canal.razon}
-      </p>
-    )}
-
-    <ul className="mt-3.5 flex flex-col gap-2">
-      {canal.puntos.map((p) => (
-        <Punto key={p.texto} tono={p.tono}>
-          {p.texto}
-        </Punto>
-      ))}
-    </ul>
-
-    <div className="mt-auto pt-4">{accion}</div>
-  </section>
-);
-
 export const SupportView: React.FC<SupportViewProps> = ({ firma, correo, onManual }) => {
-  const whatsapp = CANALES.find((c) => c.id === 'whatsapp');
-  const chat = CANALES.find((c) => c.id === 'chat');
-
+  const escritorio = useEsEscritorio();
+  if (!escritorio) return null;
   return (
-    <div data-visita="vista-soporte" className="h-full min-h-0 flex-1 overflow-y-auto bg-canvas font-sans">
-      <div className="mx-auto w-full max-w-5xl px-6 py-6">
-        <header>
-          <h1 className="text-title text-ink-900">Soporte</h1>
-          <p className="mt-1 max-w-3xl text-ui leading-[1.6] text-ink-700 [text-wrap:pretty]">
-            Dos vías para pedir ayuda, con lo que cada una puede y no puede hacer dicho antes de
-            que usted escriba.
-          </p>
-        </header>
-
-        <div className="mt-5 flex flex-col gap-4 lg:flex-row">
-          {whatsapp && (
-            <TarjetaCanal
-              canal={whatsapp}
-              accion={
-                WHATSAPP_CONFIGURADO ? (
-                  <>
-                    <a
-                      className="btn-primary w-full"
-                      href={enlaceWhatsapp(firma, correo)}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Abrir WhatsApp · {whatsappLegible()}
-                    </a>
-                    <p className="mt-2 text-center font-mono text-[11px] text-ink-400">
-                      Sale de Iureon · se abre en WhatsApp Web o en su teléfono
-                    </p>
-                  </>
-                ) : (
-                  <p className="font-mono text-[11px] leading-[1.5] text-ink-400">
-                    Sin número configurado, no hay enlace que abrir.
-                  </p>
-                )
-              }
-            />
-          )}
-
-          {chat && (
-            <TarjetaCanal
-              canal={chat}
-              accion={
-                <p className="font-mono text-[11px] leading-[1.5] text-ink-400 [text-wrap:pretty]">
-                  Sus conversaciones están más abajo, en esta misma pantalla.
-                </p>
-              }
-            />
-          )}
-        </div>
-
-        {/*
-          EL CHAT Y SU HISTORIAL, en la misma tarjeta: la lista de hilos ES el
-          historial del artboard, y separarlos obligaría a explicar dos veces
-          quién responde y qué no se pega aquí.
-        */}
-        <div className="mt-4">
-          <ChatDeSoporte firma={firma} correo={correo} />
-        </div>
-
-        <div className="mt-4 flex flex-col gap-4 lg:flex-row">
-          <section className="flex-1 rounded-card border border-line-200 bg-surface px-5 py-4">
-            <h2 className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-              Qué incluir en su mensaje
-            </h2>
-            <ul className="mt-3 flex flex-col gap-2">
-              {QUE_INCLUIR.map((texto) => (
-                <li key={texto} className="flex gap-2.5">
-                  <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-ink-400" />
-                  <span className="text-ui leading-[1.6] text-ink-700 [text-wrap:pretty]">
-                    {texto}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section className="w-full shrink-0 rounded-card border border-line-200 bg-surface px-5 py-4 lg:w-[352px]">
-            <h2 className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-              Antes de escribir
-            </h2>
-            {/*
-              Se ofrece, no se impone: obligar a leer antes de preguntar es la
-              forma más rápida de que nadie use el manual.
-            */}
-            <div className="mt-3 flex flex-col gap-2">
-              {ANTES_DE_ESCRIBIR.filter((a) => entradaPorId(a.id)).map((atajo) => (
-                <button
-                  key={atajo.id}
-                  type="button"
-                  onClick={() => onManual(atajo.id)}
-                  className="flex items-center gap-2.5 rounded-control border border-line-200 bg-surface px-3 py-2.5 text-left hover:bg-canvas"
-                >
-                  <BookOpen size={14} strokeWidth={2} className="shrink-0 text-ink-400" />
-                  <span className="min-w-0 flex-1 text-meta text-ink-900">{atajo.pregunta}</span>
-                  <ChevronRight size={13} strokeWidth={2.2} className="shrink-0 text-ink-400" />
-                </button>
-              ))}
-            </div>
-          </section>
-        </div>
-
-        {/*
-          Lo que escriba por WhatsApp sigue sin quedar registrado aquí: es un
-          canal externo, y decirlo evita que alguien busque en el chat una
-          conversación que tuvo por teléfono.
-        */}
-        <p className="mt-4 rounded-card border border-line-200 bg-surface px-5 py-3.5 text-meta leading-[1.6] text-ink-500 [text-wrap:pretty]">
-          El historial de arriba recoge solo lo escrito por el chat de la aplicación. De lo que
-          escriba por WhatsApp no queda registro dentro de Iureon.
-        </p>
-      </div>
-    </div>
+    <PaginaDeSoporte
+      movil={false}
+      firma={firma}
+      correo={correo}
+      onManual={(id) => {
+        if (id) onManual(id);
+      }}
+    />
   );
 };

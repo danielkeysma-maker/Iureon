@@ -1,23 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { Download, Share } from 'lucide-react';
+import { Check, Download, Share } from 'lucide-react';
+import '../../design/cara-nueva.css';
 import { alCambiarInstalable, eventoDeInstalacion, pedirInstalacion } from './instalable';
+import { situacionDeInstalacion } from './instalacionEnPantalla';
 import { enStandalone, esIOS } from '../push/pushCliente';
 
 /**
  * «Instalar Iureon en este dispositivo».
  *
- * Tres situaciones y una sola regla: no se ofrece lo que no se puede hacer.
- *  · Ya está instalada (standalone): no se pinta nada.
+ * Una sola regla: no se ofrece lo que no se puede hacer. Qué caso se pinta lo
+ * decide `situacionDeInstalacion` (pura, recorrida por el check `avisosCara`):
+ *  · Ya está instalada (standalone): una línea que lo confirma.
  *  · Chrome/Edge guardaron el evento de instalación: un botón que abre el
  *    diálogo nativo.
  *  · iPhone/iPad en Safari: no hay evento; se explican los dos toques.
+ *  · La aceptó o la rechazó hace un momento: se dice. Antes el «Instalada» no
+ *    se veía nunca, porque el evento se consume antes de la respuesta.
  *  · Cualquier otro caso (Firefox de escritorio, Chrome que aún no decide):
  *    nada, en vez de un botón que no hace nada.
+ *
+ * `conTitulo` pinta «Instalar la aplicación» encima: lo pide el diálogo de
+ * Avisos, que no tiene otro rótulo; Ajustes ya trae el suyo.
  */
-export const InstalarApp: React.FC<{ compacto?: boolean }> = ({ compacto = false }) => {
+export const InstalarApp: React.FC<{ compacto?: boolean; conTitulo?: boolean }> = ({ compacto = false, conTitulo = false }) => {
   const [instalada, setInstalada] = useState(() => enStandalone());
   const [hayEvento, setHayEvento] = useState(() => eventoDeInstalacion() !== null);
-  const [estado, setEstado] = useState<'' | 'rechazada' | 'aceptada'>('');
+  const [resultado, setResultado] = useState<'' | 'rechazada' | 'aceptada'>('');
 
   useEffect(() => {
     const parar = alCambiarInstalable(() => {
@@ -33,43 +41,65 @@ export const InstalarApp: React.FC<{ compacto?: boolean }> = ({ compacto = false
     };
   }, []);
 
-  if (instalada) return null;
+  const situacion = situacionDeInstalacion({ instalada, hayEvento, esIOS: esIOS(), resultado });
+  if (situacion === 'no-disponible') return null;
+  /* Compacto no tiene sitio para confirmaciones: solo el botón o las instrucciones. */
+  if (compacto && situacion !== 'instalable' && situacion !== 'ios-instrucciones') return null;
 
-  if (hayEvento) {
-    return (
-      <div className={compacto ? '' : 'flex flex-col gap-2'}>
-        <button
-          type="button"
-          onClick={() => {
-            void pedirInstalacion().then((r) => {
-              if (r === 'accepted') setEstado('aceptada');
-              else if (r === 'dismissed') setEstado('rechazada');
-            });
-          }}
-          className="btn-secondary btn-sm inline-flex items-center gap-2"
-        >
-          <Download className="h-3.5 w-3.5" />
-          Instalar Iureon en este dispositivo
-        </button>
-        {!compacto && estado === 'aceptada' && (
-          <p className="text-meta text-ink-500">Instalada. Ábrala desde su pantalla de inicio o su escritorio.</p>
-        )}
-      </div>
-    );
-  }
+  const instalar = () => {
+    void pedirInstalacion().then((r) => {
+      if (r === 'accepted') setResultado('aceptada');
+      else if (r === 'dismissed') setResultado('rechazada');
+    });
+  };
 
-  if (esIOS()) {
-    return (
-      <p className="notice text-meta">
-        <Share className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-700" />
-        <span>
-          En iPhone o iPad: toque <strong>Compartir</strong> en Safari y luego{' '}
-          <strong>Añadir a pantalla de inicio</strong>. Iureon se abre entonces como una aplicación y
-          puede recibir avisos.
-        </span>
-      </p>
-    );
-  }
+  return (
+    <div className="cara-nueva cn-avi-instalar" data-situacion={situacion}>
+      {conTitulo && <p className="cn-avi-instalar-titulo">Instalar la aplicación</p>}
 
-  return null;
+      {situacion === 'instalada' && (
+        <p className="cn-avi-instalar-ok">
+          <Check className="h-4 w-4 shrink-0" aria-hidden="true" />
+          <span>Iureon está instalada y abierta como aplicación en este dispositivo.</span>
+        </p>
+      )}
+
+      {situacion === 'aceptada' && (
+        <p className="cn-avi-instalar-ok" role="status">
+          <Check className="h-4 w-4 shrink-0" aria-hidden="true" />
+          <span>Instalada. Ábrala desde su pantalla de inicio o su escritorio.</span>
+        </p>
+      )}
+
+      {situacion === 'instalable' && (
+        <>
+          {!compacto && (
+            <p className="cn-avi-instalar-texto">
+              Queda en el escritorio o en la pantalla de inicio del teléfono, y abre sin barra del navegador.
+            </p>
+          )}
+          <button type="button" onClick={instalar} className="cn-avi-boton">
+            <Download className="h-4 w-4" aria-hidden="true" />
+            Instalar Iureon en este dispositivo
+          </button>
+        </>
+      )}
+
+      {situacion === 'ios-instrucciones' && (
+        <p className="cn-avi-instalar-pasos">
+          <Share className="h-4 w-4 shrink-0" aria-hidden="true" />
+          <span>
+            En iPhone o iPad: toque <strong>Compartir</strong> en Safari y luego <strong>Añadir a pantalla de inicio</strong>.
+            Iureon se abre entonces como una aplicación y puede recibir avisos.
+          </span>
+        </p>
+      )}
+
+      {situacion === 'rechazada' && (
+        <p className="cn-avi-instalar-texto" role="status">
+          No se instaló. El navegador decide cuándo volver a ofrecerlo.
+        </p>
+      )}
+    </div>
+  );
 };

@@ -1,10 +1,18 @@
 import React from 'react';
 import { Clock, ShieldCheck, ShieldX } from 'lucide-react';
-import { Dialog } from '../../../design/Dialog';
+import { DialogoDeAyuda } from '../../help/components/DialogoDeAyuda';
 import { supportApi, type SupportAccess } from '../support.api';
 
 /**
  * La solicitud de acceso, como la lee el socio que decide. Artboard 8a.
+ *
+ * ─── LA CARA NUEVA, DERIVADA ────────────────────────────────────────────────
+ *
+ * Ningún archivo de `public/handoff/app-*.html` dibuja esta solicitud con la
+ * cara nueva. Se viste con la cáscara de los diálogos de Aprender
+ * (`help/components/DialogoDeAyuda`), que sale de «Escribir a soporte»
+ * (`app-manual-y-soporte.html`, :491): título dentro del cuerpo, radio 16,
+ * campos sobre gris y hoja inferior en el teléfono.
  *
  * ─── LA FRASE QUE NO SE PUEDE OMITIR ────────────────────────────────────────
  *
@@ -22,9 +30,10 @@ import { supportApi, type SupportAccess } from '../support.api';
  *
  * ─── NEGAR ES UNA RESPUESTA, NO UN SILENCIO ─────────────────────────────────
  *
- * «No autorizar» es un botón del mismo tamaño y del mismo peso visual que
- * autorizar, no un enlace pequeño al margen. Una decisión que se puede tomar
- * en los dos sentidos con el mismo esfuerzo es la única que informa.
+ * «No autorizar» y «Autorizar» llevan LA MISMA clase: mismo tamaño, mismo peso
+ * y mismo color. Pintar uno como primario sería empujar la decisión, y una
+ * decisión que se puede tomar en los dos sentidos con el mismo esfuerzo es la
+ * única que informa. El foco entra al diálogo, no a ninguno de los dos.
  */
 
 const DURACION_LEGIBLE: Record<number, string> = {
@@ -46,6 +55,7 @@ export const SupportAccessDecisionDialog: React.FC<SupportAccessDecisionDialogPr
 }) => {
   const [enviando, setEnviando] = React.useState<'si' | 'no' | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const idTitulo = React.useId();
 
   const decidir = async (autoriza: boolean) => {
     if (!solicitud) return;
@@ -56,91 +66,89 @@ export const SupportAccessDecisionDialog: React.FC<SupportAccessDecisionDialogPr
       onDecidido();
       onCerrar();
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'No se pudo registrar la decisión.');
+      setError(
+        `${e instanceof Error ? e.message : 'No se pudo registrar la decisión.'} La solicitud sigue pendiente: nadie ha entrado.`
+      );
     } finally {
       setEnviando(null);
     }
   };
 
   return (
-    <Dialog
+    <DialogoDeAyuda
       abierto={solicitud !== null}
-      onCerrar={onCerrar}
-      titulo="Soporte pide ver material de su firma"
-      subtitulo="Usted decide. Nadie ha entrado todavía."
-      tamano="M"
+      onCerrar={() => {
+        if (enviando === null) onCerrar();
+      }}
+      tituloId={idTitulo}
+      clase="cn-sop-decision"
     >
       {solicitud && (
-        <div className="space-y-4">
-          <dl className="space-y-3">
+        <div className="cn-sop-decision-cuerpo">
+          <div>
+            <h2 id={idTitulo} className="cn-sop-h2 cn-sop-h2--grande">
+              Soporte pide ver material de su firma
+            </h2>
+            <p className="cn-sop-bajada-2">Usted decide. Nadie ha entrado todavía.</p>
+          </div>
+
+          <dl className="cn-sop-decision-datos">
             <div>
-              <dt className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-                Quién pide
-              </dt>
-              <dd className="mt-0.5 text-[13px] text-ink-900">{solicitud.requestedBy}</dd>
+              <dt className="cn-sop-etiqueta">Quién pide</dt>
+              <dd className="cn-sop-decision-dato">{solicitud.requestedBy}</dd>
             </div>
             <div>
-              <dt className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-                Qué pide ver
-              </dt>
-              <dd className="mt-0.5 text-[13px] text-ink-900">{solicitud.scope}</dd>
+              <dt className="cn-sop-etiqueta">Qué pide ver</dt>
+              <dd className="cn-sop-decision-dato">{solicitud.scope}</dd>
             </div>
             <div>
-              <dt className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">
-                Por qué
-              </dt>
-              <dd className="mt-0.5 text-justify text-[13px] leading-relaxed text-ink-900 [text-wrap:pretty]">
-                {solicitud.motive}
-              </dd>
+              <dt className="cn-sop-etiqueta">Por qué</dt>
+              <dd className="cn-sop-decision-dato cn-sop-decision-dato--motivo">{solicitud.motive}</dd>
             </div>
           </dl>
 
-          <div className="flex items-start gap-2 rounded-card border border-line-200 bg-canvas px-4 py-3">
-            <Clock className="mt-0.5 h-4 w-4 shrink-0 text-ink-400" />
-            <p className="text-justify text-[12px] leading-snug text-ink-700 [text-wrap:pretty]">
+          <div className="cn-sop-decision-plazo">
+            <Clock className="cn-sop-icono-linea" aria-hidden="true" />
+            <p>
               Si autoriza, el acceso dura{' '}
-              <strong className="font-semibold">
-                {DURACION_LEGIBLE[solicitud.durationMinutes] ?? `${solicitud.durationMinutes} min`}
-              </strong>{' '}
-              y se cierra solo. Es de <strong className="font-semibold">solo lectura</strong>: nadie
-              puede modificar nada. Verá una franja permanente mientras dure, con lo que se vaya
-              abriendo, y puede cortarlo en cualquier momento. No hay prórroga automática: si hace
-              falta más tiempo, se vuelve a pedir.
+              <strong>{DURACION_LEGIBLE[solicitud.durationMinutes] ?? `${solicitud.durationMinutes} min`}</strong>{' '}
+              y se cierra solo. Es de <strong>solo lectura</strong>: nadie puede modificar nada. Verá
+              una franja permanente mientras dure, con lo que se vaya abriendo, y puede cortarlo en
+              cualquier momento. No hay prórroga automática: si hace falta más tiempo, se vuelve a
+              pedir.
             </p>
           </div>
 
-          <p className="text-justify text-[13px] font-semibold leading-snug text-ink-900 [text-wrap:pretty]">
-            No autorizar no afecta su servicio.
-          </p>
+          <p className="cn-sop-decision-libre">No autorizar no afecta su servicio.</p>
 
           {error && (
-            <p className="text-justify text-[12px] leading-snug text-danger [text-wrap:pretty]">
+            <p className="cn-sop-error" role="alert">
               {error}
             </p>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="cn-sop-decision-botones">
             <button
               type="button"
               onClick={() => decidir(false)}
               disabled={enviando !== null}
-              className="btn-secondary flex items-center justify-center gap-2 disabled:opacity-60"
+              className="cn-sop-decision-boton"
             >
-              <ShieldX className="h-4 w-4" />
+              <ShieldX className="cn-sop-icono-linea" aria-hidden="true" />
               {enviando === 'no' ? 'Registrando…' : 'No autorizar'}
             </button>
             <button
               type="button"
               onClick={() => decidir(true)}
               disabled={enviando !== null}
-              className="btn-primary flex items-center justify-center gap-2 disabled:opacity-60"
+              className="cn-sop-decision-boton"
             >
-              <ShieldCheck className="h-4 w-4" />
+              <ShieldCheck className="cn-sop-icono-linea" aria-hidden="true" />
               {enviando === 'si' ? 'Autorizando…' : 'Autorizar'}
             </button>
           </div>
         </div>
       )}
-    </Dialog>
+    </DialogoDeAyuda>
   );
 };

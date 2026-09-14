@@ -182,8 +182,13 @@ export const Dialog: React.FC<DialogProps> = ({
           algo de lo que hay detras y se entienda que es una capa, no una
           pantalla nueva. Y `pb-[env(safe-area-inset-bottom)]` para no quedar
           bajo la franja del gesto de inicio.
+
+          RADIO DE 20 PX, AQUÍ Y NO EN EL TOKEN (14 sep 2026): los diálogos de la
+          cara nueva van más redondeados. `rounded-card` (6 px) lo usan también
+          tarjetas que no son diálogos, así que se cambia el marco y no el token;
+          `overflow-hidden` ya recorta cabecera y pie contra la curva.
         */
-        className={`relative flex max-h-[76vh] w-full flex-col overflow-hidden rounded-t-[16px] border-line-200 bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_16px_40px_-12px_rgb(16_24_34/0.3)] focus:outline-none sm:max-h-none sm:rounded-card sm:border sm:pb-0 ${ANCHO[tamano]}`}
+        className={`relative flex max-h-[76vh] w-full flex-col overflow-hidden rounded-t-[20px] border-line-200 bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_16px_40px_-12px_rgb(16_24_34/0.3)] focus:outline-none sm:max-h-none sm:rounded-[20px] sm:border sm:pb-0 ${ANCHO[tamano]}`}
       >
         {/* ─── CABECERA · fija, nunca lleva controles ni pestañas ────────── */}
         {/*

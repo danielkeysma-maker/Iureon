@@ -12,11 +12,13 @@
     "brand:letras": "python scripts/wordmark-to-paths.py",
     "check:prueba-terminada": "npx tsx src/modules/subscriptions/__checks__/pruebaTerminada.check.ts",
     "check:tokens":"npx tsx src/design/__checks__/tokens.check.ts",
+    "check:esquinas-dialogos": "npx tsx src/design/__checks__/esquinasDeDialogos.check.ts",
     "check:landing": "npx tsx src/design/__checks__/landing.check.ts",
     "check:inicio": "npx tsx src/modules/inicio/__checks__/inicio.check.ts",
     "check:orientacion-cara": "npx tsx src/modules/catalog/__checks__/orientacionCara.check.ts",
     "check:borradores-cara": "npx tsx src/modules/documents/__checks__/borradoresCara.check.ts",
     "check:expedientes-cara": "npx tsx src/modules/expedientes/__checks__/expedientesCara.check.ts",
+    "check:avisos-cara": "npx tsx src/modules/push/__checks__/avisosCara.check.ts",
     "check:audiencias-cara": "npx tsx src/modules/transcription/__checks__/audienciasCara.check.ts",
     "check:entrevistas-cara": "npx tsx src/modules/clients/__checks__/entrevistasCara.check.ts",
     "check:redaccion-cara": "npx tsx src/modules/workspace/__checks__/redaccionCara.check.ts",
@@ -37,7 +39,13 @@
     "check:instruccion": "npx esbuild src/modules/catalog/__checks__/instruccion.check.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/instruccion.check.mjs --log-level=error && node node_modules/.cache/instruccion.check.mjs",
     "check:calculadoras": "npx esbuild src/modules/tools/__checks__/calculadoras.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/calculadoras.check.cjs --log-level=error && node node_modules/.cache/calculadoras.check.cjs",
     "check:plazo-anunciado": "npx esbuild src/modules/catalog/__checks__/plazoAnunciado.check.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/plazoAnunciado.check.mjs --log-level=error && node node_modules/.cache/plazoAnunciado.check.mjs",
-    "check:rama-candidata": "npx esbuild src/modules/workspace/__checks__/ramaDeLaCandidata.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/ramaDeLaCandidata.check.cjs --log-level=error && node node_modules/.cache/ramaDeLaCandidata.check.cjs"
+    "check:rama-candidata": "npx esbuild src/modules/workspace/__checks__/ramaDeLaCandidata.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/ramaDeLaCandidata.check.cjs --log-level=error && node node_modules/.cache/ramaDeLaCandidata.check.cjs",
+    "check:recuperacion": "npx tsx src/modules/auth/__checks__/recuperacion.check.ts",
+    "check:manual-soporte-cara": "npx tsx src/modules/help/__checks__/manualSoporteCara.check.ts",
+    "check:cerrar-sesion": "npx tsx src/modules/tenant/__checks__/cerrarSesion.check.ts",
+    "check:herramientas-cara": "npx tsx src/modules/tools/__checks__/herramientasCara.check.ts",
+    "check:agenda-contador": "npx tsx src/modules/agenda/__checks__/desdeElContador.check.ts",
+    "check:agenda-exportar": "npx esbuild src/modules/agenda/__checks__/agendaExportar.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/agendaExportar.check.cjs --log-level=error && node node_modules/.cache/agendaExportar.check.cjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

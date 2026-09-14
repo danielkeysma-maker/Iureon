@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { FileSpreadsheet, FileText } from 'lucide-react';
-import { Dialog } from '../../../design/Dialog';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { toolsApi } from '../services/tools.api';
 import type { CalendarioAnual } from '../types';
 import { exportarExcel, type LibroExcel } from '../exportarExcel';
 import { exportarPdf } from '../exportarPdf';
 import { FuentesBox } from './FuentesBox';
+import { BotonesDeExportacion, Caja, Cargando, ErrorDeHerramienta, Opcion, PantallaDeHerramienta } from './PantallaDeHerramienta';
 
 /**
- * Calendario judicial. Diálogo tipo 3 en L: a year is a table.
+ * Festivos y vacancia del año. Pantalla DERIVADA: la maqueta no la dibuja sola,
+ * pero sí el botón que la abre («Ver los festivos del año», `app-herramientas.html`
+ * :260) y la casilla en tarjeta (:143). Se abre desde la agenda y a ella vuelve.
  *
  * The holidays are computed on the server from Ley 51 de 1983 (fixed dates,
  * dates moved to Monday, dates relative to Easter), so any year is available
@@ -97,95 +99,96 @@ export const CalendarioModal: React.FC<{ isOpen: boolean; onClose: () => void }>
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Dialog
-      abierto={isOpen}
-      onCerrar={onClose}
-      tamano="L"
-      titulo="Calendario judicial"
-      subtitulo="Festivos de la Ley 51 de 1983, vacancia judicial y Semana Santa, con la regla de cada fecha."
-      cuerpoEnCanvas
-      acciones={
-        calendario ? (
-          <>
-            <button onClick={exportar} className="btn-neutral btn-sm">
-              <FileSpreadsheet className="h-3.5 w-3.5" />
-              Exportar a Excel
-            </button>
-            <button onClick={() => void exportarPapel()} className="btn-neutral btn-sm">
-              <FileText className="h-3.5 w-3.5" />
-              Exportar a PDF
-            </button>
-          </>
-        ) : undefined
-      }
+    <PantallaDeHerramienta
+      forma="lista"
+      titulo="Festivos y vacancia del año"
+      bajada="Festivos de la Ley 51 de 1983, vacancia judicial y Semana Santa, con la regla de cada fecha."
+      onVolver={onClose}
+      volverA="Agenda de términos"
+      acciones={calendario ? <BotonesDeExportacion onExcel={exportar} onPdf={() => void exportarPapel()} /> : undefined}
     >
-      <div className="space-y-4">
-        <div className="flex flex-wrap items-end gap-3">
-          <label className="block">
-            <span className="field-label">Año</span>
-            <input
-              type="number"
-              min={1984}
-              max={2200}
-              value={anio}
-              onChange={(e) => setAnio(Number(e.target.value))}
-              className="field mt-1 w-[120px] font-mono"
-            />
+      <div className="cn-her-bloques">
+        <div className="cn-her-anio">
+          <button type="button" className="cn-her-icono cn-her-icono--suave" onClick={() => setAnio((a) => a - 1)} aria-label="Año anterior">
+            <ChevronLeft aria-hidden="true" size={16} />
+          </button>
+          <label className="cn-her-sr" htmlFor="festivos-anio">
+            Año
           </label>
-          <label className="flex items-center gap-2 pb-2 text-ui text-ink-700">
-            <input type="checkbox" checked={semanaSantaCompleta} onChange={(e) => setSemanaSantaCompleta(e.target.checked)} />
-            Descontar lunes a miércoles de Semana Santa (Decreto 1660 de 1978, art. 107; no aplica a despachos penales — verifique la circular del año)
-          </label>
+          <input
+            id="festivos-anio"
+            type="number"
+            min={1984}
+            max={2200}
+            value={anio}
+            onChange={(e) => setAnio(Number(e.target.value))}
+            className="cn-her-campo cn-her-mono cn-her-campo--anio"
+          />
+          <button type="button" className="cn-her-icono cn-her-icono--suave" onClick={() => setAnio((a) => a + 1)} aria-label="Año siguiente">
+            <ChevronRight aria-hidden="true" size={16} />
+          </button>
         </div>
 
-        {cargando && <p className="text-meta text-ink-500">Calculando…</p>}
-        {error && <p className="notice-unverified">{error}</p>}
+        <Opcion
+          tipo="checkbox"
+          marcada={semanaSantaCompleta}
+          onCambio={() => setSemanaSantaCompleta((v) => !v)}
+          titulo="Descontar lunes a miércoles de Semana Santa"
+          detalle="Decreto 1660 de 1978, art. 107. No aplica a despachos penales: verifique la circular del año."
+        />
+
+        {cargando && <Cargando texto="Calculando el calendario…" />}
+        {error && <ErrorDeHerramienta mensaje={error} />}
 
         {calendario && !cargando && (
-          <div className="space-y-3">
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_260px]">
-              <div className="overflow-hidden rounded-card border border-line-200 bg-surface">
-                <p className="t-head">{calendario.festivos.length} festivos · Ley 51 de 1983</p>
-                {calendario.festivos.map((f) => (
-                  <div key={f.fecha} className="t-row flex items-center gap-3">
-                    <span className="w-[92px] shrink-0 font-mono text-[12px] text-ink-900">{f.fecha}</span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-ui text-ink-900">{f.nombre}</span>
-                      <span className="block text-meta capitalize text-ink-500">{fechaLarga(f.fecha)}</span>
-                    </span>
-                    <span className="shrink-0 text-right text-meta text-ink-500">
-                      {REGLA[f.regla]}
-                      {f.fechaOriginal && f.fechaOriginal !== f.fecha ? ` · era ${f.fechaOriginal.slice(5)}` : ''}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="space-y-3">
-                <div className="overflow-hidden rounded-card border border-line-200 bg-surface">
-                  <p className="t-head">Días hábiles por mes</p>
-                  {calendario.diasHabilesPorMes.map((m) => (
-                    <div key={m.mes} className="t-row flex items-center justify-between">
-                      <span className="text-ui text-ink-900">{MESES[m.mes - 1]}</span>
-                      <span className="font-mono text-[12px] text-ink-900">{m.habiles}</span>
-                    </div>
+          <>
+            <div className="cn-her-dos-bloques">
+              <Caja titulo={`${calendario.festivos.length} festivos · Ley 51 de 1983`}>
+                <ul className="cn-her-tabla">
+                  {calendario.festivos.map((f) => (
+                    <li key={f.fecha} className="cn-her-tabla-fila cn-her-tabla-fila--festivo">
+                      <span className="cn-her-mono cn-her-tenue">{f.fecha}</span>
+                      <span className="cn-her-celda-doble">
+                        <span>{f.nombre}</span>
+                        <span className="cn-her-nota cn-her-mayuscula">{fechaLarga(f.fecha)}</span>
+                      </span>
+                      <span className="cn-her-tenue">
+                        {REGLA[f.regla]}
+                        {f.fechaOriginal && f.fechaOriginal !== f.fecha ? ` · era ${f.fechaOriginal.slice(5)}` : ''}
+                      </span>
+                    </li>
                   ))}
-                </div>
-              </div>
+                </ul>
+              </Caja>
+
+              <Caja titulo="Días hábiles por mes">
+                <ul className="cn-her-tabla">
+                  {calendario.diasHabilesPorMes.map((m) => (
+                    <li key={m.mes} className="cn-her-tabla-fila cn-her-tabla-fila--par">
+                      <span>{MESES[m.mes - 1]}</span>
+                      <span className="cn-her-num cn-her-mono">{m.habiles}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Caja>
             </div>
 
-            <p className="notice">
-              Vacancia judicial: del {calendario.vacancia.desde} al {calendario.vacancia.hasta}. {calendario.vacancia.descripcion}
+            <p className="cn-her-nota cn-her-nota--caja">
+              <b className="cn-her-fuerte">Vacancia judicial:</b> del <span className="cn-her-mono">{calendario.vacancia.desde}</span> al{' '}
+              <span className="cn-her-mono">{calendario.vacancia.hasta}</span>. {calendario.vacancia.descripcion}
             </p>
-            <p className="notice">
-              Semana Santa: jueves {calendario.semanaSanta.jueves} y viernes {calendario.semanaSanta.viernes}. {calendario.semanaSanta.nota}
+            <p className="cn-her-nota cn-her-nota--caja">
+              <b className="cn-her-fuerte">Semana Santa:</b> jueves <span className="cn-her-mono">{calendario.semanaSanta.jueves}</span> y
+              viernes <span className="cn-her-mono">{calendario.semanaSanta.viernes}</span>. {calendario.semanaSanta.nota}
             </p>
 
             <FuentesBox fuentes={calendario.fuentes} />
-          </div>
+          </>
         )}
       </div>
-    </Dialog>
+    </PantallaDeHerramienta>
   );
 };

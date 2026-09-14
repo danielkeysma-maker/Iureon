@@ -783,6 +783,22 @@ const A_ROLES_SALDO: ManualArticle = {
         'Puede cambiarlo cuando quiera, y también con el plan vencido. Un socio administrador puede escribirlo al dar de alta a un compañero, pero es opcional: cada quien puede ponerlo después.'
       ]
     },
+    { kind: 'subtitulo', texto: 'Si olvidó su contraseña' },
+    {
+      kind: 'pasos',
+      pasos: [
+        'En la pantalla «Entrar», junto a «Contraseña», pulse «¿Olvidó su contraseña?».',
+        'Escriba el correo con el que entra y pulse «Enviarme el enlace». La pantalla dice «Si ese correo tiene cuenta, ya salió el enlace», exista o no la cuenta: así nadie puede usarla para averiguar qué correos están en Iureon.',
+        'Abra el correo de Iureon y pulse «Poner una contraseña nueva». El enlace vence en 30 minutos y solo sirve una vez; si no lo encuentra, revise el correo no deseado. Se pueden pedir hasta tres enlaces cada media hora, y cada enlace nuevo anula el anterior.',
+        'Escriba la contraseña nueva dos veces —al menos diez caracteres— y pulse «Guardar la contraseña». Se cierran todas las sesiones abiertas con su correo, en cualquier dispositivo, y se entra de nuevo desde «Entrar».'
+      ]
+    },
+    {
+      kind: 'nota',
+      titulo: 'Si el correo no llega',
+      texto:
+        'Un socio administrador de su firma puede pedirle a operación de Iureon que le ponga una contraseña nueva. Si su usuario está desactivado, el enlace no llega: lo reactiva un socio de su firma. La solicitud y el cambio quedan en la auditoría de la firma.'
+    },
     { kind: 'subtitulo', texto: 'Eliminar su usuario o su firma' },
     {
       kind: 'pasos',

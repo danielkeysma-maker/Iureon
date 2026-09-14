@@ -66,6 +66,8 @@ export const ACCIONES: Record<string, string> = {
   PLAN_SUSPENDIDO: 'Operación suspendió el acceso',
   MODULOS_AJUSTADOS: 'Operación ajustó los módulos de la firma',
   CLAVE_RESTABLECIDA_POR_OPERADOR: 'Operación restableció una contraseña',
+  CONTRASENA_RECUPERACION_SOLICITADA: 'Pidió un enlace para cambiar su contraseña',
+  CONTRASENA_RESTABLECIDA: 'Cambió su contraseña con el enlace del correo',
   FIRMA_ELIMINADA: 'Operación eliminó una firma',
   USUARIO_ELIMINADO_POR_SI_MISMO: 'Eliminó su propio usuario',
   NOMBRE_ACTUALIZADO: 'Fijó su nombre',

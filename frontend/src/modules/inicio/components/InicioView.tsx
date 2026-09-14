@@ -11,6 +11,7 @@ import { useTenant } from '../../tenant/TenantContext';
 import { ETIQUETA_DE_PERIODO, NOMBRE_DE_PLAN, type Modulo } from '../../subscriptions/types';
 import { NOVEDADES } from '../../help/content/novedades';
 import { PUERTAS_DE_INICIO } from '../puertas';
+import { textoDeLaVisitaCompleta } from '../visitaGuiada/capitulos';
 import { dejarDocumentoParaLeer } from '../../workspace/documentoParaLeer';
 import { fechaCorta, fechaLarga, nombreParaSaludar, saludoSegunHora } from '../saludo';
 import { diasHastaVencer, haceCuanto, textoDelPlazo } from '../plazos';
@@ -66,6 +67,8 @@ interface InicioViewProps {
     invitacionPendiente: boolean;
     iniciar: () => void;
     declinarInvitacion: () => void;
+    /** Los capítulos de la visita: de sus segundos sale la duración que se anuncia. */
+    capitulos: readonly { segundos: number }[];
   };
   /** `summary.mes.escritosRestantes` del servidor; `null` si no lo informó. */
   escritosRestantes: number | null;
@@ -129,6 +132,10 @@ export const InicioView: React.FC<InicioViewProps> = ({
   // siempre: mejor un saludo aproximado que un saludo sin nadie.
   const { currentUserName } = useTenant();
   const ahora = React.useMemo(() => new Date(), []);
+  /* «unos 5 minutos», medido sobre lo que la visita dice; nunca una cifra escrita a mano. */
+  const duracionDeLaVisita = textoDeLaVisitaCompleta(
+    visita.capitulos.reduce((suma, c) => suma + c.segundos, 0)
+  ).toLowerCase();
 
   /* Un botón hacia una vista que el plan oculta no llevaría a ninguna parte: App la devuelve a Inicio. */
   const puede = (vista: MainView): boolean => !ocultas.includes(vista);
@@ -443,7 +450,14 @@ export const InicioView: React.FC<InicioViewProps> = ({
         {visita.invitacionPendiente && (
           <div className="cn-ini-visita">
             <Route className="h-5 w-5" aria-hidden="true" />
-            <p>¿Quiere una visita guiada de dos minutos? Recorre cada módulo y dice para qué sirve.</p>
+            {/*
+              LA DURACIÓN SE CALCULA. Decía «de dos minutos», escrito a mano; la
+              visita mide lo que se lee en ella (`visitaGuiada/capitulos.ts`).
+            */}
+            <p>
+              ¿Quiere una visita guiada? Recorre cada módulo y dice para qué sirve, en{' '}
+              {duracionDeLaVisita}.
+            </p>
             <div className="cn-ini-visita-botones">
               <button type="button" onClick={visita.declinarInvitacion} className="cn-ini-boton cn-ini-boton--texto">
                 Ahora no
@@ -539,8 +553,8 @@ export const InicioView: React.FC<InicioViewProps> = ({
                 ¿Primera vez aquí?
               </h2>
               <p className="cn-ini-pie-texto">
-                La visita guiada recorre cada módulo en dos minutos y dice para qué sirve. El manual
-                explica cada tarea paso a paso.
+                La visita guiada recorre cada módulo, en {duracionDeLaVisita}, y dice para qué sirve.
+                El manual explica cada tarea paso a paso.
               </p>
               <div className="cn-ini-pie-botones">
                 <button type="button" onClick={visita.iniciar} className="cn-ini-boton cn-ini-boton--suave">

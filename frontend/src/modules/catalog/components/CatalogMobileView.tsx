@@ -144,8 +144,10 @@ export const CatalogMobileView: React.FC = () => {
               `dvh` y no `vh`: en un teléfono 100vh se mide contra la ventana
               SIN la barra de direcciones, y todo lo anclado abajo —aquí, el
               botón de guardar— cae fuera de lo que se ve.
+
+              Radio de 20 px arriba (14 sep 2026): el mismo de toda hoja inferior.
             */}
-            <div className="relative flex h-[92dvh] w-full min-w-0 flex-col overflow-hidden rounded-t-[16px] bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_16px_40px_-12px_rgb(16_24_34/0.3)]">
+            <div className="relative flex h-[92dvh] w-full min-w-0 flex-col overflow-hidden rounded-t-[20px] bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_16px_40px_-12px_rgb(16_24_34/0.3)]">
               <div className="flex shrink-0 justify-center pb-0.5 pt-2" aria-hidden="true">
                 <span className="h-1 w-[38px] rounded-full bg-neutral-line" />
               </div>

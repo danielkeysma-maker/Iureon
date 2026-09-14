@@ -27,11 +27,12 @@ interface LoginPortalViewProps {
  * pegado al borde inferior. Los estilos viven en `design/cara-nueva.css`, bajo
  * `.cara-nueva`, para que el resto de la aplicación no cambie todavía.
  *
+ * «¿Olvidó su contraseña?» lleva a `/?recuperar=1` (`RecuperarContrasenaView`):
+ * la recuperación por correo de SPEC §2 ya existe. La vía de antes —un socio
+ * pide a operación que la restablezca— sigue y la nombra esa pantalla, para
+ * cuando el correo no llega.
+ *
  * LO QUE LA MAQUETA DECÍA Y NO SE COPIÓ:
- * - «¿Olvidó su contraseña?» llevaba a una recuperación por correo que no
- *   existe (SPEC §2). La contraseña la restablece operación de Iureon cuando la
- *   firma lo pide (`admin.routes.ts`, «acciones de soporte que la firma
- *   autoriza»); eso es lo que se dice, sin enlace.
  * - «Regístrela y pruebe 14 días» y «14 días del plan Premium y saldo de
  *   cortesía»: la prueba pública es de Esencial, dura
  *   `DIAS_DE_PRUEBA_GRATUITA` y empieza con saldo cero (`trial.service.ts`).
@@ -139,9 +140,15 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
             </div>
 
             <div>
-              <label htmlFor="clave" className="cn-etiqueta">
-                Contraseña
-              </label>
+              {/* Artboard: el enlace va a la derecha de la etiqueta, en la misma fila. */}
+              <div className="cn-etiqueta-fila">
+                <label htmlFor="clave" className="cn-etiqueta">
+                  Contraseña
+                </label>
+                <a href="/?recuperar=1" className="cn-nota-campo" style={{ fontWeight: 600, color: 'var(--brand)', textDecoration: 'none' }}>
+                  ¿Olvidó su contraseña?
+                </a>
+              </div>
               <div className="cn-con-boton">
                 <input
                   id="clave"
@@ -150,7 +157,6 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••"
                   autoComplete="current-password"
-                  aria-describedby="clave-ayuda"
                   className="cn-campo cn-campo--clave"
                   required
                 />
@@ -163,14 +169,6 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
                   {verContrasena ? <EyeOff size={20} aria-hidden="true" /> : <Eye size={20} aria-hidden="true" />}
                 </button>
               </div>
-              {/*
-                SIN RECUPERACIÓN POR CORREO TODAVÍA (SPEC §2). Decir quién la
-                restablece es más honesto que un enlace a una pantalla que no
-                existe: la firma la pide y operación de Iureon la pone.
-              */}
-              <p id="clave-ayuda" className="cn-ayuda">
-                Si la olvidó, un socio administrador de su firma nos pide que se la restablezcamos.
-              </p>
             </div>
 
             {errorMsg && (

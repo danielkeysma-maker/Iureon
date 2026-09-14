@@ -3,6 +3,7 @@ import { Copy, FileDown, FileText, LogOut, ShieldCheck, X } from 'lucide-react';
 import { IconoMenu, IconoPalomita } from '../../../design/ArtboardIcons';
 import { navModule } from '../navigation';
 import { IureonMark } from './IureonMark';
+import { ConfirmarCierreDeSesion } from './ConfirmarCierreDeSesion';
 import type { MainView } from '../types';
 import type { EstadoBorrador } from '../../documents/types';
 import '../../../design/cara-nueva.css';
@@ -96,6 +97,14 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   onInicio
 }) => {
   const [menu, setMenu] = React.useState(false);
+  /*
+   * «Cerrar sesión» PREGUNTA, igual que en escritorio y en Ajustes. Antes aquí
+   * salía al primer toque: el mismo gesto, con otra consecuencia según el
+   * aparato. La hoja se cierra al elegir, así que el foco vuelve al botón de
+   * menú y no a una fila que ya no existe.
+   */
+  const [confirmarSalida, setConfirmarSalida] = React.useState(false);
+  const botonDeMenu = React.useRef<HTMLButtonElement | null>(null);
   const modulo = navModule(mainView);
   const sinOpciones = { conMembrete: true, conFuentes: false };
 
@@ -125,6 +134,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         </div>
 
         <button
+          ref={botonDeMenu}
           type="button"
           onClick={() => setMenu(true)}
           aria-label="Acciones"
@@ -210,13 +220,20 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
                 </Accion>
               )}
 
-              <Accion icono={<LogOut className="h-5 w-5" />} onClick={cerrarY(onLogout)}>
+              <Accion icono={<LogOut className="h-5 w-5" />} onClick={cerrarY(() => setConfirmarSalida(true))}>
                 Cerrar sesión
               </Accion>
             </div>
           </div>
         </div>
       )}
+
+      <ConfirmarCierreDeSesion
+        abierto={confirmarSalida}
+        onCancelar={() => setConfirmarSalida(false)}
+        onCerrarSesion={onLogout}
+        focoAlCerrar={botonDeMenu}
+      />
     </>
   );
 };

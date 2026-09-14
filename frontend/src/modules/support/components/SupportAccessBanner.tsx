@@ -1,9 +1,18 @@
 import React from 'react';
-import { Eye, ShieldAlert, X } from 'lucide-react';
+import { Eye, ShieldAlert } from 'lucide-react';
 import { supportApi, type EstadoConLecturas, type SupportAccess } from '../support.api';
 
 /**
  * La franja de acceso de soporte. Artboard 8a.
+ *
+ * ─── LA CARA NUEVA, DERIVADA ────────────────────────────────────────────────
+ *
+ * Ningún `public/handoff/app-*.html` dibuja esta franja con la cara nueva. Se
+ * deriva de los avisos ya construidos (`cn-ini-fallo`, las franjas de
+ * Audiencias): fondo ámbar suave con tinta ámbar, letra de 14 px como mínimo
+ * —antes iba en 12— y botones de 44 px. Sin trazo discontinuo: aquí nada está
+ * «sin verificar», está pasando. En el teléfono el texto envuelve en vez de
+ * cortarse con puntos suspensivos: quién mira y qué mira no se puede truncar.
  *
  * ─── POR QUÉ ES UNA FRANJA Y NO UNA NOTIFICACIÓN ────────────────────────────
  *
@@ -32,10 +41,10 @@ import { supportApi, type EstadoConLecturas, type SupportAccess } from '../suppo
  * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ───────────────────
  *
  * · «El resumen final por correo llega siempre, incluso si la firma nunca abrió
- *   el panel». No hay infraestructura de correo en este backend, así que ese
- *   correo NO se envía. Lo que sí queda es el rastro completo en Auditoría —las
- *   cinco acciones y cada pantalla abierta—, que sobrevive a la sesión y se
- *   puede consultar mañana. Se dice aquí para que nadie suponga que salió.
+ *   el panel». Ese resumen NO se envía. Lo que sí queda es el rastro completo
+ *   en Auditoría —las cinco acciones y cada pantalla abierta—, que sobrevive a
+ *   la sesión y se puede consultar mañana. Se dice aquí para que nadie suponga
+ *   que salió.
  */
 
 const CADA = 30_000;
@@ -74,6 +83,8 @@ export const SupportAccessBanner: React.FC<SupportAccessBannerProps> = ({
   const [minutos, setMinutos] = React.useState<number | null>(null);
   const [panelAbierto, setPanelAbierto] = React.useState(false);
   const [revocando, setRevocando] = React.useState(false);
+  const [errorAlRevocar, setErrorAlRevocar] = React.useState('');
+  const idPanel = React.useId();
 
   const releer = React.useCallback(() => {
     supportApi
@@ -123,9 +134,15 @@ export const SupportAccessBanner: React.FC<SupportAccessBannerProps> = ({
   const revocar = async () => {
     if (!activo) return;
     setRevocando(true);
+    setErrorAlRevocar('');
     try {
       await supportApi.revocar(activo.id);
       releer();
+    } catch (e: unknown) {
+      /* Si la revocación no llegó, se dice: el acceso SIGUE abierto, y creer lo contrario es lo peligroso. */
+      setErrorAlRevocar(
+        `${e instanceof Error ? e.message : 'No se pudo revocar.'} El acceso sigue abierto.`
+      );
     } finally {
       setRevocando(false);
     }
@@ -133,25 +150,25 @@ export const SupportAccessBanner: React.FC<SupportAccessBannerProps> = ({
 
   if (pendiente && !activo) {
     return (
-      <div className="flex min-h-[34px] shrink-0 items-center gap-3 border-b border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-4 py-1.5">
-        <ShieldAlert className="h-4 w-4 shrink-0 text-unverified" />
-        <p className="min-w-0 flex-1 truncate text-[12.5px] text-unverified">
-          <strong className="font-semibold">{pendiente.requestedBy}</strong> pide acceso temporal
-          para ver <strong className="font-semibold">{pendiente.scope}</strong>. Nadie ha entrado.
-        </p>
-        {puedeDecidir ? (
-          <button
-            type="button"
-            onClick={() => onAbrirSolicitud(pendiente)}
-            className="shrink-0 rounded-input bg-surface px-3 py-1 text-[12px] font-semibold text-ink-900 shadow-sm hover:bg-canvas"
-          >
-            Leer la solicitud
-          </button>
-        ) : (
-          <span className="shrink-0 text-[11.5px] text-unverified">
-            Lo decide un socio administrador
-          </span>
-        )}
+      <div className="cara-nueva cn-sop-franja" role="status">
+        <div className="cn-sop-franja-fila">
+          <ShieldAlert className="cn-sop-franja-icono" aria-hidden="true" />
+          <p className="cn-sop-franja-texto">
+            <strong>{pendiente.requestedBy}</strong> pide acceso temporal para ver{' '}
+            <strong>{pendiente.scope}</strong>. Nadie ha entrado.
+          </p>
+          {puedeDecidir ? (
+            <button
+              type="button"
+              onClick={() => onAbrirSolicitud(pendiente)}
+              className="cn-sop-franja-boton"
+            >
+              Leer la solicitud
+            </button>
+          ) : (
+            <span className="cn-sop-franja-quien">Lo decide un socio administrador</span>
+          )}
+        </div>
       </div>
     );
   }
@@ -159,58 +176,66 @@ export const SupportAccessBanner: React.FC<SupportAccessBannerProps> = ({
   if (!activo) return null;
 
   return (
-    <div className="shrink-0 border-b border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))]">
-      <div className="flex min-h-[34px] items-center gap-3 px-4 py-1.5">
-        <Eye className="h-4 w-4 shrink-0 text-unverified" />
-        <p className="min-w-0 flex-1 truncate text-[12.5px] text-unverified">
-          <strong className="font-semibold">{activo.requestedBy}</strong> está viendo{' '}
-          <strong className="font-semibold">{activo.scope}</strong> en modo lectura ·{' '}
-          {minutos === null ? 'sin plazo declarado' : `quedan ${restanteLegible(minutos)}`}
+    <div className="cara-nueva cn-sop-franja" role="status">
+      <div className="cn-sop-franja-fila">
+        <Eye className="cn-sop-franja-icono" aria-hidden="true" />
+        <p className="cn-sop-franja-texto">
+          <strong>{activo.requestedBy}</strong> está viendo <strong>{activo.scope}</strong> en modo
+          lectura · {minutos === null ? 'sin plazo declarado' : `quedan ${restanteLegible(minutos)}`}
         </p>
 
-        <button
-          type="button"
-          onClick={() => setPanelAbierto((v) => !v)}
-          className="shrink-0 text-[12px] font-medium text-unverified underline underline-offset-2"
-        >
-          {panelAbierto ? 'Ocultar' : `Qué ha abierto (${datos?.lecturas.length ?? 0})`}
-        </button>
-
-        {puedeDecidir && (
+        <div className="cn-sop-franja-acciones">
           <button
             type="button"
-            onClick={revocar}
-            disabled={revocando}
-            className="shrink-0 rounded-input bg-surface px-3 py-1 text-[12px] font-semibold text-ink-900 shadow-sm hover:bg-canvas disabled:opacity-60"
+            onClick={() => setPanelAbierto((v) => !v)}
+            aria-expanded={panelAbierto}
+            aria-controls={idPanel}
+            className="cn-sop-franja-boton cn-sop-franja-boton--texto"
           >
-            {revocando ? 'Revocando…' : 'Revocar ahora'}
+            {panelAbierto ? 'Ocultar lo que ha abierto' : `Qué ha abierto (${datos?.lecturas.length ?? 0})`}
           </button>
-        )}
+
+          {puedeDecidir && (
+            <button
+              type="button"
+              onClick={revocar}
+              disabled={revocando}
+              className="cn-sop-franja-boton"
+            >
+              {revocando ? 'Revocando…' : 'Revocar ahora'}
+            </button>
+          )}
+        </div>
       </div>
 
+      {errorAlRevocar && (
+        <p className="cn-sop-franja-error" role="alert">
+          {errorAlRevocar}
+        </p>
+      )}
+
       {panelAbierto && (
-        <div className="border-t border-[rgb(var(--unverified-line))] px-4 py-2.5">
+        <div id={idPanel} className="cn-sop-franja-panel">
           {datos && datos.lecturas.length === 0 ? (
-            <p className="text-[12px] text-unverified">
+            <p className="cn-sop-franja-nota">
               No ha abierto nada todavía. El acceso está concedido, pero está vacío.
             </p>
           ) : (
-            <ul className="max-h-40 space-y-1 overflow-y-auto">
+            <ul className="cn-sop-franja-lecturas">
               {datos?.lecturas.map((l) => (
-                <li key={l.id} className="flex gap-3 text-[12px] text-unverified">
-                  <span className="shrink-0 tabular-nums opacity-70">{hora(l.viewedAt)}</span>
-                  <span className="min-w-0 flex-1">{l.resource}</span>
+                <li key={l.id}>
+                  <time className="cn-sop-mono" dateTime={l.viewedAt}>
+                    {hora(l.viewedAt)}
+                  </time>
+                  <span>{l.resource}</span>
                 </li>
               ))}
             </ul>
           )}
-          <p className="mt-2 flex items-start gap-1.5 text-[11px] leading-snug text-unverified opacity-80">
-            <X className="mt-0.5 h-3 w-3 shrink-0" />
-            <span className="text-justify [text-wrap:pretty]">
-              Esta lista se apaga con la sesión. Lo que queda para consultar mañana es Auditoría,
-              donde cada una de estas pantallas está registrada con su hora. No se envía resumen
-              por correo: este producto todavía no tiene correo saliente.
-            </span>
+          <p className="cn-sop-franja-nota">
+            Esta lista se apaga con la sesión. Lo que queda para consultar mañana es Auditoría, donde
+            cada una de estas pantallas está registrada con su hora. No se envía un resumen de este
+            acceso: queda solo en Auditoría.
           </p>
         </div>
       )}

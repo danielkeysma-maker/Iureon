@@ -3,6 +3,7 @@ import { AlertCircle, Check, Eye, EyeOff } from 'lucide-react';
 import { IureonMark } from './IureonMark';
 import { authApi, type ModoDeRegistro, type PlanDeRegistro } from '../../auth/auth.api';
 import type { Session } from '../../auth/session';
+import { MIN_CONTRASENA } from '../../auth/contrasena';
 import { DIAS_DE_PRUEBA_GRATUITA } from '../../subscriptions/pruebaTerminada';
 import '../../../design/cara-nueva.css';
 
@@ -57,7 +58,7 @@ interface RegistroViewProps {
 /** sessionStorage: el plan elegido, que `App.tsx` lee para abrir la pantalla del plan. */
 const PLAN_ELEGIDO_KEY = 'iureon.plan-elegido';
 
-const MIN_CONTRASENA = 10;
+// La misma regla que el restablecimiento por correo: `auth/contrasena.ts`.
 
 interface FichaDePlan {
   nombre: string;

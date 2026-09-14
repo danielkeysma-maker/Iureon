@@ -83,6 +83,9 @@ import { OperatorConsoleDialog } from './modules/admin/components/OperatorConsol
 import { FirmUsersDialog } from './modules/tenant/components/FirmUsersDialog';
 import { LoginPortalView } from './modules/tenant/components/LoginPortalView';
 import { RegistroView } from './modules/tenant/components/RegistroView';
+import { RecuperarContrasenaView } from './modules/tenant/components/RecuperarContrasenaView';
+import { RestablecerContrasenaView } from './modules/tenant/components/RestablecerContrasenaView';
+import { capturarEnlaceDeRecuperacion } from './modules/auth/enlaceDeRecuperacion';
 import type { MainView } from './modules/tenant/types';
 import { NAV_MODULES, vistasOcultasPorPlan } from './modules/tenant/navigation';
 import { InicioView } from './modules/inicio/components/InicioView';
@@ -152,6 +155,14 @@ export function App() {
   const [session, setSession] = useState(() => sesionDeVistaPreviaLocal() ?? readSession());
   const isAuthenticated = Boolean(session);
   /*
+   * EL ENLACE DE RECUPERACIÓN SE LEE ANTES QUE NADA, y en esa misma lectura se
+   * borra de la barra de direcciones (`enlaceDeRecuperacion.ts`). Antes de la
+   * decisión de la portada, porque una redirección de Supabase puede llegar a
+   * la raíz con el token solo en el fragmento, y mandar a `/landing/` perdería
+   * el enlace. Recordado: llamarlo en cada render no vuelve a leer la barra.
+   */
+  const enlaceDeRecuperacion = capturarEnlaceDeRecuperacion();
+  /*
    * PORTADA PÚBLICA. Quien llega a la raíz SIN sesión y sin decir a qué viene
    * (`?entrar=1`, `?prueba=1`, `?registro=PLAN`, `?ir=…` o `?vista=1`) va a `/landing/`, la página pública que
    * vive en `public/landing/` y que Vercel sirve como archivo antes de la
@@ -166,7 +177,9 @@ export function App() {
     const plan = params.get('plan');
     if (plan) sessionStorage.setItem(PLAN_ELEGIDO_KEY, plan.toUpperCase());
     if (
+      capturarEnlaceDeRecuperacion() ||
       params.has('entrar') ||
+      params.has('recuperar') ||
       params.has('prueba') ||
       params.has('registro') ||
       params.has('ir') ||
@@ -1040,6 +1053,16 @@ export function App() {
     setActiveFirm(firmFromSession(fresh));
   };
 
+  /*
+   * EL ENLACE DEL CORREO MANDA SOBRE LA SESIÓN. Quien lo abre en un navegador
+   * con otra sesión abierta —la suya de otro día, o la de un colega— vino a
+   * cambiar la contraseña, no a trabajar. Al guardar se cierran todas las
+   * sesiones de esa cuenta y la pantalla borra la de este navegador.
+   */
+  if (enlaceDeRecuperacion) {
+    return <RestablecerContrasenaView enlace={enlaceDeRecuperacion} />;
+  }
+
   if (!isAuthenticated) {
     if (debeIrALaPortada) return null;
     /*
@@ -1051,6 +1074,10 @@ export function App() {
      * plan desconocido en la URL cae a Esencial, nunca a un error en blanco.
      */
     const parametros = new URLSearchParams(window.location.search);
+    // «¿Olvidó su contraseña?» en Entrar, y «Pedir otro enlace» del enlace vencido.
+    if (parametros.has('recuperar')) {
+      return <RecuperarContrasenaView />;
+    }
     if (parametros.has('prueba')) {
       return <RegistroView modo="PRUEBA" plan="ESENCIAL" onLoginSuccess={handleLoginSuccess} />;
     }
@@ -1808,7 +1835,11 @@ export function App() {
           */}
           {mainView === 'manual' && (
             <div className="flex min-h-0 min-w-0 flex-1 lg:hidden">
-              <ManualMobileView onSoporte={() => setMainView('soporte')} />
+              <ManualMobileView
+                articuloInicial={manualArticulo}
+                onSoporte={() => setMainView('soporte')}
+                onVisitaGuiada={visita.iniciar}
+              />
             </div>
           )}
 
@@ -2049,9 +2080,14 @@ export function App() {
         subtitulo="Llegan aunque la pestaña esté cerrada. Se activan aparato por aparato."
         tamano="S"
       >
-        <div className="flex flex-col gap-4">
-          <InstalarApp />
-          <AvisosEnEsteDispositivo />
+        {/*
+          Cada componente abre su propio alcance `cara-nueva`; este envoltorio
+          solo separa las dos partes. Primero los avisos, que es lo que se vino
+          a hacer aquí; instalar va debajo porque en iPhone es su condición.
+        */}
+        <div className="cara-nueva cn-avi-dialogo">
+          <AvisosEnEsteDispositivo esOperador={esSuperusuario} />
+          <InstalarApp conTitulo />
         </div>
       </Dialog>
 

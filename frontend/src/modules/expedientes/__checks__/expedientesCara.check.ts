@@ -46,6 +46,16 @@ import {
   textoDelBorrado
 } from '../services/casoEnPantalla';
 import type { Carpeta, DocumentoIndexado } from '../services/expedientes.api';
+import {
+  agruparPorClienteYRama,
+  clienteYRama,
+  etiquetaDeRama,
+  filtrarCasos,
+  gruposAbiertosPorDefecto,
+  resumenDelCliente
+} from '../services/agruparCasos';
+import { BRANCH_LABELS } from '../../catalog/branchLabels';
+import type { ExpedienteEnLista } from '../types';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const SRC = join(AQUI, '..', '..', '..');
@@ -170,6 +180,8 @@ const leer = (ruta: string): string => sinComentarios(crudo(ruta));
 
 const COMP = 'modules/expedientes/components/';
 const VISTA = leer(`${COMP}ExpedientesView.tsx`);
+/* Las tarjetas de la lista viven aquí desde que la lista se agrupa por cliente. */
+const LISTAS = leer(`${COMP}CasosEnLaLista.tsx`);
 const CARPETAS = leer(`${COMP}CarpetasDelExpediente.tsx`);
 const INDEXAR = leer(`${COMP}IndexarEnExpediente.tsx`);
 const LECTOR = leer(`${COMP}LeerDocumentoIndexado.tsx`);
@@ -177,9 +189,10 @@ const BUSCAR = leer(`${COMP}BuscarEnExpediente.tsx`);
 const API = leer('modules/expedientes/services/expedientes.api.ts');
 const APP = leer('App.tsx');
 
-/* Las cinco pantallas que se rehicieron enteras con la cara nueva. */
+/* Las pantallas que se rehicieron enteras con la cara nueva. */
 const REHECHAS: Record<string, string> = {
   'ExpedientesView.tsx': VISTA,
+  'CasosEnLaLista.tsx': LISTAS,
   'CarpetasDelExpediente.tsx': CARPETAS,
   'IndexarEnExpediente.tsx': INDEXAR,
   'LeerDocumentoIndexado.tsx': LECTOR,
@@ -200,10 +213,10 @@ check('las DOS ramas (lista y caso) llevan la visita guiada y la cara nueva en s
 check('la lista sale de «Mis casos» y no de la lista plana', VISTA.includes('expedientesApi.listarMisCasos()') && !/expedientesApi\.listar\(\)/.test(VISTA));
 check('las pestañas se cuentan con lo que manda el servidor', VISTA.includes('cuentaDePestana(misCasos.pestanas[id])'));
 check('sin agenda leída, «Esta semana» dice el aviso y no se pinta vacía', VISTA.includes("misCasos.pestanas.estaSemana === null"));
-check('los documentos de una tarjeta pasan por el ayudante que calla ante null', VISTA.includes('documentosEnPalabras(caso.documentos)'));
-check('ninguna cuenta del caso cae a cero por falta de dato', !/(documentos|actores|terminosPendientes)\s*\?\?\s*0/.test(VISTA));
-check('el plazo de la lista y el aviso del caso usan el ayudante', VISTA.includes('plazoEnPalabras(t.diasRestantes)') && VISTA.includes('avisoDelTermino(abierto)'));
-check('el término sin verificar se marca, no se afirma', VISTA.includes('cn-exp-plazo--sin-verificar') && VISTA.includes('cn-exp-termino--sin-verificar'));
+check('los documentos de una tarjeta pasan por el ayudante que calla ante null', LISTAS.includes('documentosEnPalabras(caso.documentos)'));
+check('ninguna cuenta del caso cae a cero por falta de dato', !/(documentos|actores|terminosPendientes)\s*\?\?\s*0/.test(VISTA + LISTAS));
+check('el plazo de la lista y el aviso del caso usan el ayudante', LISTAS.includes('plazoEnPalabras(t.diasRestantes)') && VISTA.includes('avisoDelTermino(abierto)'));
+check('el término sin verificar se marca, no se afirma', LISTAS.includes('cn-exp-plazo--sin-verificar') && VISTA.includes('cn-exp-termino--sin-verificar'));
 check('el aviso abre la agenda por un camino real', VISTA.includes('onClick={onIrAAgenda}') && /<ExpedientesView\s+onIrAAgenda=/.test(APP));
 check('el caso abre por «Documentos»', VISTA.includes("React.useState<VistaDelCaso>('documentos')"));
 
@@ -390,6 +403,118 @@ check('el menú cierra con Escape y devuelve el foco', MENU.includes("e.key === 
 check('lo destructivo va al final y separado', MENU.includes('role="separator"') && MENU.indexOf('comunes.map(item)') < MENU.indexOf('peligrosas.map(item)'));
 check('el menú se coloca dentro de la ventana', MENU.includes('window.innerHeight') && MENU.includes('posicion.yArriba - height'));
 check('y la vista lo monta', CARPETAS.includes('<MenuDeAcciones'));
+
+/* ─── 15. LA LISTA POR CLIENTE Y, DENTRO, POR RAMA ───────────────────────── */
+/*
+ * El 14 de septiembre el dueño pidió «el expediente de cada cliente por rama»:
+ * la fila plana con el despacho en mayúsculas, el cliente, el radicado y «2
+ * documentos» encadenados no se dejaba leer. Lo que puede mentir aquí es lo de
+ * siempre —sumar como cero lo que no se contó, inventar una rama— y el orden,
+ * que es lo que hace que lo urgente se vea sin abrir nada.
+ */
+const casoDePrueba = (id: string, o: Partial<ExpedienteEnLista> = {}): ExpedienteEnLista => ({
+  id,
+  caratula: `Caso ${id}`,
+  radicado: null,
+  despacho: null,
+  rama: null,
+  clienteId: null,
+  clienteNombre: null,
+  contraparte: null,
+  estado: 'ACTIVO',
+  notas: null,
+  createdBy: 'u',
+  createdAt: '',
+  updatedAt: '',
+  terminosLeidos: true,
+  proximoTermino: null,
+  terminoVencido: null,
+  terminosPendientes: 0,
+  documentos: 0,
+  ...o
+});
+const venceEl = (vence: string, dias: number) => ({ ...termino(dias), vence });
+const deCliente = (n: string) => ({ clienteId: `cli-${n}`, clienteNombre: `Cliente ${n}` });
+
+const LISTA = [
+  casoDePrueba('a1', { ...deCliente('01'), rama: 'LABORAL', documentos: 2, proximoTermino: venceEl('2026-09-25', 11) }),
+  casoDePrueba('a2', { ...deCliente('01'), rama: 'Restitución de tierras', documentos: 1, radicado: '00000000000000000000000' }),
+  casoDePrueba('a3', { ...deCliente('01'), rama: 'LABORAL', documentos: 4, despacho: 'Juzgado 00 Laboral' }),
+  casoDePrueba('b1', { ...deCliente('02'), rama: 'CIVIL', terminoVencido: venceEl('2026-09-10', -4) }),
+  casoDePrueba('c1', { ...deCliente('03'), rama: null, documentos: null, proximoTermino: venceEl('2026-09-20', 6) }),
+  casoDePrueba('c2', { ...deCliente('03'), rama: '   ', documentos: 3 }),
+  casoDePrueba('s1', { rama: 'constructor', caratula: 'Asunto sin ficha', proximoTermino: venceEl('2026-09-11', 0) }),
+  casoDePrueba('d1', { clienteId: 'cli-z', clienteNombre: 'Álvaro Entidad 00' }),
+  casoDePrueba('e1', { clienteId: 'cli-y', clienteNombre: 'Beatriz Entidad 00' })
+];
+const grupos = agruparPorClienteYRama(LISTA, '');
+const grupo = (clave: string) => grupos.find((g) => g.clave === clave);
+
+check(
+  'los clientes van por su caso más urgente, luego en orden alfabético, y «sin cliente» al final',
+  grupos.map((g) => g.etiqueta).join(' | ') ===
+    'Cliente 02 | Cliente 03 | Cliente 01 | Álvaro Entidad 00 | Beatriz Entidad 00 | Sin cliente registrado',
+  grupos.map((g) => g.etiqueta).join(' | ')
+);
+const g01 = grupo('cli-01');
+check(
+  'un cliente con casos en dos ramas trae las dos, la urgente primero',
+  g01?.ramas.map((r) => r.etiqueta).join(' | ') === `${BRANCH_LABELS.LABORAL} | Restitución de tierras`,
+  g01?.ramas.map((r) => r.etiqueta).join(' | ')
+);
+check('los casos dentro de una rama conservan el orden de la pestaña', g01?.ramas[0].casos.map((x) => x.id).join(',') === 'a1,a3');
+check('la rama escrita a mano se muestra como se guardó', g01?.ramas[1].etiqueta === 'Restitución de tierras');
+check('las cuentas del cliente: casos y documentos contados', g01?.casos === 3 && g01?.documentos === 7, JSON.stringify([g01?.casos, g01?.documentos]));
+const g03 = grupo('cli-03');
+check('un documento sin contar NO se suma como cero', g03?.documentos === null, String(g03?.documentos));
+check('rama nula y rama en blanco son «Sin rama registrada», y en un solo grupo', g03?.ramas.length === 1 && g03.ramas[0].etiqueta === 'Sin rama registrada');
+const sin = grupos[grupos.length - 1];
+check('el caso sin ficha cae en «Sin cliente registrado»', sin.sinCliente && sin.ramas[0].casos[0].id === 's1');
+check('una rama que coincide con una propiedad del objeto no se toma por código', sin.ramas[0].etiqueta === 'constructor', sin.ramas[0].etiqueta);
+check('las ramas nunca se inventan: la etiqueta de un código conocido sale del catálogo', etiquetaDeRama('CIVIL') === BRANCH_LABELS.CIVIL);
+check('y la de uno nulo lo dice', etiquetaDeRama(null) === 'Sin rama registrada');
+check('la cabecera dice casos y documentos', resumenDelCliente(g01!) === '3 casos · 7 documentos', resumenDelCliente(g01!));
+check('y calla los documentos que no se contaron', resumenDelCliente(g03!) === '2 casos', resumenDelCliente(g03!));
+check('un caso va en singular, y cero documentos contados sí se dicen', resumenDelCliente(grupo('cli-02')!) === '1 caso · 0 documentos', resumenDelCliente(grupo('cli-02')!));
+check('la línea de «Esta semana» dice cliente y rama', clienteYRama(LISTA[0]) === `Cliente 01 · ${BRANCH_LABELS.LABORAL}`, clienteYRama(LISTA[0]));
+check('y sin cliente ni rama no inventa ninguno', clienteYRama(casoDePrueba('x')) === 'Sin cliente registrado', clienteYRama(casoDePrueba('x')));
+
+const ids = (b: string) => agruparPorClienteYRama(LISTA, b).flatMap((g) => g.ramas.flatMap((r) => r.casos.map((x) => x.id))).join(',');
+check('la búsqueda encuentra por cliente sin importar mayúsculas', ids('CLIENTE 02') === 'b1', ids('CLIENTE 02'));
+check('por carátula sin importar tildes', ids('asunto SIN ficha') === 's1' && ids('alvaro') === 'd1', `${ids('asunto SIN ficha')} / ${ids('alvaro')}`);
+check('por radicado', ids('0000000000000') === 'a2', ids('0000000000000'));
+check('por despacho', ids('juzgado 00 laboral') === 'a3', ids('juzgado 00 laboral'));
+check('los grupos sin coincidencias desaparecen', agruparPorClienteYRama(LISTA, 'Cliente 02').length === 1);
+check('sin coincidencias no queda nada', agruparPorClienteYRama(LISTA, 'nada que ver').length === 0);
+check('buscar también filtra la lista plana', filtrarCasos(LISTA, 'beatriz').map((x) => x.id).join(',') === 'e1');
+
+check('con tres clientes o menos, todos abiertos', gruposAbiertosPorDefecto(grupos.slice(0, 3), false).size === 3);
+check(
+  'con más de tres, solo el del caso más urgente',
+  [...gruposAbiertosPorDefecto(grupos, false)].join(',') === 'cli-02',
+  [...gruposAbiertosPorDefecto(grupos, false)].join(',')
+);
+check('con búsqueda, todos abiertos', gruposAbiertosPorDefecto(grupos, true).size === grupos.length);
+
+/* ─── 16. LA LISTA EN PANTALLA ───────────────────────────────────────────── */
+check(
+  '«Esta semana» es una lista plana y las otras dos van por cliente',
+  /pestanaActual === 'estaSemana' \?\s*\(\s*<ListaDeLaSemana/.test(VISTA) && VISTA.includes('<ListaPorCliente')
+);
+check('la lista plana no agrupa', !/agruparPorClienteYRama\(/.test(LISTAS.slice(LISTAS.indexOf('export const ListaDeLaSemana'), LISTAS.indexOf('export const ListaPorCliente'))));
+check('la lista por cliente sí', LISTAS.slice(LISTAS.indexOf('export const ListaPorCliente')).includes('agruparPorClienteYRama('));
+check('la cabecera del cliente se anuncia abierta o cerrada', LISTAS.includes('aria-expanded={abierto}') && LISTAS.includes('aria-controls='));
+check('lo que se abre y cierra se recuerda sin romper sin almacenamiento', /try\s*\{[^}]*localStorage\.getItem/.test(LISTAS) && /try\s*\{[^}]*localStorage\.setItem/.test(LISTAS));
+check('la búsqueda sin resultados lo dice', LISTAS.includes('Ninguno coincide'));
+check('el caso sin términos lo dice solo si la agenda se leyó', LISTAS.includes('caso.terminosLeidos ?'));
+check('los documentos de la tarjeta callan ante null', LISTAS.includes('documentosEnPalabras(caso.documentos)'));
+check('la carátula y el radicado cortados llevan el texto entero en `title`', LISTAS.includes('title={caso.caratula}') && LISTAS.includes('title={caso.radicado}'));
+check('la lista plana dice cliente y rama en cada tarjeta', LISTAS.includes('clienteYRama(caso)'));
+for (const sel of ['.cara-nueva .cn-exp-cliente-cabeza', '.cara-nueva .cn-exp-tarjeta']) {
+  check(`${sel} mide al menos 44 px`, /min-height:\s*(4[4-9]|[5-9]\d)px/.test(regla(sel)), regla(sel));
+}
+check('la tarjeta enseña el foco', /outline/.test(regla('.cara-nueva .cn-exp-tarjeta:focus-visible')));
+check('la carátula de la tarjeta va en un renglón', /text-overflow:\s*ellipsis/.test(regla('.cara-nueva .cn-exp-tarjeta-nombre')));
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

@@ -1,9 +1,19 @@
 import React, { useState } from 'react';
-import { Check, Copy, FileSpreadsheet, FileText } from 'lucide-react';
-import { Dialog } from '../../../design/Dialog';
+import { Check, Copy } from 'lucide-react';
 import { settlementsApi, type SettlementResult } from '../services/settlements.api';
 import { exportarExcel, type LibroExcel } from '../../tools/exportarExcel';
 import { exportarPdf } from '../../tools/exportarPdf';
+import {
+  BotonesDeExportacion,
+  Caja,
+  Campo,
+  Cargando,
+  ErrorDeHerramienta,
+  Opcion,
+  PantallaDeHerramienta,
+  ResultadoVacio,
+  TarjetaDeCifra
+} from '../../tools/components/PantallaDeHerramienta';
 
 interface LaborSettlementModalProps {
   isOpen: boolean;
@@ -11,7 +21,7 @@ interface LaborSettlementModalProps {
 }
 
 /**
- * Liquidación de prestaciones sociales. Diálogo tipo 3 —calculadora— en M.
+ * Liquidación de prestaciones sociales. Pantalla de `app-herramientas.html` :400.
  *
  * ─── CADA CONCEPTO CON SU FUNDAMENTO ────────────────────────────────────────
  *
@@ -20,13 +30,20 @@ interface LaborSettlementModalProps {
  * El resultado de esta calculadora termina en la pretensión económica de una
  * demanda, y un número sin fundamento no es defendible ante un juez.
  *
+ * ─── LO QUE LA MAQUETA DIBUJA Y AQUÍ NO ESTÁ ────────────────────────────────
+ *
+ * «Total a favor del trabajador» y la lista de supuestos de la maqueta: el
+ * rótulo afirma a favor de quién sin saberlo, y los supuestos que aquí se leen
+ * son los que la fórmula del servidor sí asume, no los de la maqueta. La
+ * sanción moratoria no se calcula, y la pantalla no la nombra como si existiera.
+ *
  * ─── LO QUE ESTA CALCULADORA YA NO HACE ─────────────────────────────────────
  *
- * Tenía un «fallback»: si la API fallaba mostraba una liquidación de
- * $44.441.250 escrita en el código — la misma para cualquier salario y
- * cualquier fecha, con la cara de un cálculo hecho. Dinero inventado en el
- * sitio exacto donde el abogado copia cifras hacia una demanda. Ahora un fallo
- * del servidor es un error visible con su razón.
+ * Tenía un «fallback»: si la API fallaba mostraba una liquidación escrita en el
+ * código — la misma para cualquier salario y cualquier fecha, con la cara de un
+ * cálculo hecho. Dinero inventado en el sitio exacto donde el abogado copia
+ * cifras hacia una demanda. Ahora un fallo del servidor es un error visible con
+ * su razón.
  */
 
 /** La norma detrás de cada fórmula que el servidor aplica. */
@@ -40,6 +57,12 @@ const CONCEPTOS: Array<{
   { clave: 'primaServicios', nombre: 'Prima de servicios', fundamento: 'Art. 306 CST' },
   { clave: 'vacaciones', nombre: 'Vacaciones compensadas', fundamento: 'Art. 186 y 189 CST' },
   { clave: 'severanceIndemnification', nombre: 'Indemnización por despido', fundamento: 'Art. 64 CST · sin justa causa' }
+];
+
+const CAUSALES: Array<{ valor: 'INJUSTA_CAUSA' | 'MUTUO_ACUERDO' | 'JUSTA_CAUSA'; titulo: string; detalle?: string }> = [
+  { valor: 'INJUSTA_CAUSA', titulo: 'Sin justa causa', detalle: 'CST art. 64' },
+  { valor: 'JUSTA_CAUSA', titulo: 'Con justa causa' },
+  { valor: 'MUTUO_ACUERDO', titulo: 'Mutuo acuerdo' }
 ];
 
 const pesos = (v: number): string => `$${Math.round(v).toLocaleString('es-CO')}`;
@@ -150,150 +173,143 @@ export const LaborSettlementModal: React.FC<LaborSettlementModalProps> = ({ isOp
     setTimeout(() => setCopiado(false), 2000);
   };
 
+  if (!isOpen) return null;
+
+  const primario = (
+    <button
+      type="button"
+      onClick={() => void calcular()}
+      disabled={calculando || !listo}
+      className="cn-her-boton cn-her-boton--primario cn-her-boton--ancho"
+    >
+      {calculando ? 'Liquidando…' : 'Liquidar'}
+    </button>
+  );
+
   return (
-    <Dialog
-      abierto={isOpen}
-      onCerrar={onClose}
-      tamano="M"
-      titulo="Liquidación de prestaciones sociales"
-      subtitulo="Cada concepto con la norma de la que sale su fórmula."
-      acciones={
+    <PantallaDeHerramienta
+      titulo="Liquidación de prestaciones"
+      onVolver={onClose}
+      primario={primario}
+      formulario={
         <>
-          {resultado && (
-            <>
-              <button onClick={exportar} className="btn-neutral btn-sm">
-                <FileSpreadsheet className="h-3.5 w-3.5" />
-                Exportar a Excel
-              </button>
-              <button onClick={() => void exportarPapel()} className="btn-neutral btn-sm">
-                <FileText className="h-3.5 w-3.5" />
-                Exportar a PDF
-              </button>
-              <button onClick={() => void copiar()} className="btn-neutral btn-sm">
-                {copiado ? <Check className="h-3.5 w-3.5 text-verified" /> : <Copy className="h-3.5 w-3.5" />}
-                {copiado ? 'Copiada' : 'Copiar'}
-              </button>
-            </>
-          )}
-          <button
-            onClick={() => void calcular()}
-            disabled={calculando || !listo}
-            className="btn-primary btn-sm"
-          >
-            {calculando ? 'Calculando…' : 'Calcular'}
-          </button>
+          <Campo etiqueta="Salario mensual" htmlFor="liquidacion-salario">
+            <input
+              id="liquidacion-salario"
+              type="text"
+              inputMode="numeric"
+              value={monthlySalary}
+              onChange={(e) => setMonthlySalary(e.target.value.replace(/[^\d]/g, ''))}
+              placeholder="$0.000.000"
+              className="cn-her-campo cn-her-mono"
+            />
+          </Campo>
+
+          <fieldset className="cn-her-grupo">
+            <legend className="cn-her-etiqueta">Causal de terminación</legend>
+            <div className="cn-her-opciones">
+              {CAUSALES.map((c) => (
+                <Opcion
+                  key={c.valor}
+                  nombre="liquidacion-causal"
+                  marcada={terminationType === c.valor}
+                  onCambio={() => setTerminationType(c.valor)}
+                  titulo={c.titulo}
+                  detalle={c.detalle}
+                />
+              ))}
+            </div>
+          </fieldset>
+
+          <div className="cn-her-rejilla cn-her-rejilla--2">
+            <Campo etiqueta="Ingreso" htmlFor="liquidacion-ingreso">
+              <input id="liquidacion-ingreso" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="cn-her-campo cn-her-mono" />
+            </Campo>
+            <Campo etiqueta="Retiro" htmlFor="liquidacion-retiro">
+              <input id="liquidacion-retiro" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="cn-her-campo cn-her-mono" />
+            </Campo>
+          </div>
         </>
       }
-    >
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <label className="block">
-            <span className="field-label">Salario mensual</span>
-            <div className="relative mt-1">
-              <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[12px] text-ink-400">
-                $
-              </span>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={monthlySalary}
-                onChange={(e) => setMonthlySalary(e.target.value.replace(/[^\d]/g, ''))}
-                placeholder="2480000"
-                className="field w-full pl-6 font-mono"
+      resultado={
+        <>
+          {error && <ErrorDeHerramienta mensaje={error} />}
+          {calculando && !resultado && <Cargando texto="Liquidando las prestaciones…" />}
+          {!resultado && !calculando && !error && (
+            <ResultadoVacio
+              titulo="La liquidación aparece aquí"
+              texto="Concepto por concepto, con la norma de la que sale cada fórmula y lo que el cálculo asume."
+            />
+          )}
+
+          {resultado && (
+            <>
+              <TarjetaDeCifra
+                rotulo="Total de la liquidación"
+                cifra={pesos(resultado.totalSettlement)}
+                detalle={`${resultado.daysWorked.toLocaleString('es-CO')} días laborados`}
+                acciones={
+                  <BotonesDeExportacion onExcel={exportar} onPdf={() => void exportarPapel()}>
+                    <button type="button" onClick={() => void copiar()} className="cn-her-boton cn-her-boton--texto">
+                      {copiado ? <Check aria-hidden="true" size={16} /> : <Copy aria-hidden="true" size={16} />}
+                      {copiado ? 'Copiada' : 'Copiar'}
+                    </button>
+                  </BotonesDeExportacion>
+                }
               />
-            </div>
-          </label>
 
-          <label className="block">
-            <span className="field-label">Causal de terminación</span>
-            <select
-              value={terminationType}
-              onChange={(e) => setTerminationType(e.target.value as typeof terminationType)}
-              className="field mt-1 w-full"
-            >
-              <option value="INJUSTA_CAUSA">Sin justa causa (Art. 64 CST)</option>
-              <option value="JUSTA_CAUSA">Con justa causa</option>
-              <option value="MUTUO_ACUERDO">Mutuo acuerdo</option>
-            </select>
-          </label>
-
-          <label className="block">
-            <span className="field-label">Fecha de ingreso</span>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="field mt-1 w-full"
-            />
-          </label>
-
-          <label className="block">
-            <span className="field-label">Fecha de retiro</span>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="field mt-1 w-full"
-            />
-          </label>
-        </div>
-
-        {error && <p className="notice-unverified">{error}</p>}
-
-        {resultado && (
-          <div className="space-y-3">
-            {/* ─── CONCEPTO · VALOR · FUNDAMENTO ───────────────────────────── */}
-            <div className="overflow-hidden rounded-card border border-line-200 bg-surface">
-              <div className="t-head flex items-center gap-3">
-                <span className="min-w-0 flex-1">Concepto</span>
-                <span className="w-[110px] shrink-0 text-right">Valor</span>
-                <span className="w-[170px] shrink-0">Fundamento</span>
-              </div>
-
-              {CONCEPTOS.map((c) => {
-                const valor = Number(resultado[c.clave]);
-                if (valor <= 0) return null;
-                return (
-                  <div key={c.clave} className="t-row flex items-center gap-3">
-                    <span className="min-w-0 flex-1 text-ui text-ink-900">{c.nombre}</span>
-                    <span className="w-[110px] shrink-0 text-right font-mono text-[12.5px] text-ink-900">
-                      {pesos(valor)}
+              {/* ─── CONCEPTO · VALOR · FUNDAMENTO ───────────────────────────── */}
+              <Caja>
+                <div className="cn-her-tabla" role="table" aria-label="Conceptos de la liquidación">
+                  <div className="cn-her-tabla-cabeza cn-her-tabla-fila--conceptos" role="row">
+                    <span role="columnheader">Concepto</span>
+                    <span role="columnheader" className="cn-her-num">
+                      Valor
                     </span>
-                    <span className="w-[170px] shrink-0 text-meta text-ink-500">{c.fundamento}</span>
+                    <span role="columnheader">Fundamento</span>
                   </div>
-                );
-              })}
+                  {CONCEPTOS.map((c) => {
+                    const valor = Number(resultado[c.clave]);
+                    if (valor <= 0) return null;
+                    return (
+                      <div key={c.clave} role="row" className="cn-her-tabla-fila cn-her-tabla-fila--conceptos">
+                        <span role="cell">{c.nombre}</span>
+                        <span role="cell" className="cn-her-num cn-her-mono">
+                          {pesos(valor)}
+                        </span>
+                        <span role="cell" className="cn-her-tenue">
+                          {c.fundamento}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </Caja>
 
-              <div className="flex items-center gap-3 border-t border-line-200 bg-canvas px-3 py-2.5">
-                <span className="min-w-0 flex-1 text-ui font-semibold text-ink-900">
-                  Total · {resultado.daysWorked.toLocaleString('es-CO')} días laborados
-                </span>
-                <span className="shrink-0 font-mono text-[15px] font-semibold text-ink-900">
-                  {pesos(resultado.totalSettlement)}
-                </span>
+              <Caja titulo="Agencias en derecho">
+                <p className="cn-her-nota">
+                  Estimadas en el 10 % de las pretensiones:{' '}
+                  <span className="cn-her-mono cn-her-fuerte">{pesos(resultado.agenciasEnDerechoEstimadas)}</span>. Es una
+                  estimación sobre tarifas del CSJ, no un valor tasado.
+                </p>
+              </Caja>
+
+              {/*
+                LA ADVERTENCIA DE TODA CALCULADORA JURÍDICA: es la fórmula
+                general. Salario variable, auxilio de transporte, o cortes de
+                cesantías por año cambian el resultado, y esos casos se liquidan
+                a mano o con el contador de la firma.
+              */}
+              <div className="cn-her-aviso">
+                <p>
+                  Cálculo con la fórmula general del CST sobre salario fijo. Salario variable, auxilio de transporte o
+                  cortes anuales de cesantías cambian el resultado: verifíquelo antes de llevarlo a una pretensión.
+                </p>
               </div>
-            </div>
-
-            <p className="text-meta text-ink-500">
-              Agencias en derecho estimadas (10% de las pretensiones):{' '}
-              <span className="font-mono text-ink-700">{pesos(resultado.agenciasEnDerechoEstimadas)}</span>
-              . Es una estimación sobre tarifas del CSJ, no un valor tasado.
-            </p>
-
-            {/*
-              LA ADVERTENCIA DE TODA CALCULADORA JURÍDICA: es la fórmula
-              general. Salario variable, auxilio de transporte, o cortes de
-              cesantías por año cambian el resultado, y esos casos se liquidan
-              a mano o con el contador de la firma.
-            */}
-            <p className="notice">
-              Cálculo con la fórmula general del CST sobre salario fijo. Salario variable, auxilio
-              de transporte o cortes anuales de cesantías cambian el resultado: verifíquelo antes
-              de llevarlo a una pretensión.
-            </p>
-          </div>
-        )}
-      </div>
-    </Dialog>
+            </>
+          )}
+        </>
+      }
+    />
   );
 };

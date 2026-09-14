@@ -1,14 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { ExternalLink, FileSpreadsheet, FileText } from 'lucide-react';
-import { Dialog } from '../../../design/Dialog';
+import { ExternalLink } from 'lucide-react';
 import { toolsApi } from '../services/tools.api';
 import type { Fuente, IndexacionResult } from '../types';
 import { exportarExcel, type LibroExcel } from '../exportarExcel';
 import { exportarPdf } from '../exportarPdf';
 import { FuentesBox } from './FuentesBox';
+import {
+  BotonesDeExportacion,
+  Caja,
+  Campo,
+  Cargando,
+  Dato,
+  ErrorDeHerramienta,
+  PantallaDeHerramienta,
+  ResultadoVacio,
+  TarjetaDeCifra
+} from './PantallaDeHerramienta';
 
 /**
- * Indexación por IPC. Diálogo tipo 3 —calculadora— en M.
+ * Indexación por IPC. Pantalla de `app-herramientas.html` :335.
  *
  * ─── THE USER ENTERS THE TWO INDEX VALUES ───────────────────────────────────
  *
@@ -20,6 +30,13 @@ import { FuentesBox } from './FuentesBox';
  * here — and the tool applies the formula it prints: valor × (IPC final /
  * IPC inicial). What is verified is the formula and the source; the numbers
  * are the lawyer's, and the result says so.
+ *
+ * ─── LO QUE LA MAQUETA DIBUJA Y AQUÍ NO ESTÁ ────────────────────────────────
+ *
+ * «Variación del IPC» y «Diferencia»: el servidor devuelve el factor y el valor
+ * indexado, y esas dos son las que se muestran. Derivar otras en el navegador
+ * pondría en pantalla cifras que el Excel y el PDF no llevan. Los índices de
+ * ejemplo de la maqueta tampoco se copian: parecen los del DANE.
  */
 const pesos = (v: number): string => `$${Math.round(v).toLocaleString('es-CO')}`;
 
@@ -100,120 +117,135 @@ export const IndexacionModal: React.FC<{ isOpen: boolean; onClose: () => void }>
     }
   };
 
-  return (
-    <Dialog
-      abierto={isOpen}
-      onCerrar={onClose}
-      tamano="M"
-      titulo="Indexación por IPC"
-      subtitulo="Actualiza un valor con los índices del DANE que usted lea; la fórmula se muestra."
-      acciones={
-        <>
-          {resultado && (
-            <>
-              <button onClick={exportar} className="btn-neutral btn-sm">
-                <FileSpreadsheet className="h-3.5 w-3.5" />
-                Exportar a Excel
-              </button>
-              <button onClick={() => void exportarPapel()} className="btn-neutral btn-sm">
-                <FileText className="h-3.5 w-3.5" />
-                Exportar a PDF
-              </button>
-            </>
-          )}
-          <button onClick={() => void calcular()} disabled={calculando || !listo} className="btn-primary btn-sm">
-            {calculando ? 'Calculando…' : 'Indexar'}
-          </button>
-        </>
-      }
-    >
-      <div className="space-y-4">
-        <label className="block">
-          <span className="field-label">Valor histórico (pesos)</span>
-          <input
-            type="text"
-            inputMode="numeric"
-            value={valor}
-            onChange={(e) => setValor(e.target.value.replace(/[^\d]/g, ''))}
-            placeholder="10000000"
-            className="field mt-1 w-full font-mono"
-          />
-        </label>
+  if (!isOpen) return null;
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div className="space-y-2">
-            <label className="block">
-              <span className="field-label">IPC inicial (índice)</span>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={ipcInicial}
-                onChange={(e) => setIpcInicial(e.target.value.replace(',', '.'))}
-                placeholder="105.48"
-                className="field mt-1 w-full font-mono"
-              />
-            </label>
+  const primario = (
+    <button
+      type="button"
+      onClick={() => void calcular()}
+      disabled={calculando || !listo}
+      className="cn-her-boton cn-her-boton--primario cn-her-boton--ancho"
+    >
+      {calculando ? 'Indexando…' : 'Indexar'}
+    </button>
+  );
+
+  return (
+    <PantallaDeHerramienta
+      titulo="Indexación por IPC"
+      onVolver={onClose}
+      primario={primario}
+      formulario={
+        <>
+          <Campo etiqueta="Valor histórico" htmlFor="indexacion-valor">
+            <input
+              id="indexacion-valor"
+              type="text"
+              inputMode="numeric"
+              value={valor}
+              onChange={(e) => setValor(e.target.value.replace(/[^\d]/g, ''))}
+              placeholder="$0.000.000"
+              className="cn-her-campo cn-her-mono"
+            />
+          </Campo>
+
+          <Campo etiqueta="IPC inicial" htmlFor="indexacion-inicial">
+            <input
+              id="indexacion-inicial"
+              type="text"
+              inputMode="decimal"
+              value={ipcInicial}
+              onChange={(e) => setIpcInicial(e.target.value.replace(',', '.'))}
+              placeholder="000,00"
+              className="cn-her-campo cn-her-mono"
+            />
             <input
               value={etiquetaInicial}
               onChange={(e) => setEtiquetaInicial(e.target.value)}
-              placeholder="Mes y año, p. ej. enero de 2021"
-              className="field w-full"
+              placeholder="Mes y año del índice"
+              aria-label="Mes y año del IPC inicial"
+              className="cn-her-campo cn-her-campo--segundo"
             />
-          </div>
-          <div className="space-y-2">
-            <label className="block">
-              <span className="field-label">IPC final (índice)</span>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={ipcFinal}
-                onChange={(e) => setIpcFinal(e.target.value.replace(',', '.'))}
-                placeholder="145.12"
-                className="field mt-1 w-full font-mono"
-              />
-            </label>
+          </Campo>
+
+          <Campo etiqueta="IPC final" htmlFor="indexacion-final">
+            <input
+              id="indexacion-final"
+              type="text"
+              inputMode="decimal"
+              value={ipcFinal}
+              onChange={(e) => setIpcFinal(e.target.value.replace(',', '.'))}
+              placeholder="000,00"
+              className="cn-her-campo cn-her-mono"
+            />
             <input
               value={etiquetaFinal}
               onChange={(e) => setEtiquetaFinal(e.target.value)}
-              placeholder="Mes y año, p. ej. julio de 2026"
-              className="field w-full"
+              placeholder="Mes y año del índice"
+              aria-label="Mes y año del IPC final"
+              className="cn-her-campo cn-her-campo--segundo"
             />
-          </div>
-        </div>
+          </Campo>
 
-        {/* Where the two numbers come from, said before the result exists. */}
-        <p className="text-meta leading-[1.6] text-ink-500">
-          Los índices no se cargan solos: el DANE no publica la serie en una dirección estable que un servidor
-          pueda leer cada mes. Tome los dos valores del índice (base 2018 = 100, total nacional) de la página
-          oficial y escríbalos aquí.{' '}
-          {enlaceIpc && (
-            <a href={enlaceIpc.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-brand-700 hover:underline">
-              Abrir la página del IPC del DANE <ExternalLink className="h-3 w-3" />
-            </a>
+          {/* Where the two numbers come from, said before the result exists. */}
+          <p className="cn-her-ayuda cn-her-ayuda--aviso">
+            Los índices los escribe usted: el DANE no publica la serie en una dirección estable que un servidor pueda leer
+            cada mes. Tome los dos valores del índice (base 2018 = 100, total nacional) de la página oficial.{' '}
+            {enlaceIpc && (
+              <a href={enlaceIpc.url} target="_blank" rel="noreferrer" className="cn-her-enlace-en-texto">
+                Abrir la página del IPC del DANE <ExternalLink aria-hidden="true" size={14} />
+              </a>
+            )}
+          </p>
+        </>
+      }
+      resultado={
+        <>
+          {error && <ErrorDeHerramienta mensaje={error} />}
+          {calculando && !resultado && <Cargando texto="Indexando el valor…" />}
+          {!resultado && !calculando && !error && (
+            <ResultadoVacio
+              titulo="El valor indexado aparece aquí"
+              texto="Con el factor, la operación que se aplicó sobre los índices que usted dio y sus fuentes."
+            />
           )}
-        </p>
 
-        {error && <p className="notice-unverified">{error}</p>}
+          {resultado && (
+            <>
+              <TarjetaDeCifra
+                rotulo="Valor indexado"
+                cifra={pesos(resultado.valorIndexado)}
+                acciones={<BotonesDeExportacion onExcel={exportar} onPdf={() => void exportarPapel()} />}
+              >
+                <Dato nombre="Valor histórico" valor={pesos(resultado.valor)} />
+                <Dato nombre="Factor" valor={resultado.factor.toFixed(6)} />
+              </TarjetaDeCifra>
 
-        {resultado && (
-          <div className="space-y-3">
-            <div className="rounded-card border border-line-200 bg-canvas p-4 text-center">
-              <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">Valor indexado</p>
-              <p className="mt-1 font-mono text-[24px] font-semibold text-ink-900">{pesos(resultado.valorIndexado)}</p>
-              <p className="mt-1 font-mono text-[12px] text-ink-700">{resultado.formula}</p>
-              <p className="mt-0.5 text-meta text-ink-500">Factor {resultado.factor.toFixed(6)}</p>
-            </div>
+              <Caja titulo="La operación">
+                <p className="cn-her-operacion cn-her-mono">{resultado.formula}</p>
+                <p className="cn-her-nota cn-her-nota--despues">
+                  Aritmética sobre los dos índices que usted dio. No se aplica ninguna otra corrección.
+                </p>
+              </Caja>
 
-            {resultado.advertencias.map((a) => (
-              <p key={a} className="notice">
-                {a}
-              </p>
-            ))}
+              <div className="cn-her-aviso">
+                <p>
+                  Qué índice corresponde a su caso —el total, por grupos o el de un mes concreto— lo decide usted. Esta
+                  herramienta no elige el índice.
+                </p>
+              </div>
 
-            <FuentesBox fuentes={resultado.fuentes} />
-          </div>
-        )}
-      </div>
-    </Dialog>
+              {resultado.advertencias.map((a) => (
+                <div key={a} className="cn-her-aviso">
+                  <p>{a}</p>
+                </div>
+              ))}
+
+              <FuentesBox fuentes={resultado.fuentes} />
+            </>
+          )}
+        </>
+      }
+    />
   );
 };

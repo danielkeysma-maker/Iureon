@@ -1,16 +1,20 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, BadgeCheck, CalendarClock, Loader2 } from 'lucide-react';
+import { AlertTriangle, BadgeCheck, CalendarClock } from 'lucide-react';
 import { BRANCH_LABELS } from '../../catalog/branchLabels';
 import { useBranchActuacionesState } from '../../catalog/hooks/useBranchActuaciones';
 import { useCatalogBranches } from '../../catalog/hooks/useCatalogBranches';
 import { readSession } from '../../auth/session';
 import { agendaApi } from '../services/agenda.api';
 import type { AgendaPendiente } from '../pendiente';
+import { avisoDeDiscrepancia, comoQuedaraElTermino, valoresInicialesDelFormulario } from '../desdeElContador';
 import { SelectorDeExpediente } from '../../expedientes/components/SelectorDeExpediente';
 import type { EntradaDeAgenda, PlazoDeActuacion, TipoDeDias, VencimientoPrevisto } from '../types';
+import { Campo, Cargando, ErrorDeHerramienta, Opcion } from '../../tools/components/PantallaDeHerramienta';
 
 /**
- * Poner un término en la agenda.
+ * Poner un término en la agenda. Formulario DERIVADO: la maqueta de
+ * Herramientas no lo dibuja; lleva los campos, las opciones en tarjeta y los
+ * avisos de las calculadoras de `app-herramientas.html`.
  *
  * ─── EL ORDEN DE LOS CAMPOS ES EL ORDEN DE LA DECISIÓN ──────────────────────
  *
@@ -29,12 +33,19 @@ import type { EntradaDeAgenda, PlazoDeActuacion, TipoDeDias, VencimientoPrevisto
  * la lectura la hizo él. Y solo cuando no hay plazo en días —un término en
  * meses, una actuación sin catalogar— se escribe la fecha a mano.
  *
+ * ─── LO QUE TRAE EL CONTADOR DE TÉRMINOS ────────────────────────────────────
+ *
+ * Nace con la notificación, el plazo y la jurisdicción de la cuenta ya puestos
+ * (`desdeElContador.ts`), sin ficha del catálogo y sin buscarla por el nombre:
+ * el abogado completa el caso, revisa y guarda él. Si con esos mismos datos la
+ * agenda no llega a la fecha que dio el contador, se dice antes de guardar.
+ *
  * Nunca se propone una fecha que nadie calculó, y nunca se dice «verificado»
  * de un plazo que el catálogo no comprobó.
  */
 
 interface AgendaFormProps {
-  /** Lo que trae el botón «Poner en la agenda» de un borrador o una revisión. */
+  /** Lo que trae el botón «Poner en la agenda» de un borrador, una revisión o el contador. */
   pendiente: AgendaPendiente | null;
   onGuardada: (entrada: EntradaDeAgenda) => void;
 }
@@ -50,9 +61,12 @@ export const AgendaForm: React.FC<AgendaFormProps> = ({ pendiente, onGuardada })
   const correoPropio = readSession()?.user.email ?? '';
   const ramas = useCatalogBranches();
 
-  const [asunto, setAsunto] = useState(pendiente?.asunto ?? '');
-  const [cliente, setCliente] = useState(pendiente?.cliente ?? '');
-  const [radicado, setRadicado] = useState(pendiente?.radicado ?? '');
+  /* Los valores con que nace el formulario se deciden una vez y fuera de React: tienen su check. */
+  const [inicio] = useState(() => valoresInicialesDelFormulario(pendiente, hoyISO()));
+
+  const [asunto, setAsunto] = useState(inicio.asunto);
+  const [cliente, setCliente] = useState(inicio.cliente);
+  const [radicado, setRadicado] = useState(inicio.radicado);
   /*
    * ─── DE QUE CASO ES EL VENCIMIENTO ────────────────────────────────────────
    *
@@ -63,17 +77,15 @@ export const AgendaForm: React.FC<AgendaFormProps> = ({ pendiente, onGuardada })
    * Y si viene de una revision que YA estaba atada, llega heredado: el
    * desplegable aparece con ese caso puesto y nadie vuelve a escogerlo.
    */
-  const [expedienteId, setExpedienteId] = useState(pendiente?.expedienteId ?? '');
+  const [expedienteId, setExpedienteId] = useState(inicio.expedienteId);
 
-  const [rama, setRama] = useState(pendiente?.rama ?? '');
-  const [actuacionId, setActuacionId] = useState(pendiente?.actuacionId ?? '');
-  const [nombreSinCatalogar, setNombreSinCatalogar] = useState(
-    pendiente?.actuacionId ? '' : (pendiente?.actuacionNombre ?? '')
-  );
-  const [fechaNotificacion, setFechaNotificacion] = useState(hoyISO());
-  const [dias, setDias] = useState('');
-  const [tipoDias, setTipoDias] = useState<TipoDeDias>('HABILES');
-  const [fechaManual, setFechaManual] = useState('');
+  const [rama, setRama] = useState(inicio.rama);
+  const [actuacionId, setActuacionId] = useState(inicio.actuacionId);
+  const [nombreSinCatalogar, setNombreSinCatalogar] = useState(inicio.nombreSinCatalogar);
+  const [fechaNotificacion, setFechaNotificacion] = useState(inicio.fechaNotificacion);
+  const [dias, setDias] = useState(inicio.dias);
+  const [tipoDias, setTipoDias] = useState<TipoDeDias>(inicio.tipoDias);
+  const [fechaManual, setFechaManual] = useState(inicio.fechaManual);
   const [destinatario, setDestinatario] = useState<Destinatario>('FIRMA');
   const [correoOtro, setCorreoOtro] = useState('');
   const [notas, setNotas] = useState('');
@@ -95,8 +107,12 @@ export const AgendaForm: React.FC<AgendaFormProps> = ({ pendiente, onGuardada })
    * otro termino: el vencimiento que se vigilaria seria el de otra actuacion,
    * con cara de calculo. Si no coincide, el desplegable se queda abierto para
    * que lo elija el abogado.
+   *
+   * Lo del contador NO se resuelve: el abogado conto su propio plazo, y atarlo
+   * a la ficha por el nombre lo reemplazaria por el de la ficha sin pedirselo.
    */
   useEffect(() => {
+    if (!inicio.resolverActuacionPorNombre) return;
     if (actuacionId || !pendiente?.actuacionNombre || listaDeRama.estado !== 'LISTA') return;
     const objetivo = pendiente.actuacionNombre.trim().toLowerCase();
     const encontrada = listaDeRama.actuaciones.find((a) => a.exactName.trim().toLowerCase() === objetivo);
@@ -165,6 +181,14 @@ export const AgendaForm: React.FC<AgendaFormProps> = ({ pendiente, onGuardada })
     return null;
   }, [destinatario, correoPropio, correoOtro]);
 
+  /* La misma regla que aplicará el servidor al guardar: se muestra antes, no se descubre después. */
+  const marca = comoQuedaraElTermino({ actuacionId: actuacionId || null, lecturaLegible, dias: Number(dias), fechaManual });
+  const discrepancia = lecturaLegible
+    ? null
+    : avisoDeDiscrepancia(pendiente, { fechaNotificacion, dias, tipoDias, fechaPrevista: previsto?.fechaLimite ?? null });
+  const plazoLargoDelContador =
+    pendiente?.origen === 'CONTADOR' && (pendiente.plazo?.unidad === 'MESES' || pendiente.plazo?.unidad === 'ANIOS');
+
   const puedeGuardar =
     asunto.trim().length > 0 &&
     Boolean(fechaNotificacion) &&
@@ -200,17 +224,25 @@ export const AgendaForm: React.FC<AgendaFormProps> = ({ pendiente, onGuardada })
   };
 
   return (
-    <div className="min-w-0 space-y-4 [overflow-wrap:anywhere]">
-      {pendiente && (
-        <p className="rounded-card border border-line-200 bg-surface px-3 py-2 text-meta text-ink-500">
+    <div className="cn-her-formulario-agenda">
+      {pendiente && pendiente.origen !== 'CONTADOR' && (
+        <p className="cn-her-nota cn-her-nota--caja">
           Viene {pendiente.origen === 'BORRADOR' ? 'de un borrador' : 'de una revisión'}
-          {pendiente.actuacionNombre ? ` · ${pendiente.actuacionNombre}` : ''}. Complete la fecha de
-          notificación y compruebe el plazo antes de guardar.
+          {pendiente.actuacionNombre ? ` · ${pendiente.actuacionNombre}` : ''}. Complete la fecha de notificación y
+          compruebe el plazo antes de guardar.
+        </p>
+      )}
+      {pendiente?.origen === 'CONTADOR' && (
+        <p className="cn-her-nota cn-her-nota--caja">
+          Viene del contador de términos, con su fecha de notificación y su plazo. Escriba el asunto y el caso, revise los
+          datos y guarde: nada queda en la agenda hasta que usted pulse «Poner en la agenda». Quedará sin verificar, porque
+          el plazo lo escribió usted y no una ficha del catálogo.
         </p>
       )}
 
       {/* ── El caso ─────────────────────────────────────────────────────── */}
-      <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
+      <fieldset className="cn-her-grupo">
+        <legend className="cn-her-h2">El caso</legend>
         {/*
           EL EXPEDIENTE VA PRIMERO, y no por jerarquia: es lo unico de este
           bloque que ata el vencimiento a algo. «Asunto», «Cliente» y
@@ -218,235 +250,245 @@ export const AgendaForm: React.FC<AgendaFormProps> = ({ pendiente, onGuardada })
           el expediente es lo que hace que el caso lo cuente como suyo.
 
           Solo se pinta si la firma tiene expedientes: un desplegable con
-          «— sin expediente —» y nada mas no ofrece nada.
+          «sin expediente» y nada mas no ofrece nada.
         */}
-        <div className="min-w-0 sm:col-span-2">
-          <SelectorDeExpediente
-            valor={expedienteId}
-            onCambio={setExpedienteId}
-            etiqueta="Expediente (opcional)"
-            id="expediente-del-termino"
-            pie={
-              pendiente?.expedienteId
-                ? 'Heredado de la revisión de la que viene.'
-                : 'Átelo y el vencimiento aparece contado dentro del caso.'
-            }
-          />
-        </div>
-        <label className="block min-w-0 sm:col-span-2">
-          <span className="field-label">Asunto o proceso</span>
+        <SelectorDeExpediente
+          cara="nueva"
+          valor={expedienteId}
+          onCambio={setExpedienteId}
+          etiqueta="Expediente (opcional)"
+          id="expediente-del-termino"
+          pie={
+            pendiente?.expedienteId
+              ? 'Heredado de la revisión de la que viene.'
+              : 'Átelo y el vencimiento aparece contado dentro del caso.'
+          }
+        />
+        <Campo etiqueta="Asunto o proceso" htmlFor="agenda-asunto">
           <input
+            id="agenda-asunto"
             value={asunto}
             onChange={(e) => setAsunto(e.target.value)}
-            placeholder="Mosquera · Juzgado 12 Laboral de Barranquilla"
-            className="field mt-1 w-full"
+            placeholder="Proceso 00 · Juzgado 00 Civil Municipal"
+            className="cn-her-campo"
           />
-        </label>
-        <label className="block min-w-0">
-          <span className="field-label">Cliente (opcional)</span>
-          <input value={cliente} onChange={(e) => setCliente(e.target.value)} className="field mt-1 w-full" />
-        </label>
-        <label className="block min-w-0">
-          <span className="field-label">Radicado (opcional)</span>
-          <input
-            value={radicado}
-            onChange={(e) => setRadicado(e.target.value)}
-            className="field mt-1 w-full font-mono"
-          />
-        </label>
-      </div>
+        </Campo>
+        <div className="cn-her-rejilla cn-her-rejilla--2">
+          <Campo etiqueta={<>Cliente <span className="cn-her-etiqueta-suave">(opcional)</span></>} htmlFor="agenda-cliente">
+            <input id="agenda-cliente" value={cliente} onChange={(e) => setCliente(e.target.value)} className="cn-her-campo" />
+          </Campo>
+          <Campo etiqueta={<>Radicado <span className="cn-her-etiqueta-suave">(opcional)</span></>} htmlFor="agenda-radicado">
+            <input
+              id="agenda-radicado"
+              value={radicado}
+              onChange={(e) => setRadicado(e.target.value)}
+              placeholder="00000-00-00-000-0000-00000-00"
+              className="cn-her-campo cn-her-mono"
+            />
+          </Campo>
+        </div>
+      </fieldset>
 
       {/* ── La actuación, que es la que fija el plazo ────────────────────── */}
-      <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2">
-        <label className="block min-w-0">
-          <span className="field-label">Rama</span>
-          <select
-            value={rama}
-            onChange={(e) => {
-              setRama(e.target.value);
-              setActuacionId('');
-              setPlazo(null);
-            }}
-            className="field mt-1 w-full"
-          >
-            <option value="">Elija la rama…</option>
-            {ramas.map((r) => (
-              <option key={r} value={r}>
-                {BRANCH_LABELS[r] ?? r}
-              </option>
-            ))}
-          </select>
-        </label>
+      <fieldset className="cn-her-grupo">
+        <legend className="cn-her-h2">La actuación, que fija el plazo</legend>
+        <div className="cn-her-rejilla cn-her-rejilla--2">
+          <Campo etiqueta="Rama" htmlFor="agenda-rama">
+            <select
+              id="agenda-rama"
+              value={rama}
+              onChange={(e) => {
+                setRama(e.target.value);
+                setActuacionId('');
+                setPlazo(null);
+              }}
+              className="cn-her-campo"
+            >
+              <option value="">Elija la rama…</option>
+              {ramas.map((r) => (
+                <option key={r} value={r}>
+                  {BRANCH_LABELS[r] ?? r}
+                </option>
+              ))}
+            </select>
+          </Campo>
 
-        <label className="block min-w-0">
-          <span className="field-label">Actuación</span>
-          <select
-            value={actuacionId}
-            onChange={(e) => setActuacionId(e.target.value)}
-            disabled={!rama || listaDeRama.estado === 'CARGANDO'}
-            className="field mt-1 w-full"
-          >
-            <option value="">
-              {listaDeRama.estado === 'CARGANDO' ? 'Cargando el catálogo…' : 'Ninguna: la escribo yo'}
-            </option>
-            {listaDeRama.actuaciones.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.exactName}
+          <Campo etiqueta="Actuación" htmlFor="agenda-actuacion">
+            <select
+              id="agenda-actuacion"
+              value={actuacionId}
+              onChange={(e) => setActuacionId(e.target.value)}
+              disabled={!rama || listaDeRama.estado === 'CARGANDO'}
+              className="cn-her-campo"
+            >
+              <option value="">
+                {listaDeRama.estado === 'CARGANDO' ? 'Cargando el catálogo…' : 'Ninguna: la escribo yo'}
               </option>
-            ))}
-          </select>
-        </label>
+              {listaDeRama.actuaciones.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.exactName}
+                </option>
+              ))}
+            </select>
+          </Campo>
+        </div>
 
         {!actuacionId && (
-          <label className="block min-w-0 sm:col-span-2">
-            <span className="field-label">Nombre de la actuación</span>
+          <Campo
+            etiqueta="Nombre de la actuación"
+            htmlFor="agenda-nombre"
+            ayudaEsAviso
+            ayuda="Sin ficha del catálogo no hay término verificado: tendrá que escribir el plazo o la fecha, y la entrada quedará marcada sin verificar."
+          >
             <input
+              id="agenda-nombre"
               value={nombreSinCatalogar}
               onChange={(e) => setNombreSinCatalogar(e.target.value)}
               placeholder="Cómo se llama lo que se vence"
-              className="field mt-1 w-full"
+              className="cn-her-campo"
             />
-            <span className="mt-1 block text-meta text-ink-400">
-              Sin ficha del catálogo no hay término verificado: tendrá que escribir el plazo o la
-              fecha, y la entrada quedará marcada sin verificar.
-            </span>
-          </label>
+          </Campo>
         )}
-      </div>
 
-      {/* ── Lo que el catálogo dice de su plazo ──────────────────────────── */}
-      {consultando && (
-        <p className="flex items-center gap-2 text-meta text-ink-500">
-          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          Consultando el término en el catálogo…
-        </p>
-      )}
+        {/* ── Lo que el catálogo dice de su plazo ──────────────────────────── */}
+        {consultando && <Cargando texto="Consultando el término en el catálogo…" />}
 
-      {plazo && !consultando && plazo.lectura.legible && (
-        <div className="rounded-card border border-[rgb(var(--verified-line))] bg-[rgb(var(--verified-surf))] px-3 py-2.5 text-verified">
-          <p className="flex items-start gap-2 text-[12px] leading-snug">
-            <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0" />
-            <span className="min-w-0 text-justify [text-wrap:pretty]">
-              <strong className="font-semibold">
-                El catálogo fija {plazo.lectura.plazo.dias}{' '}
-                {plazo.lectura.plazo.tipo === 'HABILES' ? 'días hábiles' : 'días de calendario'}.
-              </strong>{' '}
-              {plazo.legalBasis}
-              {plazo.curadaPorLaFirma ? ' · curada por su firma' : ''}
-            </span>
-          </p>
-          <p className="mt-1.5 text-justify text-[12px] leading-snug text-ink-500 [text-wrap:pretty]">
-            {plazo.lectura.plazo.evidencia}
-          </p>
-        </div>
-      )}
-
-      {plazo && !consultando && !plazo.lectura.legible && (
-        <div className="space-y-2 rounded-card border border-[rgb(var(--unverified-line))] bg-[rgb(var(--unverified-surf))] px-3 py-2.5">
-          <p className="flex items-start gap-2 text-[12px] leading-snug text-unverified">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-            <span className="min-w-0 text-justify [text-wrap:pretty]">
-              <strong className="font-semibold">Este plazo no se puede leer solo.</strong>{' '}
-              {plazo.lectura.motivo}
-            </span>
-          </p>
-          {plazo.terminoLiteral && (
-            <p className="text-justify text-[12px] leading-snug text-ink-700 [text-wrap:pretty]">
-              <span className="font-semibold">Dice la ficha:</span> {plazo.terminoLiteral}
+        {plazo && !consultando && plazo.lectura.legible && (
+          <div className="cn-her-sello">
+            <p className="cn-her-con-icono">
+              <BadgeCheck aria-hidden="true" size={18} />
+              <span>
+                <b className="cn-her-fuerte-sello">
+                  El catálogo fija {plazo.lectura.plazo.dias}{' '}
+                  {plazo.lectura.plazo.tipo === 'HABILES' ? 'días hábiles' : 'días de calendario'}.
+                </b>{' '}
+                {plazo.legalBasis}
+                {plazo.curadaPorLaFirma ? ' · curada por su firma' : ''}
+              </span>
             </p>
-          )}
-        </div>
-      )}
+            <p className="cn-her-sello-evidencia">{plazo.lectura.plazo.evidencia}</p>
+          </div>
+        )}
+
+        {plazo && !consultando && !plazo.lectura.legible && (
+          <div className="cn-her-aviso cn-her-aviso--sin-verificar">
+            <p className="cn-her-con-icono">
+              <AlertTriangle aria-hidden="true" size={18} />
+              <span>
+                <b className="cn-her-aviso-titulo-en-linea">Este plazo no se puede leer solo.</b> {plazo.lectura.motivo}
+              </span>
+            </p>
+            {plazo.terminoLiteral && (
+              <p className="cn-her-aviso-literal">
+                <b className="cn-her-fuerte">Dice la ficha:</b> {plazo.terminoLiteral}
+              </p>
+            )}
+          </div>
+        )}
+      </fieldset>
 
       {/* ── La fecha de partida y el plazo ───────────────────────────────── */}
-      <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-3">
-        <label className="block min-w-0">
-          <span className="field-label">Fecha de notificación</span>
-          <input
-            type="date"
-            value={fechaNotificacion}
-            onChange={(e) => setFechaNotificacion(e.target.value)}
-            className="field mt-1 w-full font-mono"
-          />
-        </label>
+      <fieldset className="cn-her-grupo">
+        <legend className="cn-her-h2">Desde cuándo corre</legend>
+        <div className={`cn-her-rejilla ${lecturaLegible ? 'cn-her-rejilla--2' : 'cn-her-rejilla--3'}`}>
+          <Campo etiqueta="Fecha de notificación" htmlFor="agenda-notificacion">
+            <input
+              id="agenda-notificacion"
+              type="date"
+              value={fechaNotificacion}
+              onChange={(e) => setFechaNotificacion(e.target.value)}
+              className="cn-her-campo cn-her-mono"
+            />
+          </Campo>
 
-        {!lecturaLegible && (
-          <>
-            <label className="block min-w-0">
-              <span className="field-label">Días del término</span>
-              <input
-                type="number"
-                min={1}
-                max={3650}
-                value={dias}
-                onChange={(e) => setDias(e.target.value)}
-                placeholder="p. ej. 10"
-                className="field mt-1 w-full font-mono"
-              />
-            </label>
-            <label className="block min-w-0">
-              <span className="field-label">Clase de días</span>
-              <select
-                value={tipoDias}
-                onChange={(e) => setTipoDias(e.target.value as TipoDeDias)}
-                className="field mt-1 w-full"
-              >
-                <option value="HABILES">Hábiles</option>
-                <option value="CALENDARIO">De calendario</option>
-              </select>
-            </label>
-          </>
-        )}
-      </div>
-
-      {/* ── El resultado, o la salida de emergencia ──────────────────────── */}
-      {previsto && (
-        <div className="rounded-card border border-line-200 bg-surface px-3 py-2.5">
-          <p className="flex items-center gap-2 text-ui text-ink-900">
-            <CalendarClock className="h-4 w-4 shrink-0 text-[rgb(var(--rail-gold-ink))]" />
-            Vence el <strong className="font-semibold">{previsto.fechaLimite}</strong>
-            {!lecturaLegible && (
-              <span className="chip-unverified ml-1">Plazo escrito por usted</span>
-            )}
-          </p>
-          {previsto.excluidos.length > 0 && (
-            <details className="mt-1.5">
-              <summary className="cursor-pointer text-meta text-ink-500">
-                {previsto.excluidos.length} días descontados y por qué
-              </summary>
-              <ul className="mt-1 space-y-0.5">
-                {previsto.excluidos.map((d) => (
-                  <li key={d.fecha} className="text-meta text-ink-500">
-                    <span className="font-mono">{d.fecha}</span> · {d.motivo}
-                  </li>
-                ))}
-              </ul>
-            </details>
+          {!lecturaLegible && (
+            <>
+              <Campo etiqueta="Días del término" htmlFor="agenda-dias">
+                <input
+                  id="agenda-dias"
+                  type="number"
+                  min={1}
+                  max={3650}
+                  value={dias}
+                  onChange={(e) => setDias(e.target.value)}
+                  placeholder="00"
+                  className="cn-her-campo cn-her-mono"
+                />
+              </Campo>
+              <Campo etiqueta="Clase de días" htmlFor="agenda-tipo">
+                <select
+                  id="agenda-tipo"
+                  value={tipoDias}
+                  onChange={(e) => setTipoDias(e.target.value as TipoDeDias)}
+                  className="cn-her-campo"
+                >
+                  <option value="HABILES">Hábiles</option>
+                  <option value="CALENDARIO">De calendario</option>
+                </select>
+              </Campo>
+            </>
           )}
         </div>
-      )}
 
-      {!lecturaLegible && !(Number(dias) > 0) && (
-        <label className="block min-w-0">
-          <span className="field-label">O escriba la fecha límite</span>
-          <input
-            type="date"
-            value={fechaManual}
-            onChange={(e) => setFechaManual(e.target.value)}
-            className="field mt-1 w-full font-mono sm:w-[220px]"
-          />
-          <span className="mt-1 block text-justify text-meta text-ink-400 [text-wrap:pretty]">
-            Solo cuando el término no se cuenta en días —meses, años o «en cualquier tiempo»—. La
-            aplicación no la calcula: la vigila tal como usted la escriba, y la entrada queda
-            marcada sin verificar.
-          </span>
-        </label>
-      )}
+        {/* ── El resultado, o la salida de emergencia ──────────────────────── */}
+        {previsto && (
+          <div className="cn-her-caja cn-her-caja--previsto">
+            <p className="cn-her-con-icono cn-her-previsto">
+              <CalendarClock aria-hidden="true" size={18} />
+              <span>
+                Vence el <b className="cn-her-mono cn-her-fuerte">{previsto.fechaLimite}</b>
+              </span>
+              {!marca.verificado && <span className="cn-her-chip cn-her-chip--sin-verificar">Plazo escrito por usted</span>}
+            </p>
+            {previsto.excluidos.length > 0 && (
+              <details className="cn-her-desglose">
+                <summary>{previsto.excluidos.length} días descontados y por qué</summary>
+                <ul className="cn-her-tabla">
+                  {previsto.excluidos.map((d) => (
+                    <li key={d.fecha} className="cn-her-tabla-fila cn-her-tabla-fila--fecha">
+                      <span className="cn-her-mono cn-her-tenue">{d.fecha}</span>
+                      <span>{d.motivo}</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+          </div>
+        )}
+
+        {discrepancia && (
+          <p className="cn-her-ayuda cn-her-ayuda--aviso cn-her-con-icono" role="alert">
+            <AlertTriangle aria-hidden="true" size={16} />
+            {discrepancia}
+          </p>
+        )}
+
+        {!lecturaLegible && !(Number(dias) > 0) && (
+          <Campo
+            etiqueta="O escriba la fecha límite"
+            htmlFor="agenda-fecha-manual"
+            ayudaEsAviso
+            ayuda={
+              plazoLargoDelContador
+                ? 'Es la fecha que dio el contador de términos para un plazo de meses o de años, que la agenda no cuenta. Revísela: la agenda la vigila tal como quede escrita, y la entrada queda marcada sin verificar.'
+                : 'Solo cuando el término no se cuenta en días —meses, años o «en cualquier tiempo»—. La aplicación no la calcula: la vigila tal como usted la escriba, y la entrada queda marcada sin verificar.'
+            }
+          >
+            <input
+              id="agenda-fecha-manual"
+              type="date"
+              value={fechaManual}
+              onChange={(e) => setFechaManual(e.target.value)}
+              className="cn-her-campo cn-her-mono cn-her-campo--corto"
+            />
+          </Campo>
+        )}
+      </fieldset>
 
       {/* ── A quién se avisa ─────────────────────────────────────────────── */}
-      <div className="min-w-0 space-y-1.5">
-        <span className="field-label">A quién se le avisa</span>
-        <div className="flex min-w-0 flex-wrap gap-x-4 gap-y-1.5">
+      <fieldset className="cn-her-grupo">
+        <legend className="cn-her-h2">A quién se le avisa</legend>
+        <div className="cn-her-opciones cn-her-opciones--fila">
           {(
             [
               ['FIRMA', 'A toda la firma'],
@@ -454,48 +496,50 @@ export const AgendaForm: React.FC<AgendaFormProps> = ({ pendiente, onGuardada })
               ['OTRA', 'A otra persona']
             ] as Array<[Destinatario, string]>
           ).map(([valor, etiqueta]) => (
-            <label key={valor} className="flex items-center gap-1.5 text-ui text-ink-700">
-              <input
-                type="radio"
-                checked={destinatario === valor}
-                onChange={() => setDestinatario(valor)}
-              />
-              {etiqueta}
-            </label>
+            <Opcion
+              key={valor}
+              nombre="agenda-destinatario"
+              marcada={destinatario === valor}
+              onCambio={() => setDestinatario(valor)}
+              titulo={etiqueta}
+            />
           ))}
         </div>
         {destinatario === 'OTRA' && (
-          <input
-            value={correoOtro}
-            onChange={(e) => setCorreoOtro(e.target.value)}
-            placeholder="correo@sufirma.com"
-            className="field mt-1 w-full sm:w-[280px]"
-          />
+          <Campo etiqueta="Correo de esa persona" htmlFor="agenda-correo">
+            <input
+              id="agenda-correo"
+              value={correoOtro}
+              onChange={(e) => setCorreoOtro(e.target.value)}
+              placeholder="correo@sufirma.com"
+              className="cn-her-campo cn-her-campo--corto"
+            />
+          </Campo>
         )}
-        <p className="text-justify text-meta text-ink-400 [text-wrap:pretty]">
-          Se avisa cinco días antes, dos días antes y el día del vencimiento, en los dispositivos
-          donde haya activado los avisos. Con un responsable, el aviso es solo suyo: compruebe que
-          el correo sea el de su cuenta en Iureon, o no le llegará a nadie.
+        <p className="cn-her-nota">
+          Se avisa cinco días antes, dos días antes y el día del vencimiento, en los dispositivos donde haya activado los
+          avisos. Con un responsable, el aviso es solo suyo: compruebe que el correo sea el de su cuenta en Iureon, o no le
+          llegará a nadie.
         </p>
-      </div>
+      </fieldset>
 
-      <label className="block min-w-0">
-        <span className="field-label">Notas (opcional)</span>
+      <Campo etiqueta={<>Notas <span className="cn-her-etiqueta-suave">(opcional)</span></>} htmlFor="agenda-notas">
         <textarea
+          id="agenda-notas"
           value={notas}
           onChange={(e) => setNotas(e.target.value)}
           rows={2}
-          className="field mt-1 w-full"
+          className="cn-her-campo cn-her-campo--texto"
         />
-      </label>
+      </Campo>
 
-      {error && <p className="notice-unverified">{error}</p>}
+      {error && <ErrorDeHerramienta mensaje={error} />}
 
       <button
         type="button"
         onClick={() => void guardar()}
         disabled={!puedeGuardar || guardando}
-        className="btn-primary w-full sm:w-auto"
+        className="cn-her-boton cn-her-boton--primario cn-her-boton--guardar"
       >
         {guardando ? 'Guardando…' : 'Poner en la agenda'}
       </button>

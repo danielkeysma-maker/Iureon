@@ -309,7 +309,8 @@ export const SearchMobileView: React.FC = () => {
             onClick={() => setFiltrosAbiertos(false)}
             className="flex-1 bg-black/40"
           />
-          <div className="rounded-t-card border-t border-line-200 bg-surface pb-[env(safe-area-inset-bottom)]">
+          {/* Hoja inferior: 20 px arriba (14 sep 2026) y recorte para que la cabecera siga la curva. */}
+          <div className="overflow-hidden rounded-t-[20px] border-t border-line-200 bg-surface pb-[env(safe-area-inset-bottom)]">
             <header className="border-b border-line-200 px-4 py-3">
               <h2 className="text-[14px] font-semibold text-ink-900">Corporación</h2>
             </header>

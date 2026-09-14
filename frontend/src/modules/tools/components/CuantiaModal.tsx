@@ -1,19 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { FileSpreadsheet, FileText } from 'lucide-react';
-import { Dialog } from '../../../design/Dialog';
 import { toolsApi } from '../services/tools.api';
 import type { CuantiaResult, Jurisdiccion, SmlmvAnual } from '../types';
 import { exportarExcel, type LibroExcel } from '../exportarExcel';
 import { exportarPdf } from '../exportarPdf';
 import { FuentesBox } from './FuentesBox';
+import {
+  BotonesDeExportacion,
+  Caja,
+  Campo,
+  Cargando,
+  ErrorDeHerramienta,
+  Opcion,
+  PantallaDeHerramienta,
+  ResultadoVacio,
+  TarjetaDeCifra
+} from './PantallaDeHerramienta';
 
 /**
- * Competencia por cuantía. Diálogo tipo 3 —calculadora— en M.
+ * Competencia por cuantía. Pantalla de `app-herramientas.html` :365.
  *
  * The year list comes from the server: only years whose SMLMV was verified
  * against its decree are offered, so the lawyer cannot pick a year the tool
  * would have to guess. CGP art. 26: the SMLMV that counts is the one in force
  * when the demand is filed — hence «año de presentación», not «año de los hechos».
+ *
+ * ─── LOS TRAMOS SALEN DEL SERVIDOR ──────────────────────────────────────────
+ *
+ * La maqueta imprime los límites de cada cuantía. Aquí la tabla se pinta con
+ * `limites`, la respuesta del cálculo, en salarios mínimos y en pesos del año
+ * elegido: si la norma cambia, cambia en un solo sitio. Y el aviso de que la
+ * cuantía no es el único factor de competencia viaja en `advertencias`, escrito
+ * por el servidor, no por esta pantalla.
  */
 const pesos = (v: number): string => `$${Math.round(v).toLocaleString('es-CO')}`;
 
@@ -96,110 +113,139 @@ export const CuantiaModal: React.FC<{ isOpen: boolean; onClose: () => void }> = 
     }
   };
 
-  return (
-    <Dialog
-      abierto={isOpen}
-      onCerrar={onClose}
-      tamano="M"
-      titulo="Competencia por cuantía"
-      subtitulo="Mínima, menor o mayor cuantía según el salario mínimo del año de presentación."
-      acciones={
-        <>
-          {resultado && (
-            <>
-              <button onClick={exportar} className="btn-neutral btn-sm">
-                <FileSpreadsheet className="h-3.5 w-3.5" />
-                Exportar a Excel
-              </button>
-              <button onClick={() => void exportarPapel()} className="btn-neutral btn-sm">
-                <FileText className="h-3.5 w-3.5" />
-                Exportar a PDF
-              </button>
-            </>
-          )}
-          <button onClick={() => void calcular()} disabled={calculando || !listo} className="btn-primary btn-sm">
-            {calculando ? 'Calculando…' : 'Determinar'}
-          </button>
-        </>
-      }
+  if (!isOpen) return null;
+
+  const primario = (
+    <button
+      type="button"
+      onClick={() => void calcular()}
+      disabled={calculando || !listo}
+      className="cn-her-boton cn-her-boton--primario cn-her-boton--ancho"
     >
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <label className="block">
-            <span className="field-label">Pretensión (pesos)</span>
+      {calculando ? 'Calculando…' : 'Calcular'}
+    </button>
+  );
+
+  return (
+    <PantallaDeHerramienta
+      titulo="Competencia por cuantía"
+      onVolver={onClose}
+      primario={primario}
+      formulario={
+        <>
+          <Campo etiqueta="Pretensión" htmlFor="cuantia-pretension">
             <input
+              id="cuantia-pretension"
               type="text"
               inputMode="numeric"
               value={pretension}
               onChange={(e) => setPretension(e.target.value.replace(/[^\d]/g, ''))}
-              placeholder="80000000"
-              className="field mt-1 w-full font-mono"
+              placeholder="$0.000.000"
+              className="cn-her-campo cn-her-mono"
             />
-          </label>
-          <label className="block">
-            <span className="field-label">Año de presentación</span>
-            <select value={anio} onChange={(e) => setAnio(Number(e.target.value))} className="field mt-1 w-full font-mono">
+          </Campo>
+
+          <Campo
+            etiqueta="Año de presentación"
+            htmlFor="cuantia-anio"
+            ayuda={
+              anios.length === 0 && !error
+                ? 'Leyendo los salarios mínimos verificados…'
+                : 'Solo se ofrecen los años cuyo salario mínimo está verificado contra su decreto. Cuenta el vigente al presentar la demanda.'
+            }
+          >
+            <select
+              id="cuantia-anio"
+              value={anio}
+              onChange={(e) => setAnio(Number(e.target.value))}
+              disabled={anios.length === 0}
+              className="cn-her-campo cn-her-mono"
+            >
               {anios.map((s) => (
                 <option key={s.anio} value={s.anio}>
                   {s.anio} · {pesos(s.smlmv)}
                 </option>
               ))}
             </select>
-          </label>
-          <label className="block">
-            <span className="field-label">Jurisdicción</span>
-            <select value={jurisdiccion} onChange={(e) => setJurisdiccion(e.target.value as Jurisdiccion)} className="field mt-1 w-full">
-              <option value="CIVIL">Civil y de familia (CGP)</option>
-              <option value="LABORAL">Laboral</option>
-            </select>
-          </label>
-        </div>
+          </Campo>
 
-        <p className="text-meta text-ink-500">
-          Solo se ofrecen los años cuyo salario mínimo está verificado contra su decreto. Cuenta el vigente al presentar la demanda.
-        </p>
-
-        {error && <p className="notice-unverified">{error}</p>}
-
-        {resultado && (
-          <div className="space-y-3">
-            <div className="rounded-card border border-line-200 bg-canvas p-4 text-center">
-              <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">{resultado.categoria}</p>
-              <p className="mt-1 text-[18px] font-semibold text-ink-900">{resultado.juez}</p>
-              <p className="mt-0.5 text-ui text-ink-700">{resultado.instancia}</p>
-              <p className="mt-1 font-mono text-[12px] text-ink-700">
-                {pesos(resultado.pretension)} ÷ {pesos(resultado.smlmv)} = {resultado.enSmlmv.toLocaleString('es-CO', { maximumFractionDigits: 2 })} SMLMV
-              </p>
-              <p className="mt-0.5 text-meta text-ink-500">{resultado.regla}</p>
+          <fieldset className="cn-her-grupo">
+            <legend className="cn-her-etiqueta">Jurisdicción</legend>
+            <div className="cn-her-opciones">
+              <Opcion nombre="cuantia-jurisdiccion" marcada={jurisdiccion === 'CIVIL'} onCambio={() => setJurisdiccion('CIVIL')} titulo="Civil y de familia · CGP" />
+              <Opcion nombre="cuantia-jurisdiccion" marcada={jurisdiccion === 'LABORAL'} onCambio={() => setJurisdiccion('LABORAL')} titulo="Laboral" />
             </div>
+          </fieldset>
+        </>
+      }
+      resultado={
+        <>
+          {error && <ErrorDeHerramienta mensaje={error} />}
+          {calculando && !resultado && <Cargando texto="Determinando la cuantía…" />}
+          {!resultado && !calculando && !error && (
+            <ResultadoVacio
+              titulo="La cuantía aparece aquí"
+              texto="En salarios mínimos del año de presentación, con el juez competente, los tramos y sus fuentes."
+            />
+          )}
 
-            <div className="overflow-hidden rounded-card border border-line-200 bg-surface">
-              <div className="t-head flex items-center gap-3">
-                <span className="min-w-0 flex-1">Cuantía</span>
-                <span className="w-[110px] shrink-0 text-right">Hasta (SMLMV)</span>
-                <span className="w-[140px] shrink-0 text-right">Hasta (pesos {resultado.anio})</span>
-              </div>
-              {resultado.limites.map((l) => (
-                <div key={l.categoria} className={`t-row flex items-center gap-3 ${l.categoria === resultado.categoria ? 'bg-canvas' : ''}`}>
-                  <span className="min-w-0 flex-1 text-ui text-ink-900">{l.categoria}</span>
-                  <span className="w-[110px] shrink-0 text-right font-mono text-[12.5px] text-ink-900">{l.hasta ?? '—'}</span>
-                  <span className="w-[140px] shrink-0 text-right font-mono text-[12.5px] text-ink-900">
-                    {l.hastaPesos != null ? pesos(l.hastaPesos) : 'sin tope'}
-                  </span>
+          {resultado && (
+            <>
+              <TarjetaDeCifra
+                rotulo="La pretensión equivale a"
+                cifra={`${resultado.enSmlmv.toLocaleString('es-CO', { maximumFractionDigits: 2 })} SMLMV`}
+                acciones={<BotonesDeExportacion onExcel={exportar} onPdf={() => void exportarPapel()} />}
+              >
+                <p className="cn-her-veredicto">{resultado.categoria}</p>
+                <p className="cn-her-veredicto-detalle">
+                  {resultado.juez} · {resultado.instancia}
+                </p>
+                <p className="cn-her-operacion cn-her-mono">
+                  {pesos(resultado.pretension)} ÷ {pesos(resultado.smlmv)}
+                </p>
+                <p className="cn-her-nota">{resultado.regla}</p>
+              </TarjetaDeCifra>
+
+              <Caja titulo="Los tramos">
+                <div className="cn-her-tabla" role="table" aria-label="Tramos de cuantía">
+                  <div className="cn-her-tabla-cabeza cn-her-tabla-fila--tramos" role="row">
+                    <span role="columnheader">Cuantía</span>
+                    <span role="columnheader" className="cn-her-num">
+                      Hasta (SMLMV)
+                    </span>
+                    <span role="columnheader" className="cn-her-num">
+                      Hasta (pesos {resultado.anio})
+                    </span>
+                  </div>
+                  {resultado.limites.map((l) => (
+                    <div
+                      key={l.categoria}
+                      role="row"
+                      className={`cn-her-tabla-fila cn-her-tabla-fila--tramos${l.categoria === resultado.categoria ? ' cn-her-tabla-fila--actual' : ''}`}
+                    >
+                      <span role="cell">{l.categoria}</span>
+                      <span role="cell" className="cn-her-num cn-her-mono">
+                        {l.hasta ?? 'sin tope'}
+                      </span>
+                      <span role="cell" className="cn-her-num cn-her-mono">
+                        {l.hastaPesos != null ? pesos(l.hastaPesos) : 'sin tope'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </Caja>
+
+              {resultado.advertencias.map((a) => (
+                <div key={a} className="cn-her-aviso">
+                  <p>{a}</p>
                 </div>
               ))}
-            </div>
 
-            {resultado.advertencias.map((a) => (
-              <p key={a} className="notice">
-                {a}
-              </p>
-            ))}
-
-            <FuentesBox fuentes={resultado.fuentes} />
-          </div>
-        )}
-      </div>
-    </Dialog>
+              <FuentesBox fuentes={resultado.fuentes} />
+            </>
+          )}
+        </>
+      }
+    />
   );
 };

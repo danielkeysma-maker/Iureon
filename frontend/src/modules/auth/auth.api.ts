@@ -1,6 +1,7 @@
 import { API_BASE_URL } from '../../config/api.config';
 import { ApiError, httpClient } from '../../config/httpClient';
 import { readSession, type Session } from './session';
+import type { EnlaceDeRecuperacion } from './enlaceDeRecuperacion';
 
 /**
  * The sign-in calls, which deliberately do NOT go through `httpClient`.
@@ -24,10 +25,10 @@ export interface FirmProfile {
   creditsBalance: number;
 }
 
-const post = async <T>(path: string, body: unknown): Promise<T> => {
+const post = async <T>(path: string, body: unknown, cabeceras: Record<string, string> = {}): Promise<T> => {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...cabeceras },
     body: JSON.stringify(body)
   });
 
@@ -144,5 +145,32 @@ export const authApi = {
   },
 
   eliminarMiFirma: (contrasena: string, confirmacion: string) =>
-    deleteConSesion<{ success: true; advertencias: string[] }>('/api/firms/me', { contrasena, confirmacion })
+    deleteConSesion<{ success: true; advertencias: string[] }>('/api/firms/me', { contrasena, confirmacion }),
+
+  /*
+   * «¿Olvidó su contraseña?». El servidor responde lo mismo exista o no la
+   * cuenta; solo lanza lo que no depende de ella (400 formato, 429 límite por
+   * conexión, 503 no disponible).
+   */
+  recuperar: (email: string) =>
+    post<{ success: true; message: string; minutosDeVigencia: number }>('/api/auth/recuperar', { email }),
+
+  /*
+   * Canjea el enlace del correo y guarda la contraseña nueva. Sin `httpClient`
+   * por la misma razón que el ingreso: no hay sesión, y un 401/410 aquí es
+   * «este enlace ya no sirve», no una sesión perdida. El token de Iureon viaja
+   * en el cuerpo; el de la redirección de Supabase, en `Authorization`. Ninguno
+   * va nunca en la dirección.
+   */
+  restablecer: (enlace: EnlaceDeRecuperacion, password: string) =>
+    enlace.tipo === 'TOKEN_HASH'
+      ? post<{ success: true; sesionesCerradas: boolean }>('/api/auth/restablecer', {
+          token_hash: enlace.tokenHash,
+          password
+        })
+      : post<{ success: true; sesionesCerradas: boolean }>(
+          '/api/auth/restablecer',
+          { password },
+          enlace.tipo === 'SESION' ? { Authorization: `Bearer ${enlace.accessToken}` } : {}
+        )
 };

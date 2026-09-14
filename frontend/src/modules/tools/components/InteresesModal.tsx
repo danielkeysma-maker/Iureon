@@ -1,40 +1,77 @@
 import React, { useEffect, useState } from 'react';
-import { ExternalLink, FileSpreadsheet, FileText } from 'lucide-react';
-import { Dialog } from '../../../design/Dialog';
+import { ExternalLink } from 'lucide-react';
 import { toolsApi } from '../services/tools.api';
-import type { IbcVerificado, InteresesResult, ModoInteres } from '../types';
+import type { CertificacionesCargadas, InteresesResult, ModoInteres, TramoDeInteres } from '../types';
 import { exportarExcel, type LibroExcel } from '../exportarExcel';
 import { exportarPdf } from '../exportarPdf';
 import { FuentesBox } from './FuentesBox';
+import {
+  BotonesDeExportacion,
+  Caja,
+  Campo,
+  Cargando,
+  Dato,
+  ErrorDeHerramienta,
+  Opcion,
+  PantallaDeHerramienta,
+  ResultadoVacio,
+  TarjetaDeCifra
+} from './PantallaDeHerramienta';
 
 /**
- * Intereses de mora. Diálogo tipo 3 —calculadora— en M.
+ * Intereses de mora. Pantalla de `app-herramientas.html` :188.
  *
- * ─── THE CERTIFIED RATE IS ENTERED, NOT ASSUMED ─────────────────────────────
+ * ─── CADA PERIODO CON SU TASA CERTIFICADA ───────────────────────────────────
  *
- * The interés bancario corriente changes every month by resolución of the
- * Superintendencia Financiera. The server pre-fills only the most recent
- * value it could verify on the official page, labelled with its month; for
- * any other period the lawyer reads the certification and types it. Liquidating
- * a year of mora with one month's rate is an approximation, and the result
- * says so instead of hiding it.
+ * El abogado ya no escribe el interés bancario corriente. El servidor guarda
+ * las certificaciones de la Superintendencia Financiera periodo por periodo, con
+ * su resolución, y parte la mora en tramos: una deuda en mora desde hace dos
+ * años se liquida con la tasa de cada mes, no con la de este. Por eso la tabla
+ * «Por tramos de tasa» de la maqueta sí se pinta ahora: cada fila trae la tasa
+ * que la resolución certificó y el enlace a la fuente, no una tasa repetida ni
+ * inventada. Las cifras de muestra de la maqueta no se copian.
  *
- * Three modes, each with its norm printed next to the result: COMERCIAL
- * (1.5 × IBC, C.Co. art. 884), CIVIL (6% anual, C.C. art. 1617) and PACTADA
- * (the agreed rate, checked against the usury ceiling of C.P. art. 305).
- * Simple interest over calendar days, no capitalisation: the assumption is
- * part of the answer.
+ * ─── LO QUE LA PANTALLA DICE SIN QUE SE LO PREGUNTEN ────────────────────────
+ *
+ * - Qué rango de certificaciones está cargado y cuándo se consultó, antes de
+ *   calcular: una fecha fuera del rango se niega en el servidor y la ayuda del
+ *   campo ya lo advierte.
+ * - Si el corte pasa de la última certificación, la liquidación se detiene ahí
+ *   y la tarjeta muestra hasta qué día se liquidó.
+ *
+ * ─── EN EL TELÉFONO ─────────────────────────────────────────────────────────
+ *
+ * La tabla tiene cinco columnas y no cabe en 375 px. Se desliza dentro de su
+ * caja, que es donde el ojo espera que se mueva; apilar cada tramo en tarjetas
+ * rompía la lectura vertical de las tasas, que es para lo que existe la tabla.
  */
 const pesos = (v: number): string => `$${Math.round(v).toLocaleString('es-CO')}`;
+const tasa = (v: number): string => `${v.toLocaleString('es-CO', { maximumFractionDigits: 3 })} %`;
+/** AAAA-MM-DD → DD/MM/AAAA, sin pasar por Date: una fecha civil no tiene zona horaria. */
+const fecha = (iso: string): string => iso.split('-').reverse().join('/');
+
+const MODOS: Array<{ modo: ModoInteres; titulo: string; detalle: string }> = [
+  { modo: 'COMERCIAL', titulo: 'Mora comercial', detalle: '1,5 × el bancario corriente de cada periodo · C.Co. art. 884' },
+  { modo: 'CIVIL', titulo: 'Interés legal civil', detalle: '6 % anual · C.C. art. 1617' },
+  { modo: 'PACTADA', titulo: 'Tasa pactada', detalle: 'Sin pasar la usura de cada periodo · C.P. art. 305' }
+];
+
+const fuenteDelTramo = (t: TramoDeInteres): React.ReactNode =>
+  t.url && t.resolucion ? (
+    <a href={t.url} target="_blank" rel="noreferrer" className="cn-her-enlace-en-texto">
+      {t.resolucion} <ExternalLink aria-hidden="true" size={14} />
+    </a>
+  ) : (
+    <span className="cn-her-tenue">C.C. art. 1617</span>
+  );
 
 export const InteresesModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const [capital, setCapital] = useState('');
   const [desde, setDesde] = useState('');
   const [hasta, setHasta] = useState('');
   const [modo, setModo] = useState<ModoInteres>('COMERCIAL');
-  const [ibcEA, setIbcEA] = useState('');
   const [tasaPactadaEA, setTasaPactadaEA] = useState('');
-  const [ibcVerificado, setIbcVerificado] = useState<IbcVerificado | null>(null);
+  const [cargadas, setCargadas] = useState<CertificacionesCargadas | null>(null);
   const [enlaceIbc, setEnlaceIbc] = useState('');
   const [resultado, setResultado] = useState<InteresesResult | null>(null);
   const [error, setError] = useState('');
@@ -45,21 +82,14 @@ export const InteresesModal: React.FC<{ isOpen: boolean; onClose: () => void }> 
     toolsApi
       .parametros()
       .then((p) => {
-        setIbcVerificado(p.ibc);
+        setCargadas(p.certificaciones ?? null);
         setEnlaceIbc(p.enlaces.ibc.url);
-        // Pre-fill ONLY the verified value, and only if the field is still empty.
-        if (p.ibc) setIbcEA((actual) => actual || String(p.ibc?.tasaEA ?? ''));
       })
-      .catch(() => setIbcVerificado(null));
+      .catch(() => setCargadas(null));
   }, [isOpen]);
 
-  const necesitaIbc = modo === 'COMERCIAL' || modo === 'PACTADA';
-  const listo =
-    Number(capital) > 0 &&
-    desde !== '' &&
-    hasta !== '' &&
-    (!necesitaIbc || Number(ibcEA) > 0) &&
-    (modo !== 'PACTADA' || Number(tasaPactadaEA) > 0);
+  const usaCertificadas = modo === 'COMERCIAL' || modo === 'PACTADA';
+  const listo = Number(capital) > 0 && desde !== '' && hasta !== '' && (modo !== 'PACTADA' || Number(tasaPactadaEA) > 0);
 
   const calcular = async () => {
     if (!listo) return;
@@ -72,7 +102,6 @@ export const InteresesModal: React.FC<{ isOpen: boolean; onClose: () => void }> 
           desde,
           hasta,
           modo,
-          ibcEA: necesitaIbc ? Number(ibcEA) : undefined,
           tasaPactadaEA: modo === 'PACTADA' ? Number(tasaPactadaEA) : undefined
         })
       );
@@ -84,30 +113,47 @@ export const InteresesModal: React.FC<{ isOpen: boolean; onClose: () => void }> 
     }
   };
 
+  const conCertificadas = resultado !== null && resultado.modo !== 'CIVIL';
+
   /* El mismo objeto para las dos salidas: el Excel y el PDF no pueden diferir. */
   const libro = (): LibroExcel | null => {
     if (!resultado) return null;
     return {
       archivo: 'intereses-mora',
+      titulo: 'Intereses de mora por tramos de tasa',
       resultado: [
         ['Capital', resultado.capital],
-        ['Desde', resultado.desde],
-        ['Hasta', resultado.hasta],
-        ['Días', resultado.dias],
-        ['Modo', resultado.modo],
-        ['Tasa anual aplicada (% E.A.)', resultado.tasaAnualEA],
-        ['Tasa diaria aplicada (%)', resultado.tasaDiaria * 100],
+        ['Exigibilidad', fecha(resultado.desde)],
+        ['Fecha de corte pedida', fecha(resultado.hasta)],
+        ['Liquidado hasta', fecha(resultado.corte)],
+        ['Días en mora', resultado.dias],
+        ['Modo', MODOS.find((m) => m.modo === resultado.modo)?.titulo ?? resultado.modo],
+        ['Tasa pactada (% E.A.)', resultado.tasaPactadaEA ?? 'No aplica'],
+        ['Tramos de tasa', resultado.tramos.length],
         ['Intereses', resultado.interes],
         ['Total (capital + intereses)', resultado.total],
-        ['Tope de usura (% E.A.)', resultado.topeUsuraEA ?? 'No aplica']
+        [
+          'Tasas',
+          conCertificadas
+            ? `Tasas certificadas por la Superintendencia Financiera (${resultado.certificadas.modalidad}); consultadas el ${resultado.certificadas.consultadoEl}`
+            : 'Interés legal civil, C.C. art. 1617'
+        ]
       ],
       detalle: {
-        columnas: ['Fórmula y supuestos'],
-        filas: [[resultado.formula], ...resultado.supuestos.map((s) => [s])]
+        columnas: ['Desde', 'Hasta', 'Días', 'Bancario corriente (% E.A.)', 'Usura (% E.A.)', 'Tasa aplicada (% E.A.)', 'Interés del tramo', 'Fuente'],
+        filas: resultado.tramos.map((t) => [
+          fecha(t.desde),
+          fecha(t.hasta),
+          t.dias,
+          t.interesBancarioCorrienteEA ?? 'No aplica',
+          t.usuraEA ?? 'No aplica',
+          t.tasaEA,
+          t.interes,
+          t.resolucion ?? 'C.C. art. 1617'
+        ])
       },
       fuentes: resultado.fuentes,
-      notas: resultado.advertencias,
-      titulo: 'Intereses de mora'
+      notas: [resultado.formula, ...resultado.supuestos, ...resultado.advertencias],
     };
   };
 
@@ -126,150 +172,187 @@ export const InteresesModal: React.FC<{ isOpen: boolean; onClose: () => void }> 
     }
   };
 
-  return (
-    <Dialog
-      abierto={isOpen}
-      onCerrar={onClose}
-      tamano="M"
-      titulo="Intereses de mora"
-      subtitulo="Comercial (1,5 × bancario corriente), legal civil (6 %) o pactado, con su norma."
-      acciones={
-        <>
-          {resultado && (
-            <>
-              <button onClick={exportar} className="btn-neutral btn-sm">
-                <FileSpreadsheet className="h-3.5 w-3.5" />
-                Exportar a Excel
-              </button>
-              <button onClick={() => void exportarPapel()} className="btn-neutral btn-sm">
-                <FileText className="h-3.5 w-3.5" />
-                Exportar a PDF
-              </button>
-            </>
-          )}
-          <button onClick={() => void calcular()} disabled={calculando || !listo} className="btn-primary btn-sm">
-            {calculando ? 'Calculando…' : 'Liquidar'}
-          </button>
-        </>
-      }
+  if (!isOpen) return null;
+
+  const primario = (
+    <button
+      type="button"
+      onClick={() => void calcular()}
+      disabled={calculando || !listo}
+      className="cn-her-boton cn-her-boton--primario cn-her-boton--ancho"
     >
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <label className="block">
-            <span className="field-label">Capital (pesos)</span>
+      {calculando ? 'Calculando…' : 'Calcular'}
+    </button>
+  );
+
+  return (
+    <PantallaDeHerramienta
+      titulo="Intereses de mora"
+      onVolver={onClose}
+      primario={primario}
+      formulario={
+        <>
+          <Campo etiqueta="Capital" htmlFor="intereses-capital">
             <input
+              id="intereses-capital"
               type="text"
               inputMode="numeric"
               value={capital}
               onChange={(e) => setCapital(e.target.value.replace(/[^\d]/g, ''))}
-              placeholder="5000000"
-              className="field mt-1 w-full font-mono"
+              placeholder="$0.000.000"
+              className="cn-her-campo cn-her-mono"
             />
-          </label>
-          <label className="block">
-            <span className="field-label">Modo</span>
-            <select value={modo} onChange={(e) => setModo(e.target.value as ModoInteres)} className="field mt-1 w-full">
-              <option value="COMERCIAL">Mora comercial · 1,5 × IBC (C.Co. art. 884)</option>
-              <option value="CIVIL">Interés legal civil · 6 % anual (C.C. art. 1617)</option>
-              <option value="PACTADA">Tasa pactada · con control de usura (C.P. art. 305)</option>
-            </select>
-          </label>
-          <label className="block">
-            <span className="field-label">Desde (exigibilidad)</span>
-            <input type="date" value={desde} onChange={(e) => setDesde(e.target.value)} className="field mt-1 w-full" />
-          </label>
-          <label className="block">
-            <span className="field-label">Hasta (fecha de corte)</span>
-            <input type="date" value={hasta} onChange={(e) => setHasta(e.target.value)} className="field mt-1 w-full" />
-          </label>
+          </Campo>
 
-          {necesitaIbc && (
-            <label className="block">
-              <span className="field-label">Interés bancario corriente certificado (% E.A.)</span>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={ibcEA}
-                onChange={(e) => setIbcEA(e.target.value.replace(',', '.'))}
-                placeholder="18.70"
-                className="field mt-1 w-full font-mono"
-              />
-            </label>
+          <fieldset className="cn-her-grupo">
+            <legend className="cn-her-etiqueta">Qué tasa aplica</legend>
+            <div className="cn-her-opciones">
+              {MODOS.map((m) => (
+                <Opcion
+                  key={m.modo}
+                  nombre="intereses-modo"
+                  marcada={modo === m.modo}
+                  onCambio={() => setModo(m.modo)}
+                  titulo={m.titulo}
+                  detalle={m.detalle}
+                />
+              ))}
+            </div>
+          </fieldset>
+
+          <div className="cn-her-rejilla cn-her-rejilla--2">
+            <Campo etiqueta="Desde" htmlFor="intereses-desde" ayuda="Exigibilidad. No cuenta como día de mora.">
+              <input id="intereses-desde" type="date" value={desde} onChange={(e) => setDesde(e.target.value)} className="cn-her-campo cn-her-mono" />
+            </Campo>
+            <Campo etiqueta="Hasta" htmlFor="intereses-hasta" ayuda="Fecha de corte. Cuenta.">
+              <input id="intereses-hasta" type="date" value={hasta} onChange={(e) => setHasta(e.target.value)} className="cn-her-campo cn-her-mono" />
+            </Campo>
+          </div>
+
+          {usaCertificadas && (
+            <p className="cn-her-ayuda">
+              {cargadas ? (
+                <>
+                  La tasa de cada periodo sale de la certificación de la Superintendencia Financiera ({cargadas.modalidad}). Hay
+                  certificaciones cargadas del <span className="cn-her-mono">{fecha(cargadas.desde)}</span> al{' '}
+                  <span className="cn-her-mono">{fecha(cargadas.hasta)}</span>, consultadas el{' '}
+                  <span className="cn-her-mono">{fecha(cargadas.consultadoEl)}</span>; fuera de ese rango no se liquida.{' '}
+                </>
+              ) : (
+                <>La tasa de cada periodo sale de la certificación de la Superintendencia Financiera. </>
+              )}
+              {enlaceIbc && (
+                <a href={enlaceIbc} target="_blank" rel="noreferrer" className="cn-her-enlace-en-texto">
+                  Ver certificaciones <ExternalLink aria-hidden="true" size={14} />
+                </a>
+              )}
+            </p>
           )}
           {modo === 'PACTADA' && (
-            <label className="block">
-              <span className="field-label">Tasa pactada (% E.A.)</span>
+            <Campo etiqueta="Tasa pactada (% E.A.)" htmlFor="intereses-pactada">
               <input
+                id="intereses-pactada"
                 type="text"
                 inputMode="decimal"
                 value={tasaPactadaEA}
                 onChange={(e) => setTasaPactadaEA(e.target.value.replace(',', '.'))}
-                placeholder="24"
-                className="field mt-1 w-full font-mono"
+                placeholder="00,00"
+                className="cn-her-campo cn-her-mono"
               />
-            </label>
+            </Campo>
           )}
-        </div>
+        </>
+      }
+      resultado={
+        <>
+          {error && <ErrorDeHerramienta mensaje={error} />}
+          {calculando && !resultado && <Cargando texto="Liquidando los intereses…" />}
+          {!resultado && !calculando && !error && (
+            <ResultadoVacio
+              titulo="Los intereses aparecen aquí"
+              texto="Con los días en mora, la tasa de cada periodo, los supuestos del cálculo y sus fuentes."
+            />
+          )}
 
-        {necesitaIbc && (
-          <p className="text-meta leading-[1.6] text-ink-500">
-            {ibcVerificado ? (
-              <>
-                Prellenado con la última certificación verificada: {ibcVerificado.tasaEA.toLocaleString('es-CO')} % E.A. para{' '}
-                {ibcVerificado.mes} ({ibcVerificado.resolucion}, {ibcVerificado.modalidad}).{' '}
-              </>
-            ) : (
-              <>No hay una certificación verificada cargada: escriba la tasa del periodo. </>
-            )}
-            La tasa cambia cada mes; para otro periodo tome la certificación de la Superintendencia Financiera.{' '}
-            {enlaceIbc && (
-              <a href={enlaceIbc} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-brand-700 hover:underline">
-                Ver certificaciones <ExternalLink className="h-3 w-3" />
-              </a>
-            )}
-          </p>
-        )}
+          {resultado && (
+            <>
+              <TarjetaDeCifra
+                rotulo="Intereses"
+                cifra={pesos(resultado.interes)}
+                acciones={<BotonesDeExportacion onExcel={exportar} onPdf={() => void exportarPapel()} />}
+              >
+                <Dato nombre="Capital" valor={pesos(resultado.capital)} />
+                <Dato nombre="Días en mora" valor={resultado.dias} />
+                <Dato nombre="Tramos de tasa" valor={resultado.tramos.length} />
+                {resultado.corte !== resultado.hasta && <Dato nombre="Liquidado hasta" valor={fecha(resultado.corte)} />}
+                <Dato nombre="Total con capital" valor={pesos(resultado.total)} fuerte />
+              </TarjetaDeCifra>
 
-        {error && <p className="notice-unverified">{error}</p>}
-
-        {resultado && (
-          <div className="space-y-3">
-            <div className="rounded-card border border-line-200 bg-canvas p-4 text-center">
-              <p className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">Intereses</p>
-              <p className="mt-1 font-mono text-[24px] font-semibold text-ink-900">{pesos(resultado.interes)}</p>
-              <p className="mt-0.5 text-ui text-ink-700">
-                {resultado.dias} días · {resultado.tasaAnualEA.toLocaleString('es-CO', { maximumFractionDigits: 2 })} % E.A. · total{' '}
-                {pesos(resultado.total)}
-              </p>
-              <p className="mt-1 font-mono text-[12px] text-ink-700">{resultado.formula}</p>
-            </div>
-
-            {resultado.excedeUsura && (
-              <p className="notice-unverified">
-                La tasa aplicada supera el tope de usura ({resultado.topeUsuraEA?.toLocaleString('es-CO', { maximumFractionDigits: 2 })} % E.A. =
-                1,5 × IBC). Cobrarla es usura (C.P. art. 305) y el exceso se pierde (C.Co. art. 884).
-              </p>
-            )}
-
-            <div className="overflow-hidden rounded-card border border-line-200 bg-surface">
-              <p className="t-head">Supuestos del cálculo</p>
-              {resultado.supuestos.map((s) => (
-                <p key={s} className="t-row text-meta text-ink-700">
-                  {s}
-                </p>
+              {resultado.advertencias.map((a) => (
+                <div key={a} className="cn-her-aviso">
+                  <p>{a}</p>
+                </div>
               ))}
-            </div>
 
-            {resultado.advertencias.map((a) => (
-              <p key={a} className="notice">
-                {a}
-              </p>
-            ))}
+              <Caja titulo="Por tramos de tasa">
+                <div className="cn-her-desliza" role="region" aria-label="Tramos de tasa" tabIndex={0}>
+                  <div className="cn-her-tabla cn-her-tabla--tramos-tasa" role="table">
+                    <div className="cn-her-tabla-cabeza cn-her-tabla-fila--tramos-tasa" role="row">
+                      <span role="columnheader">Periodo</span>
+                      <span role="columnheader" className="cn-her-num">Días</span>
+                      <span role="columnheader" className="cn-her-num">Tasa E.A.</span>
+                      <span role="columnheader" className="cn-her-num">Interés</span>
+                      <span role="columnheader">Fuente</span>
+                    </div>
+                    {resultado.tramos.map((t) => (
+                      <div key={t.desde} className="cn-her-tabla-fila cn-her-tabla-fila--tramos-tasa" role="row">
+                        <span role="cell" className="cn-her-mono">
+                          {fecha(t.desde)} — {fecha(t.hasta)}
+                        </span>
+                        <span role="cell" className="cn-her-mono cn-her-num">{t.dias}</span>
+                        <span role="cell" className="cn-her-mono cn-her-num">
+                          {tasa(t.tasaEA)}
+                          {t.excedeUsura && <span className="cn-her-tramo-tope"> tope</span>}
+                        </span>
+                        <span role="cell" className="cn-her-mono cn-her-num">{pesos(t.interes)}</span>
+                        <span role="cell">{fuenteDelTramo(t)}</span>
+                      </div>
+                    ))}
+                    <div className="cn-her-tabla-fila cn-her-tabla-fila--tramos-tasa cn-her-tabla-fila--total" role="row">
+                      <span role="cell">Total</span>
+                      <span role="cell" className="cn-her-mono cn-her-num">{resultado.dias}</span>
+                      <span role="cell" />
+                      <span role="cell" className="cn-her-mono cn-her-num">{pesos(resultado.interes)}</span>
+                      <span role="cell" />
+                    </div>
+                  </div>
+                </div>
+                {conCertificadas && (
+                  <p className="cn-her-nota cn-her-nota--despues">
+                    Tasas certificadas por la Superintendencia Financiera; consultadas el{' '}
+                    <span className="cn-her-mono">{fecha(resultado.certificadas.consultadoEl)}</span>.
+                    {resultado.tramos.some((t) => t.nota) && ` ${resultado.tramos.find((t) => t.nota)?.nota}`}
+                  </p>
+                )}
+              </Caja>
 
-            <FuentesBox fuentes={resultado.fuentes} />
-          </div>
-        )}
-      </div>
-    </Dialog>
+              <Caja titulo="La operación">
+                <p className="cn-her-operacion cn-her-mono">{resultado.formula}</p>
+              </Caja>
+
+              <Caja titulo="Supuestos del cálculo">
+                <ul className="cn-her-lineas">
+                  {resultado.supuestos.map((s) => (
+                    <li key={s}>{s}</li>
+                  ))}
+                </ul>
+              </Caja>
+
+              <FuentesBox fuentes={resultado.fuentes} />
+            </>
+          )}
+        </>
+      }
+    />
   );
 };

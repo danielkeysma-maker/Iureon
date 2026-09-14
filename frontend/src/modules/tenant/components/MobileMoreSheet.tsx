@@ -86,7 +86,12 @@ export const MobileMoreSheet: React.FC<MobileMoreSheetProps> = ({
         className="flex-1 bg-black/40"
       />
 
-      <div className="max-h-[75vh] overflow-y-auto rounded-t-card border-t border-line-200 bg-surface pb-[env(safe-area-inset-bottom)]">
+      {/*
+        Hoja de 20 px arriba (14 sep 2026), como toda hoja inferior. No se usa
+        `rounded-t-card`: ese token es de 6 px y lo comparten las tarjetas.
+        `overflow-y-auto` ya recorta la cabecera pegada contra la curva.
+      */}
+      <div className="max-h-[75vh] overflow-y-auto rounded-t-[20px] border-t border-line-200 bg-surface pb-[env(safe-area-inset-bottom)]">
         <header className="sticky top-0 flex items-center justify-between border-b border-line-200 bg-surface px-4 py-3">
           <h2 className="text-[14px] font-semibold text-ink-900">Todo lo demás</h2>
           <button

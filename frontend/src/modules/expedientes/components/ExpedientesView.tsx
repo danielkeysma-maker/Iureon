@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, ChevronLeft, EllipsisVertical, Loader2, Plus } from 'lucide-react';
+import { AlertCircle, ChevronLeft, EllipsisVertical, Loader2, Plus, Search } from 'lucide-react';
 import { Dialog } from '../../../design/Dialog';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { expedientesApi, type Carpeta, type DocumentoIndexado } from '../services/expedientes.api';
@@ -13,12 +13,11 @@ import {
 import {
   avisoDelTermino,
   cuentaDePestana,
-  documentosEnPalabras,
   esUrgente,
   lineaDeEstaSemana,
-  plazoEnPalabras,
   resumenDeCarpeta
 } from '../services/casoEnPantalla';
+import { ListaDeLaSemana, ListaPorCliente } from './CasosEnLaLista';
 import { ActoresDelExpediente } from './ActoresDelExpediente';
 import { PreguntasDelExpedientePanel } from './PreguntasDelExpedientePanel';
 import { TraerAlExpediente } from './TraerAlExpediente';
@@ -81,6 +80,8 @@ export const ExpedientesView: React.FC<{
 }> = ({ onIrAAgenda }) => {
   const [misCasos, setMisCasos] = React.useState<MisCasos | null>(null);
   const [pestana, setPestana] = React.useState<Pestana | null>(null);
+  /* La búsqueda sobrevive al cambio de pestaña: se busca un cliente, no una pestaña. */
+  const [busqueda, setBusqueda] = React.useState('');
   const [abierto, setAbierto] = React.useState<ExpedienteConDetalle | null>(null);
   const [abriendo, setAbriendo] = React.useState<string | null>(null);
   const [vista, setVista] = React.useState<VistaDelCaso>('documentos');
@@ -621,23 +622,38 @@ export const ExpedientesView: React.FC<{
         </button>
       </header>
 
-      <div className="cn-exp-pestanas" role="tablist" aria-label="Casos">
-        {PESTANAS.map(({ id, nombre }) => {
-          const cuenta = misCasos ? cuentaDePestana(misCasos.pestanas[id]) : null;
-          return (
-            <button
-              key={id}
-              type="button"
-              role="tab"
-              aria-selected={pestanaActual === id}
-              className="cn-exp-pestana"
-              onClick={() => setPestana(id)}
-            >
-              {nombre}
-              {cuenta !== null && <span className="cn-exp-pestana-cuenta">{cuenta}</span>}
-            </button>
-          );
-        })}
+      <div className="cn-exp-lista-barra">
+        <div className="cn-exp-pestanas" role="tablist" aria-label="Casos">
+          {PESTANAS.map(({ id, nombre }) => {
+            const cuenta = misCasos ? cuentaDePestana(misCasos.pestanas[id]) : null;
+            return (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={pestanaActual === id}
+                className="cn-exp-pestana"
+                onClick={() => setPestana(id)}
+              >
+                {nombre}
+                {cuenta !== null && <span className="cn-exp-pestana-cuenta">{cuenta}</span>}
+              </button>
+            );
+          })}
+        </div>
+        {total > 0 && (
+          <div className="cn-exp-filtro cn-exp-lista-filtro">
+            <Search className="cn-exp-filtro-icono h-4 w-4" aria-hidden="true" />
+            <input
+              type="search"
+              className="cn-exp-entrada cn-exp-entrada--con-icono"
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              placeholder="Buscar cliente o radicado"
+              aria-label="Buscar por cliente, nombre del caso, radicado o despacho"
+            />
+          </div>
+        )}
       </div>
 
       <div className="cn-exp-cuerpo">
@@ -694,20 +710,28 @@ export const ExpedientesView: React.FC<{
                   : 'Un caso pasa aquí cuando lo marca como terminado o archivado.'}
             </p>
           </div>
+        ) : pestanaActual === 'estaSemana' ? (
+          <ListaDeLaSemana
+            casos={casos}
+            busqueda={busqueda}
+            abriendo={abriendo}
+            onAbrir={(id) => void abrir(id)}
+            onBorrarBusqueda={() => setBusqueda('')}
+          />
         ) : (
-          <ul className={pestanaActual === 'estaSemana' ? 'cn-exp-tarjetas' : 'cn-exp-filas'}>
-            {casos.map((e) => (
-              <li key={e.id}>
-                <CasoEnLista
-                  caso={e}
-                  grande={pestanaActual === 'estaSemana'}
-                  cerrado={pestanaActual === 'cerrados'}
-                  abriendo={abriendo === e.id}
-                  onAbrir={() => void abrir(e.id)}
-                />
-              </li>
-            ))}
-          </ul>
+          /*
+           * «ACTIVOS» Y «CERRADOS», POR CLIENTE Y DENTRO POR RAMA: así lo pidió
+           * el dueño el 14 de septiembre. La maqueta los dibuja como filas
+           * planas; el agrupado es derivado y está explicado en la lista.
+           */
+          <ListaPorCliente
+            casos={casos}
+            busqueda={busqueda}
+            cerrados={pestanaActual === 'cerrados'}
+            abriendo={abriendo}
+            onAbrir={(id) => void abrir(id)}
+            onBorrarBusqueda={() => setBusqueda('')}
+          />
         )}
       </div>
 
@@ -811,64 +835,5 @@ export const ExpedientesView: React.FC<{
 
       {confirmar}
     </div>
-  );
-};
-
-/**
- * UN CASO EN LA LISTA: tarjeta en «Esta semana», fila en las otras dos
- * (maqueta :111 y :136). La carátula manda; el radicado va en mono porque se
- * copia; el término a la derecha, porque es lo que se busca con la vista.
- */
-const CasoEnLista: React.FC<{
-  caso: ExpedienteEnLista;
-  grande: boolean;
-  cerrado: boolean;
-  abriendo: boolean;
-  onAbrir: () => void;
-}> = ({ caso, grande, cerrado, abriendo, onAbrir }) => {
-  /* Lo vencido manda sobre lo próximo, igual que en el aviso del caso. */
-  const t = caso.terminoVencido ?? caso.proximoTermino;
-  const docs = documentosEnPalabras(caso.documentos);
-  const bajada = [caso.despacho, caso.clienteNombre].filter(Boolean).join(' · ');
-
-  return (
-    <button
-      type="button"
-      onClick={onAbrir}
-      disabled={abriendo}
-      className={`cn-exp-caso-item ${grande ? 'cn-exp-caso-item--tarjeta' : ''} ${cerrado ? 'cn-exp-caso-item--cerrado' : ''}`}
-    >
-      <span className="cn-exp-caso-item-texto">
-        <span className="cn-exp-caso-item-nombre">{caso.caratula}</span>
-        {bajada && <span className="cn-exp-caso-item-bajada">{bajada}</span>}
-        <span className="cn-exp-caso-item-meta">
-          {caso.radicado && <span className="cn-exp-mono">{caso.radicado}</span>}
-          {caso.estado === 'SUSPENDIDO' && <span>Suspendido</span>}
-          {docs && <span>{docs}</span>}
-        </span>
-      </span>
-      <span className="cn-exp-caso-item-plazo">
-        {abriendo ? (
-          <Loader2 className="h-4 w-4 animate-spin" aria-label="Abriendo el caso" />
-        ) : t ? (
-          <>
-            <span
-              className={`cn-exp-plazo ${esUrgente(t) ? 'cn-exp-plazo--urgente' : ''} ${
-                t.verificado ? '' : 'cn-exp-plazo--sin-verificar'
-              }`}
-              title={t.verificado ? undefined : 'Término sin verificar en la agenda'}
-            >
-              {plazoEnPalabras(t.diasRestantes)}
-            </span>
-            <span className="cn-exp-plazo-que">
-              {t.que}
-              {!t.verificado && ' · sin verificar'}
-            </span>
-          </>
-        ) : caso.terminosLeidos ? (
-          <span className="cn-exp-plazo-que">sin términos pendientes</span>
-        ) : null}
-      </span>
-    </button>
   );
 };

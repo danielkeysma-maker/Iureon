@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LogOut, Shield } from 'lucide-react';
-import { ActionConfirmationModal } from './ActionConfirmationModal';
+import { ConfirmarCierreDeSesion } from './ConfirmarCierreDeSesion';
 import type { MainView } from '../types';
 import { navModule } from '../navigation';
 import '../../../design/cara-nueva.css';
@@ -74,23 +74,17 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({ mainView, onOpenUserManage
       </header>
 
       {/*
-        EL DIÁLOGO VA FUERA DE `.cara-nueva`. Es una pieza compartida que todavía
-        no se ha rediseñado; es `fixed`, así que salir del <header> no lo mueve.
+        LA MISMA CONFIRMACIÓN QUE EL TELÉFONO Y AJUSTES. Ya lleva la cara nueva:
+        se monta en el cuerpo del documento con su propio alcance `.cara-nueva`,
+        así que no depende de estar dentro de este <header>.
       */}
-      <ActionConfirmationModal
-        isOpen={isLogoutConfirmOpen}
-        title="¿Cerrar la sesión en este dispositivo?"
-        message="Su trabajo queda guardado en la nube de su firma: borradores, revisiones, transcritos y ajustes. Al volver a entrar, retomará donde quedó."
-        detail="Solo se cierra la sesión de este navegador. Los demás dispositivos siguen conectados."
-        confirmText="Cerrar sesión"
-        cancelText="Seguir trabajando"
-        confirmVariant="primary"
-        onConfirm={() => {
-          setIsLogoutConfirmOpen(false);
-          if (onLogout) onLogout();
-        }}
-        onCancel={() => setIsLogoutConfirmOpen(false)}
-      />
+      {onLogout && (
+        <ConfirmarCierreDeSesion
+          abierto={isLogoutConfirmOpen}
+          onCancelar={() => setIsLogoutConfirmOpen(false)}
+          onCerrarSesion={onLogout}
+        />
+      )}
     </>
   );
 };

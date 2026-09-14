@@ -10,6 +10,7 @@ import { subscriptionApi } from '../../subscriptions/subscription.api';
 import { FirmSubscriptionModal } from '../../subscriptions/components/FirmSubscriptionModal';
 import { ETIQUETA_DE_ESTADO, ETIQUETA_DE_PERIODO, NOMBRE_DE_MODULO, NOMBRE_DE_PLAN, type PlanDeFirma } from '../../subscriptions/types';
 import { ZonaDeRiesgoDeCuenta } from './ZonaDeRiesgoDeCuenta';
+import { ConfirmarCierreDeSesion } from '../../tenant/components/ConfirmarCierreDeSesion';
 
 /**
  * Las secciones de Ajustes que faltaban. Cada una reúne algo que YA existe en
@@ -199,6 +200,8 @@ const NombreDeUsuario: React.FC = () => {
 export const CuentaSection: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
   const sesion = readSession();
   const { activeFirm, currentUserName } = useTenant();
+  /* La misma confirmación que la cabecera y el teléfono: salir desde Ajustes no es un gesto distinto. */
+  const [confirmarSalida, setConfirmarSalida] = React.useState(false);
   const Dato: React.FC<{ etiqueta: string; valor: React.ReactNode }> = ({ etiqueta, valor }) => (
     <div className="flex flex-col gap-0.5 border-b border-line-100 px-4 py-3 last:border-0 sm:flex-row sm:items-center">
       <span className="w-[160px] shrink-0 text-meta text-ink-500">{etiqueta}</span>
@@ -218,10 +221,17 @@ export const CuentaSection: React.FC<{ onLogout?: () => void }> = ({ onLogout })
       <NombreDeUsuario />
       <div className="mt-4 flex flex-wrap items-center gap-3">
         {onLogout && (
-          <button type="button" onClick={onLogout} className="btn-neutral">
+          <button type="button" onClick={() => setConfirmarSalida(true)} className="btn-neutral">
             <LogOut className="h-3.5 w-3.5" />
             Cerrar sesión en este dispositivo
           </button>
+        )}
+        {onLogout && (
+          <ConfirmarCierreDeSesion
+            abierto={confirmarSalida}
+            onCancelar={() => setConfirmarSalida(false)}
+            onCerrarSesion={onLogout}
+          />
         )}
         <span className="inline-flex items-center gap-1.5 text-meta text-ink-500">
           <KeyRound className="h-3.5 w-3.5" />

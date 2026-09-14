@@ -1,18 +1,41 @@
-import React, { useEffect, useRef } from 'react';
-import { AlertTriangle, LogOut, type LucideIcon } from 'lucide-react';
+import React, { useEffect, useId, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import '../../../design/cara-nueva.css';
 
 /**
- * Confirmación de una acción, con el lenguaje visual del resto de la aplicación.
+ * Confirmación de una acción, con la cara nueva.
  *
- * LO QUE HABÍA: un triángulo de alerta rojo y un botón carmesí para cerrar
- * sesión, como si salir fuera destruir algo. No lo es —el trabajo está en la
- * nube de la firma— y el rojo enseñaba a dudar de un botón inocuo. Ahora la
- * confirmación dice qué pasa y qué no pasa, en dos frases, con el icono de la
- * acción y el azul de marca; el rojo queda reservado a lo que sí borra.
+ * ─── DE DÓNDE SALE LA FORMA ────────────────────────────────────────────────
  *
- * Comportamiento que un diálogo profesional debe tener y este no tenía: Esc
- * cierra, clic fuera cierra, el foco entra al botón seguro (Cancelar), y en el
- * teléfono se presenta como hoja anclada abajo, a la mano del pulgar.
+ * `public/handoff/app-dialogos-y-estados.html`, las confirmaciones de tamaño S
+ * («¿Quitar este documento del caso?», «¿Volver a revisar el escrito?»): panel
+ * de radio 16 sin filete superior ni icono, título de 21 px, texto de 15 px y
+ * un pie sobre el lavado con los dos botones a la derecha. El artboard no
+ * dibuja un diálogo de cierre de sesión; se usa esa anatomía tal cual y las
+ * palabras las pone quien lo invoca.
+ *
+ * LO QUE HABÍA: un filete degradado arriba, un círculo con icono, texto de
+ * 13,5 y 12 px y la tarjeta del sistema viejo, montado FUERA de `.cara-nueva`.
+ *
+ * ─── DESVÍOS DEL ARTBOARD, con la razón ────────────────────────────────────
+ *
+ * · Botones de 44 px y no de 42: es el mínimo táctil del resto de la cara
+ *   nueva, y este diálogo también se abre desde el teléfono.
+ * · En el teléfono es hoja inferior (radio 20 arriba, botones a lo ancho), como
+ *   la hoja de acciones desde donde se llega: a la mano del pulgar.
+ *
+ * ─── COMPORTAMIENTO ────────────────────────────────────────────────────────
+ *
+ * `Esc` y el velo equivalen a cancelar, nunca a confirmar. El foco entra al
+ * botón seguro —cancelar— para que un Intro distraído no ejecute la acción; el
+ * tabulador queda atrapado entre los dos botones; al cerrar, el foco vuelve a
+ * quien abrió el diálogo (o a `focoAlCerrar`, cuando ese elemento ya no existe,
+ * como la hoja de acciones del teléfono que se cierra al elegir). La página de
+ * detrás no se desplaza mientras está abierto.
+ *
+ * SE MONTA EN EL CUERPO DEL DOCUMENTO con su propio alcance `.cara-nueva`: la
+ * cabecera y la hoja del teléfono tienen su propio apilamiento, y dentro de
+ * ellas el velo quedaría bajo la barra inferior.
  */
 
 interface ActionConfirmationModalProps {
@@ -25,7 +48,8 @@ interface ActionConfirmationModalProps {
   cancelText?: string;
   /** `primary` para acciones inocuas (salir); `danger` solo para lo que borra. */
   confirmVariant?: 'danger' | 'primary';
-  icon?: LucideIcon;
+  /** A dónde vuelve el foco si quien abrió el diálogo ya no está en la página. */
+  focoAlCerrar?: React.RefObject<HTMLElement | null>;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -38,80 +62,104 @@ export const ActionConfirmationModal: React.FC<ActionConfirmationModalProps> = (
   confirmText = 'Confirmar',
   cancelText = 'Cancelar',
   confirmVariant = 'primary',
-  icon,
+  focoAlCerrar,
   onConfirm,
   onCancel
 }) => {
+  const panel = useRef<HTMLDivElement | null>(null);
   const cancelar = useRef<HTMLButtonElement | null>(null);
+  const id = useId();
+  const idTitulo = `${id}-titulo`;
+  const idTexto = `${id}-texto`;
+  const idDetalle = `${id}-detalle`;
+
+  /* `onCancel` por ref: el padre se repinta solo y eso no debe volver a mover el foco. */
+  const alCancelarRef = useRef(onCancel);
+  useEffect(() => {
+    alCancelarRef.current = onCancel;
+  });
 
   useEffect(() => {
     if (!isOpen) return;
+    const invocador = document.activeElement as HTMLElement | null;
     cancelar.current?.focus();
-    const alTeclear = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onCancel();
+
+    const alPulsar = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        /* Se detiene aquí: el taller en «Pantalla completa» también escucha `Esc`. */
+        e.stopPropagation();
+        alCancelarRef.current();
+        return;
+      }
+      if (e.key !== 'Tab' || !panel.current) return;
+      const botones = Array.from(panel.current.querySelectorAll<HTMLElement>('button:not([disabled])'));
+      if (botones.length === 0) return;
+      const actual = botones.indexOf(document.activeElement as HTMLElement);
+      const primero = botones[0];
+      const ultimo = botones[botones.length - 1];
+      if (e.shiftKey && (actual <= 0)) {
+        e.preventDefault();
+        ultimo.focus();
+      } else if (!e.shiftKey && (actual === -1 || actual === botones.length - 1)) {
+        e.preventDefault();
+        primero.focus();
+      }
     };
-    document.addEventListener('keydown', alTeclear);
-    return () => document.removeEventListener('keydown', alTeclear);
-  }, [isOpen, onCancel]);
+    document.addEventListener('keydown', alPulsar);
+    const overflowPrevio = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', alPulsar);
+      document.body.style.overflow = overflowPrevio;
+      const destino = invocador && invocador.isConnected && invocador !== document.body ? invocador : focoAlCerrar?.current;
+      destino?.focus?.({ preventScroll: true });
+    };
+  }, [isOpen, focoAlCerrar]);
 
   if (!isOpen) return null;
 
-  const Icono = icon ?? (confirmVariant === 'danger' ? AlertTriangle : LogOut);
   const peligro = confirmVariant === 'danger';
 
-  return (
-    <div
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-[rgb(var(--ink-900)/0.45)] p-0 backdrop-blur-[2px] sm:items-center sm:p-6"
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onCancel();
-      }}
-    >
+  return createPortal(
+    <div className="cara-nueva cn-sal">
+      {/* El velo cancela: tocar fuera nunca ejecuta la acción. */}
+      <div className="cn-sal-velo" onClick={onCancel} aria-hidden="true" />
       <div
+        ref={panel}
+        className="cn-sal-panel"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="confirmacion-titulo"
-        aria-describedby="confirmacion-texto"
-        className="w-full max-w-[440px] overflow-hidden rounded-t-card border border-line-200 bg-surface shadow-e2 motion-safe:animate-[aparecer_.22s_ease-out] sm:rounded-card"
+        aria-labelledby={idTitulo}
+        aria-describedby={detail ? `${idTexto} ${idDetalle}` : idTexto}
       >
-        {/* Filete superior de marca: identifica el diálogo como de la aplicación, no del navegador. */}
-        <div className={`h-1 w-full ${peligro ? 'bg-danger' : 'bg-gradient-to-r from-brand-700 to-[rgb(var(--nav-accent))]'}`} />
-
-        <div className="px-6 pb-6 pt-6 sm:px-7">
-          <div className="flex items-start gap-4">
-            <span
-              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${
-                peligro ? 'bg-[rgb(var(--danger)/0.08)] text-danger' : 'bg-brand-50 text-brand-700'
-              }`}
-            >
-              <Icono className="h-5 w-5" strokeWidth={2} />
-            </span>
-            <div className="min-w-0 flex-1">
-              <h4 id="confirmacion-titulo" className="text-[17px] font-semibold leading-snug tracking-[-0.01em] text-ink-900">
-                {title}
-              </h4>
-              <p id="confirmacion-texto" className="mt-1.5 text-[13.5px] leading-[1.6] text-ink-700 [text-wrap:pretty]">
-                {message}
-              </p>
-              {detail && <p className="mt-2 text-[12px] leading-snug text-ink-500">{detail}</p>}
-            </div>
-          </div>
-
-          <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <button ref={cancelar} type="button" onClick={onCancel} className="btn-neutral h-11 justify-center sm:h-10">
-              {cancelText}
-            </button>
-            <button
-              type="button"
-              onClick={onConfirm}
-              className={`h-11 justify-center sm:h-10 ${peligro ? 'btn-danger' : 'btn-primary'}`}
-            >
-              <Icono className="h-3.5 w-3.5" />
-              {confirmText}
-            </button>
-          </div>
+        <div className="cn-sal-cuerpo">
+          <h2 id={idTitulo} className="cn-sal-titulo">
+            {title}
+          </h2>
+          <p id={idTexto} className="cn-sal-texto">
+            {message}
+          </p>
+          {detail && (
+            <p id={idDetalle} className="cn-sal-detalle">
+              {detail}
+            </p>
+          )}
+        </div>
+        <div className="cn-sal-pie">
+          <button ref={cancelar} type="button" onClick={onCancel} className="cn-sal-boton cn-sal-boton--seguro">
+            {cancelText}
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className={`cn-sal-boton ${peligro ? 'cn-sal-boton--peligro' : 'cn-sal-boton--primario'}`}
+          >
+            {confirmText}
+          </button>
         </div>
       </div>
-      <style>{`@keyframes aparecer{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}`}</style>
-    </div>
+    </div>,
+    document.body
   );
 };

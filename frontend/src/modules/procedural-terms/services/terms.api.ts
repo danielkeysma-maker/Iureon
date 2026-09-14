@@ -1,21 +1,41 @@
 import { httpClient } from '../../../config/httpClient';
 
+/** La clase de término. Sin campo, el servidor cuenta días hábiles. */
+export type TermUnit = 'DIAS_HABILES' | 'DIAS_CALENDARIO' | 'MESES' | 'ANIOS';
+
 export interface TermsCalculationRequest {
   notifiedDate: string;
+  /** La cantidad: días, meses o años según `termUnit`. */
   termInDays: number;
   jurisdictionType: 'LABORAL' | 'CIVIL' | 'CONSTITUCIONAL' | 'PENAL';
+  termUnit?: TermUnit;
 }
+
+type FilaDeDia = { date: string; reason: string };
 
 export interface TermsCalculationResult {
   notifiedDate: string;
   startDate: string;
   dueDate: string;
   dueTime: string;
+  /** Días hábiles contados; 0 cuando el término no se cuenta en días hábiles. */
   totalBusinessDays: number;
-  excludedDays: { date: string; reason: string }[];
+  excludedDays: FilaDeDia[];
   normativeReference: string;
   /** Official sources behind the calendar (Ley 51 de 1983, CGP art. 118). */
   fuentes?: Array<{ nombre: string; norma: string; url: string; consultadoEl: string }>;
+  /*
+   * Opcionales: un servidor anterior al selector no los manda, y entonces la
+   * pantalla lee la respuesta como días hábiles, que es lo que ese servidor contó.
+   */
+  termUnit?: TermUnit;
+  termAmount?: number;
+  modeLabel?: string;
+  countedNonBusinessDays?: FilaDeDia[];
+  nominalDueDate?: string | null;
+  extensionDays?: FilaDeDia[];
+  dueOnNonBusinessDay?: string | null;
+  notes?: string[];
 }
 
 interface TermsResponse {

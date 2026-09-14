@@ -78,7 +78,8 @@ export const ModuloBloqueado: React.FC<ModuloBloqueadoProps> = ({ quePuede, modu
         <div
           role="alertdialog"
           aria-labelledby="modulo-bloqueado-titulo"
-          className="flex w-full max-w-sm flex-col items-center gap-3 rounded-[10px] border border-line-200 bg-surface px-6 py-6 text-center shadow-lg"
+          /* Radio de 20 px (14 sep 2026): es un diálogo de alerta y va con el radio común de los diálogos. */
+          className="flex w-full max-w-sm flex-col items-center gap-3 rounded-[20px] border border-line-200 bg-surface px-6 py-6 text-center shadow-lg"
         >
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgb(var(--danger)/0.08)] text-danger">
             <Lock className="h-5 w-5" />
