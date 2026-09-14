@@ -1,4 +1,4 @@
-import { NAV_GROUPS, NAV_MODULES, VISTA_POR_MODULO, modulosSinGrupo } from '../navigation';
+import { NAV_GROUPS, NAV_MODULES, NUMERAL_DE_MODULO, VISTA_POR_MODULO, modulosSinGrupo } from '../navigation';
 import { PUERTAS_DE_INICIO } from '../../inicio/puertas';
 import { PASOS_DE_VISITA } from '../../inicio/visitaGuiada/pasos';
 import { MANUAL } from '../../help/content/manual';
@@ -108,6 +108,41 @@ check(
   'y el operador puede apagárselo a una firma',
   VISTA_POR_MODULO.EXPEDIENTES === 'expedientes',
   'sin esto, apagar el módulo dejaría la puerta abierta a un 403'
+);
+
+/* ─── 5b. LOS NUMERALES DEL PANEL SON LOS DEL DISEÑO, Y NO SE MUEVEN ────── */
+/*
+ * El panel numeraba contando solo lo visible, así que el plan de la firma
+ * cambiaba los números: sin Orientación, Expedientes era «04». El diseño
+ * (README-app §1) fija los doce por identidad. Se comprueban uno por uno
+ * porque un módulo añadido o reordenado en `NAV_GROUPS` desplazaría a todos
+ * los de abajo sin que ningún conteo lo notara.
+ */
+const NUMERALES_DEL_DISENO: ReadonlyArray<[MainView, string]> = [
+  ['workspace', '01'],
+  ['borradores', '02'],
+  ['taller', '03'],
+  ['orientacion', '04'],
+  ['expedientes', '05'],
+  ['audiencias', '06'],
+  ['entrevistas', '07'],
+  ['search', '08'],
+  ['catalogo', '09'],
+  ['tools', '10'],
+  ['manual', '11'],
+  ['soporte', '12']
+];
+const numeralesCorridos = NUMERALES_DEL_DISENO.filter(([id, n]) => NUMERAL_DE_MODULO[id] !== n);
+check(
+  'los doce módulos llevan el numeral fijo del diseño (01–12)',
+  numeralesCorridos.length === 0,
+  numeralesCorridos.length > 0
+    ? `CORRIDOS: ${numeralesCorridos.map(([id, n]) => `${id} es ${NUMERAL_DE_MODULO[id] ?? '—'} y debe ser ${n}`).join(', ')}`
+    : '01 Redacción … 12 Soporte'
+);
+check(
+  'Inicio no lleva numeral: es la casa, no una entrada del índice',
+  NUMERAL_DE_MODULO.inicio === undefined
 );
 
 /* ─── 5. LAS PUERTAS DE INICIO LLEVAN A ALGUN SITIO ─────────────────────── */

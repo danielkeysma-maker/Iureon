@@ -1,14 +1,15 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { Bell, Building2, Check, ChevronDown, ChevronRight, Settings, Shield, User } from 'lucide-react';
 import type { LawFirmTenant } from '../types';
 import type { MainView } from '../types';
-import { NAV_GROUPS, NAV_MODULES, navModule } from '../navigation';
+import { NAV_GROUPS, NAV_MODULES, NUMERAL_DE_MODULO, navModule } from '../navigation';
 import { IureonMark } from './IureonMark';
 import { useTenant } from '../TenantContext';
 import { solicitarAbrirNovedades, useNovedadesNuevas } from '../../help/useNovedades';
 import { usePlan } from '../../subscriptions/PlanContext';
 import { NOMBRE_DE_PLAN } from '../../subscriptions/types';
 import type { PlanDeFirma } from '../../subscriptions/types';
+import '../../../design/cara-nueva.css';
 
 interface SidebarLeftProps {
   mainView: MainView;
@@ -46,32 +47,29 @@ interface SidebarLeftProps {
 }
 
 /**
- * EL PANEL «ÍNDICE CLARO» (diseño 3b del titular, `public/sidebar-3b-indice-claro.html`).
+ * EL PANEL LATERAL DE LA CARA NUEVA (`public/handoff/app-inicio.html`, artboard 1;
+ * README-app §1).
  *
- * Papel claro con una línea fina a la derecha. Desplegado, los módulos son un
- * índice: número monoespaciado a dos cifras y etiqueta, sin iconos; el activo
- * va en tinta sólida con el número en oro. Colapsado, cada módulo es una ficha
- * blanca con solo el icono, y los rótulos de grupo se vuelven una raya corta.
- * Los anchos son los del diseño: 258 abierto, 82 cerrado.
+ * Papel cálido, sin raya a la derecha: la diferencia de papel ya separa el
+ * índice del trabajo. Arriba la marca y la ficha de la firma; en medio el
+ * índice por grupos con numerales fijos, que se desplaza; abajo la ficha de
+ * saldo, ANCLADA, con «Recargar», y los ajustes del panel. El módulo abierto es
+ * una tarjeta blanca con una barra de oro de 3 px: el oro marca el módulo
+ * activo y nada más, así que los puntos de «pendiente» y de novedades, que
+ * antes eran de oro, pasan al azul.
+ *
+ * Todo el estilo vive en `design/cara-nueva.css`, bajo `.cara-nueva`, y lo que
+ * el artboard no dibuja pero el panel ya tenía —Administrar, el menú de firmas,
+ * colapsar, Membrete, Avisos, la nota del plan y el sello de versión— sigue
+ * aquí con el mismo lenguaje.
+ *
+ * SIN CUADRO DE BÚSQUEDA. El artboard dibuja «Buscar ⌘K» bajo la marca, pero la
+ * aplicación no tiene una búsqueda global: un campo que no busca nada es una
+ * promesa rota en el lugar más visible del panel. Su sitio lo ocupa la ficha de
+ * la firma, que sí existe. El día que haya búsqueda, va ahí.
+ *
+ * Los anchos: 216 abierto, el del artboard; 82 cerrado, el de siempre.
  */
-const ANCHO = 'w-[258px]';
-const RIEL = 'w-[82px]';
-
-/** La curva del diseño. `motion-reduce` la anula: quien pidió menos movimiento no ve deslizar nada. */
-const TRANSICION = 'transition-[width] duration-300 ease-[cubic-bezier(.4,0,.2,1)] motion-reduce:transition-none';
-
-/** El rótulo de grupo del diseño: 9.5px, versales, tracking .18em, tinta al 34 %. */
-const ROTULO = 'text-[9.5px] font-semibold uppercase tracking-[0.18em] text-rail-ink/[.34]';
-
-/** Las fichas del riel colapsado: 48×42, blancas, con borde de tinta al 9 %. */
-/*
- * La ficha colapsada SIN color: el fondo y el borde los pone cada estado.
- * Traerlos aquí ponía dos `bg-` en el mismo elemento —el de la ficha y el del
- * activo— y en Tailwind eso no lo decide el orden en que se escriben sino el
- * orden de la hoja: ganaba el blanco, así que el módulo abierto se pintaba
- * blanco y su icono, también blanco, desaparecía.
- */
-const FICHA = 'h-[42px] w-12 rounded-[14px] border';
 
 /**
  * El panel se queda como se dejó. La clave es la del diseño; se lee una vez al
@@ -143,26 +141,6 @@ const fraccionDelPeriodo = (plan: PlanDeFirma | null): number | null => {
   return Math.min(1, plan.diasRestantes / total);
 };
 
-/**
- * El índice del panel. Inicio es la casa y no lleva número; la numeración
- * arranca en el primer módulo de «Producir» y sigue continua por todos los
- * grupos, contando solo lo que se ve: un módulo oculto por el plan no deja un
- * hueco en la cuenta. Administrar, aunque esté plegado, conserva sus números
- * para que al abrirlo el índice no salte.
- */
-const indicesDeNavegacion = (ocultas: readonly MainView[]): Map<MainView, string> => {
-  const indices = new Map<MainView, string>();
-  let n = 0;
-  for (const grupo of NAV_GROUPS) {
-    for (const id of grupo.modulos) {
-      if (id === 'inicio' || ocultas.includes(id)) continue;
-      n += 1;
-      indices.set(id, String(n).padStart(2, '0'));
-    }
-  }
-  return indices;
-};
-
 export const SidebarLeft: React.FC<SidebarLeftProps> = ({
   mainView,
   setMainView,
@@ -188,13 +166,12 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
   const { currentUserEmail, currentUserName } = useTenant();
   const { plan } = usePlan();
 
-  const indices = useMemo(() => indicesDeNavegacion(ocultas), [ocultas]);
   /*
-   * QUIÉN ESTÁ TRABAJANDO, bajo la marca. Antes aquí iba un chip con dos
-   * iniciales SACADAS DEL CORREO, porque la aplicación no guardaba un nombre;
-   * ahora sí lo guarda y se escribe entero. Mientras una cuenta no tenga
-   * nombre se muestra su correo, que es verdad y no lo inventa nadie —jamás
-   * un nombre deducido de la parte local, que es como salía «Ingdanielma».
+   * QUIÉN ESTÁ TRABAJANDO. Antes aquí iba un chip con dos iniciales SACADAS DEL
+   * CORREO, porque la aplicación no guardaba un nombre; ahora sí lo guarda y se
+   * escribe entero. Mientras una cuenta no tenga nombre se muestra su correo,
+   * que es verdad y no lo inventa nadie —jamás un nombre deducido de la parte
+   * local, que es como salía «Ingdanielma».
    */
   const quienTrabaja = currentUserName || currentUserEmail;
   const saldo = activeFirm.creditsBalance ?? 0;
@@ -208,7 +185,10 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
     ? { nombre: 'Abogado particular', detalle: 'Uso personal · sin firma', Icono: User }
     : { nombre: activeFirm.name, detalle: activeFirm.nit || 'Sin NIT', Icono: Building2 };
 
-  /** Un módulo del índice. Desplegado: número y etiqueta. Colapsado: ficha con el icono. */
+  /**
+   * Un módulo del índice. Desplegado: numeral fijo y etiqueta. Colapsado: ficha
+   * con el icono. El activo es la tarjeta blanca con la barra de oro en los dos.
+   */
   const Item = ({ id }: { id: MainView }) => {
     const { label, icon: Icon } = navModule(id);
     const activo = mainView === id;
@@ -224,20 +204,12 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
           title={hayPendiente ? `${label} · ${pendiente} sin leer` : label}
           aria-label={label}
           aria-current={activo ? 'page' : undefined}
-          className={`relative grid place-items-center ${FICHA} transition-colors ${
-            activo
-              ? 'border-brand-700 bg-brand-700 text-white'
-              : 'border-rail-ink/10 bg-rail-surface text-rail-muted hover:border-rail-ink/25 hover:text-rail-ink'
-          }`}
+          className="cn-rail-ficha"
         >
-          <Icon className="h-[21px] w-[21px]" strokeWidth={1.6} aria-hidden />
+          {activo && <span className="cn-rail-oro" aria-hidden />}
+          <Icon className="h-5 w-5" strokeWidth={1.6} aria-hidden />
           {/* El punto dice que hay trabajo sin ver; la cifra exacta espera a desplegar. */}
-          {hayPendiente && (
-            <span
-              className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-rail-gold"
-              aria-hidden
-            />
-          )}
+          {hayPendiente && <span className="cn-rail-punto cn-rail-punto--esquina" aria-hidden />}
         </button>
       );
     }
@@ -248,50 +220,28 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
         data-visita={`nav-${id}`}
         onClick={() => setMainView(id)}
         aria-current={activo ? 'page' : undefined}
-        className={`grid h-[42px] w-full grid-cols-[22px_1fr] items-center gap-3 rounded-[12px] px-[14px] text-left text-[15.5px] tracking-[-0.015em] transition-colors ${
-          activo
-            ? 'bg-brand-700 font-semibold text-white'
-            : 'text-rail-ink-soft hover:bg-rail-ink/5 hover:text-rail-ink'
-        }`}
+        className="cn-rail-item"
       >
+        {activo && <span className="cn-rail-oro" aria-hidden />}
         {/* Inicio no lleva número: es la casa, no una entrada del índice. La columna queda para alinear. */}
-        <span
-          className={`font-mono text-[11px] font-medium leading-none tracking-[0.02em] ${
-            activo ? 'text-rail-gold' : 'text-rail-ink/30'
-          }`}
-          aria-hidden
-        >
-          {indices.get(id) ?? ''}
+        <span className="cn-rail-numeral" aria-hidden>
+          {NUMERAL_DE_MODULO[id] ?? ''}
         </span>
-        <span className="flex min-w-0 items-center gap-2">
-          <span className="truncate">{label}</span>
-          {hayPendiente && (
-            <span
-              className={`ml-auto shrink-0 rounded-full px-1.5 font-mono text-[10px] font-semibold ${
-                activo ? 'bg-white/15 text-white' : 'bg-rail-ink/10 text-rail-ink-soft'
-              }`}
-            >
-              {pendiente}
-            </span>
-          )}
-        </span>
+        <span className="cn-rail-etiqueta">{label}</span>
+        {hayPendiente && <span className="cn-rail-cuenta">{pendiente}</span>}
       </button>
     );
   };
 
   /**
    * El menú de la firma: cambiar de firma y abrir «Firmas y usuarios». El mismo
-   * bajo la fila del contexto (desplegado) y flotando a la derecha del icono
+   * bajo la ficha de la firma (desplegado) y flotando a la derecha del icono
    * (colapsado), para que plegar el panel no le quite al superusuario su única
    * entrada a la consola desde aquí.
    */
   const MenuDeFirma = ({ className }: { className: string }) => (
-    <div className={`surface-raised absolute z-30 overflow-hidden py-1 ${className}`}>
-      {(isSuperUser || isParticularUser) && (
-        <p className="border-b border-line-100 px-3 py-2 text-label uppercase text-ink-500">
-          {contexto.detalle}
-        </p>
-      )}
+    <div className={`cn-rail-menu ${className}`}>
+      {(isSuperUser || isParticularUser) && <p className="cn-rail-menu-detalle">{contexto.detalle}</p>}
       {sampleFirms.map((firm) => (
         <button
           key={firm.id}
@@ -300,25 +250,24 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
             setActiveFirm(firm);
             setIsFirmDropdownOpen(false);
           }}
-          className={`flex w-full items-center justify-between px-3 py-1.5 text-left text-ui hover:bg-canvas ${
-            firm.id === activeFirm.id ? 'font-medium text-brand-700' : 'text-ink-700'
-          }`}
+          aria-current={firm.id === activeFirm.id ? 'true' : undefined}
+          className="cn-rail-menu-fila"
         >
-          <span className="truncate">{firm.name}</span>
-          {firm.id === activeFirm.id && <Check className="ml-2 h-3.5 w-3.5 shrink-0 text-brand-700" />}
+          <span className="min-w-0 flex-1 truncate">{firm.name}</span>
+          {firm.id === activeFirm.id && <Check className="h-4 w-4 shrink-0" aria-hidden />}
         </button>
       ))}
       {onOpenUserManagementModal && (
-        <div className="mt-1 border-t border-line-100 p-1">
+        <div className="cn-rail-menu-pie">
           <button
             type="button"
             onClick={() => {
               setIsFirmDropdownOpen(false);
               onOpenUserManagementModal();
             }}
-            className="btn-secondary btn-sm w-full"
+            className="cn-rail-menu-boton"
           >
-            <Shield className="h-3.5 w-3.5" />
+            <Shield className="h-4 w-4" aria-hidden />
             Firmas y usuarios
           </button>
         </div>
@@ -327,74 +276,48 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
   );
 
   return (
-    <aside
-      className={`flex h-full flex-col border-r border-rail-ink/10 bg-rail font-sans ${TRANSICION} ${
-        isCollapsed ? RIEL : ANCHO
-      }`}
-    >
-      {/* ─── CABECERA: MARCA Y USUARIO ─────────────────────────────────────
-          70px, como el diseño. El logo va a casa: ahora que una recarga deja al
-          abogado en el módulo que estaba leyendo, salir de uno tiene que ser
-          algo que pueda pedir. */}
-      <div
-        className={`flex h-[70px] shrink-0 items-center gap-[11px] overflow-hidden ${
-          isCollapsed ? 'justify-center px-0' : 'px-[18px]'
-        }`}
+    <aside className={`cara-nueva cn-rail ${isCollapsed ? 'cn-rail--cerrado' : ''}`}>
+      {/* ─── MARCA ─────────────────────────────────────────────────────────
+          El logo va a casa: ahora que una recarga deja al abogado en el módulo
+          que estaba leyendo, salir de uno tiene que ser algo que pueda pedir. */}
+      <button
+        type="button"
+        onClick={onInicio ?? (() => setMainView('inicio'))}
+        data-visita="marca"
+        title={currentUserEmail ? `Ir al inicio · ${currentUserEmail}` : 'Ir al inicio'}
+        aria-label="Ir al inicio"
+        className="cn-rail-marca"
       >
-        <button
-          type="button"
-          onClick={onInicio ?? (() => setMainView('inicio'))}
-          data-visita="marca"
-          title={currentUserEmail ? `Ir al inicio · ${currentUserEmail}` : 'Ir al inicio'}
-          aria-label="Ir al inicio"
-          className={`flex min-w-0 cursor-pointer items-center gap-[11px] rounded-control transition-opacity hover:opacity-80 ${
-            isCollapsed ? 'justify-center' : 'flex-1'
-          }`}
-        >
-          <IureonMark size={30} className="shrink-0" />
-          {/*
-            APILADO, NO EN FILA. En el riel de 258px la cabecera ya gasta 77
-            entre márgenes, logo y separación: «Iureon» y un nombre corriente
-            uno al lado del otro no caben sin cortar el segundo. Apilados,
-            el nombre dispone de la línea entera y «Iureon» conserva su
-            tamaño. El correo va en el título, que es donde se mira cuando
-            hace falta comprobar con qué cuenta se entró.
-          */}
-          {!isCollapsed && (
-            <span className="flex min-w-0 flex-col items-start leading-none">
-              <span className="whitespace-nowrap text-[19px] font-semibold tracking-[-0.02em] text-rail-ink">
-                Iureon
-              </span>
-              {quienTrabaja && (
-                <span className="mt-[3px] max-w-full truncate text-[11.5px] text-rail-muted">
-                  {quienTrabaja}
-                </span>
-              )}
-            </span>
-          )}
-        </button>
-      </div>
+        <IureonMark size={isCollapsed ? 26 : 20} className="shrink-0" />
+        {!isCollapsed && <span className="cn-rail-palabra">IUREON</span>}
+      </button>
 
-      {/* ─── CONTEXTO: LA FIRMA ────────────────────────────────────────────
-          Una fila bajo la cabecera, no una tarjeta. Es contexto permanente:
-          con qué firma trabajo. Colapsado, el icono abre el mismo menú. */}
+      {/* ─── LA FIRMA Y QUIÉN TRABAJA ──────────────────────────────────────
+          Ocupa el sitio que el artboard da a la búsqueda (ver arriba por qué
+          no se dibuja). Es contexto permanente: con qué firma y con qué
+          cuenta se trabaja. APILADOS, NO EN FILA: en 188 px de ancho útil un
+          nombre de firma y un nombre de persona uno al lado del otro no caben
+          sin cortar el segundo. Colapsado, el icono abre el mismo menú. */}
       {!isCollapsed ? (
-        <div className="relative shrink-0 px-[14px] pb-1">
+        <div className="cn-rail-firma-caja">
           <button
             type="button"
             onClick={() => setIsFirmDropdownOpen(!isFirmDropdownOpen)}
             aria-expanded={isFirmDropdownOpen}
             aria-haspopup="menu"
-            className="flex h-8 w-full items-center gap-2 rounded-[10px] px-[14px] text-left text-[12.5px] text-rail-muted hover:bg-rail-ink/5 hover:text-rail-ink"
+            className="cn-rail-firma"
           >
-            <contexto.Icono className="h-3.5 w-3.5 shrink-0" strokeWidth={1.8} />
-            <span className="min-w-0 flex-1 truncate">{contexto.nombre}</span>
-            <ChevronDown className="h-3.5 w-3.5 shrink-0" />
+            <contexto.Icono className="h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden />
+            <span className="cn-rail-firma-textos">
+              <span className="cn-rail-firma-nombre">{contexto.nombre}</span>
+              {quienTrabaja && <span className="cn-rail-firma-quien">{quienTrabaja}</span>}
+            </span>
+            <ChevronDown className="h-4 w-4 shrink-0" aria-hidden />
           </button>
-          {isFirmDropdownOpen && <MenuDeFirma className="left-[14px] right-[14px] top-full mt-1" />}
+          {isFirmDropdownOpen && <MenuDeFirma className="cn-rail-menu--abajo" />}
         </div>
       ) : (
-        <div className="relative flex shrink-0 justify-center pb-1">
+        <div className="cn-rail-firma-caja">
           <button
             type="button"
             onClick={() => setIsFirmDropdownOpen(!isFirmDropdownOpen)}
@@ -402,53 +325,47 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
             aria-label={`Firma: ${contexto.nombre}`}
             aria-expanded={isFirmDropdownOpen}
             aria-haspopup="menu"
-            className="flex h-8 w-12 items-center justify-center rounded-[10px] text-rail-muted hover:bg-rail-ink/5 hover:text-rail-ink"
+            className="cn-rail-icono"
           >
-            <contexto.Icono className="h-4 w-4" strokeWidth={1.8} />
+            <contexto.Icono className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden />
           </button>
-          {isFirmDropdownOpen && <MenuDeFirma className="left-full top-0 ml-2 w-56" />}
+          {isFirmDropdownOpen && <MenuDeFirma className="cn-rail-menu--lado" />}
         </div>
       )}
 
       {/* ─── EL ÍNDICE ─────────────────────────────────────────────────────
-          `min-h-0` es obligatorio: sin él el hijo flex no encoge y el pie se
-          sale del panel en pantallas bajas. */}
-      <nav
-        aria-label="Módulos"
-        className={`flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden [scrollbar-width:thin] ${
-          isCollapsed ? 'gap-2 px-[17px]' : 'px-[14px]'
-        }`}
-      >
+          Es lo único que se desplaza. `min-h-0` (en la hoja) es obligatorio:
+          sin él el hijo flex no encoge y la ficha de saldo se sale del panel
+          en pantallas bajas. */}
+      <nav aria-label="Módulos" className="cn-rail-indice">
         {NAV_GROUPS.map((grupo) => {
           const abierto = !grupo.plegable || administrarAbierto;
           const modulos = grupo.modulos.filter((id) => !ocultas.includes(id));
           if (modulos.length === 0) return null;
 
           return (
-            <div
-              key={grupo.titulo}
-              className={isCollapsed ? 'grid justify-items-center gap-2 py-1.5' : 'pb-1 pt-3'}
-            >
-              {/* Colapsado, el rótulo es una raya de 26px; Inicio no lleva ni rótulo ni raya. */}
+            <div key={grupo.titulo} className="cn-rail-grupo">
+              {/* Colapsado, el rótulo es una raya de 26 px; Inicio no lleva ni rótulo ni raya. */}
               {isCollapsed
-                ? !grupo.sinTitulo && <span className="h-px w-[26px] bg-rail-ink/[.14]" aria-hidden />
+                ? !grupo.sinTitulo && <span className="cn-rail-raya" aria-hidden />
                 : !grupo.sinTitulo &&
                   (grupo.plegable ? (
                     <button
                       type="button"
                       onClick={() => setAdministrarAbierto((v) => !v)}
-                      className={`flex w-full items-center gap-1 px-[14px] pb-2 text-left ${ROTULO}`}
+                      className="cn-rail-rotulo cn-rail-rotulo--boton"
                       aria-expanded={abierto}
                     >
                       {grupo.titulo}
                       <ChevronRight
-                        className={`h-3 w-3 transition-transform motion-reduce:transition-none ${
+                        className={`h-3.5 w-3.5 transition-transform motion-reduce:transition-none ${
                           abierto ? 'rotate-90' : ''
                         }`}
+                        aria-hidden
                       />
                     </button>
                   ) : (
-                    <p className={`px-[14px] pb-2 ${ROTULO}`}>{grupo.titulo}</p>
+                    <p className="cn-rail-rotulo">{grupo.titulo}</p>
                   ))}
 
               {/*
@@ -456,16 +373,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
                 etiquetas no hay forma de saber que hay algo escondido, y un
                 módulo invisible es un módulo que no existe.
               */}
-              {(abierto || isCollapsed) &&
-                (isCollapsed ? (
-                  modulos.map((id) => <Item key={id} id={id} />)
-                ) : (
-                  <div className="space-y-px">
-                    {modulos.map((id) => (
-                      <Item key={id} id={id} />
-                    ))}
-                  </div>
-                ))}
+              {(abierto || isCollapsed) && modulos.map((id) => <Item key={id} id={id} />)}
             </div>
           );
         })}
@@ -482,15 +390,12 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
           ))}
       </nav>
 
-      {/* ─── PIE: SALDO, AJUSTES Y EL BOTÓN DE COLAPSAR ────────────────────*/}
-      <div className={`grid shrink-0 gap-2 ${isCollapsed ? 'justify-items-center p-4' : 'p-[14px]'}`}>
+      {/* ─── PIE ANCLADO: SALDO, AJUSTES Y EL BOTÓN DE COLAPSAR ────────────*/}
+      <div className="cn-rail-pie">
         {/* SALDO. Vive en la barra y no en un menú: es lo único que puede
             detener el trabajo a mitad de un término. */}
         {!isCollapsed ? (
-          <div
-            data-visita="saldo"
-            className="rounded-2xl border border-rail-ink/10 bg-rail-surface p-4"
-          >
+          <div data-visita="saldo" className="cn-rail-saldo">
             {/*
               DOS DINEROS DISTINTOS, UNO ENCIMA DEL OTRO Y NO UNO AL LADO DEL
               OTRO. Arriba el saldo, que es consumo: se gasta escribiendo y se
@@ -499,40 +404,36 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
               dos enlaces gemelos en el mismo renglón parecían la misma puerta
               con dos nombres, y el titular lo leyó así.
             */}
-            <div className="flex items-baseline gap-3">
-              <span className={`${ROTULO} !text-rail-ink/[.38]`}>Saldo</span>
-              <button
-                type="button"
-                onClick={onOpenRechargeModal || onOpenSubscriptionModal}
-                className="ml-auto text-[12px] font-semibold text-rail-gold-ink hover:underline"
-              >
-                Recargar
-              </button>
-            </div>
-            {/* En mono porque es un dato, no interfaz. */}
-            <p className="mt-1.5 font-mono text-[27px] font-semibold leading-none tracking-[-0.03em] text-rail-ink">
-              {saldoTexto}
-            </p>
+            <p className="cn-rail-saldo-rotulo">Saldo</p>
+            {/* En mono porque es un dato citable, no interfaz (README-app §1). */}
+            <p className="cn-rail-saldo-cifra">{saldoTexto}</p>
+            <button
+              type="button"
+              onClick={onOpenRechargeModal || onOpenSubscriptionModal}
+              className="cn-rail-recargar"
+            >
+              Recargar
+            </button>
             <button
               type="button"
               onClick={onOpenSubscriptionModal}
               title="Ver el plan de la firma"
-              className="mt-3 flex w-full items-center gap-2 border-t border-rail-ink/10 pt-2.5 text-left text-[11px] text-rail-faint transition-colors hover:text-rail-ink"
+              className="cn-rail-plan"
             >
               <span className="min-w-0 flex-1 truncate">{nota ?? 'Ver el plan'}</span>
-              <ChevronRight className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              <ChevronRight className="h-4 w-4 shrink-0" aria-hidden />
             </button>
-            {/* La barra mide el periodo del plan, así que va con el plan. */}
+            {/* La barra mide el periodo del plan, así que va con el plan. Azul y no oro: el oro es solo del módulo activo. */}
             {fraccion !== null && (
               <div
-                className="mt-2 h-[3px] overflow-hidden rounded-full bg-rail-ink/10"
+                className="cn-rail-periodo"
                 role="progressbar"
                 aria-label="Parte del periodo del plan que queda"
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-valuenow={Math.round(fraccion * 100)}
               >
-                <i className="block h-full rounded-full bg-rail-gold" style={{ width: `${fraccion * 100}%` }} />
+                <i style={{ width: `${fraccion * 100}%` }} />
               </div>
             )}
           </div>
@@ -544,15 +445,12 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
               onClick={onOpenRechargeModal || onOpenSubscriptionModal}
               title={`Saldo ${saldoTexto}${nota ? ` · ${nota}` : ''} · Recargar`}
               aria-label={`Saldo ${saldoTexto}. Recargar`}
-              className="grid w-12 place-items-center gap-px rounded-[14px] border border-rail-ink/10 bg-rail-surface py-2 hover:border-rail-ink/20"
+              className="cn-rail-saldo-ficha"
             >
-              <span className="text-[8.5px] font-semibold uppercase tracking-[0.1em] text-rail-faint">Saldo</span>
-              <span className="font-mono text-[12.5px] font-semibold text-rail-ink">{saldoCompacto(saldo)}</span>
+              <span className="cn-rail-saldo-ficha-rotulo">Saldo</span>
+              <span className="cn-rail-saldo-ficha-cifra">{saldoCompacto(saldo)}</span>
             </button>
-            <span
-              className="py-2 text-[9.5px] font-semibold tracking-[0.32em] text-rail-ink/[.28] [writing-mode:vertical-rl] rotate-180"
-              aria-hidden
-            >
+            <span className="cn-rail-vertical" aria-hidden>
               IUREON
             </span>
           </>
@@ -560,21 +458,17 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
 
         {/* MEMBRETE Y AVISOS. Ajustes del aparato y de la firma, no módulos:
             van en una fila pareja, cada uno con la mitad del ancho, para que
-            se lean como dos cosas del mismo rango. El sello de versión salía
-            aquí mismo, empujado a la derecha, y partía el renglón en dos:
-            ahora vive solo, bajo el botón de colapsar, que es donde termina
-            la barra y donde no estorba. */}
-        <div className={`flex ${isCollapsed ? 'flex-col items-center gap-0.5' : 'gap-1'}`}>
+            se lean como dos cosas del mismo rango. El sello de versión vive
+            solo, bajo el botón de colapsar, que es donde termina la barra. */}
+        <div className="cn-rail-ajustes">
           <button
             type="button"
             onClick={onOpenBrandingModal}
             title="Membrete de la firma"
             aria-label="Membrete de la firma"
-            className={`flex items-center gap-1.5 rounded-[10px] text-[11.5px] text-rail-muted transition-colors hover:bg-rail-ink/5 hover:text-rail-ink ${
-              isCollapsed ? 'h-8 w-8 justify-center' : 'h-8 flex-1 justify-center'
-            }`}
+            className="cn-rail-ajuste"
           >
-            <Settings className="h-3.5 w-3.5 shrink-0" strokeWidth={1.8} />
+            <Settings className="h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden />
             {!isCollapsed && <span>Membrete</span>}
           </button>
 
@@ -584,11 +478,9 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
               onClick={onOpenAvisos}
               title="Avisos en este dispositivo"
               aria-label="Avisos en este dispositivo"
-              className={`flex items-center gap-1.5 rounded-[10px] text-[11.5px] text-rail-muted transition-colors hover:bg-rail-ink/5 hover:text-rail-ink ${
-                isCollapsed ? 'h-8 w-8 justify-center' : 'h-8 flex-1 justify-center'
-              }`}
+              className="cn-rail-ajuste"
             >
-              <Bell className="h-3.5 w-3.5 shrink-0" strokeWidth={1.8} />
+              <Bell className="h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden />
               {!isCollapsed && <span>Avisos</span>}
             </button>
           )}
@@ -605,13 +497,11 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
           aria-expanded={!isCollapsed}
           aria-label={isCollapsed ? 'Desplegar panel' : 'Colapsar panel'}
           title={isCollapsed ? 'Desplegar panel' : 'Colapsar panel'}
-          className={`flex h-10 items-center justify-center gap-[9px] border border-rail-ink/10 bg-rail-surface text-[12.5px] font-medium text-rail-muted transition-colors hover:border-rail-ink/20 hover:text-rail-ink ${
-            isCollapsed ? 'w-12 rounded-[14px]' : 'w-full rounded-[12px]'
-          }`}
+          className="cn-rail-colapsar"
         >
           <svg
-            width="15"
-            height="15"
+            width="16"
+            height="16"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -641,15 +531,11 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
           }}
           title={`Versión ${__COMMIT__} · ver qué cambió`}
           aria-label={`Versión ${__COMMIT__}. Ver qué cambió`}
-          className={`relative mx-auto flex items-center justify-center gap-1.5 rounded-[10px] py-0.5 font-mono text-[9px] tracking-wider text-rail-faint transition-colors hover:text-rail-muted ${
-            isCollapsed ? 'w-12' : 'w-full'
-          }`}
+          className="cn-rail-version"
         >
           {novedadesNuevas > 0 && (
             <span
-              className={`h-1.5 w-1.5 shrink-0 rounded-full bg-rail-gold ${
-                isCollapsed ? 'absolute right-1.5 top-0.5' : ''
-              }`}
+              className={`cn-rail-punto ${isCollapsed ? 'cn-rail-punto--esquina' : ''}`}
               aria-hidden
             />
           )}

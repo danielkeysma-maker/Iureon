@@ -188,7 +188,7 @@ export const RegistroView: React.FC<RegistroViewProps> = ({ modo, plan, onLoginS
       : `Crear la firma y probar ${DIAS_DE_PRUEBA_GRATUITA} días`;
 
   return (
-    <div className="cara-nueva">
+    <div className="cara-nueva cara-nueva--pagina">
       <main className="cn-columna cn-columna--ancha">
         <div className="cn-columna-cuerpo">
           <div className="cn-marca">

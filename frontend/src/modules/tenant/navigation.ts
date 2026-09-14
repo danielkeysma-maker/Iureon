@@ -155,6 +155,37 @@ export const NAV_GROUPS: NavGroup[] = [
 ];
 
 /**
+ * EL NUMERAL DE CADA MÓDULO, FIJO POR IDENTIDAD Y NO POR LO QUE SE VE.
+ *
+ * Antes el panel contaba solo los módulos visibles: a una firma Esencial, sin
+ * Orientación, Expedientes pasaba de «05» a «04» y todo lo de abajo corría un
+ * puesto. El numeral dejaba de ser un nombre y se volvía una posición, y el
+ * manual, el diseño (README-app §1: Producir 01–04 · Registrar 05–07 ·
+ * Consultar 08–10 · Aprender 11–12, igual que `plan.catalog.ts`) y el soporte
+ * no pueden decir «vaya al 05» si el 05 cambia de firma a firma. Ahora un
+ * módulo oculto deja su número sin usar, como una página arrancada de un
+ * índice, y el resto conserva el suyo.
+ *
+ * Se calcula una sola vez del orden de `NAV_GROUPS`, saltando Inicio, que es la
+ * casa y no una entrada del índice. «Administrar» sigue la cuenta (13–15), que
+ * es lo que ya mostraba el panel cuando nada estaba oculto: sus módulos no los
+ * recorta ningún plan, así que su número tampoco se movía, y la columna del
+ * índice queda alineada al desplegar el grupo.
+ */
+export const NUMERAL_DE_MODULO: Readonly<Partial<Record<MainView, string>>> = (() => {
+  const numerales: Partial<Record<MainView, string>> = {};
+  let n = 0;
+  for (const grupo of NAV_GROUPS) {
+    for (const id of grupo.modulos) {
+      if (id === 'inicio') continue;
+      n += 1;
+      numerales[id] = String(n).padStart(2, '0');
+    }
+  }
+  return numerales;
+})();
+
+/**
  * Comprueba que los grupos cubren todos los módulos, sin sobras ni faltantes.
  *
  * Un módulo que se agregue a `NAV_MODULES` y no a un grupo desaparece de la

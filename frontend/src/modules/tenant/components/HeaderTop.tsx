@@ -4,6 +4,7 @@ import type { EstadoBorrador } from '../../documents/types';
 import { ActionConfirmationModal } from './ActionConfirmationModal';
 import type { MainView } from '../types';
 import { navModule } from '../navigation';
+import '../../../design/cara-nueva.css';
 
 interface HeaderTopProps {
   mainView: MainView;
@@ -51,6 +52,12 @@ interface HeaderTopProps {
  * era exportar a PDF — y el rojo, que en este sistema significa destruir algo,
  * estaba puesto sobre guardar una copia. Ahora los dos son secundarios y van
  * unidos como un solo control de dos mitades.
+ *
+ * LA CARA NUEVA (README-app §1). Los botones pierden el contorno: secundario
+ * sobre gris #F1F3F6, primario sólido, terciario sin fondo; todos de 44 px, el
+ * alto de los botones del artboard de Inicio, y por eso la barra pasa de 46 a
+ * 60. El título sube a 16 px porque la escala nueva no baja de 14. Mismas
+ * acciones, en el mismo orden y con las mismas condiciones.
  */
 export const HeaderTop: React.FC<HeaderTopProps> = ({
   mainView,
@@ -104,232 +111,240 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
   const enTaller = mainView === 'workspace';
 
   return (
-    <header className="z-20 flex h-[46px] shrink-0 select-none items-center gap-3 border-b border-line-200 bg-surface px-5 font-sans">
-      <h1 className="min-w-0 truncate text-[14px] font-semibold text-ink-900">
-        {enTaller ? tituloDelEscrito || 'Escrito sin título' : modulo.label}
-      </h1>
+    <>
+      <header className="cara-nueva cn-cab">
+        <h1 className="cn-cab-titulo">
+          {enTaller ? tituloDelEscrito || 'Escrito sin título' : modulo.label}
+        </h1>
 
-      {/*
-        EL RADICADO SE VA EN MOVIL. Son veintitres digitos que no se encogen y
-        el bloque de la derecha tampoco, asi que a 375px empujaban la cabecera
-        fuera de la pantalla. El titulo del escrito es lo que orienta al volver
-        a una pestaña; el radicado se lee en la configuracion del taller, que en
-        movil es donde 4d lo pone.
-      */}
-      {radicado && enTaller && (
-        <span className="hidden shrink-0 font-mono text-[11.5px] text-ink-400 sm:inline">
-          {radicado}
-        </span>
-      )}
-
-      {/*
-        ESTE BLOQUE ERA EL QUE RECORTABA TODA LA APLICACION EN MOVIL.
-
-        Son ocho controles `shrink-0` en una fila que no envuelve: a 375px miden
-        mas que la pantalla, empujaban la cabecera fuera del ancho y, como la
-        raiz es `overflow-hidden`, TODO quedaba cortado. Se reporto como «las
-        pantallas se ven recortadas» y no era de cada vista: era la unica pieza
-        que todas comparten. El login se veia bien porque es la unica pantalla
-        que no monta esta cabecera.
-
-        `min-w-0` le permite ceder ancho —sin el, `shrink-0` en los hijos hace
-        que el contenedor imponga su tamaño al padre— y `overflow-x-auto`
-        contiene el sobrante DENTRO del bloque en vez de repartirlo por la
-        pagina. Ninguna accion se esconde: se desplazan entre ellas.
-
-        PENDIENTE DECLARADO: 4d no quiere estas acciones en la cabecera movil.
-        Quiere el primario de 48px fijo sobre la barra de pestañas con el costo
-        debajo, y la exportacion en la pantalla del documento. Eso es rehacer la
-        cabecera por tamaño; esto evita que rompa el resto mientras tanto.
-      */}
-      <div className="ml-auto flex min-w-0 shrink items-center gap-1.5 overflow-x-auto lg:shrink-0 lg:overflow-x-visible">
-        {enTaller && (
-          <>
-            {/*
-              Documento contra expediente. Pestañas subrayadas y no un
-              interruptor de dos colores: se navega dentro de la misma pantalla,
-              no se alterna un contexto.
-            */}
-            <div className="mr-1 flex items-center gap-1">
-              {(
-                [
-                  ['draft', 'Documento'],
-                  ['pdf', 'Expediente']
-                ] as const
-              ).map(([valor, etiqueta]) => (
-                <button
-                  key={valor}
-                  onClick={() => setRightView(valor)}
-                  className={`rounded-control px-2.5 py-1.5 text-meta font-medium transition-colors ${
-                    rightView === valor
-                      ? 'bg-brand-50 text-brand-700'
-                      : 'text-ink-500 hover:text-ink-900'
-                  }`}
-                >
-                  {etiqueta}
-                </button>
-              ))}
-            </div>
-
-            {rightView === 'draft' && (
-              <>
-                <button onClick={onCopyText} className="btn-neutral btn-sm">
-                  {copied ? (
-                    <Check className="h-3.5 w-3.5 text-verified" />
-                  ) : (
-                    <Copy className="h-3.5 w-3.5 text-ink-400" />
-                  )}
-                  {copied ? 'Copiado' : 'Copiar'}
-                </button>
-
-                {/*
-                  Word y PDF unidos: son la misma acción con dos formatos, y
-                  separarlos en dos botones de colores distintos convertía una
-                  decisión de formato en dos decisiones.
-                */}
-                <div ref={opcionesRef} className="relative flex">
-                  <button
-                    onClick={() => onExportWord(opciones())}
-                    className="btn-secondary btn-sm rounded-r-none"
-                    title="Word conserva estilos y numeración editables"
-                  >
-                    <FileText className="h-3 w-3" />
-                    Word
-                  </button>
-                  <button
-                    onClick={() => onExportPdf(opciones())}
-                    className="btn-secondary btn-sm -ml-px rounded-none"
-                    title="El PDF sale en papel blanco, aunque la app esté en oscuro"
-                  >
-                    PDF
-                  </button>
-                  {/* La tercera mitad del grupo: cómo sale, no a qué formato. */}
-                  <button
-                    onClick={() => setOpcionesAbiertas((v) => !v)}
-                    aria-label="Opciones de exportación"
-                    aria-expanded={opcionesAbiertas}
-                    className="btn-secondary btn-sm -ml-px rounded-l-none px-1.5"
-                  >
-                    <ChevronDown className="h-3 w-3" />
-                  </button>
-
-                  {opcionesAbiertas && (
-                    <div className="surface-raised absolute right-0 top-full z-40 mt-1 w-[240px] p-3">
-                      <p className="mb-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-                        Al exportar
-                      </p>
-
-                      <label className="flex cursor-pointer items-start gap-2 py-1">
-                        <input
-                          type="checkbox"
-                          checked={conMembrete}
-                          onChange={(e) => setConMembrete(e.target.checked)}
-                          className="mt-0.5"
-                        />
-                        <span className="text-ui text-ink-900">Membrete de la firma</span>
-                      </label>
-
-                      {/*
-                        La casilla solo existe cuando hay fuentes que anexar.
-                        Ofrecer una hoja vacía es prometer lo que la exportación
-                        no va a cumplir.
-                      */}
-                      {hayFuentes && (
-                        <label className="flex cursor-pointer items-start gap-2 py-1">
-                          <input
-                            type="checkbox"
-                            checked={conFuentes}
-                            onChange={(e) => setConFuentes(e.target.checked)}
-                            className="mt-0.5"
-                          />
-                          <span className="text-ui text-ink-900">
-                            Anexar hoja de fuentes citadas
-                          </span>
-                        </label>
-                      )}
-
-                      <p className="mt-2 border-t border-line-100 pt-2 text-meta leading-[1.5] text-ink-500">
-                        Word conserva estilos editables. El PDF sale en papel blanco, aunque la
-                        aplicación esté en oscuro.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/*
-                  EL PRIMARIO ES MARCAR LISTO, NO EXPORTAR. Exportar es un
-                  medio; el estado del borrador es lo que la firma necesita
-                  registrar. Solo aparece con un borrador guardado abierto y
-                  todavía sin ese estado.
-                */}
-                {onMarcarListo &&
-                  estadoDelBorrador &&
-                  estadoDelBorrador !== 'LISTO' &&
-                  estadoDelBorrador !== 'RADICADO' && (
-                    <button onClick={onMarcarListo} className="btn-primary btn-sm">
-                      <PenLine className="h-3 w-3" />
-                      Marcar listo para firma
-                    </button>
-                  )}
-
-                {onToggleFocusMode && (
-                  <button
-                    onClick={onToggleFocusMode}
-                    className="btn-neutral btn-sm"
-                    title={
-                      isFocusMode
-                        ? 'Volver a la vista dividida'
-                        : 'Ver el documento a pantalla completa'
-                    }
-                  >
-                    {isFocusMode ? (
-                      <Minimize2 className="h-3.5 w-3.5 text-ink-400" />
-                    ) : (
-                      <Maximize2 className="h-3.5 w-3.5 text-ink-400" />
-                    )}
-                    {isFocusMode ? 'Vista dividida' : 'Pantalla completa'}
-                  </button>
-                )}
-              </>
-            )}
-          </>
+        {/*
+          EL RADICADO SE VA EN MOVIL. Son veintitres digitos que no se encogen y
+          el bloque de la derecha tampoco, asi que a 375px empujaban la cabecera
+          fuera de la pantalla. El titulo del escrito es lo que orienta al volver
+          a una pestaña; el radicado se lee en la configuracion del taller, que en
+          movil es donde 4d lo pone.
+        */}
+        {radicado && enTaller && (
+          <span className="cn-cab-radicado hidden sm:inline">{radicado}</span>
         )}
 
         {/*
-          SUPERUSUARIO Y CERRAR SESIÓN.
+          ESTE BLOQUE ERA EL QUE RECORTABA TODA LA APLICACION EN MOVIL.
 
-          Llevaban el tratamiento más pesado del producto: slate-900 sólido,
-          negrita, radio distinto del de las pestañas. El resultado era que el
-          elemento más llamativo de la pantalla era un panel de administración y
-          el segundo un "Cerrar Sesión" rojo, mientras el trabajo de verdad
-          —redactar— quedaba en gris debajo.
+          Son ocho controles `shrink-0` en una fila que no envuelve: a 375px miden
+          mas que la pantalla, empujaban la cabecera fuera del ancho y, como la
+          raiz es `overflow-hidden`, TODO quedaba cortado. Se reporto como «las
+          pantallas se ven recortadas» y no era de cada vista: era la unica pieza
+          que todas comparten. El login se veia bien porque es la unica pantalla
+          que no monta esta cabecera.
 
-          Siguen siendo secundarios. El rojo se reserva para lo que destruye
-          algo, y salir de una sesión no destruye nada.
+          `min-w-0` le permite ceder ancho —sin el, `shrink-0` en los hijos hace
+          que el contenedor imponga su tamaño al padre— y `overflow-x-auto`
+          contiene el sobrante DENTRO del bloque en vez de repartirlo por la
+          pagina. Ninguna accion se esconde: se desplazan entre ellas.
+
+          PENDIENTE DECLARADO: 4d no quiere estas acciones en la cabecera movil.
+          Quiere el primario de 48px fijo sobre la barra de pestañas con el costo
+          debajo, y la exportacion en la pantalla del documento. Eso es rehacer la
+          cabecera por tamaño; esto evita que rompa el resto mientras tanto.
         */}
-        {onOpenUserManagementModal && (
-          <button
-            onClick={onOpenUserManagementModal}
-            className="btn-neutral btn-sm"
-            title="Firmas, usuarios y autenticación"
-          >
-            <Shield className="h-3.5 w-3.5 text-ink-400" />
-            <span className="hidden lg:inline">Firmas</span>
-          </button>
-        )}
+        <div className="cn-cab-acciones flex min-w-0 shrink items-center overflow-x-auto lg:shrink-0 lg:overflow-x-visible">
+          {enTaller && (
+            <>
+              {/*
+                Documento contra expediente. Pestañas y no un interruptor de dos
+                colores: se navega dentro de la misma pantalla, no se alterna un
+                contexto.
+              */}
+              <div className="cn-cab-pestanas">
+                {(
+                  [
+                    ['draft', 'Documento'],
+                    ['pdf', 'Expediente']
+                  ] as const
+                ).map(([valor, etiqueta]) => (
+                  <button
+                    key={valor}
+                    type="button"
+                    onClick={() => setRightView(valor)}
+                    aria-pressed={rightView === valor}
+                    className={`cn-cab-pestana ${rightView === valor ? 'cn-cab-pestana--activa' : ''}`}
+                  >
+                    {etiqueta}
+                  </button>
+                ))}
+              </div>
 
-        {onLogout && (
-          <button
-            onClick={() => setIsLogoutConfirmOpen(true)}
-            className="btn-ghost btn-sm"
-            title="Cerrar sesión"
-            aria-label="Cerrar sesión"
-          >
-            <LogOut className="h-3.5 w-3.5 text-ink-400" />
-          </button>
-        )}
-      </div>
+              {rightView === 'draft' && (
+                <>
+                  <button type="button" onClick={onCopyText} className="cn-cab-boton">
+                    {copied ? (
+                      <Check className="cn-cab-ok h-4 w-4" aria-hidden />
+                    ) : (
+                      <Copy className="h-4 w-4" aria-hidden />
+                    )}
+                    {copied ? 'Copiado' : 'Copiar'}
+                  </button>
 
+                  {/*
+                    Word y PDF unidos: son la misma acción con dos formatos, y
+                    separarlos en dos botones de colores distintos convertía una
+                    decisión de formato en dos decisiones.
+                  */}
+                  <div ref={opcionesRef} className="cn-cab-grupo">
+                    <button
+                      type="button"
+                      onClick={() => onExportWord(opciones())}
+                      className="cn-cab-boton cn-cab-boton--izq"
+                      title="Word conserva estilos y numeración editables"
+                    >
+                      <FileText className="h-4 w-4" aria-hidden />
+                      Word
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onExportPdf(opciones())}
+                      className="cn-cab-boton"
+                      title="El PDF sale en papel blanco, aunque la app esté en oscuro"
+                    >
+                      PDF
+                    </button>
+                    {/* La tercera mitad del grupo: cómo sale, no a qué formato. */}
+                    <button
+                      type="button"
+                      onClick={() => setOpcionesAbiertas((v) => !v)}
+                      aria-label="Opciones de exportación"
+                      aria-expanded={opcionesAbiertas}
+                      className="cn-cab-boton cn-cab-boton--der"
+                    >
+                      <ChevronDown className="h-4 w-4" aria-hidden />
+                    </button>
+
+                    {opcionesAbiertas && (
+                      <div className="cn-cab-pop">
+                        <p className="cn-cab-pop-rotulo">Al exportar</p>
+
+                        <label className="cn-cab-pop-casilla">
+                          <input
+                            type="checkbox"
+                            checked={conMembrete}
+                            onChange={(e) => setConMembrete(e.target.checked)}
+                          />
+                          <span>Membrete de la firma</span>
+                        </label>
+
+                        {/*
+                          La casilla solo existe cuando hay fuentes que anexar.
+                          Ofrecer una hoja vacía es prometer lo que la exportación
+                          no va a cumplir.
+                        */}
+                        {hayFuentes && (
+                          <label className="cn-cab-pop-casilla">
+                            <input
+                              type="checkbox"
+                              checked={conFuentes}
+                              onChange={(e) => setConFuentes(e.target.checked)}
+                            />
+                            <span>Anexar hoja de fuentes citadas</span>
+                          </label>
+                        )}
+
+                        <p className="cn-cab-pop-nota">
+                          Word conserva estilos editables. El PDF sale en papel blanco, aunque la
+                          aplicación esté en oscuro.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/*
+                    EL PRIMARIO ES MARCAR LISTO, NO EXPORTAR. Exportar es un
+                    medio; el estado del borrador es lo que la firma necesita
+                    registrar. Solo aparece con un borrador guardado abierto y
+                    todavía sin ese estado.
+                  */}
+                  {onMarcarListo &&
+                    estadoDelBorrador &&
+                    estadoDelBorrador !== 'LISTO' &&
+                    estadoDelBorrador !== 'RADICADO' && (
+                      <button
+                        type="button"
+                        onClick={onMarcarListo}
+                        className="cn-cab-boton cn-cab-boton--primario"
+                      >
+                        <PenLine className="h-4 w-4" aria-hidden />
+                        Marcar listo para firma
+                      </button>
+                    )}
+
+                  {onToggleFocusMode && (
+                    <button
+                      type="button"
+                      onClick={onToggleFocusMode}
+                      className="cn-cab-boton"
+                      title={
+                        isFocusMode
+                          ? 'Volver a la vista dividida'
+                          : 'Ver el documento a pantalla completa'
+                      }
+                    >
+                      {isFocusMode ? (
+                        <Minimize2 className="h-4 w-4" aria-hidden />
+                      ) : (
+                        <Maximize2 className="h-4 w-4" aria-hidden />
+                      )}
+                      {isFocusMode ? 'Vista dividida' : 'Pantalla completa'}
+                    </button>
+                  )}
+                </>
+              )}
+            </>
+          )}
+
+          {/*
+            SUPERUSUARIO Y CERRAR SESIÓN.
+
+            Llevaban el tratamiento más pesado del producto: slate-900 sólido,
+            negrita, radio distinto del de las pestañas. El resultado era que el
+            elemento más llamativo de la pantalla era un panel de administración y
+            el segundo un "Cerrar Sesión" rojo, mientras el trabajo de verdad
+            —redactar— quedaba en gris debajo.
+
+            Siguen siendo secundarios. El rojo se reserva para lo que destruye
+            algo, y salir de una sesión no destruye nada.
+          */}
+          {onOpenUserManagementModal && (
+            <button
+              type="button"
+              onClick={onOpenUserManagementModal}
+              className="cn-cab-boton"
+              title="Firmas, usuarios y autenticación"
+            >
+              <Shield className="h-4 w-4" aria-hidden />
+              <span className="hidden lg:inline">Firmas</span>
+            </button>
+          )}
+
+          {onLogout && (
+            <button
+              type="button"
+              onClick={() => setIsLogoutConfirmOpen(true)}
+              className="cn-cab-boton cn-cab-boton--fantasma"
+              title="Cerrar sesión"
+              aria-label="Cerrar sesión"
+            >
+              <LogOut className="h-4 w-4" aria-hidden />
+            </button>
+          )}
+        </div>
+      </header>
+
+      {/*
+        EL DIÁLOGO VA FUERA DE `.cara-nueva`. Es una pieza compartida que todavía
+        no se ha rediseñado; dentro de la cabecera habría heredado la letra y los
+        reinicios de la cara nueva y se vería distinto aquí que en el resto de la
+        aplicación. Es `fixed`, así que salir del <header> no lo mueve de sitio.
+      */}
       <ActionConfirmationModal
         isOpen={isLogoutConfirmOpen}
         title="¿Cerrar la sesión en este dispositivo?"
@@ -344,6 +359,6 @@ export const HeaderTop: React.FC<HeaderTopProps> = ({
         }}
         onCancel={() => setIsLogoutConfirmOpen(false)}
       />
-    </header>
+    </>
   );
 };

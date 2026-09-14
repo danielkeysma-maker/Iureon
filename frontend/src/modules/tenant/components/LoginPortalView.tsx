@@ -97,7 +97,7 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
   };
 
   return (
-    <div className="cara-nueva">
+    <div className="cara-nueva cara-nueva--pagina">
       <main className="cn-columna">
         <div className="cn-columna-cuerpo">
           <div className="cn-marca">

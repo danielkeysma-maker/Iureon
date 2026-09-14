@@ -5,37 +5,39 @@ import { navModule } from '../navigation';
 import { IureonMark } from './IureonMark';
 import type { MainView } from '../types';
 import type { EstadoBorrador } from '../../documents/types';
+import '../../../design/cara-nueva.css';
 
 /**
- * La cabecera de móvil. Artboard 4d — leída de la maqueta, no deducida.
+ * La cabecera de móvil. Artboard 2 de `public/handoff/app-inicio.html` en su
+ * aspecto; artboard 4d en lo que dice.
  *
- * Medidas COPIADAS del HTML del artboard, no estimadas:
+ * ─── EL ASPECTO: LA BARRA DE 56 PX DEL ARTBOARD 2 ───────────────────────────
  *
- *     height:52px; background:#fff; border-bottom:1px solid #E3E7EC;
- *     display:flex; align-items:center; gap:10px; padding:0 16px
+ * 56 px de alto sobre el lienzo blanco, sin raya inferior; el isotipo a la
+ * izquierda y botones de 44×44 sin contorno, radio 12, a la derecha. El botón
+ * de menú perdió su borde gris: en el sistema nuevo los botones no llevan
+ * contorno.
  *
- * Título `600 15px` en `#101822`; subtítulo `400 11px` en MONO y `#8B96A6`; el
- * botón `34x34` con `border-radius:8px` y borde `#E3E7EC`.
+ * El artboard dibuja además una lupa. NO SE PONE: la aplicación no tiene una
+ * búsqueda global, y un botón que no busca nada en la barra más visible del
+ * teléfono es una promesa rota. El día que exista, va a la izquierda del menú.
  *
- * ─── QUÉ MUESTRA 4d, Y QUÉ MOSTRABA LA DE ESCRITORIO ────────────────────────
+ * ─── LO QUE DICE: 4d ────────────────────────────────────────────────────────
  *
  * La maqueta pone **el nombre del módulo** en negrita —«Redactar»— y debajo, en
- * gris pequeño, **de qué caso se trata**: «Mosquera vs. Colpensiones». A la
- * derecha, un solo botón de menú.
- *
- * La de escritorio ponía el título del escrito truncado a «Escrito sin t…» y a
- * su lado las pestañas Documento/Expediente más ocho acciones. En 375px eso
- * medía 533 y cortaba la aplicación entera. Pero el problema no era solo el
- * ancho: era que **la cabecera no decía dónde estaba uno**. En escritorio lo
- * dice la barra lateral, que en el teléfono no existe.
+ * gris, **de qué caso se trata**: «Mosquera vs. Colpensiones». El artboard 2
+ * escribe «IUREON» junto al isotipo porque es Inicio; aquí se conserva el
+ * nombre del módulo, porque **la cabecera es lo único que dice dónde está uno**:
+ * en escritorio lo dice la barra lateral, que en el teléfono no existe. El
+ * subtítulo deja el mono: es el caso o una cuenta de escritos, no un dato
+ * citable (README-app §1).
  *
  * ─── EL MENÚ RECOGE LAS ACCIONES QUE ANTES ESTABAN SUELTAS ──────────────────
  *
- * Copiar, Word, PDF y «listo para firma» viven ahora en una hoja que se abre al
- * tocar el menú. Esto además cierra una regresión declarada: al contener el
- * desborde de la cabecera con `overflow-x-auto`, el desplegable de exportación
- * quedaba recortado por su propio contenedor. En una hoja no hay nada que
- * recortar.
+ * Copiar, Word, PDF y «listo para firma» viven en una hoja que se abre al tocar
+ * el menú. Esto además cierra una regresión declarada: al contener el desborde
+ * de la cabecera con `overflow-x-auto`, el desplegable de exportación quedaba
+ * recortado por su propio contenedor. En una hoja no hay nada que recortar.
  *
  * ─── LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón ───────────────────
  *
@@ -72,11 +74,9 @@ const Accion: React.FC<{
   <button
     type="button"
     onClick={onClick}
-    className={`flex min-h-[48px] w-full items-center gap-3 rounded-control px-3 text-left text-[13.5px] ${
-      destacada ? 'bg-brand-50 font-semibold text-brand-700' : 'text-ink-900'
-    }`}
+    className={`cn-hoja-accion ${destacada ? 'cn-hoja-accion--destacada' : ''}`}
   >
-    <span className={destacada ? 'text-brand-700' : 'text-ink-400'}>{icono}</span>
+    <span className="cn-hoja-accion-icono">{icono}</span>
     {children}
   </button>
 );
@@ -106,7 +106,8 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
 
   return (
     <>
-      <header className="flex h-[52px] shrink-0 items-center gap-2.5 border-b border-line-200 bg-surface px-4 lg:hidden">
+      {/* `flex` y `lg:hidden` quedan en Tailwind: la hoja nueva no declara `display` para no ganarle al corte de escritorio. */}
+      <header className="cara-nueva cn-mcab flex lg:hidden">
         {/* La marca lleva al inicio, igual que en la barra lateral de escritorio. */}
         <button
           type="button"
@@ -114,52 +115,48 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
           data-visita="marca"
           title="Ir al inicio"
           aria-label="Ir al inicio"
-          className="flex h-[34px] w-[34px] shrink-0 cursor-pointer items-center justify-center rounded-[8px]"
+          className="cn-mcab-boton"
         >
-          <IureonMark size={24} />
+          <IureonMark size={22} />
         </button>
-        <div className="min-w-0 flex-1">
-          <h1 className="truncate text-[15px] font-semibold leading-tight text-ink-900">
-            {modulo.label}
-          </h1>
-          {subtitulo && (
-            <p className="truncate font-mono text-[11px] leading-tight text-ink-400">{subtitulo}</p>
-          )}
+        <div className="cn-mcab-textos">
+          <h1 className="cn-mcab-titulo">{modulo.label}</h1>
+          {subtitulo && <p className="cn-mcab-sub">{subtitulo}</p>}
         </div>
 
         <button
           type="button"
           onClick={() => setMenu(true)}
           aria-label="Acciones"
-          className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[8px] border border-line-200 text-ink-700"
+          className="cn-mcab-boton"
         >
-          <IconoMenu className="h-4 w-4" />
+          <IconoMenu className="h-5 w-5" />
         </button>
       </header>
 
       {menu && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end lg:hidden">
+        <div className="cara-nueva fixed inset-0 z-50 flex flex-col justify-end lg:hidden">
           <button
             type="button"
             aria-label="Cerrar"
             onClick={() => setMenu(false)}
-            className="flex-1 bg-black/40"
+            className="cn-hoja-velo"
           />
 
-          <div className="rounded-t-card border-t border-line-200 bg-surface pb-[env(safe-area-inset-bottom)]">
-            <header className="flex items-center justify-between border-b border-line-200 px-4 py-3">
-              <h2 className="text-[14px] font-semibold text-ink-900">Acciones</h2>
+          <div className="cn-hoja">
+            <header className="cn-hoja-cabeza">
+              <h2 className="cn-hoja-titulo">Acciones</h2>
               <button
                 type="button"
                 onClick={() => setMenu(false)}
                 aria-label="Cerrar"
-                className="flex h-11 w-11 items-center justify-center text-ink-500"
+                className="cn-hoja-cerrar"
               >
                 <X className="h-5 w-5" />
               </button>
             </header>
 
-            <div className="space-y-0.5 p-2">
+            <div className="cn-hoja-lista">
               {enTaller && (
                 <>
                   {/*
@@ -170,7 +167,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
                   */}
                   {onMarcarListo && estadoDelBorrador && estadoDelBorrador !== 'LISTO' && (
                     <Accion
-                      icono={<IconoPalomita className="h-4 w-4" />}
+                      icono={<IconoPalomita className="h-5 w-5" />}
                       onClick={cerrarY(onMarcarListo)}
                       destacada
                     >
@@ -178,17 +175,17 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
                     </Accion>
                   )}
 
-                  <Accion icono={<Copy className="h-4 w-4" />} onClick={cerrarY(onCopyText)}>
+                  <Accion icono={<Copy className="h-5 w-5" />} onClick={cerrarY(onCopyText)}>
                     {copied ? 'Copiado' : 'Copiar el texto'}
                   </Accion>
                   <Accion
-                    icono={<FileText className="h-4 w-4" />}
+                    icono={<FileText className="h-5 w-5" />}
                     onClick={cerrarY(() => onExportWord(sinOpciones))}
                   >
                     Exportar a Word
                   </Accion>
                   <Accion
-                    icono={<FileDown className="h-4 w-4" />}
+                    icono={<FileDown className="h-5 w-5" />}
                     onClick={cerrarY(() => onExportPdf(sinOpciones))}
                   >
                     Exportar a PDF
@@ -198,14 +195,14 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
 
               {onAbrirGestion && (
                 <Accion
-                  icono={<ShieldCheck className="h-4 w-4" />}
+                  icono={<ShieldCheck className="h-5 w-5" />}
                   onClick={cerrarY(onAbrirGestion)}
                 >
                   Firmas y usuarios
                 </Accion>
               )}
 
-              <Accion icono={<LogOut className="h-4 w-4" />} onClick={cerrarY(onLogout)}>
+              <Accion icono={<LogOut className="h-5 w-5" />} onClick={cerrarY(onLogout)}>
                 Cerrar sesión
               </Accion>
             </div>

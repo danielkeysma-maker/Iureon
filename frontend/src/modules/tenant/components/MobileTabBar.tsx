@@ -9,29 +9,34 @@ import {
 } from '../../../design/ArtboardIcons';
 import { NAV_MODULES } from '../navigation';
 import type { MainView } from '../types';
+import '../../../design/cara-nueva.css';
 
 /**
- * La navegación de móvil. Artboard 4d, COPIADA de su HTML.
+ * La navegación de móvil. Artboard 4d en su estructura; la cara nueva
+ * (README-app §1) en su aspecto.
  *
- * ─── LA ESPECIFICACIÓN, LEÍDA Y NO DEDUCIDA ─────────────────────────────────
+ * ─── LA ESTRUCTURA, LEÍDA Y NO DEDUCIDA ─────────────────────────────────────
  *
  * La primera versión de esta barra se hizo desde la descripción del artboard y
- * salió AZUL OSCURA, como la barra lateral del escritorio. La maqueta dice otra
- * cosa, y se puede citar:
- *
- *     height:62px; background:#fff; border-top:1px solid #E3E7EC;
- *     display:grid; grid-template-columns:repeat(4,1fr);
- *     align-items:center; padding:0 4px 8px
- *
- * Cada destino: columna centrada con `gap:3px`, ícono de 20px y etiqueta de
- * 10.5px. Activo en `#17456B` con peso 600; inactivo en `#8B96A6` con peso 500.
- * Todos esos colores ya son tokens del sistema —brand-700, ink-400, line-200—,
- * así que no se introduce ni un valor suelto.
+ * salió AZUL OSCURA, como la barra lateral del escritorio. La maqueta decía
+ * otra cosa: 62 px de alto, fondo blanco, cinco columnas, cada destino con un
+ * ícono de 20 px sobre su etiqueta. Eso se conserva.
  *
  * La lección de la equivocación vale más que el arreglo: **una barra inferior
- * NO es la barra lateral acostada**. La lateral es oscura porque es un panel
- * permanente que enmarca el trabajo; esta se apoya sobre el contenido y en
- * oscuro competiría con el documento, que es lo que tiene que resaltar.
+ * NO es la barra lateral acostada**. Se apoya sobre el contenido y, oscura,
+ * competiría con el documento, que es lo que tiene que resaltar.
+ *
+ * ─── LO QUE CAMBIA CON LA CARA NUEVA ────────────────────────────────────────
+ *
+ * · Sin raya gris de 1 px: un filo del color de línea del sistema, más suave.
+ * · El destino abierto va en tinta plena con la barra de oro de 3 px arriba,
+ *   la misma que marca el módulo activo en el panel lateral: el oro es el
+ *   marcador de módulo activo y nada más. Antes era azul de enlace, que en
+ *   este sistema significa «esto se puede pulsar», no «aquí está usted».
+ * · Inactivos en #667487, la tinta mínima AA sobre blanco; el #8B96A6 de
+ *   antes daba 3,0:1.
+ * · Etiqueta de 13 px y no 14: cinco columnas en 320 px dejan 62 px por
+ *   destino, y «Orientar» a 14 px roza el borde de la suya.
  *
  * ─── POR QUÉ «GRABAR» ES LA ENTREVISTA ──────────────────────────────────────
  *
@@ -80,7 +85,7 @@ interface MobileTabBarProps {
   ocultas?: readonly MainView[];
 }
 
-/** 62px de alto con `padding:0 4px 8px`, más el área segura del sistema. */
+/** Un destino: ícono de 20 px sobre su etiqueta, en toda la altura de la barra. */
 const Destino: React.FC<{
   Icono: React.FC<IconoProps>;
   etiqueta: string;
@@ -95,19 +100,10 @@ const Destino: React.FC<{
     onClick={onClick}
     aria-current={activo ? 'page' : undefined}
     aria-expanded={expandido}
-    className="flex h-full flex-col items-center justify-center gap-[3px]"
+    className="cn-tab"
   >
-    <Icono
-      className={`h-5 w-5 ${activo ? 'text-brand-700' : 'text-ink-400'}`}
-      strokeWidth={2}
-    />
-    <span
-      className={`text-[10.5px] leading-none ${
-        activo ? 'font-semibold text-brand-700' : 'font-medium text-ink-400'
-      }`}
-    >
-      {etiqueta}
-    </span>
+    <Icono className="h-5 w-5" strokeWidth={activo ? 2 : 1.8} />
+    <span>{etiqueta}</span>
   </button>
 );
 
@@ -128,7 +124,8 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
   return (
     <nav
       aria-label="Navegación principal"
-      className="grid h-[62px] shrink-0 grid-cols-5 items-center border-t border-line-200 bg-surface px-1 pb-2 lg:hidden"
+      /* `grid` y `lg:hidden` quedan en Tailwind: la hoja nueva no declara `display` para no ganarle al corte de escritorio. */
+      className="cara-nueva cn-tabs grid grid-cols-5 lg:hidden"
       style={{ paddingBottom: 'calc(8px + env(safe-area-inset-bottom))' }}
     >
       {DESTINOS.filter(({ id }) => !ocultas.includes(id)).map(({ id, etiqueta, Icono }) => (

@@ -48,16 +48,42 @@
   --shadow-1: 0 1px 2px rgb(16 24 34 / 0.06);
   --shadow-btn: 0 2px 8px rgb(23 69 107 / 0.28);
   --shadow-pie: 0 -8px 24px rgb(16 24 34 / 0.06);
+  /*
+   * EL MARCO DE LA APLICACIÓN (panel lateral, cabeceras, barra inferior), de
+   * `public/handoff/app-inicio.html`, artboards 1 y 2. El papel del panel es
+   * cálido y no el blanco del lienzo: separa el índice del trabajo sin raya.
+   */
+  --rail: #faf9f6;
+  --rail-hover: #f1efe9;
+  --rail-card: #fff;
+  --rail-ink: #0b1220;
+  --gold-ink: #8a6d1f;
+  --gold-soft: #faf7ef;
+  --gold-soft-hover: #f3ecda;
+  --shadow-menu: 0 8px 28px rgb(16 24 34 / 0.14);
+  --velo: rgb(16 24 34 / 0.4);
 
+  color: var(--ink);
+  font-family: 'Satoshi', -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: light;
+}
+
+/*
+ * LA PÁGINA ENTERA, APARTE DEL ALCANCE. `.cara-nueva` nació para las dos
+ * pantallas de pie —entrar y registrarse— y traía `display:flex` y el alto de
+ * la ventana en la misma regla que los colores. Al llevar la clase al marco de
+ * la aplicación, el panel lateral y las cabeceras habrían heredado un alto de
+ * 100dvh y una fila flex que no son suyos. Por eso la clase base solo abre el
+ * alcance (tokens y letra) y la maquetación de página va en este modificador,
+ * que llevan únicamente LoginPortalView y RegistroView.
+ */
+.cara-nueva.cara-nueva--pagina {
   display: flex;
   min-height: 100vh;
   min-height: 100dvh;
   width: 100%;
   background: var(--canvas);
-  color: var(--ink);
-  font-family: 'Satoshi', -apple-system, 'Segoe UI', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  color-scheme: light;
 }
 
 /*
@@ -93,6 +119,15 @@
     --panel: #0b1219;
     --shadow-btn: none;
     --shadow-pie: none;
+    --rail: #0e151e;
+    --rail-hover: #19222d;
+    --rail-card: #1a2430;
+    --rail-ink: #e8edf2;
+    --gold-ink: #d9b45c;
+    --gold-soft: rgb(217 180 92 / 0.12);
+    --gold-soft-hover: rgb(217 180 92 / 0.2);
+    --shadow-menu: none;
+    --velo: rgb(0 0 0 / 0.55);
     color-scheme: dark;
   }
 }
@@ -122,6 +157,15 @@
   --panel: #0b1219;
   --shadow-btn: none;
   --shadow-pie: none;
+  --rail: #0e151e;
+  --rail-hover: #19222d;
+  --rail-card: #1a2430;
+  --rail-ink: #e8edf2;
+  --gold-ink: #d9b45c;
+  --gold-soft: rgb(217 180 92 / 0.12);
+  --gold-soft-hover: rgb(217 180 92 / 0.2);
+  --shadow-menu: none;
+  --velo: rgb(0 0 0 / 0.55);
   color-scheme: dark;
 }
 
@@ -714,6 +758,912 @@
   }
   .cara-nueva .cn-panel-cuerpo {
     margin: auto 0 0;
+  }
+}
+
+/* ═══ EL MARCO DE LA APLICACIÓN ════════════════════════════════════════════
+ * Panel lateral, cabecera de escritorio, cabecera y barra inferior de móvil.
+ * Artboards 1 y 2 de `public/handoff/app-inicio.html`. Tres reglas del
+ * sistema que se ven aquí más que en ninguna pantalla:
+ *   · el oro marca el módulo activo y NADA MÁS; pendientes y novedades van en
+ *     azul;
+ *   · la tinta más clara es #5C6673 sobre el papel del panel: el #8B94A1 de
+ *     los numerales y rótulos del artboard da 2,9:1 y no pasa AA;
+ *   · todo lo que se toca mide al menos 44 px, aunque el artboard dibuje las
+ *     filas del índice en 34: la lista se desplaza, el dedo no se achica.
+ * La visibilidad por tamaño (`lg:hidden`, `hidden lg:block`) la siguen poniendo
+ * las clases de Tailwind en el elemento; por eso ninguna regla de aquí declara
+ * `display` en la raíz de las piezas móviles: con más especificidad, lo haría
+ * aparecer en escritorio.
+ */
+
+/* ── Panel lateral ─────────────────────────────────────────────────────── */
+.cara-nueva.cn-rail {
+  display: flex;
+  height: 100%;
+  width: 216px;
+  flex-direction: column;
+  padding: 20px 14px 10px;
+  background: var(--rail);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.cara-nueva.cn-rail--cerrado {
+  width: 82px;
+  align-items: center;
+  padding: 16px 17px 10px;
+}
+.cara-nueva .cn-rail-marca {
+  display: flex;
+  min-height: 44px;
+  flex: none;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 8px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--rail-ink);
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-rail-marca:hover {
+  background: var(--rail-hover);
+}
+.cara-nueva.cn-rail--cerrado .cn-rail-marca {
+  width: 48px;
+  justify-content: center;
+  padding: 0;
+}
+.cara-nueva .cn-rail-palabra {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+}
+
+.cara-nueva .cn-rail-firma-caja {
+  position: relative;
+  flex: none;
+  margin-bottom: 14px;
+}
+.cara-nueva.cn-rail--cerrado .cn-rail-firma-caja {
+  margin-bottom: 8px;
+}
+.cara-nueva .cn-rail-firma {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 6px 12px;
+  border: none;
+  border-radius: 10px;
+  background: var(--rail-card);
+  box-shadow: var(--shadow-1);
+  color: var(--ink-4);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-rail-firma:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-rail-firma-textos {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+.cara-nueva .cn-rail-firma-nombre,
+.cara-nueva .cn-rail-firma-quien {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-rail-firma-nombre {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--rail-ink);
+}
+.cara-nueva .cn-rail-firma-quien {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-rail-icono {
+  display: grid;
+  width: 48px;
+  height: 44px;
+  place-items: center;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink-4);
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-rail-icono:hover {
+  background: var(--rail-hover);
+  color: var(--rail-ink);
+}
+
+/* El menú de la firma: flotante, sin contorno de botón, elevado con sombra en claro y con superficie en oscuro. */
+.cara-nueva .cn-rail-menu {
+  position: absolute;
+  z-index: 30;
+  overflow: hidden;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-menu);
+}
+.cara-nueva .cn-rail-menu--abajo {
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+}
+.cara-nueva .cn-rail-menu--lado {
+  top: 0;
+  left: calc(100% + 10px);
+  width: 240px;
+}
+.cara-nueva .cn-rail-menu-detalle {
+  padding: 8px 10px;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-rail-menu-fila {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-2);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-rail-menu-fila:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-rail-menu-fila[aria-current='true'] {
+  font-weight: 600;
+  color: var(--brand);
+}
+.cara-nueva .cn-rail-menu-pie {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-rail-menu-boton {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: 10px;
+  background: var(--neutral);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-rail-menu-boton:hover {
+  background: var(--line-2);
+}
+
+/* El índice es lo único que se desplaza. El margen negativo con su relleno deja sitio al anillo de foco, que el `overflow` recortaría. */
+.cara-nueva .cn-rail-indice {
+  display: grid;
+  min-height: 0;
+  flex: 1;
+  align-content: start;
+  gap: 1px;
+  margin: 0 -4px;
+  padding: 2px 4px 4px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.cara-nueva.cn-rail--cerrado .cn-rail-indice {
+  justify-items: center;
+}
+.cara-nueva .cn-rail-grupo {
+  display: grid;
+  gap: 1px;
+}
+.cara-nueva.cn-rail--cerrado .cn-rail-grupo {
+  justify-items: center;
+  gap: 4px;
+  padding: 4px 0;
+}
+.cara-nueva .cn-rail-rotulo {
+  margin: 0;
+  padding: 12px 12px 5px;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-rail-rotulo--boton {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 0 12px 7px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.16s;
+}
+.cara-nueva .cn-rail-rotulo--boton:hover {
+  color: var(--rail-ink);
+}
+.cara-nueva .cn-rail-raya {
+  width: 26px;
+  height: 1px;
+  margin: 4px 0;
+  background: var(--line-2);
+}
+
+.cara-nueva .cn-rail-item {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 14.5px;
+  line-height: 20px;
+  color: var(--ink-3);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-rail-item:hover:not([aria-current='page']),
+.cara-nueva .cn-rail-ficha:hover:not([aria-current='page']) {
+  background: var(--rail-hover);
+  color: var(--rail-ink);
+}
+/* EL ACTIVO: tarjeta blanca con la barra de oro, en vez del azul relleno de antes. */
+.cara-nueva .cn-rail-item[aria-current='page'],
+.cara-nueva .cn-rail-ficha[aria-current='page'] {
+  background: var(--rail-card);
+  box-shadow: var(--shadow-1);
+  font-weight: 600;
+  color: var(--rail-ink);
+}
+.cara-nueva .cn-rail-oro {
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  width: 3px;
+  height: 16px;
+  margin-top: -8px;
+  border-radius: 2px;
+  background: var(--gold);
+}
+.cara-nueva .cn-rail-numeral {
+  width: 16px;
+  flex: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 400;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-rail-etiqueta {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-rail-cuenta {
+  flex: none;
+  min-width: 22px;
+  padding: 0 6px;
+  border-radius: 8px;
+  background: var(--brand-soft);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--brand);
+  text-align: center;
+}
+.cara-nueva .cn-rail-ficha {
+  position: relative;
+  display: grid;
+  width: 48px;
+  height: 44px;
+  place-items: center;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink-4);
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-rail-punto {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--brand);
+}
+.cara-nueva .cn-rail-punto--esquina {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+
+/* El pie no se desplaza: la ficha de saldo queda anclada debajo del índice. */
+.cara-nueva .cn-rail-pie {
+  display: grid;
+  flex: none;
+  gap: 6px;
+  margin-top: 12px;
+}
+.cara-nueva.cn-rail--cerrado .cn-rail-pie {
+  justify-items: center;
+}
+.cara-nueva .cn-rail-saldo {
+  margin-bottom: 4px;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--rail-card);
+  box-shadow: var(--shadow-1);
+}
+.cara-nueva .cn-rail-saldo-rotulo {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-rail-saldo-cifra {
+  margin: 2px 0 10px;
+  overflow: hidden;
+  font-family: var(--mono);
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--rail-ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-rail-recargar {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 10px;
+  background: var(--gold-soft);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gold-ink);
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-rail-recargar:hover {
+  background: var(--gold-soft-hover);
+}
+.cara-nueva .cn-rail-plan {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 0;
+  border: none;
+  border-top: 1px solid var(--line);
+  background: transparent;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-4);
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.16s;
+}
+.cara-nueva .cn-rail-plan:hover {
+  color: var(--rail-ink);
+}
+.cara-nueva .cn-rail-periodo {
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--line-2);
+}
+.cara-nueva .cn-rail-periodo i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--brand);
+}
+.cara-nueva .cn-rail-saldo-ficha {
+  display: grid;
+  width: 48px;
+  min-height: 48px;
+  place-items: center;
+  gap: 1px;
+  padding: 6px 0;
+  border: none;
+  border-radius: 12px;
+  background: var(--rail-card);
+  box-shadow: var(--shadow-1);
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-rail-saldo-ficha:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-rail-saldo-ficha-rotulo {
+  font-size: 10px;
+  line-height: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-rail-saldo-ficha-cifra {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 16px;
+  font-weight: 500;
+  color: var(--rail-ink);
+}
+.cara-nueva .cn-rail-vertical {
+  padding: 6px 0;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  color: var(--ink-4);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+.cara-nueva .cn-rail-ajustes {
+  display: flex;
+  gap: 4px;
+}
+.cara-nueva.cn-rail--cerrado .cn-rail-ajustes {
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.cara-nueva .cn-rail-ajuste,
+.cara-nueva .cn-rail-colapsar,
+.cara-nueva .cn-rail-version {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-rail-ajuste {
+  min-height: 44px;
+  flex: 1;
+  gap: 6px;
+  background: transparent;
+  font-size: 14px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-rail-ajuste:hover {
+  background: var(--rail-hover);
+  color: var(--rail-ink);
+}
+.cara-nueva.cn-rail--cerrado .cn-rail-ajuste {
+  width: 48px;
+  flex: none;
+}
+.cara-nueva .cn-rail-colapsar {
+  width: 100%;
+  min-height: 44px;
+  gap: 9px;
+  background: var(--rail-hover);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-rail-colapsar:hover {
+  color: var(--rail-ink);
+  filter: brightness(0.97);
+}
+/* Un sello, no un control de trabajo: 32 px de alto, por encima de los 24 del mínimo AA de tamaño de objetivo. */
+.cara-nueva .cn-rail-version {
+  position: relative;
+  width: 100%;
+  min-height: 32px;
+  gap: 6px;
+  background: transparent;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-rail-version:hover {
+  color: var(--rail-ink);
+}
+.cara-nueva.cn-rail--cerrado .cn-rail-colapsar,
+.cara-nueva.cn-rail--cerrado .cn-rail-version {
+  width: 48px;
+}
+
+/* ── Cabecera de escritorio ────────────────────────────────────────────── */
+.cara-nueva.cn-cab {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  height: 60px;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px;
+  background: var(--canvas);
+  box-shadow: inset 0 -1px 0 var(--line);
+  user-select: none;
+}
+.cara-nueva .cn-cab-titulo {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-cab-radicado {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-cab-acciones {
+  margin-left: auto;
+  gap: 8px;
+}
+.cara-nueva .cn-cab-pestanas {
+  display: flex;
+  gap: 2px;
+  margin-right: 4px;
+}
+.cara-nueva .cn-cab-pestana {
+  min-height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-4);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-cab-pestana:hover {
+  color: var(--ink);
+}
+.cara-nueva .cn-cab-pestana--activa,
+.cara-nueva .cn-cab-pestana--activa:hover {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.cara-nueva .cn-cab-boton {
+  display: inline-flex;
+  min-height: 44px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--neutral);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--ink-2);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-cab-boton:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-cab-boton svg {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-cab-boton .cn-cab-ok {
+  color: var(--ok);
+}
+.cara-nueva .cn-cab-boton--primario {
+  background: var(--brand-fill);
+  box-shadow: var(--shadow-btn);
+  color: #fff;
+}
+.cara-nueva .cn-cab-boton--primario:hover {
+  background: var(--brand-fill-hover);
+}
+.cara-nueva .cn-cab-boton--primario svg {
+  color: currentColor;
+}
+.cara-nueva .cn-cab-boton--fantasma {
+  width: 44px;
+  padding: 0;
+  background: transparent;
+}
+.cara-nueva .cn-cab-boton--fantasma:hover {
+  background: var(--field);
+}
+/* Word, PDF y opciones: un solo control de tres mitades, separadas por un filo de lienzo y no por un contorno. */
+.cara-nueva .cn-cab-grupo {
+  position: relative;
+  display: flex;
+  flex: none;
+  gap: 1px;
+}
+.cara-nueva .cn-cab-grupo .cn-cab-boton {
+  border-radius: 0;
+}
+.cara-nueva .cn-cab-grupo .cn-cab-boton--izq {
+  border-radius: 10px 0 0 10px;
+}
+.cara-nueva .cn-cab-grupo .cn-cab-boton--der {
+  padding: 0 10px;
+  border-radius: 0 10px 10px 0;
+}
+.cara-nueva .cn-cab-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 40;
+  width: 280px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-menu);
+  user-select: text;
+}
+.cara-nueva .cn-cab-pop-rotulo {
+  margin-bottom: 4px;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-cab-pop-casilla {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.cara-nueva .cn-cab-pop-casilla input {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin: 0;
+  accent-color: var(--brand-fill);
+  cursor: pointer;
+}
+.cara-nueva .cn-cab-pop-nota {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+
+/* ── Cabecera de móvil (artboard 2) ────────────────────────────────────── */
+.cara-nueva.cn-mcab {
+  height: 56px;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  padding: 0 6px 0 4px;
+  background: var(--canvas);
+}
+.cara-nueva .cn-mcab-boton {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  place-items: center;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-mcab-boton:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-mcab-textos {
+  min-width: 0;
+  flex: 1;
+}
+.cara-nueva .cn-mcab-titulo,
+.cara-nueva .cn-mcab-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-mcab-titulo {
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.cara-nueva .cn-mcab-sub {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-5);
+}
+
+/* La hoja de acciones: radio 20 arriba, filas sin contorno, velo en lugar de negro puro. */
+.cara-nueva .cn-hoja-velo {
+  flex: 1;
+  border: none;
+  background: var(--velo);
+  cursor: pointer;
+}
+.cara-nueva .cn-hoja {
+  padding-bottom: env(safe-area-inset-bottom);
+  border-radius: 20px 20px 0 0;
+  background: var(--canvas);
+  box-shadow: 0 -8px 28px rgb(16 24 34 / 0.12);
+}
+.cara-nueva .cn-hoja-cabeza {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 8px 4px 20px;
+}
+.cara-nueva .cn-hoja-titulo {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-hoja-cerrar {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink-4);
+  cursor: pointer;
+}
+.cara-nueva .cn-hoja-lista {
+  display: grid;
+  gap: 2px;
+  padding: 4px 8px 12px;
+}
+.cara-nueva .cn-hoja-accion {
+  display: flex;
+  width: 100%;
+  min-height: 52px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-hoja-accion:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-hoja-accion-icono {
+  display: flex;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-hoja-accion--destacada,
+.cara-nueva .cn-hoja-accion--destacada:hover {
+  background: var(--brand-soft);
+  font-weight: 600;
+  color: var(--brand);
+}
+.cara-nueva .cn-hoja-accion--destacada .cn-hoja-accion-icono {
+  color: var(--brand);
+}
+
+/* ── Barra inferior de móvil ───────────────────────────────────────────── */
+.cara-nueva.cn-tabs {
+  height: 62px;
+  flex: none;
+  align-items: center;
+  padding-right: 4px;
+  padding-left: 4px;
+  background: var(--canvas);
+  box-shadow: inset 0 1px 0 var(--line);
+}
+.cara-nueva .cn-tab {
+  position: relative;
+  display: flex;
+  height: 100%;
+  min-height: 44px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 500;
+  color: var(--ink-5);
+  cursor: pointer;
+}
+.cara-nueva .cn-tab:focus-visible {
+  outline-offset: -2px;
+}
+/* El destino abierto: tinta plena y la misma barra de oro que el panel lateral, acostada arriba. */
+.cara-nueva .cn-tab[aria-current='page'] {
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-tab[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 20px;
+  height: 3px;
+  margin-left: -10px;
+  border-radius: 0 0 2px 2px;
+  background: var(--gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cara-nueva.cn-rail {
+    transition: none;
   }
 }
 
