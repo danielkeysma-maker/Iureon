@@ -406,7 +406,9 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
             */}
             <p className="cn-rail-saldo-rotulo">Saldo</p>
             {/* En mono porque es un dato citable, no interfaz (README-app §1). */}
-            <p className="cn-rail-saldo-cifra">{saldoTexto}</p>
+            <p className="cn-rail-saldo-cifra" title={`Saldo ${saldoTexto}`}>
+              {saldoTexto}
+            </p>
             <button
               type="button"
               onClick={onOpenRechargeModal || onOpenSubscriptionModal}
@@ -417,7 +419,8 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
             <button
               type="button"
               onClick={onOpenSubscriptionModal}
-              title="Ver el plan de la firma"
+              /* La nota se trunca con puntos suspensivos en la barra; entera, en el `title`. */
+              title={nota ? `${nota} · Ver el plan de la firma` : 'Ver el plan de la firma'}
               className="cn-rail-plan"
             >
               <span className="min-w-0 flex-1 truncate">{nota ?? 'Ver el plan'}</span>

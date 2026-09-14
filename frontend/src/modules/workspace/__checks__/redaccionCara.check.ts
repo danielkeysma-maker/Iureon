@@ -31,6 +31,7 @@ import { fileURLToPath } from 'node:url';
 import type { Actuacion } from '../../catalog/types';
 import { articuloDe, estadoDeLaFicha, ordenarParaLaLista } from '../services/fichaEnLaLista';
 import { desacuerdoDeRama, ramaAlElegirCaso } from '../services/ramaDelCaso';
+import { ordenDelDesplegable } from '../services/ordenDelDesplegable';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const SRC = join(AQUI, '..', '..', '..');
@@ -208,8 +209,40 @@ check(
   const inicioTipo = BARRA.indexOf('const opcionesTipo');
   const finTipo = BARRA.indexOf('[catalogo.actuaciones]', inicioTipo);
   check('escritorio: las salidas no están entre las fichas (ni se ordenan ni se filtran)', inicioTipo !== -1 && !/OPCION_/.test(BARRA.slice(inicioTipo, finTipo)));
-  check('escritorio: las salidas se pintan en el bloque de antes de la lista', /antesDeLaLista=\{\(cerrar\) => \([\s\S]*SERVICIOS\.map/.test(BARRA));
-  check('el selector pinta ese bloque antes de las filas filtradas', SELECTOR.indexOf('antesDeLaLista?.(') !== -1 && SELECTOR.indexOf('antesDeLaLista?.(') < SELECTOR.indexOf('visibles.map('));
+  /*
+   * CAMBIÓ EL 14 DE SEPTIEMBRE DE 2026: el bloque se pliega en un renglón
+   * «¿No está en la lista? · 3 opciones» que se abre con un clic. Medido en
+   * 1366×768, las tres filas abiertas dejaban unos 100 px de actuaciones a la
+   * vista. Plegado sigue antes de la lista y sigue sin filtrarse.
+   */
+  {
+    const inicioSalidas = BARRA.indexOf('const SalidasDelDesplegable');
+    check('escritorio: las salidas se pintan en el bloque aparte de la lista', /antesDeLaLista=\{\(cerrar\) => \(\s*<SalidasDelDesplegable/.test(BARRA));
+    check(
+      'escritorio: ese bloque pinta las tres salidas, nace plegado y dice cuántas son',
+      inicioSalidas !== -1 &&
+        BARRA.slice(inicioSalidas).includes('SERVICIOS.map') &&
+        BARRA.slice(inicioSalidas).includes('useState(false)') &&
+        BARRA.slice(inicioSalidas).includes('aria-expanded={abiertas}') &&
+        BARRA.slice(inicioSalidas).includes('{SERVICIOS.length} opciones')
+    );
+  }
+  /*
+   * CAMBIÓ EL 14 DE SEPTIEMBRE DE 2026, reportado en producción: con texto en
+   * el filtro, las coincidencias quedaban debajo del bloque de salidas. Sin
+   * texto sigue la regla del titular (las salidas primero); con texto, los
+   * resultados primero. Se prueba ejecutando la regla, no leyendo el JSX.
+   */
+  const sinFiltro = ordenDelDesplegable('').join('>');
+  const soloEspacios = ordenDelDesplegable('   ').join('>');
+  const filtrado = ordenDelDesplegable('recurso').join('>');
+  check('sin filtro: las salidas antes de las fichas', sinFiltro === 'antesDeLaLista>filas', sinFiltro);
+  check('un filtro de solo espacios cuenta como vacío', soloEspacios === 'antesDeLaLista>filas', soloEspacios);
+  check('con filtro: las fichas que coinciden primero y las salidas después', filtrado === 'filas>antesDeLaLista', filtrado);
+  check(
+    'el selector pinta sus dos zonas en el orden de esa regla, y en ningún otro',
+    SELECTOR.includes('ordenDelDesplegable(filtro).map(') && (SELECTOR.match(/antesDeLaLista\?\.\(/g) ?? []).length === 1 && (SELECTOR.match(/\{filas\}|\? filas :/g) ?? []).length === 1
+  );
 
   const mg = MOVIL.indexOf('value={OPCION_GUIA}');
   const ms = MOVIL.indexOf('value={OPCION_SIN_NOMBRE}');
@@ -298,8 +331,10 @@ check(
 
   check('«Enseñar estilo» ya no dice «Aprendido»', !/Aprendido/.test(VISOR));
   check(
-    '«Enseñar estilo» y «Sugerir jerga» siguen cableados pero apagados, con «Próximamente»',
-    /onClick=\{handleSaveAndTeachStyle\} disabled/.test(VISOR) && /onClick=\{\(\) => setIsJargonModalOpen\(true\)\} disabled/.test(VISOR) && VISOR.includes('Próximamente')
+    '«Enseñar estilo» y «Sugerir jerga» siguen a la vista, apagados, sin cablear al simulacro y con «Próximamente»',
+    (VISOR.match(/<button type="button" disabled className="cn-red-trabajar-boton">/g) ?? []).length === 2 &&
+      !/JargonSuggestionModal|learningApi|learning\.api/.test(VISOR) &&
+      VISOR.includes('Próximamente')
   );
   check('la columna y «Trabajar el escrito» se van en modo concentración', VISOR.includes('{!isFocusMode && (') && VISOR.includes('{isFocusMode && trabajar}'));
   check('lo editado sale con keepalive también al desmontar el visor', /return \(\) => \{[\s\S]*?removeEventListener\('pagehide', vaciar\);\s*vaciar\(\);/.test(VISOR));

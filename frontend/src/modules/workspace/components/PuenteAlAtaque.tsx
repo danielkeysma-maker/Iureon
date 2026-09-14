@@ -1,6 +1,6 @@
 import React from 'react';
 import { AlertTriangle, PenLine, Sparkles } from 'lucide-react';
-import { Combobox, type OpcionCombobox } from './Combobox';
+import { SelectorEnCascada, type OpcionEnCascada } from './SelectorEnCascada';
 import { GuiaEligeActuacionDialog } from './GuiaEligeActuacionDialog';
 import { ActuacionPropiaDialog } from './ActuacionPropiaDialog';
 import { useCatalogBranchesState } from '../../catalog/hooks/useCatalogBranches';
@@ -173,7 +173,7 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
   const alineacion = holgado ? '' : 'cn-inf-bandera';
 
   const ramasEstado = useCatalogBranchesState();
-  const opcionesRama: OpcionCombobox[] = React.useMemo(
+  const opcionesRama: OpcionEnCascada[] = React.useMemo(
     () => ramasEstado.ramas.map((b) => ({ valor: b, etiqueta: BRANCH_LABELS[b] ?? b })),
     [ramasEstado.ramas]
   );
@@ -204,13 +204,25 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
       */}
       <div className={`flex min-w-0 gap-3 ${holgado ? 'flex-row items-end' : 'flex-col'}`}>
         <div className="min-w-0 flex-1">
-          <Combobox
+          {/*
+            EL SELECTOR DE LA CARA NUEVA, el mismo de Redacción: rótulo encima,
+            44 px, lupa y la cuenta «N de 28». Aquí era el `Combobox` viejo
+            —letra de 12,5 px, cabecera «RAMA» y borde azul—, y el dueño lo vio
+            en producción al lado de un informe que ya tenía la cara nueva.
+
+            EN LÍNEA, Y NO FLOTANTE: este bloque vive dentro del panel del
+            informe, que se desplaza, y una lista absoluta quedaba recortada
+            por ese contenedor. Dentro del flujo empuja lo de abajo y el panel
+            la deja ver entera.
+          */}
+          <SelectorEnCascada
             etiqueta="Rama"
             valor={rama}
             opciones={opcionesRama}
             onChange={setRama}
             vacio="Elegir rama…"
-            anchoBoton="max-w-full"
+            cargando={ramasEstado.estado === 'CARGANDO'}
+            enLinea
             /*
               EL NOMBRE DE LA RAMA NO SE TRUNCA EN ESTRECHO. «Restitución de
               tierras (Ley 1448)» con puntos suspensivos en «Restitución de …»
@@ -218,7 +230,7 @@ export const PuenteAlAtaque: React.FC<PuenteAlAtaqueProps> = ({
               control informa. Con ancho sigue truncando: ahí el nombre cabe y
               la fila debe mantener su altura.
             */
-            partirEtiqueta={!holgado}
+            anchoCampo={holgado ? '' : 'cn-red-campo--partir'}
             pie={
               sinRama
                 ? 'Se buscará en todo el catálogo: la rama queda sin usar.'

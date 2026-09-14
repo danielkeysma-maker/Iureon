@@ -234,7 +234,15 @@ check(
   'el diálogo conserva los dos modos, la pregunta de guardado y sus dos respuestas',
   ["'ESCRITO_PROPIO'", "'DOCUMENTO_RECIBIDO'", 'setPreguntaDeGuardado(true)', 'Solo el informe', 'Sí, conservar', '<SelectorDeExpediente', 'onElegir={(exactName, branch)'].every((t) => DIALOGO.includes(t))
 );
-check('el puente conserva la guía y la rama de la candidata', PUENTE.includes('<GuiaEligeActuacionDialog') && PUENTE.includes('onElegir={(exactName, branch)') && PUENTE.includes('branch || rama'));
+check(
+  'el selector de rama del puente es el de la cara nueva, en línea, y no el Combobox viejo',
+  PUENTE.includes('<SelectorEnCascada') && PUENTE.includes('enLinea') && !PUENTE.includes('<Combobox') && !PUENTE.includes("from './Combobox'")
+);
+check(
+  'el puente conserva la casilla «No sé la rama» y su advertencia de costo',
+  PUENTE.includes('No sé la rama: buscar en todo el catálogo.') && PUENTE.includes('{LO_QUE_CUESTA_BUSCAR_EN_TODO}')
+);
+check('el puente conserva la guía y la rama de la candidata',PUENTE.includes('<GuiaEligeActuacionDialog') && PUENTE.includes('onElegir={(exactName, branch)') && PUENTE.includes('branch || rama'));
 check(
   'la lectura conserva la atribución de cada carga y el plazo ausente',
   ['Esta carga no es suya.', ': le corresponde a usted.', 'El documento no anuncia plazo para esta carga.', 'Qué le exige y para cuándo', 'Qué exige el documento y para cuándo'].every((t) => LECTURA.includes(t))

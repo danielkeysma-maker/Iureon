@@ -16,6 +16,7 @@
     "check:inicio": "npx tsx src/modules/inicio/__checks__/inicio.check.ts",
     "check:orientacion-cara": "npx tsx src/modules/catalog/__checks__/orientacionCara.check.ts",
     "check:borradores-cara": "npx tsx src/modules/documents/__checks__/borradoresCara.check.ts",
+    "check:expedientes-cara": "npx tsx src/modules/expedientes/__checks__/expedientesCara.check.ts",
     "check:redaccion-cara": "npx tsx src/modules/workspace/__checks__/redaccionCara.check.ts",
     "check:taller-cara": "npx tsx src/modules/workspace/__checks__/tallerCara.check.ts",
     "check:secciones-escrito": "npx tsx src/modules/workspace/__checks__/seccionesEnElEscrito.check.ts",

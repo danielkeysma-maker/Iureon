@@ -382,26 +382,12 @@ export const WorkshopConfigBar: React.FC<WorkshopConfigBarProps> = ({
             anchoCampo="cn-red-campo--actuacion"
             cargando={catalogo.estado === 'CARGANDO'}
             antesDeLaLista={(cerrar) => (
-              <div className="cn-red-servicios">
-                <p className="cn-red-servicios-titulo">Si no está en la lista</p>
-                {SERVICIOS.map(({ valor, etiqueta, detalle, Icono }) => (
-                  <button
-                    key={valor}
-                    type="button"
-                    onClick={() => {
-                      cerrar();
-                      elegirTipo(valor);
-                    }}
-                    className="cn-red-servicio"
-                  >
-                    <Icono className="cn-red-servicio-icono" strokeWidth={1.8} aria-hidden />
-                    <span className="cn-red-fila-textos">
-                      <span className="cn-red-servicio-nombre">{etiqueta}</span>
-                      <span className="cn-red-fila-detalle">{detalle}</span>
-                    </span>
-                  </button>
-                ))}
-              </div>
+              <SalidasDelDesplegable
+                onSalida={(valor) => {
+                  cerrar();
+                  elegirTipo(valor);
+                }}
+              />
             )}
             pie={
               catalogo.estado === 'LISTA' ? (
@@ -531,6 +517,52 @@ export const SelectorDeCasoDeRedaccion: React.FC<SelectorDeCasoProps> = ({
           </button>
         </div>
       )}
+    </div>
+  );
+};
+
+/**
+ * Las tres salidas del desplegable de la actuación, plegadas en un renglón.
+ *
+ * ─── POR QUÉ PLEGADAS Y NO TRES FILAS CORTAS ───────────────────────────────
+ *
+ * El dueño lo reportó en producción: las tres salidas se comían el desplegable
+ * y las actuaciones apenas asomaban. Primero se probaron tres filas de 44 px
+ * con el detalle en el `title`, y se midió en 1366×768: el selector del
+ * asistente abre a media pantalla, así que lupa (65 px) más las tres filas
+ * (165 px) dejaban unos 100 px de actuaciones visibles. Plegadas ocupan un
+ * renglón de 44 px y las actuaciones ganan ese sitio.
+ *
+ * LA REGLA DEL TITULAR SE CONSERVA: el renglón está siempre ahí, antes de la
+ * lista cuando no hay filtro, dice cuántas salidas guarda y se abre con un
+ * clic. Nace plegado cada vez que se abre la lista, porque se desmonta al
+ * cerrarla. Los nombres aprobados se explican solos; el detalle va en el `title`.
+ */
+/*
+ * `onSalida` y no `onElegir`: `check:rama-candidata` exige que todo `onElegir`
+ * reciba la rama de la candidata, y este no elige actuación, abre un diálogo.
+ */
+const SalidasDelDesplegable: React.FC<{ onSalida: (valor: string) => void }> = ({ onSalida }) => {
+  const [abiertas, setAbiertas] = useState(false);
+  return (
+    <div className="cn-red-servicios">
+      <button
+        type="button"
+        onClick={() => setAbiertas((v) => !v)}
+        aria-expanded={abiertas}
+        className="cn-red-servicios-plegar"
+      >
+        <span className="cn-red-servicios-plegar-texto">¿No está en la lista?</span>
+        <span className="cn-red-servicios-cuenta">{SERVICIOS.length} opciones</span>
+        <ChevronRight className="cn-red-servicios-chevron" strokeWidth={1.8} aria-hidden />
+      </button>
+      {abiertas &&
+        SERVICIOS.map(({ valor, etiqueta, detalle, Icono }) => (
+          <button key={valor} type="button" onClick={() => onSalida(valor)} title={detalle} className="cn-red-servicio">
+            <Icono className="cn-red-servicio-icono" strokeWidth={1.8} aria-hidden />
+            <span className="cn-red-servicio-nombre">{etiqueta}</span>
+          </button>
+        ))}
     </div>
   );
 };

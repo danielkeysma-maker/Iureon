@@ -1123,10 +1123,22 @@
   right: 6px;
 }
 
-/* El pie no se desplaza: la ficha de saldo queda anclada debajo del índice. */
+/*
+ * El pie no se desplaza: la ficha de saldo queda anclada debajo del índice.
+ *
+ * LA COLUMNA ES `minmax(0, 1fr)` Y NO LA IMPLÍCITA. Una columna implícita es
+ * `auto`, y su mínimo es el ancho mínimo del contenido: la nota del plan va en
+ * una sola línea (`nowrap`), así que «Premium · vence en 109 días» contaba
+ * entera aunque su `span` tuviera `min-w-0`. En producción la columna midió
+ * 227 px dentro de un pie de 188: la ficha de saldo, la barra del periodo y la
+ * fila Membrete · Avisos se salían por la derecha del panel. Con mínimo cero la
+ * columna es el ancho del pie y los textos se truncan donde deben.
+ */
 .cara-nueva .cn-rail-pie {
   display: grid;
+  min-width: 0;
   flex: none;
+  grid-template-columns: minmax(0, 1fr);
   gap: 6px;
   margin-top: 12px;
 }
@@ -1249,8 +1261,16 @@
   writing-mode: vertical-rl;
   transform: rotate(180deg);
 }
+/*
+ * MEMBRETE Y AVISOS PARTEN RENGLÓN SI NO CABEN. Cada botón toma el ancho de su
+ * contenido y crece para repartir el sobrante; si los dos no caben —otra letra,
+ * otro idioma del sistema, un zoom—, Avisos baja al renglón siguiente en vez de
+ * quedar cortado por el borde del panel.
+ */
 .cara-nueva .cn-rail-ajustes {
   display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
   gap: 4px;
 }
 .cara-nueva.cn-rail--cerrado .cn-rail-ajustes {
@@ -1271,8 +1291,10 @@
 }
 .cara-nueva .cn-rail-ajuste {
   min-height: 44px;
-  flex: 1;
+  /* Base en el contenido y no en cero: con base cero nunca se partiría el renglón. */
+  flex: 1 0 auto;
   gap: 6px;
+  padding: 0 8px;
   background: transparent;
   font-size: 14px;
   color: var(--ink-4);
@@ -4375,7 +4397,8 @@
    */
   display: flex;
   flex-direction: column;
-  max-height: calc(100dvh - 190px);
+  /* `--cn-red-espacio` lo mide el selector al abrir: el sitio real bajo el campo. */
+  max-height: min(calc(100dvh - 190px), var(--cn-red-espacio, 100dvh));
   overflow: hidden;
   border-radius: 14px;
   background: var(--canvas);
@@ -4431,17 +4454,97 @@
 }
 .cara-nueva .cn-red-servicios {
   display: grid;
-  gap: 2px;
-  padding: 8px;
+  gap: 0;
+  padding: 4px 6px;
   border-bottom: 1px solid var(--line);
   background: var(--wash);
 }
+/* Con el filtro puesto el bloque va DEBAJO de las filas: la raya pasa arriba. */
+.cara-nueva .cn-red-filas + .cn-red-servicios {
+  border-top: 1px solid var(--line);
+  border-bottom: none;
+}
 .cara-nueva .cn-red-servicios-titulo {
-  padding: 4px 10px 2px;
+  padding: 4px 10px 0;
   font-size: 14px;
-  line-height: 21px;
+  line-height: 20px;
   font-weight: 600;
   color: var(--ink-4);
+}
+/* El renglón plegado: 44 px, a lo ancho, con la cuenta de salidas y un chevrón que gira al abrir. */
+.cara-nueva .cn-red-servicios-plegar {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--brand);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-red-servicios-plegar:hover {
+  background: var(--brand-soft);
+}
+.cara-nueva .cn-red-servicios-plegar-texto {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-red-servicios-cuenta {
+  flex: none;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-red-servicios-chevron {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--ink-4);
+  transition: transform 0.16s;
+}
+.cara-nueva .cn-red-servicios-plegar[aria-expanded='true'] .cn-red-servicios-chevron {
+  transform: rotate(90deg);
+}
+/*
+ * CON LAS SALIDAS ABIERTAS, LAS FILAS CEDEN SU MÍNIMO. Quien abrió el renglón está
+ * mirando las tres salidas: con los 96 px de siempre, en el hueco de 320 px bajo
+ * el selector del asistente, el pie quedaba empujado fuera de la lista.
+ */
+.cara-nueva .cn-red-lista:has(.cn-red-servicios-plegar[aria-expanded='true']) .cn-red-filas {
+  min-height: 0;
+}
+/*
+ * EN EL DESPLEGABLE, UNA FILA CORTA POR SALIDA: 44 px, icono y nombre en un
+ * renglón que se trunca, el detalle en el `title`. Antes eran tres tarjetas de
+ * dos o tres renglones y en 1366×768 dejaban a las actuaciones sin sitio.
+ * `cn-red-servicio--suelto` (móvil) queda como estaba: no vive en este bloque.
+ */
+.cara-nueva .cn-red-servicios .cn-red-servicio {
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+}
+.cara-nueva .cn-red-servicios .cn-red-servicio-icono {
+  margin-top: 0;
+}
+.cara-nueva .cn-red-servicios .cn-red-servicio-nombre {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .cara-nueva .cn-red-servicio {
   display: flex;
@@ -5780,6 +5883,11 @@
   white-space: nowrap;
   cursor: pointer;
 }
+/* Sin sitio bajo el campo y con más encima, la lista flotante abre hacia arriba (lo decide el selector al abrir). */
+.cara-nueva .cn-red-lista--arriba {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
 /* La lista de la actuación abre hacia la izquierda: es la caja del borde derecho y no debe salirse de la columna. */
 .cara-nueva .cn-red-campo--actuacion .cn-red-lista {
   right: 0;
@@ -5789,6 +5897,37 @@
   padding: 14px 16px;
   border-radius: 14px;
   background: var(--field);
+}
+/*
+ * EL SELECTOR EN LÍNEA (`enLinea`): la lista entra en el flujo y ocupa el ancho
+ * del campo. Es para los paneles que se desplazan —el puente al ataque dentro
+ * del informe—, donde una lista absoluta queda recortada por el contenedor.
+ * El tope de alto es el mismo de la flotante: nunca más alta que la ventana.
+ */
+.cara-nueva .cn-red-campo--en-linea .cn-red-lista {
+  position: relative;
+  top: auto;
+  right: auto;
+  left: auto;
+  z-index: auto;
+  width: 100%;
+  max-width: 100%;
+}
+/*
+ * El panel del informe mide unos 450 px en 1366×768; lupa y pie se llevan ~130.
+ * Con el tope anterior (340) la lista medía 470 y su pie quedaba bajo el borde.
+ */
+.cara-nueva .cn-red-campo--en-linea .cn-red-filas {
+  max-height: max(160px, min(340px, calc(100dvh - 450px)));
+}
+/* El nombre de la rama se parte en renglones en vez de truncarse, donde el panel es estrecho. */
+.cara-nueva .cn-red-campo--partir .cn-red-disparador {
+  padding-block: 10px;
+}
+.cara-nueva .cn-red-campo--partir .cn-red-disparador-texto {
+  overflow: visible;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 .cara-nueva .cn-red-caso {
   display: grid;
@@ -8596,5 +8735,1411 @@
   .cara-nueva .cn-tal-hoja-comentario {
     border-radius: 14px;
     box-shadow: var(--shadow-menu), inset 0 0 0 1px var(--line-2);
+  }
+}
+
+/* ─── Expedientes ─── */
+/*
+ * `public/handoff/app-expedientes.html` («Mis casos», el caso en tres zonas,
+ * el lector y las tres pantallas de 375 px) y `app-carpetas-y-vista-previa.html`
+ * (carpetas en tarjetas y en árbol, diálogos, archivo sin texto). Reglas que se
+ * ven aquí:
+ *   · el BORDE DISCONTINUO es solo del término que la agenda no tiene
+ *     verificado (`--sin-verificar`);
+ *   · la urgencia es ámbar con peso, no rojo; `--danger` queda para borrar y
+ *     quitar (`--peligro`);
+ *   · el mono es del radicado (`cn-exp-mono`); fechas, cuentas y fragmentos
+ *     van en la letra de interfaz;
+ *   · el oro no aparece: es el marcador del módulo activo y lo pinta la barra;
+ *   · el icono de carpeta va en tinta y no en oro por la misma razón, aunque la
+ *     maqueta lo dibuje dorado;
+ *   · las zonas que el caso oculta con `hidden` no reciben `display` salvo con
+ *     `:not([hidden])`, o esta regla, más específica, las encendería;
+ *   · el papel del lector es blanco también en oscuro, como el escrito
+ *     exportado: el documento es del abogado, no de la interfaz.
+ */
+.cara-nueva.cn-exp {
+  --exp-ok-bg: #e9f2ec;
+  --exp-guion: rgb(138 90 18 / 0.6);
+  --exp-mesa: #edeff2;
+  --exp-hoja: #fff;
+  --exp-hoja-tinta: #101822;
+  --exp-hoja-sombra: 0 4px 24px rgb(16 24 34 / 0.1);
+  min-height: 100%;
+  background: var(--canvas);
+  color: var(--ink);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva.cn-exp {
+    --exp-ok-bg: rgb(79 180 131 / 0.14);
+    --exp-guion: rgb(217 166 74 / 0.7);
+    --exp-mesa: #0b1219;
+    --exp-hoja: #fff;
+    --exp-hoja-tinta: #101822;
+    --exp-hoja-sombra: none;
+  }
+}
+:root[data-theme='dark'] .cara-nueva.cn-exp {
+  --exp-ok-bg: rgb(79 180 131 / 0.14);
+  --exp-guion: rgb(217 166 74 / 0.7);
+  --exp-mesa: #0b1219;
+  --exp-hoja: #fff;
+  --exp-hoja-tinta: #101822;
+  --exp-hoja-sombra: none;
+}
+.cara-nueva.cn-exp ul,
+.cara-nueva.cn-exp ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ── Tipografía, notas y datos ─────────────────────────────────────────── */
+.cara-nueva .cn-exp-h1 {
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-h2 {
+  font-size: 26px;
+  line-height: 34px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-h3 {
+  margin: 0;
+  font-size: 17px;
+  line-height: 26px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-bajada {
+  margin-top: 6px;
+  font-size: 18px;
+  line-height: 26px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-bajada-2 {
+  margin-top: 4px;
+  font-size: 16px;
+  line-height: 25px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-exp-nota {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-nota--caja {
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--field);
+  color: var(--ink-3);
+}
+.cara-nueva .cn-exp-fuerte {
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-mono {
+  font-family: var(--mono);
+}
+.cara-nueva .cn-exp-falta {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-cargando {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-exp-raya {
+  margin: 22px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+/* ── Botones, iconos, segmento y menú ──────────────────────────────────── */
+.cara-nueva .cn-exp-boton {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 10px;
+  font-size: 15px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.cara-nueva .cn-exp-boton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  box-shadow: none;
+}
+.cara-nueva .cn-exp-boton--ancho {
+  width: 100%;
+}
+.cara-nueva .cn-exp-icono {
+  display: inline-grid;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-4);
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-icono:hover {
+  background: var(--field);
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-icono:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.cara-nueva .cn-exp-icono--peligro {
+  color: var(--danger);
+}
+.cara-nueva .cn-exp-icono--peligro:hover {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+.cara-nueva .cn-exp-segmento {
+  display: inline-flex;
+  flex: none;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 12px;
+  background: var(--neutral);
+}
+.cara-nueva .cn-exp-segmento-boton {
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-4);
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-segmento-boton:hover {
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-segmento-boton[aria-pressed='true'],
+.cara-nueva .cn-exp-segmento-boton[aria-selected='true'] {
+  background: var(--canvas);
+  box-shadow: var(--shadow-1);
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-select {
+  min-height: 44px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 10px;
+  background: var(--neutral);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-menu-velo {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  border: none;
+  background: transparent;
+  cursor: default;
+}
+.cara-nueva .cn-exp-menu {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  z-index: 31;
+  display: grid;
+  min-width: 240px;
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-menu), inset 0 0 0 1px var(--line-2);
+}
+.cara-nueva .cn-exp-menu-item {
+  min-height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 15px;
+  text-align: left;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-menu-item:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-exp-menu-item--peligro {
+  color: var(--danger);
+}
+
+/* ── Pestañas ──────────────────────────────────────────────────────────── */
+.cara-nueva .cn-exp-pestanas {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 26px;
+  border-bottom: 1px solid var(--line);
+}
+.cara-nueva .cn-exp-pestana {
+  display: inline-flex;
+  height: 48px;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-pestana:hover {
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-pestana[aria-selected='true'] {
+  box-shadow: inset 0 -2px 0 var(--brand);
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-pestana-cuenta {
+  margin-left: 7px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-5);
+}
+
+/* ── Campos y diálogos (el marco del diálogo es compartido y no se toca) ── */
+.cara-nueva .cn-exp-dlg {
+  display: grid;
+  gap: 16px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-dlg-texto {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-exp-dlg-pie {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-campo {
+  display: grid;
+  gap: 6px;
+}
+.cara-nueva .cn-exp-campos-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.cara-nueva .cn-exp-rotulo {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-opcional {
+  font-weight: 400;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-ayuda {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-entrada {
+  display: block;
+  width: 100%;
+  height: 46px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  font-size: 16px;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-entrada::placeholder {
+  color: var(--ink-4);
+  opacity: 1;
+}
+.cara-nueva .cn-exp-entrada:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-exp-entrada--con-icono {
+  padding-left: 42px;
+}
+.cara-nueva .cn-exp-filtro {
+  position: relative;
+  min-width: 0;
+  flex: 1 1 220px;
+}
+.cara-nueva .cn-exp-filtro-icono {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  color: var(--ink-5);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+/* ── Vacíos y chips ────────────────────────────────────────────────────── */
+.cara-nueva .cn-exp-vacio {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 36px 28px;
+  border-radius: 16px;
+  background: var(--wash);
+  text-align: center;
+}
+.cara-nueva .cn-exp-vacio--suave {
+  justify-items: start;
+  padding: 22px 24px;
+  text-align: left;
+}
+.cara-nueva .cn-exp-vacio--aviso {
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-exp-vacio-titulo {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-vacio-texto {
+  max-width: 48ch;
+  margin-bottom: 8px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-exp-vacio--aviso .cn-exp-vacio-texto {
+  color: var(--warn);
+}
+.cara-nueva .cn-exp-chip {
+  display: inline-flex;
+  flex: none;
+  min-height: 28px;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  border-radius: 10px;
+  background: var(--neutral);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-exp-chip-punto {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.cara-nueva .cn-exp-chip--activo {
+  background: var(--exp-ok-bg);
+  color: var(--ok);
+}
+.cara-nueva .cn-exp-chip--suspendido,
+.cara-nueva .cn-exp-chip--aviso {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+/* ── «Mis casos»: cabecera, pestañas y casos ───────────────────────────── */
+.cara-nueva .cn-exp-cabeza {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px 32px;
+  padding: 28px 40px 0;
+  margin-bottom: 22px;
+}
+.cara-nueva.cn-exp-lista > .cn-exp-pestanas {
+  margin: 0 40px;
+}
+.cara-nueva .cn-exp-cuerpo {
+  display: grid;
+  max-width: 860px;
+  gap: 12px;
+  padding: 24px 40px 40px;
+}
+.cara-nueva .cn-exp-tarjetas {
+  display: grid;
+  gap: 12px;
+}
+.cara-nueva .cn-exp-filas {
+  display: grid;
+  gap: 2px;
+}
+.cara-nueva .cn-exp-caso-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 12px 24px;
+  padding: 16px 14px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-caso-item:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-exp-caso-item:disabled {
+  cursor: progress;
+}
+.cara-nueva .cn-exp-caso-item--tarjeta {
+  padding: 22px 24px;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: 0 1px 3px rgb(16 24 34 / 0.08), inset 0 0 0 1px var(--line);
+}
+.cara-nueva .cn-exp-caso-item--tarjeta:hover {
+  background: var(--canvas);
+  box-shadow: 0 6px 20px rgb(16 24 34 / 0.1), inset 0 0 0 1px var(--line-2);
+}
+.cara-nueva .cn-exp-caso-item-texto {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 2px;
+}
+.cara-nueva .cn-exp-caso-item-nombre {
+  font-size: 17px;
+  line-height: 25px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-caso-item--tarjeta .cn-exp-caso-item-nombre {
+  font-size: 20px;
+  line-height: 28px;
+  letter-spacing: -0.015em;
+}
+.cara-nueva .cn-exp-caso-item--cerrado .cn-exp-caso-item-nombre {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-caso-item-bajada {
+  font-size: 15px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-caso-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  font-size: 14px;
+  line-height: 21px;
+  overflow-wrap: anywhere;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-exp-caso-item-meta:empty {
+  display: none;
+}
+.cara-nueva .cn-exp-caso-item-plazo {
+  display: grid;
+  flex: none;
+  max-width: 40%;
+  justify-items: end;
+  gap: 2px;
+  text-align: right;
+}
+.cara-nueva .cn-exp-plazo {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-exp-caso-item--tarjeta .cn-exp-plazo {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+}
+.cara-nueva .cn-exp-plazo--urgente {
+  font-weight: 600;
+  color: var(--warn);
+}
+.cara-nueva .cn-exp-plazo--sin-verificar {
+  border-bottom: 1.5px dashed var(--exp-guion);
+}
+.cara-nueva .cn-exp-plazo-que {
+  font-size: 14px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-exp-pie-movil {
+  display: none;
+}
+
+/* ── El caso: dónde estoy · en qué trabajo · qué es esto ───────────────── */
+.cara-nueva .cn-exp-caso-trabajo {
+  min-width: 0;
+}
+.cara-nueva .cn-exp-caso-cabeza {
+  padding: 24px 40px 0;
+}
+.cara-nueva .cn-exp-volver {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 10px -8px;
+  padding: 0 12px 0 4px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 15px;
+  color: var(--ink-4);
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-volver:hover {
+  background: var(--field);
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-caso-titulo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px 32px;
+}
+.cara-nueva .cn-exp-caso-controles {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+.cara-nueva .cn-exp-termino {
+  display: flex;
+  align-items: center;
+  gap: 16px 24px;
+  margin: 24px 40px 0;
+  padding: 20px 24px;
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  background: var(--field);
+}
+.cara-nueva .cn-exp-termino--urgente {
+  background: var(--warn-bg);
+}
+.cara-nueva .cn-exp-termino--sin-verificar {
+  border: 1.5px dashed var(--exp-guion);
+}
+.cara-nueva .cn-exp-termino-titulo {
+  margin-bottom: 3px;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-termino-detalle {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-exp-termino--urgente .cn-exp-termino-detalle {
+  color: var(--warn);
+}
+.cara-nueva .cn-exp-caso-trabajo > .cn-exp-nota,
+.cara-nueva .cn-exp-caso-trabajo > .cn-error {
+  margin: 16px 40px 0;
+}
+.cara-nueva .cn-exp-caso-trabajo > .cn-exp-pestanas {
+  margin: 24px 40px 0;
+}
+.cara-nueva .cn-exp-zona:not([hidden]) {
+  display: grid;
+  max-width: 900px;
+  align-content: start;
+  gap: 28px;
+  padding: 24px 40px 48px;
+}
+.cara-nueva .cn-exp-caso-datos {
+  padding: 28px 24px 32px;
+  background: var(--wash);
+}
+.cara-nueva .cn-exp-caso-datos > .cn-exp-chip {
+  margin-bottom: 22px;
+}
+.cara-nueva .cn-exp-datos {
+  display: grid;
+  gap: 18px;
+  margin: 0;
+}
+.cara-nueva .cn-exp-datos dt {
+  margin-bottom: 2px;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-exp-datos dd {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-exp-caso-datos .cn-exp-h3 {
+  margin-bottom: 12px;
+}
+.cara-nueva .cn-exp-cuentas {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.cara-nueva .cn-exp-cuentas li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-exp-cuenta {
+  font-weight: 500;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-cuenta--pendiente {
+  font-weight: 600;
+  color: var(--warn);
+}
+.cara-nueva .cn-exp-carpetas-lado {
+  display: grid;
+  gap: 2px;
+}
+.cara-nueva .cn-exp-carpeta-lado {
+  display: flex;
+  width: calc(100% + 20px);
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 -10px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 15px;
+  text-align: left;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-carpeta-lado:hover {
+  background: var(--canvas);
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-cuenta-suave {
+  color: var(--ink-5);
+}
+
+/* ── Búsqueda dentro del caso ──────────────────────────────────────────── */
+.cara-nueva .cn-exp-buscar {
+  display: grid;
+  gap: 12px;
+}
+.cara-nueva .cn-exp-buscar-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cara-nueva .cn-exp-pasajes {
+  display: grid;
+  gap: 8px;
+}
+.cara-nueva .cn-exp-pasaje {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--wash);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.cara-nueva .cn-exp-pasaje-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 12px;
+  font-size: 15px;
+  line-height: 22px;
+}
+.cara-nueva .cn-exp-pasaje-relevancia {
+  font-size: 14px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-pasaje-texto {
+  margin-top: 6px;
+  font-size: 15px;
+  line-height: 24px;
+  color: var(--ink-2);
+}
+
+/* ── Carpetas: cabecera, migas, tarjetas, filas y árbol ────────────────── */
+.cara-nueva .cn-exp-carpetas {
+  display: grid;
+  gap: 16px;
+}
+.cara-nueva .cn-exp-migas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 6px;
+}
+.cara-nueva .cn-exp-miga {
+  min-height: 36px;
+  margin-left: -8px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brand);
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-miga:hover {
+  background: var(--brand-soft);
+}
+.cara-nueva .cn-exp-miga--aqui {
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink);
+  cursor: default;
+}
+.cara-nueva .cn-exp-miga--aqui:hover {
+  background: transparent;
+}
+.cara-nueva .cn-exp-miga-flecha {
+  color: var(--ink-5);
+}
+.cara-nueva .cn-exp-seccion-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px 24px;
+}
+.cara-nueva .cn-exp-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.cara-nueva .cn-exp-rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+.cara-nueva .cn-exp-tarjeta {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  align-content: start;
+  gap: 4px;
+  padding: 18px 20px;
+  border: none;
+  border-radius: 14px;
+  background: var(--wash);
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-tarjeta:hover {
+  box-shadow: 0 8px 24px rgb(16 24 34 / 0.1);
+}
+.cara-nueva .cn-exp-tarjeta--carpeta .cn-exp-fila-icono {
+  margin-bottom: 8px;
+}
+.cara-nueva .cn-exp-tarjeta--documento {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--canvas);
+  box-shadow: 0 1px 2px rgb(16 24 34 / 0.07), inset 0 0 0 1px var(--line);
+}
+.cara-nueva .cn-exp-tarjeta--nueva {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 72px;
+  box-shadow: inset 0 0 0 1.5px var(--line-2);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brand);
+}
+.cara-nueva .cn-exp-tarjeta-nombre {
+  display: block;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-tarjeta-dato {
+  display: block;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-fila-icono {
+  flex: none;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-tabla-cabeza {
+  display: none;
+}
+.cara-nueva .cn-exp-filas-tabla {
+  display: grid;
+}
+.cara-nueva .cn-exp-fila {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0 12px;
+  padding: 4px 4px 4px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.cara-nueva .cn-exp-fila:hover {
+  background: var(--wash);
+}
+.cara-nueva .cn-exp-fila-nombre {
+  display: flex;
+  min-width: 0;
+  min-height: 44px;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0 6px min(calc(var(--nivel, 0) * 22px), 88px);
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  line-height: 23px;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-fila-nombre:hover span {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cara-nueva .cn-exp-fila-dato {
+  display: none;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-fila-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2px;
+}
+.cara-nueva .cn-exp-destinos {
+  display: grid;
+  gap: 6px;
+}
+.cara-nueva .cn-exp-destino {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  font-size: 15px;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-destino:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-exp-destino[aria-checked='true'] {
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-exp-destino:disabled {
+  background: var(--neutral);
+  color: var(--ink-4);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.cara-nueva .cn-exp-destino-motivo {
+  flex: none;
+  font-size: 14px;
+  color: var(--ink-4);
+}
+
+/* ── Agregar un documento y el archivo sin texto ───────────────────────── */
+.cara-nueva .cn-exp-escoger {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  padding: 24px;
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-exp-hecho {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--exp-ok-bg);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-hecho svg {
+  flex: none;
+  color: var(--ok);
+}
+.cara-nueva .cn-exp-progreso-caja {
+  display: grid;
+  gap: 8px;
+}
+.cara-nueva .cn-exp-progreso {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--neutral);
+}
+.cara-nueva .cn-exp-progreso span {
+  display: block;
+  height: 100%;
+  background: var(--brand-fill);
+  transition: width 0.2s;
+}
+.cara-nueva .cn-exp-escaneado {
+  display: grid;
+  gap: 14px;
+}
+.cara-nueva .cn-exp-escaneado-cabeza {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  line-height: 24px;
+}
+.cara-nueva .cn-exp-escaneado-aviso {
+  display: grid;
+  gap: 4px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--warn-bg);
+  font-size: 15.5px;
+  line-height: 24px;
+  color: var(--warn);
+}
+.cara-nueva .cn-exp-escaneado-titulo {
+  font-size: 17px;
+  line-height: 26px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-opciones {
+  display: grid;
+  gap: 8px;
+}
+.cara-nueva .cn-exp-opciones li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--wash);
+}
+.cara-nueva .cn-exp-opcion-numero {
+  flex: none;
+  margin-top: 2px;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-opcion-titulo {
+  display: block;
+  font-size: 16px;
+  line-height: 25px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-opcion-texto {
+  display: block;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+}
+
+/* ── El lector a pantalla completa ─────────────────────────────────────── */
+.cara-nueva .cn-exp-lector {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  background: var(--exp-mesa);
+}
+.cara-nueva .cn-exp-lector:focus {
+  outline: none;
+}
+.cara-nueva .cn-exp-lector-barra {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 8px 20px;
+  border-bottom: 1px solid var(--line-2);
+  background: var(--canvas);
+}
+.cara-nueva .cn-exp-lector-volver {
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 44px;
+  max-width: 260px;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px 0 8px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 15px;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-lector-volver:hover {
+  background: var(--field);
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-lector-volver-texto {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cara-nueva .cn-exp-lector-titulos {
+  min-width: 0;
+  flex: 1 1 220px;
+}
+.cara-nueva .cn-exp-lector-titulo {
+  overflow: hidden;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-lector-meta {
+  font-size: 14px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-lector-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.cara-nueva .cn-exp-lector-mesa {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 32px;
+}
+.cara-nueva .cn-exp-lector-columna {
+  display: grid;
+  max-width: 760px;
+  gap: 12px;
+  margin: 0 auto;
+}
+.cara-nueva .cn-exp-lector-hoja {
+  min-width: 0;
+  padding: 48px 56px;
+  border-radius: 6px;
+  background: var(--exp-hoja);
+  box-shadow: var(--exp-hoja-sombra);
+  color: var(--exp-hoja-tinta);
+}
+.cara-nueva .cn-exp-lector-hoja--visor {
+  padding: 16px;
+}
+.cara-nueva .cn-exp-lector-texto {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--exp-hoja-tinta);
+}
+
+/* ── Los paneles de «Personas» y «Traer»: su interior, con esta piel ────── */
+/*
+ * Quién es quién, el cliente, el interrogatorio y traer al caso conservan su
+ * lógica y su marcado; aquí se les cambia la piel de las piezas del sistema
+ * viejo que traen dentro —letra de 12 px, campos con contorno, botones
+ * pequeños— para que no queden como un parche de la cara anterior en medio de
+ * la nueva. Se hace desde fuera, sin tocar `components.css`: el resto de la
+ * aplicación sigue igual.
+ */
+.cara-nueva .cn-exp-panel {
+  display: grid;
+  gap: 8px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-exp-zona > .cn-exp-panel:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+.cara-nueva .cn-exp-piel .text-meta,
+.cara-nueva .cn-exp-piel .text-ui {
+  font-size: 14px;
+  line-height: 21px;
+}
+.cara-nueva .cn-exp-piel .text-body {
+  font-size: 15px;
+  line-height: 23px;
+}
+.cara-nueva .cn-exp-piel .field,
+.cara-nueva .cn-exp-piel .field-area {
+  min-height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  font-size: 15px;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-piel .field:focus,
+.cara-nueva .cn-exp-piel .field-area:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-exp-piel .field-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-piel .btn-sm {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+.cara-nueva .cn-exp-piel .btn-primary {
+  border: none;
+  background: var(--brand-fill);
+  color: #fff;
+}
+.cara-nueva .cn-exp-piel .btn-primary:hover {
+  background: var(--brand-fill-hover);
+}
+.cara-nueva .cn-exp-piel .btn-secondary {
+  border: none;
+  background: var(--neutral);
+  color: var(--ink-2);
+}
+.cara-nueva .cn-exp-piel .btn-secondary:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-exp-piel .btn-ghost {
+  border: none;
+  background: transparent;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-exp-piel .btn-ghost:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-exp-piel .rounded-card {
+  border-radius: 12px;
+}
+.cara-nueva .cn-exp-piel .border-line-200 {
+  border-color: var(--line);
+}
+
+/* ── Escritorio ancho: las tres zonas y la tabla ───────────────────────── */
+@media (min-width: 760px) {
+  .cara-nueva .cn-exp-tabla-cabeza {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 170px 110px 136px;
+    gap: 12px;
+    padding: 10px 4px 10px 8px;
+    border-bottom: 1px solid var(--line);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink-4);
+  }
+  .cara-nueva .cn-exp-fila {
+    grid-template-columns: minmax(0, 1fr) 170px 110px 136px;
+  }
+  .cara-nueva .cn-exp-fila-dato {
+    display: block;
+  }
+}
+@media (min-width: 1024px) {
+  .cara-nueva.cn-exp-caso {
+    display: grid;
+    height: 100%;
+    grid-template-columns: minmax(0, 1fr) 296px;
+  }
+  /* El trabajo se desplaza por dentro; el término y el radicado quedan quietos. */
+  .cara-nueva .cn-exp-caso-trabajo {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .cara-nueva .cn-exp-caso-trabajo > * {
+    flex: none;
+  }
+  .cara-nueva .cn-exp-caso-trabajo > .cn-exp-zona:not([hidden]) {
+    min-height: 0;
+    flex: 1;
+    overflow-y: auto;
+  }
+  .cara-nueva .cn-exp-caso-datos {
+    overflow-y: auto;
+    border-left: 1px solid var(--line);
+  }
+}
+
+/* ── Teléfono (375) ────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .cara-nueva .cn-exp-h1 {
+    font-size: 28px;
+    line-height: 34px;
+  }
+  .cara-nueva .cn-exp-h2 {
+    font-size: 22px;
+    line-height: 30px;
+  }
+  .cara-nueva .cn-exp-bajada {
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .cara-nueva .cn-exp-cabeza {
+    padding: 16px 16px 0;
+    margin-bottom: 16px;
+  }
+  .cara-nueva .cn-exp-nuevo {
+    display: none;
+  }
+  .cara-nueva.cn-exp-lista > .cn-exp-pestanas,
+  .cara-nueva .cn-exp-caso-trabajo > .cn-exp-pestanas {
+    gap: 0 20px;
+    margin: 16px 16px 0;
+  }
+  .cara-nueva .cn-exp-cuerpo {
+    padding: 16px 16px 24px;
+  }
+  .cara-nueva .cn-exp-caso-item {
+    padding: 14px 12px;
+  }
+  .cara-nueva .cn-exp-caso-item--tarjeta {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 18px;
+  }
+  .cara-nueva .cn-exp-caso-item--tarjeta .cn-exp-caso-item-plazo {
+    max-width: none;
+    justify-items: start;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    text-align: left;
+  }
+  .cara-nueva .cn-exp-caso-item:not(.cn-exp-caso-item--tarjeta) {
+    flex-wrap: wrap;
+  }
+  .cara-nueva .cn-exp-caso-item:not(.cn-exp-caso-item--tarjeta) .cn-exp-caso-item-plazo {
+    max-width: none;
+    justify-items: start;
+    text-align: left;
+  }
+  .cara-nueva .cn-exp-pie-movil {
+    position: sticky;
+    bottom: 0;
+    display: block;
+    padding: 12px 16px 16px;
+    background: linear-gradient(to top, var(--canvas) 60%, transparent);
+  }
+  .cara-nueva .cn-exp-caso-cabeza {
+    padding: 8px 16px 0;
+  }
+  .cara-nueva .cn-exp-caso-titulo {
+    flex-wrap: wrap;
+  }
+  .cara-nueva .cn-exp-termino {
+    flex-direction: column;
+    align-items: stretch;
+    margin: 16px 16px 0;
+    padding: 18px;
+  }
+  .cara-nueva .cn-exp-termino-titulo {
+    font-size: 18px;
+    line-height: 26px;
+  }
+  .cara-nueva .cn-exp-caso-trabajo > .cn-exp-nota,
+  .cara-nueva .cn-exp-caso-trabajo > .cn-error {
+    margin: 12px 16px 0;
+  }
+  .cara-nueva .cn-exp-zona:not([hidden]) {
+    padding: 20px 16px 32px;
+  }
+  .cara-nueva .cn-exp-caso-datos {
+    padding: 24px 16px 32px;
+    border-top: 1px solid var(--line);
+  }
+  .cara-nueva .cn-exp-campos-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cara-nueva .cn-exp-acciones {
+    width: 100%;
+  }
+  .cara-nueva .cn-exp-lector-barra {
+    padding: 6px 8px;
+  }
+  .cara-nueva .cn-exp-lector-volver-texto {
+    display: none;
+  }
+  .cara-nueva .cn-exp-lector-acciones {
+    width: 100%;
+  }
+  .cara-nueva .cn-exp-lector-mesa {
+    padding: 16px 12px;
+  }
+  .cara-nueva .cn-exp-lector-hoja {
+    padding: 24px 20px;
+  }
+  .cara-nueva .cn-exp-lector-hoja--visor {
+    padding: 8px;
+  }
+}
+@media (min-width: 641px) and (max-width: 1023px) {
+  .cara-nueva .cn-exp-caso-datos {
+    padding: 24px 40px 40px;
+    border-top: 1px solid var(--line);
   }
 }
