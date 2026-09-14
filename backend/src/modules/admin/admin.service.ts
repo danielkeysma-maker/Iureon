@@ -6,6 +6,7 @@ import {
   AuthError,
   addUserToFirm,
   listFirmUsers,
+  olvidarSesionesDe,
   usuarioDeLaFirma,
   type FirmUserRole
 } from '../auth/auth.service';
@@ -1177,6 +1178,13 @@ export const restablecerContrasenaDeUsuario = async (
     console.error('[ADMIN] No se pudo restablecer la contraseña:', error.message);
     throw new AuthError('USER_UPDATE_FAILED', 'No se pudo restablecer la contraseña.', 502);
   }
+
+  /*
+   * Se olvidan sus sesiones recordadas en esta instancia. Otras instancias
+   * calientes pueden aceptarlas hasta 60 s más: costo aceptado de la memoria
+   * de sesiones (ver auth/sesionesVerificadas.ts).
+   */
+  olvidarSesionesDe(userId);
 
   return { email: objetivo.email ?? '' };
 };

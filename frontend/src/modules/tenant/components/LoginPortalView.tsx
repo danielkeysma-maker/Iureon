@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AlertCircle, Eye, EyeOff, Lock } from 'lucide-react';
 import { IureonMark } from './IureonMark';
 import { authApi } from '../../auth/auth.api';
+import { ApiError } from '../../../config/httpClient';
 import type { Session } from '../../auth/session';
 import { DIAS_DE_PRUEBA_GRATUITA } from '../../subscriptions/pruebaTerminada';
 import '../../../design/cara-nueva.css';
@@ -87,10 +88,22 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
       const { session } = await authApi.login(email.trim(), password);
       onLoginSuccess(session);
     } catch (err) {
-      // The API answers in Spanish and distinguishes nothing an attacker could
-      // use — "Correo o contraseña incorrectos" covers both a wrong password
-      // and an address that has no account.
-      setErrorMsg(err instanceof Error ? err.message : 'No se pudo entrar.');
+      /*
+       * Se muestra el mensaje del servidor, en español, sea cual sea el estado:
+       * 401 «Correo o contraseña incorrectos.» (una sola frase para contraseña
+       * equivocada y correo inexistente), 429 «Demasiados intentos…» y 503
+       * «No se pudo verificar el acceso…». `authApi.login` usa su propio
+       * `fetch` y no `httpClient`, así que ni el 401 borra sesión alguna ni el
+       * 503 se reintenta: el abogado lee la causa real.
+       *
+       * Sin respuesta del servidor, `fetch` lanza un `TypeError` con un texto
+       * en inglés del navegador; ese caso se dice en español.
+       */
+      if (err instanceof ApiError) {
+        setErrorMsg(err.message);
+      } else {
+        setErrorMsg('No se pudo conectar con el servidor. Revise su conexión e intente de nuevo.');
+      }
     } finally {
       setIsLoading(false);
     }

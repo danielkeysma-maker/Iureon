@@ -2,7 +2,9 @@ import { listarTodasLasCuentas } from './listarCuentas';
 import { isAuthRetryableFetchError } from '@supabase/supabase-js';
 import { supabase, supabaseAuth } from '../../config/supabase.config';
 import { validarBorradoDePropioUsuario } from './borrado.rules';
+import { clasificarFalloDeIngreso } from './acceso.rules';
 import { validarNombre, validarNombreOpcional } from './nombre.rules';
+import { crearMemoriaDeSesiones, verificarRecordando } from './sesionesVerificadas';
 import { describirPlan, estadoDeAcceso, leerPlan } from '../subscriptions/plan.service';
 
 /**
@@ -165,7 +167,32 @@ const esFalloDeTransporte = (error: unknown): boolean => {
   return status === 0 || status === 429 || status >= 500;
 };
 
-export const verificarToken = async (accessToken: string): Promise<VerificacionDeToken> => {
+/**
+ * Las verificaciones VÁLIDAS recientes de esta instancia. Las reglas —solo lo
+ * válido, llave hasheada, vida de 60 s acortada por el `exp`, techo de tamaño—
+ * y el costo aceptado viven en `sesionesVerificadas.ts`.
+ */
+const memoriaDeSesiones = crearMemoriaDeSesiones<AuthenticatedUser>();
+
+/**
+ * Olvida en ESTA instancia las sesiones recordadas de un usuario. Se llama
+ * después de que el backend cambia la cuenta con éxito. Otras instancias
+ * calientes pueden seguir aceptando esa sesión hasta 60 s: es el costo
+ * aceptado de no verificar contra la red en cada petición.
+ */
+export const olvidarSesionesDe = (userId: string): void => {
+  memoriaDeSesiones.olvidarUsuario(userId);
+};
+
+/*
+ * `verificarToken` pregunta primero a la memoria y solo va a Supabase si no
+ * hay una verificación válida reciente. La semántica de los tres desenlaces no
+ * cambia: INVALIDO y NO_DISPONIBLE salen siempre de una consulta real.
+ */
+export const verificarToken = (accessToken: string): Promise<VerificacionDeToken> =>
+  verificarRecordando(accessToken, verificarContraSupabase, memoriaDeSesiones);
+
+async function verificarContraSupabase(accessToken: string): Promise<VerificacionDeToken> {
   let data: Awaited<ReturnType<ReturnType<typeof requireAuthClient>['auth']['getUser']>>['data'];
 
   try {
@@ -205,7 +232,7 @@ export const verificarToken = async (accessToken: string): Promise<VerificacionD
     estado: 'VALIDO',
     user: { id: data.user.id, email: data.user.email ?? '', firmId, role, nombre }
   };
-};
+}
 
 /**
  * La forma corta, para quien no puede hacer nada distinto con «no se pudo
@@ -219,12 +246,33 @@ export const userFromToken = async (accessToken: string): Promise<AuthenticatedU
 
 /** Exchanges e-mail and password for a session. */
 export const signIn = async (email: string, password: string): Promise<Session> => {
-  const { data, error } = await requireAuthClient().auth.signInWithPassword({ email, password });
+  const cliente = requireAuthClient();
+
+  let respuesta: Awaited<ReturnType<typeof cliente.auth.signInWithPassword>>;
+  try {
+    respuesta = await cliente.auth.signInWithPassword({ email, password });
+  } catch (err) {
+    /*
+     * `signInWithPassword` devuelve los errores de autenticación, pero relanza
+     * los demás. Sin este `catch` saldrían como 500 genérico del controlador.
+     */
+    const fallo = clasificarFalloDeIngreso(err);
+    console.warn('[AUTH] Ingreso no concedido:', fallo.status, fallo.causa);
+    throw new AuthError(fallo.codigo, fallo.mensaje, fallo.status);
+  }
+
+  const { data, error } = respuesta;
 
   if (error || !data.session) {
-    // Deliberately one message for a wrong password and an unknown address:
-    // telling them apart tells an attacker which e-mails have accounts.
-    throw new AuthError('INVALID_CREDENTIALS', 'Correo o contraseña incorrectos.', 401);
+    /*
+     * Antes, cualquier error salía como «Correo o contraseña incorrectos.»,
+     * incluidos el límite de intentos y un Supabase caído. La clasificación y
+     * el porqué de cada desenlace viven en `acceso.rules.ts`. Se registra la
+     * causa real —clase, estado y código de Supabase—, nunca el correo.
+     */
+    const fallo = clasificarFalloDeIngreso(error);
+    console.warn('[AUTH] Ingreso no concedido:', fallo.status, fallo.causa);
+    throw new AuthError(fallo.codigo, fallo.mensaje, fallo.status);
   }
 
   const user = await userFromToken(data.session.access_token);
@@ -386,6 +434,9 @@ export const actualizarMiNombre = async (
     throw new AuthError('USER_UPDATE_FAILED', 'No se pudo guardar su nombre.', 502);
   }
 
+  // El nombre viaja en la sesión recordada: sin olvidar, /auth/me mostraría el viejo hasta 60 s.
+  olvidarSesionesDe(user.id);
+
   return nombre;
 };
 
@@ -477,6 +528,9 @@ export const setUserActive = async (
   });
 
   if (error) throw new AuthError('USER_UPDATE_FAILED', 'No se pudo cambiar el estado del usuario.', 502);
+
+  // Desactivado debe dejar de entrar ya en esta instancia; en otras, hasta 60 s.
+  olvidarSesionesDe(userId);
 };
 
 /** Cambia el rol dentro de la firma. Nunca SUPER_ADMIN, y nunca a uno mismo. */
@@ -500,6 +554,9 @@ export const setUserRole = async (
   });
 
   if (error) throw new AuthError('USER_UPDATE_FAILED', 'No se pudo cambiar el rol.', 502);
+
+  // El rol viaja en la sesión recordada: un permiso retirado no debe sobrevivir en memoria.
+  olvidarSesionesDe(userId);
 };
 
 /**
@@ -549,6 +606,9 @@ export const eliminarMiUsuario = async (input: {
   if (error) {
     throw new AuthError('USER_DELETE_FAILED', 'No se pudo eliminar su usuario.', 502);
   }
+
+  // Incluye la sesión que acaba de volver a abrir `signIn` para comprobar la contraseña.
+  olvidarSesionesDe(input.user.id);
 };
 
 /** The firm's own registry row, for the header and the subscription screen. */

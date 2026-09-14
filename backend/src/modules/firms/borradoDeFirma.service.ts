@@ -1,6 +1,6 @@
 import { listarTodasLasCuentas } from '../auth/listarCuentas';
 import { supabase } from '../../config/supabase.config';
-import { AuthError, listFirmUsers } from '../auth/auth.service';
+import { AuthError, listFirmUsers, olvidarSesionesDe } from '../auth/auth.service';
 import { BackblazeB2TenantStorageService } from '../documents/b2.service';
 import { correoDeBorrado } from '../mail/avisos.mail';
 import type { QuienBorro } from '../mail/avisos.mail';
@@ -156,6 +156,13 @@ export const borrarFirmaConTodo = async (input: {
     const { error: errorCuenta } = await client.auth.admin.deleteUser(cuenta.id);
     if (errorCuenta) advertencias.push(`Cuenta no eliminada: ${cuenta.email} (${errorCuenta.message})`);
     else usuariosEliminados += 1;
+    /*
+     * Se olvida AUNQUE la cuenta no se haya podido borrar: los datos de la
+     * firma ya no existen desde el paso 3, y una sesión recordada seguiría
+     * entrando a una firma vacía. Otras instancias calientes pueden aceptarla
+     * hasta 60 s: costo aceptado (ver auth/sesionesVerificadas.ts).
+     */
+    olvidarSesionesDe(cuenta.id);
   }
 
   const resultado: FirmaEliminada = {
