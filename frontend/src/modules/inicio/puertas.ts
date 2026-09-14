@@ -1,4 +1,5 @@
-import { ClipboardCheck, Compass, FolderOpen, Mic, Sparkles, type LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { navModule } from '../tenant/navigation';
 import type { MainView } from '../tenant/types';
 
 /**
@@ -75,37 +76,42 @@ export interface PuertaDeInicio {
  * a Orientación una brújula aquí y otra cosa allá haría que la misma puerta
  * pareciera dos sitios distintos; reconocer por forma es la mitad de aprender
  * dónde vive cada cosa.
+ *
+ * Esa promesa vivía solo en este comentario, con los íconos copiados a mano, y
+ * se habría roto el 14 de septiembre de 2026, cuando la navegación cambió de
+ * íconos. Ahora cada puerta LEE el ícono de su módulo de destino: no queda
+ * copia que pueda quedarse atrás.
  */
 export const PUERTAS_DE_INICIO: readonly PuertaDeInicio[] = [
   {
     titulo: 'Me llegó un documento',
     queHace: 'Un auto, una sentencia, un oficio. Qué dice, qué le exigen y para cuándo, y por dónde se ataca.',
     destino: 'taller',
-    icono: ClipboardCheck,
+    icono: navModule('taller').icon,
     abreDocumentoRecibido: true
   },
   {
     titulo: 'Tengo los hechos y no el nombre',
     queHace: 'Cuente el caso como a un colega y el catálogo le dice qué actuación cabe, con su término y su artículo.',
     destino: 'orientacion',
-    icono: Compass
+    icono: navModule('orientacion').icon
   },
   {
     titulo: 'Ya sé qué voy a presentar',
     queHace: 'El primer borrador de una actuación del catálogo, con su término y su fuente.',
     destino: 'workspace',
-    icono: Sparkles
+    icono: navModule('workspace').icon
   },
   {
     titulo: 'Tengo un caso con muchos papeles',
     queHace: 'Reúna el expediente, busque dentro de él por significado y prepare el interrogatorio.',
     destino: 'expedientes',
-    icono: FolderOpen
+    icono: navModule('expedientes').icon
   },
   {
     titulo: 'Grabé una audiencia',
     queHace: 'El transcrito con cada interlocutor separado, y su acta.',
     destino: 'audiencias',
-    icono: Mic
+    icono: navModule('audiencias').icon
   }
 ];

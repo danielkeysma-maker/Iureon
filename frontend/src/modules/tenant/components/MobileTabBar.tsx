@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  IconoDocumento,
-  IconoInicio,
-  IconoMas,
-  IconoMicrofono,
-  IconoOrientar,
-  type IconoProps
-} from '../../../design/ArtboardIcons';
-import { NAV_MODULES } from '../navigation';
+import { ICONO_MAS, NAV_MODULES, navModule, type NavIcon } from '../navigation';
 import type { MainView } from '../types';
 import '../../../design/cara-nueva.css';
 
@@ -46,29 +38,36 @@ import '../../../design/cara-nueva.css';
  * de cincuenta megas, cosa que nadie hace en un juzgado; una entrevista se graba
  * con el cliente enfrente. Audiencias queda primera en «Más».
  *
- * ─── LOS ÍCONOS SON LOS DE LA MAQUETA ───────────────────────────────────────
+ * ─── LOS ÍCONOS VIENEN DE `navigation.ts`, NO DE AQUÍ ───────────────────────
  *
- * NO son equivalentes «parecidos» de una libreria: son los trazos del HTML,
- * en `design/ArtboardIcons.tsx`. La diferencia cambia el significado — la
- * maqueta pone una BOMBILLA en «Orientar» y aqui habia una brujula. Una brujula
- * dice «ubiquese»; una bombilla dice «aqui se le ocurre que hacer», que es lo
- * que hace Orientacion. Y el cuarto son TRES CIRCULOS en fila, no una
- * cuadricula: la cuadricula promete una parrilla de aplicaciones.
+ * Esta barra dibujaba los trazos de la maqueta y el panel lateral usaba
+ * `lucide-react`, así que un mismo módulo tenía dos caras. Desde el 14 de
+ * septiembre de 2026 toda la navegación usa lucide, elegido por lo que quiere
+ * decir cada dibujo de la maqueta y no por parecido: BOMBILLA en «Orientar»
+ * (una brújula dice «ubíquese»; una bombilla, «aquí se le ocurre qué hacer») y
+ * TRES PUNTOS en «Más», no una cuadrícula, que promete una parrilla de
+ * aplicaciones.
  */
 
+/*
+ * EL ÍCONO NO SE DECLARA AQUÍ. Esta barra tenía su propia tabla de íconos y el
+ * panel lateral otra, y un mismo módulo se veía distinto en el teléfono y en el
+ * escritorio. Ahora cada destino toma el suyo de `navigation.ts`, así que no
+ * pueden separarse. La
+ * etiqueta sí es propia: «Redactar» y «Grabar» son verbos para el pulgar, y el
+ * panel lateral nombra el módulo.
+ */
 interface Destino {
   id: MainView;
   etiqueta: string;
-  Icono: React.FC<IconoProps>;
 }
 
 const DESTINOS: readonly Destino[] = [
   /* Inicio primero: es donde se entra y adonde lleva el logo. Cinco columnas desde entonces. */
-  { id: 'inicio', etiqueta: 'Inicio', Icono: IconoInicio },
-  { id: 'workspace', etiqueta: 'Redactar', Icono: IconoDocumento },
-  /* BOMBILLA, no brujula: es el trazo del artboard y dice otra cosa. */
-  { id: 'orientacion', etiqueta: 'Orientar', Icono: IconoOrientar },
-  { id: 'entrevistas', etiqueta: 'Grabar', Icono: IconoMicrofono }
+  { id: 'inicio', etiqueta: 'Inicio' },
+  { id: 'workspace', etiqueta: 'Redactar' },
+  { id: 'orientacion', etiqueta: 'Orientar' },
+  { id: 'entrevistas', etiqueta: 'Grabar' }
 ];
 
 /** Lo que queda, en el orden de la barra lateral. Audiencias primero. */
@@ -87,7 +86,7 @@ interface MobileTabBarProps {
 
 /** Un destino: ícono de 20 px sobre su etiqueta, en toda la altura de la barra. */
 const Destino: React.FC<{
-  Icono: React.FC<IconoProps>;
+  Icono: NavIcon;
   etiqueta: string;
   activo: boolean;
   onClick: () => void;
@@ -128,10 +127,10 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
       className="cara-nueva cn-tabs grid grid-cols-5 lg:hidden"
       style={{ paddingBottom: 'calc(8px + env(safe-area-inset-bottom))' }}
     >
-      {DESTINOS.filter(({ id }) => !ocultas.includes(id)).map(({ id, etiqueta, Icono }) => (
+      {DESTINOS.filter(({ id }) => !ocultas.includes(id)).map(({ id, etiqueta }) => (
         <Destino
           key={id}
-          Icono={Icono}
+          Icono={navModule(id).icon}
           etiqueta={etiqueta}
           activo={mainView === id && !masAbierto}
           onClick={() => setMainView(id)}
@@ -140,7 +139,7 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({
       ))}
 
       <Destino
-        Icono={IconoMas}
+        Icono={ICONO_MAS}
         etiqueta="Más"
         activo={masAbierto || enMas}
         onClick={onAbrirMas}

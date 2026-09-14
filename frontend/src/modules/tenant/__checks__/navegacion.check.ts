@@ -1,4 +1,7 @@
-import { NAV_GROUPS, NAV_MODULES, NUMERAL_DE_MODULO, VISTA_POR_MODULO, modulosSinGrupo } from '../navigation';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import * as lucide from 'lucide-react';
+import { ICONO_MAS, NAV_GROUPS, NAV_MODULES, NUMERAL_DE_MODULO, VISTA_POR_MODULO, modulosSinGrupo, navModule } from '../navigation';
 import { PUERTAS_DE_INICIO } from '../../inicio/puertas';
 import { PASOS_DE_VISITA } from '../../inicio/visitaGuiada/pasos';
 import { MANUAL } from '../../help/content/manual';
@@ -238,6 +241,93 @@ check(
   sinManual.length > 0
     ? `SIN MANUAL: ${sinManual.map((m) => m.label).join(', ')}`
     : `${enRutas.size} destinos nombrados en las rutas`
+);
+
+/* ─── 8. UN MÓDULO TIENE UN SOLO ÍCONO, EN TODAS LAS PANTALLAS ──────────── */
+/*
+ * Decisión del propietario, 14 de septiembre de 2026: el panel colapsado va con
+ * ÍCONOS —un numeral sin etiqueta no dice adónde lleva— y el ícono de cada
+ * módulo es el mismo en el panel, en la barra inferior del teléfono, en «Más»
+ * y en las puertas de Inicio. Antes la barra inferior tenía su propia tabla y
+ * Redacción era un documento en el teléfono y unas chispas en el escritorio.
+ *
+ * Se lee el código fuente de los componentes porque montarlos exige la firma y
+ * el plan en contexto. Se ejecuta desde `frontend/` (npm run), de ahí `cwd`.
+ */
+const COMPONENTES = join(process.cwd(), 'src', 'modules', 'tenant', 'components');
+const SIDEBAR = readFileSync(join(COMPONENTES, 'SidebarLeft.tsx'), 'utf8');
+const TAB_BAR = readFileSync(join(COMPONENTES, 'MobileTabBar.tsx'), 'utf8');
+
+const inicioColapsado = SIDEBAR.indexOf('if (isCollapsed) {');
+const bloqueColapsado =
+  inicioColapsado < 0 ? '' : SIDEBAR.slice(inicioColapsado, SIDEBAR.indexOf('\n    }\n', inicioColapsado));
+check(
+  'el panel colapsado pinta el ícono del módulo y no su numeral',
+  bloqueColapsado.includes('<Icon ') &&
+    !bloqueColapsado.includes('NUMERAL_DE_MODULO') &&
+    /icon:\s*Icon\s*\}\s*=\s*navModule\(id\)/.test(SIDEBAR),
+  bloqueColapsado ? 'ficha con ícono, numeral solo desplegado' : 'NO SE ENCONTRÓ el bloque colapsado'
+);
+check(
+  'y cada ficha colapsada conserva el nombre del módulo en title y aria-label',
+  /title=\{[^}]*label/.test(bloqueColapsado) && bloqueColapsado.includes('aria-label={label}'),
+  'sin etiqueta visible, el nombre tiene que estar en algún sitio'
+);
+
+/*
+ * UNA SOLA LIBRERÍA. Los íconos del teléfono eran trazos copiados de la
+ * maqueta (`design/ArtboardIcons.tsx`) y el panel usaba lucide. Se compara por
+ * identidad contra lo que exporta `lucide-react`, y además se lee la fuente:
+ * un componente propio con el mismo nombre que uno de lucide no pasaría.
+ */
+const NAVIGATION_TS = readFileSync(join(process.cwd(), 'src', 'modules', 'tenant', 'navigation.ts'), 'utf8');
+const DE_LUCIDE = new Set<unknown>(Object.values(lucide));
+const ajenos = NAV_MODULES.filter((m) => !DE_LUCIDE.has(m.icon));
+check(
+  'todo ícono de navegación sale de lucide-react, incluido «Más»',
+  ajenos.length === 0 && DE_LUCIDE.has(ICONO_MAS) && !NAVIGATION_TS.includes('ArtboardIcons'),
+  ajenos.length > 0
+    ? `NO SON DE LUCIDE: ${ajenos.map((m) => m.id).join(', ')}`
+    : NAVIGATION_TS.includes('ArtboardIcons')
+    ? 'navigation.ts importa ArtboardIcons'
+    : `${NAV_MODULES.length} módulos y «Más»`
+);
+check(
+  'la barra inferior no tiene tabla de íconos propia: los lee de navigation.ts',
+  !TAB_BAR.includes('ArtboardIcons') &&
+    !TAB_BAR.includes("from 'lucide-react'") &&
+    TAB_BAR.includes('navModule(id).icon') &&
+    TAB_BAR.includes('Icono={ICONO_MAS}'),
+  'una sola fuente'
+);
+check(
+  'Orientación es una bombilla (Lightbulb), no una brújula',
+  navModule('orientacion').icon === lucide.Lightbulb,
+  'la bombilla dice «aquí se le ocurre qué hacer»'
+);
+check('«Más» son tres puntos en fila (Ellipsis), no una cuadrícula', ICONO_MAS === lucide.Ellipsis);
+
+const iconos = NAV_MODULES.map((m) => m.icon);
+const compartidos = NAV_MODULES.filter((m, i) => iconos.indexOf(m.icon) !== i);
+check(
+  'ningún par de módulos comparte ícono',
+  compartidos.length === 0,
+  compartidos.length > 0
+    ? `REPETIDO EN: ${compartidos.map((m) => m.id).join(', ')}`
+    : `${new Set(iconos).size} íconos para ${NAV_MODULES.length} módulos`
+);
+check(
+  'Audiencias no lleva el micrófono: es de Entrevistas («Grabar»)',
+  navModule('audiencias').icon !== lucide.Mic && navModule('entrevistas').icon === lucide.Mic
+);
+
+const puertasConOtroIcono = PUERTAS_DE_INICIO.filter((p) => p.icono !== navModule(p.destino).icon);
+check(
+  'cada puerta de Inicio lleva el ícono de su módulo de destino',
+  puertasConOtroIcono.length === 0,
+  puertasConOtroIcono.length > 0
+    ? `DISTINTO: ${puertasConOtroIcono.map((p) => p.destino).join(', ')}`
+    : `${PUERTAS_DE_INICIO.length} puertas`
 );
 
 console.log('');

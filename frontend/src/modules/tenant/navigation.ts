@@ -1,6 +1,35 @@
-import { Home, Sparkles, ClipboardCheck, Mic, BookOpen, BookMarked, LifeBuoy, Library, Wrench, Shield, UserRound, ShieldCheck, Compass, SlidersHorizontal, FileClock, FolderOpen } from 'lucide-react';
+import { House, File, Lightbulb, Mic, AudioLines, Ellipsis, Sparkles, ClipboardCheck, BookOpen, BookMarked, LifeBuoy, Library, Wrench, Shield, ShieldCheck, SlidersHorizontal, FileClock, FolderOpen } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { MainView } from './types';
+
+/**
+ * EL ÍCONO DE UN MÓDULO ES UNO SOLO, EN TODAS LAS PANTALLAS.
+ *
+ * Decisión del propietario (14 de septiembre de 2026). El panel lateral
+ * colapsado muestra ÍCONOS, no numerales: el diseño proponía el numeral solo,
+ * y un «05» sin etiqueta no le dice a nadie adónde lleva. Pero el defecto real
+ * era otro: la barra inferior del teléfono tenía su propia tabla de íconos
+ * —los trazos del artboard— y el panel lateral otra —la de `lucide-react`—, de
+ * modo que Redacción era un documento en el teléfono y unas chispas en el
+ * escritorio, y Orientación una bombilla allá y una brújula acá. El mismo
+ * módulo parecía dos sitios.
+ *
+ * UNA SOLA LIBRERÍA. Los íconos del teléfono no eran de ninguna librería:
+ * eran trazos copiados de las maquetas, dibujados al estilo de lucide. Toda la
+ * navegación usa ahora `lucide-react` desde esta lista, y cada ícono del
+ * teléfono se cambió por el de lucide que corresponde a su dibujo, conservando
+ * lo que quiere decir. La barra inferior, la hoja «Más», el panel (colapsado y
+ * desplegado) y las puertas de Inicio lo leen de aquí; ninguna pantalla declara
+ * íconos de módulo por su cuenta, así que no pueden volver a separarse.
+ */
+export type NavIcon = LucideIcon;
+
+/**
+ * «Más» no es un módulo, pero es navegación y va con la misma librería.
+ * TRES PUNTOS EN FILA y no una cuadrícula: la cuadrícula promete una parrilla
+ * de aplicaciones, y detrás de «Más» hay una lista.
+ */
+export const ICONO_MAS: NavIcon = Ellipsis;
 
 /**
  * The product's top-level modules, named once.
@@ -26,7 +55,7 @@ export interface NavModule {
   id: MainView;
   label: string;
   description: string;
-  icon: LucideIcon;
+  icon: NavIcon;
 }
 
 export const NAV_MODULES: NavModule[] = [
@@ -36,7 +65,7 @@ export const NAV_MODULES: NavModule[] = [
    * dejo abierto, el plan y el saldo, y las novedades. Visible para todo plan
    * y todo rol; no depende de ningun modulo del servidor.
    */
-  { id: 'inicio', label: 'Inicio', description: 'Su punto de partida', icon: Home },
+  { id: 'inicio', label: 'Inicio', description: 'Su punto de partida', icon: House },
   /*
    * Primero en la lista a propósito.
    *
@@ -49,9 +78,19 @@ export const NAV_MODULES: NavModule[] = [
     id: 'orientacion',
     label: 'Orientación',
     description: 'Desde los hechos del caso',
-    icon: Compass
+    /*
+     * BOMBILLA, no brújula, y es a propósito: es el dibujo de la maqueta. Una
+     * brújula dice «ubíquese»; una bombilla dice «aquí se le ocurre qué hacer»,
+     * que es lo que hace Orientación.
+     */
+    icon: Lightbulb
   },
-  { id: 'workspace', label: 'Redacción', description: 'Providencias judiciales', icon: Sparkles },
+  /*
+   * La hoja con la esquina doblada, sin renglones, como la dibuja la maqueta.
+   * `File` y no `FileText`: a 20 px el contorno se lee bien, y los renglones
+   * lo acercarían a los otros íconos de hoja de la barra (`FileClock`).
+   */
+  { id: 'workspace', label: 'Redacción', description: 'Providencias judiciales', icon: File },
   /*
    * EL EXPEDIENTE VA EN «REGISTRAR» Y NO EN «PRODUCIR», aunque de él salga el
    * interrogatorio. Lo que se hace aquí es anotar el asunto y quién está en
@@ -84,12 +123,21 @@ export const NAV_MODULES: NavModule[] = [
     description: 'Corregir un escrito con el revisor',
     icon: ClipboardCheck
   },
-  { id: 'audiencias', label: 'Audiencias', description: 'Transcripción de grabaciones', icon: Mic },
+  /*
+   * ONDAS DE SONIDO Y NO MICRÓFONO. El micrófono es de Entrevistas, que en el
+   * teléfono es «Grabar»: ahí se graba con el cliente enfrente. Una audiencia
+   * no se graba aquí, se SUBE como archivo y se transcribe; lo que se trabaja
+   * es el sonido ya grabado, y eso es lo que dibuja `AudioLines`. Se descartó
+   * `FileAudio`: otra hoja con esquina doblada junto a Redacción (`File`) y
+   * Borradores (`FileClock`) sería la tercera forma casi igual en el panel
+   * colapsado, que es donde no hay etiqueta que las distinga.
+   */
+  { id: 'audiencias', label: 'Audiencias', description: 'Transcripción de grabaciones', icon: AudioLines },
   {
     id: 'entrevistas',
     label: 'Entrevistas',
     description: 'Clientes y sus declaraciones',
-    icon: UserRound
+    icon: Mic
   },
   { id: 'search', label: 'Buscador', description: 'Sentencias & precedentes', icon: BookOpen },
   { id: 'catalogo', label: 'Catálogo', description: 'Actuaciones y términos verificados', icon: Library },

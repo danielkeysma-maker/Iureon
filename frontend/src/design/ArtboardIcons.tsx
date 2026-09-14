@@ -1,18 +1,27 @@
 import React from 'react';
 
 /**
- * Los íconos de las maquetas de Claude Design, con sus trazos EXACTOS.
+ * Íconos de ESTADO y de acción de las maquetas de Claude Design, con sus trazos
+ * exactos. La NAVEGACIÓN ya no vive aquí.
  *
- * ─── POR QUÉ NO SE USA LA LIBRERÍA DE ÍCONOS AQUÍ ───────────────────────────
+ * ─── POR QUÉ LA NAVEGACIÓN SALIÓ DE ESTE ARCHIVO ───────────────────────────
  *
- * Las pantallas móviles se hicieron primero con equivalentes de `lucide-react`
- * elegidos «por parecido», y el resultado se desviaba del diseño en cosas que
- * cambian el significado. La más clara: en la barra inferior, **«Orientar» es
- * una BOMBILLA en el artboard** —`M12 3a7 7 0 00-4 12.7V19h8v-3.3A7 7 0 0012 3z`—
- * y se había puesto una brújula. Una brújula dice «ubíquese»; una bombilla dice
- * «aquí se le ocurre qué hacer», que es exactamente lo que hace Orientación.
- * También el cuarto destino: tres círculos en fila, no una cuadrícula — la
- * cuadrícula promete una parrilla de aplicaciones.
+ * Aquí estuvieron Inicio, Orientar, Grabar y Más de la barra inferior del
+ * teléfono, mientras el panel lateral usaba `lucide-react`. Eran dos juegos
+ * para los mismos módulos y el mismo módulo se veía distinto en el teléfono y
+ * en el escritorio. Estos trazos no son de ninguna librería: están dibujados a
+ * mano en el estilo de lucide (lienzo 24, trazo 2, puntas redondas). Por
+ * decisión del propietario (14 de septiembre de 2026) toda la navegación usa
+ * `lucide-react` desde `modules/tenant/navigation.ts`, con el ícono de lucide
+ * que corresponde a cada dibujo.
+ *
+ * ─── LA LECCIÓN QUE SE CONSERVA AL CAMBIAR DE LIBRERÍA ─────────────────────
+ *
+ * Los equivalentes «parecidos» cambian el significado si se eligen por forma y
+ * no por intención. **«Orientar» es una BOMBILLA** (`Lightbulb`), no una
+ * brújula: una brújula dice «ubíquese»; una bombilla dice «aquí se le ocurre
+ * qué hacer», que es lo que hace Orientación. Y «Más» son TRES PUNTOS en fila
+ * (`Ellipsis`), no una cuadrícula, que promete una parrilla de aplicaciones.
  *
  * Estos `d` están copiados del HTML de los artboards, no redibujados. Todos
  * comparten el mismo lienzo `0 0 24 24`, `fill:none`, y las terminaciones
@@ -50,51 +59,15 @@ const Svg: React.FC<IconoProps & { children: React.ReactNode }> = ({
   </svg>
 );
 
-/** Casa. «Inicio» en la barra inferior: el mismo trazo que `Home` en la barra lateral. */
-export const IconoInicio: React.FC<IconoProps> = (p) => (
-  <Svg {...p}>
-    <path d="M3 10.5 12 3l9 7.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z" />
-  </Svg>
-);
-
-/** Documento con esquina doblada. «Redactar» en la barra inferior. */
+/**
+ * Documento con esquina doblada. Lo usa la entrevista en el teléfono. Ya no es
+ * «Redactar» en la barra inferior: la navegación usa `File` de lucide.
+ */
 export const IconoDocumento: React.FC<IconoProps> = (p) => (
   <Svg {...p}>
     <path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z" />
     <path d="M14 3v5h5" />
   </Svg>
-);
-
-/** BOMBILLA. «Orientar» — no una brújula, que es lo que se había puesto. */
-export const IconoOrientar: React.FC<IconoProps> = (p) => (
-  <Svg {...p}>
-    <path d="M12 3a7 7 0 00-4 12.7V19h8v-3.3A7 7 0 0012 3z" />
-  </Svg>
-);
-
-/** Micrófono. «Grabar». */
-export const IconoMicrofono: React.FC<IconoProps> = (p) => (
-  <Svg {...p}>
-    <path d="M12 15a4 4 0 004-4V7a4 4 0 10-8 0v4a4 4 0 004 4z" />
-    <path d="M12 19v2" />
-  </Svg>
-);
-
-/** Tres círculos en fila. «Más» — el HTML no usa cuadrícula. */
-export const IconoMas: React.FC<IconoProps> = ({ className, strokeWidth = 2 }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={strokeWidth}
-    strokeLinecap="round"
-    className={className}
-    aria-hidden="true"
-  >
-    <circle cx="5" cy="12" r="1.6" />
-    <circle cx="12" cy="12" r="1.6" />
-    <circle cx="19" cy="12" r="1.6" />
-  </svg>
 );
 
 /** Verificado: círculo con palomita. Las maquetas lo trazan a 2.4. */
