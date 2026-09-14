@@ -1,0 +1,742 @@
+/*
+ * LA CARA NUEVA, POR PANTALLA Y NO DE GOLPE.
+ *
+ * Sale de `public/handoff/app-entrada-y-sesion.html` (README-app §1): escala
+ * 30/28/24…/14, radios 8/10/12/14/16–20, botones sin contorno, campos sobre gris
+ * y Satoshi como letra de interfaz. El resto de la aplicación todavía no se ha
+ * rediseñado y tiene que verse exactamente igual que hoy, así que NADA de este
+ * archivo vive fuera de `.cara-nueva`: ni una variable en `:root`, ni una regla
+ * sobre `body`, ni un `*` suelto. Una pantalla solo cambia de cara si su raíz
+ * lleva esa clase; las demás no la tienen y no se enteran de que este archivo
+ * existe, aunque Vite lo empaquete en el mismo CSS.
+ *
+ * No toca `tokens.css`: esos tokens son canales RGB para Tailwind y los usa
+ * toda la aplicación. Estos son colores literales del diseño, con nombre
+ * propio, y solo valen dentro del envoltorio.
+ */
+
+.cara-nueva {
+  --ink: #101822;
+  --ink-2: #2b3542;
+  --ink-3: #3b4453;
+  --ink-4: #5c6673;
+  --ink-5: #667487;
+  --line: #eef1f4;
+  --line-2: #e6e9ee;
+  --field: #f6f7f9;
+  --neutral: #f1f3f6;
+  --canvas: #fff;
+  --wash: #fafbfc;
+  --gold: #c8a046;
+  --brand: #17456b;
+  --brand-dark: #113652;
+  --brand-soft: #eaf0f5;
+  /* El relleno del botón primario va aparte del azul de enlace: en oscuro el enlace aclara y el botón no puede, o el texto blanco baja de 4,5:1. */
+  --brand-fill: #17456b;
+  --brand-fill-hover: #113652;
+  --ok: #14653f;
+  --warn: #8a5a12;
+  --warn-bg: #fbf3e4;
+  --danger: #8c2f26;
+  --danger-bg: #faf0ee;
+  --panel: #0f2233;
+  --panel-kicker: #7fa8c4;
+  --panel-ink-2: #a9bccc;
+  --panel-ok: #4fb483;
+  --panel-warn: #d9a64a;
+  --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --shadow-1: 0 1px 2px rgb(16 24 34 / 0.06);
+  --shadow-btn: 0 2px 8px rgb(23 69 107 / 0.28);
+  --shadow-pie: 0 -8px 24px rgb(16 24 34 / 0.06);
+
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: 'Satoshi', -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: light;
+}
+
+/*
+ * EL OSCURO, EN LOS DOS SELECTORES QUE USA LA APLICACIÓN (ver tokens.css): el
+ * del sistema, que respeta «Claro siempre», y el forzado. Uno solo dejaría la
+ * pantalla clara para la mitad de los usuarios. Es sustitución token por token,
+ * con los `--d-*` del diseño; la elevación se expresa con superficie.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva {
+    --ink: #e8edf2;
+    --ink-2: #c3cdd8;
+    --ink-3: #c3cdd8;
+    --ink-4: #8fa0b2;
+    --ink-5: #8fa0b2;
+    --line: #24303d;
+    --line-2: #24303d;
+    --field: #1a2430;
+    --neutral: #1a2430;
+    --canvas: #131b24;
+    --wash: #0b1219;
+    --gold: #d9b45c;
+    --brand: #4e90c4;
+    --brand-dark: #7fb0d8;
+    --brand-soft: #1a2430;
+    --brand-fill: #1f5a8a;
+    --brand-fill-hover: #17456b;
+    --ok: #4fb483;
+    --warn: #d9a64a;
+    --warn-bg: rgb(217 166 74 / 0.12);
+    --danger: #eba59c;
+    --danger-bg: rgb(235 165 156 / 0.12);
+    --panel: #0b1219;
+    --shadow-btn: none;
+    --shadow-pie: none;
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] .cara-nueva {
+  --ink: #e8edf2;
+  --ink-2: #c3cdd8;
+  --ink-3: #c3cdd8;
+  --ink-4: #8fa0b2;
+  --ink-5: #8fa0b2;
+  --line: #24303d;
+  --line-2: #24303d;
+  --field: #1a2430;
+  --neutral: #1a2430;
+  --canvas: #131b24;
+  --wash: #0b1219;
+  --gold: #d9b45c;
+  --brand: #4e90c4;
+  --brand-dark: #7fb0d8;
+  --brand-soft: #1a2430;
+  --brand-fill: #1f5a8a;
+  --brand-fill-hover: #17456b;
+  --ok: #4fb483;
+  --warn: #d9a64a;
+  --warn-bg: rgb(217 166 74 / 0.12);
+  --danger: #eba59c;
+  --danger-bg: rgb(235 165 156 / 0.12);
+  --panel: #0b1219;
+  --shadow-btn: none;
+  --shadow-pie: none;
+  color-scheme: dark;
+}
+
+.cara-nueva *,
+.cara-nueva *::before,
+.cara-nueva *::after {
+  box-sizing: border-box;
+}
+.cara-nueva h1,
+.cara-nueva h2 {
+  margin: 0;
+  text-wrap: balance;
+}
+.cara-nueva p {
+  margin: 0;
+  text-wrap: pretty;
+}
+.cara-nueva a {
+  color: var(--brand);
+}
+.cara-nueva a:hover {
+  color: var(--brand-dark);
+}
+.cara-nueva button,
+.cara-nueva input {
+  font-family: inherit;
+}
+/* El foco propio del diseño. Nunca se quita sin reemplazo. */
+.cara-nueva *:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* ── Estados del diseño: viajan como clases, no en estilos inline ──────── */
+.cara-nueva .h-solid:hover {
+  background: var(--brand-fill-hover) !important;
+}
+.cara-nueva .h-soft:hover {
+  background: var(--line-2) !important;
+}
+.cara-nueva .h-neutral:hover {
+  background: var(--neutral) !important;
+}
+.cara-nueva .h-ghostbrand:hover {
+  background: var(--brand-soft) !important;
+}
+.cara-nueva .h-row:hover {
+  background: var(--field) !important;
+}
+.cara-nueva .h-ink:hover {
+  background: var(--field) !important;
+  color: var(--ink) !important;
+}
+.cara-nueva .h-dim:hover {
+  filter: brightness(0.97);
+}
+
+/* ── Marca ─────────────────────────────────────────────────────────────── */
+.cara-nueva .cn-marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+.cara-nueva .cn-marca span {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  color: var(--ink);
+}
+
+/* ── Columna del formulario ────────────────────────────────────────────── */
+.cara-nueva .cn-columna {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  background: var(--canvas);
+  padding: 36px 20px 0;
+}
+.cara-nueva .cn-columna-cuerpo {
+  display: flex;
+  width: 100%;
+  max-width: 440px;
+  flex: 1;
+  flex-direction: column;
+  margin: 0 auto;
+}
+.cara-nueva .cn-columna--ancha .cn-columna-cuerpo {
+  max-width: 560px;
+}
+
+.cara-nueva .cn-titulo {
+  margin-bottom: 4px;
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.cara-nueva .cn-bajada {
+  margin-bottom: 24px;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ink-4);
+}
+
+.cara-nueva .cn-campos {
+  display: grid;
+  gap: 16px;
+}
+.cara-nueva .cn-dos {
+  display: grid;
+  gap: 16px;
+}
+
+.cara-nueva .cn-etiqueta-fila {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.cara-nueva .cn-etiqueta {
+  display: block;
+  font-size: 15px;
+  line-height: 23px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.cara-nueva .cn-etiqueta {
+  margin-bottom: 6px;
+}
+.cara-nueva .cn-etiqueta-fila > .cn-etiqueta {
+  margin-bottom: 0;
+}
+.cara-nueva .cn-nota-campo {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-ayuda {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+
+.cara-nueva .cn-campo {
+  display: block;
+  width: 100%;
+  height: 52px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  font-size: 16px;
+  color: var(--ink);
+  transition: box-shadow 0.16s;
+}
+.cara-nueva .cn-campo::placeholder {
+  color: var(--ink-5);
+  opacity: 1;
+}
+.cara-nueva .cn-campo:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+.cara-nueva .cn-campo:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.cara-nueva .cn-campo--mono {
+  font-family: var(--mono);
+  font-size: 15px;
+}
+.cara-nueva .cn-campo--clave {
+  padding-right: 56px;
+}
+
+.cara-nueva .cn-con-boton {
+  position: relative;
+}
+.cara-nueva .cn-ver-clave {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-4);
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.cara-nueva .cn-ver-clave:hover {
+  background: var(--neutral);
+  color: var(--ink);
+}
+
+/* ── Botones sin contorno ──────────────────────────────────────────────── */
+.cara-nueva .cn-boton {
+  display: flex;
+  width: 100%;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  background: var(--brand-fill);
+  box-shadow: var(--shadow-btn);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.16s, transform 0.16s;
+}
+.cara-nueva .cn-boton:disabled {
+  cursor: progress;
+  opacity: 0.72;
+}
+.cara-nueva .cn-boton-sec {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border-radius: 12px;
+  background: var(--neutral);
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  text-decoration: none;
+  transition: background 0.16s;
+}
+.cara-nueva a.cn-boton-sec:hover {
+  color: var(--ink);
+}
+
+/* ── Avisos ────────────────────────────────────────────────────────────── */
+.cara-nueva .cn-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--danger-bg);
+  font-size: 15.5px;
+  line-height: 24px;
+  color: var(--ink);
+}
+.cara-nueva .cn-error svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--danger);
+}
+.cara-nueva .cn-aviso {
+  display: grid;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--warn-bg);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--warn);
+}
+.cara-nueva .cn-aviso strong {
+  font-weight: 600;
+}
+.cara-nueva .cn-recuadro {
+  display: flex;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--field);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-recuadro svg {
+  flex: none;
+  margin-top: 3px;
+}
+
+.cara-nueva .cn-acepto {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--field);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+  cursor: pointer;
+}
+.cara-nueva .cn-acepto input {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin: 1px 0 0;
+  accent-color: var(--brand-fill);
+  cursor: pointer;
+}
+.cara-nueva .cn-acepto a {
+  font-weight: 600;
+}
+
+.cara-nueva .cn-sin-cuenta {
+  margin-top: 26px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-sin-cuenta-titulo {
+  margin-bottom: 2px;
+  font-size: 15.5px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-sin-cuenta p {
+  margin-bottom: 12px;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+
+.cara-nueva .cn-texto {
+  font-size: 15.5px;
+  line-height: 24px;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-texto a {
+  font-weight: 600;
+  text-decoration: none;
+}
+.cara-nueva .cn-texto a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.cara-nueva .cn-volver {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  font-size: 14.5px;
+  color: var(--ink-4);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.cara-nueva a.cn-volver:hover {
+  color: var(--ink);
+}
+.cara-nueva .cn-ley {
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-mono {
+  font-family: var(--mono);
+  font-weight: 500;
+}
+
+/*
+ * EL BOTÓN DE ENTRAR, PEGADO AL BORDE INFERIOR EN MÓVIL (marco 375 del diseño).
+ * Va último en la columna solo a la vista; en el documento sigue justo después
+ * de la contraseña, que es el orden en que se llega a él con el teclado.
+ */
+.cara-nueva .cn-pie-accion {
+  order: 99;
+  position: sticky;
+  bottom: 0;
+  margin: auto -20px 0;
+  padding: 12px 20px 20px;
+  background: var(--canvas);
+  box-shadow: var(--shadow-pie);
+}
+.cara-nueva .cn-pie-accion .cn-boton {
+  min-height: 54px;
+  border-radius: 14px;
+  font-size: 16.5px;
+}
+.cara-nueva .cn-pie-flujo {
+  padding: 24px 0 32px;
+}
+
+/* ── Panel oscuro: lo que se ofrece. Solo en escritorio ─────────────────── */
+.cara-nueva .cn-panel {
+  display: none;
+}
+.cara-nueva .cn-kicker {
+  margin-bottom: 14px;
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--panel-kicker);
+}
+.cara-nueva .cn-panel-titulo {
+  max-width: 26ch;
+  margin-bottom: 16px;
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #fff;
+}
+.cara-nueva .cn-panel-bajada {
+  max-width: 46ch;
+  margin-bottom: 28px;
+  font-size: 16px;
+  line-height: 26px;
+  color: var(--panel-ink-2);
+}
+.cara-nueva .cn-estados {
+  display: grid;
+  max-width: 360px;
+  gap: 10px;
+}
+.cara-nueva .cn-estado {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.08);
+  font-size: 15px;
+  line-height: 23px;
+  color: #fff;
+}
+/* «Sin comprobar» se distingue por el borde discontinuo, no solo por el ámbar: así se lee también en escala de grises. */
+.cara-nueva .cn-estado--sin {
+  border: 1px dashed rgb(217 166 74 / 0.6);
+  background: rgb(217 166 74 / 0.14);
+}
+.cara-nueva .cn-punto {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--panel-ok);
+}
+.cara-nueva .cn-estado--sin .cn-punto {
+  background: var(--panel-warn);
+}
+.cara-nueva .cn-cifras {
+  display: grid;
+  max-width: 460px;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 24px;
+  margin: 36px 0 0;
+}
+.cara-nueva .cn-cifras > div {
+  padding-top: 12px;
+  border-top: 1px solid rgb(255 255 255 / 0.14);
+}
+.cara-nueva .cn-cifras dt {
+  font-family: var(--mono);
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 500;
+  color: #fff;
+}
+.cara-nueva .cn-cifras dd {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--panel-ink-2);
+}
+.cara-nueva .cn-incluye {
+  display: grid;
+  max-width: 460px;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-incluye li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 15px;
+  line-height: 23px;
+  color: #fff;
+}
+.cara-nueva .cn-incluye svg {
+  flex: none;
+  margin-top: 4px;
+  color: var(--panel-ok);
+}
+.cara-nueva .cn-panel-letra {
+  max-width: 460px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgb(255 255 255 / 0.14);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--panel-ink-2);
+}
+.cara-nueva .cn-panel-ley {
+  margin-top: auto;
+  padding-top: 32px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--panel-ink-2);
+}
+
+@media (min-width: 640px) {
+  .cara-nueva .cn-dos {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+}
+
+/* Escritorio: el mismo corte `lg` que usaba la pantalla anterior. */
+@media (min-width: 1024px) {
+  .cara-nueva .cn-columna {
+    width: 520px;
+    flex: none;
+    padding: 40px 48px;
+  }
+  .cara-nueva .cn-columna--ancha {
+    width: 640px;
+  }
+  .cara-nueva .cn-columna-cuerpo {
+    justify-content: center;
+  }
+  .cara-nueva .cn-marca {
+    margin-bottom: 32px;
+  }
+  .cara-nueva .cn-titulo {
+    font-size: 30px;
+    line-height: 38px;
+  }
+  .cara-nueva .cn-bajada {
+    margin-bottom: 26px;
+    font-size: 16.5px;
+    line-height: 25px;
+  }
+  .cara-nueva .cn-pie-accion {
+    order: 0;
+    position: static;
+    margin: 16px 0 0;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+  }
+  .cara-nueva .cn-pie-accion .cn-boton {
+    min-height: 50px;
+    border-radius: 12px;
+    font-size: 16px;
+  }
+  /* En escritorio la invitación a registrarse es texto tras una raya, no una tarjeta. */
+  .cara-nueva .cn-sin-cuenta {
+    padding: 26px 0 0;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+    background: none;
+  }
+  .cara-nueva .cn-sin-cuenta p {
+    margin-bottom: 4px;
+  }
+  .cara-nueva .cn-sin-cuenta .cn-boton-sec {
+    width: auto;
+    min-height: 44px;
+    justify-content: flex-start;
+    padding: 0;
+    background: none !important;
+    color: var(--brand);
+  }
+  .cara-nueva .cn-sin-cuenta .cn-boton-sec:hover {
+    color: var(--brand-dark);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .cara-nueva .cn-panel {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    padding: 48px;
+    background: var(--panel);
+  }
+  .cara-nueva .cn-panel-cuerpo {
+    margin: auto 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cara-nueva *,
+  .cara-nueva *::before,
+  .cara-nueva *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/*
+ * EL ISOTIPO EN MODO OSCURO. IureonMark se dibuja aqui con la version clara
+ * fija: un trazo oro y otro azul marino #14294A, y el marino desaparece sobre
+ * el fondo oscuro. La version oficial para fondo oscuro de public/brand
+ * (isotipo-dark.svg) cambia ese trazo por crema #F4F1EA y deja el oro. Se hace
+ * aqui, acotado a estas pantallas, y no en IureonMark, que usan otras partes de
+ * la aplicacion que todavia no se han rediseñado.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva svg [stroke='#14294A'] { stroke: #F4F1EA; }
+  :root:not([data-theme='light']) .cara-nueva svg [fill='#14294A'] { fill: #F4F1EA; }
+}
+:root[data-theme='dark'] .cara-nueva svg [stroke='#14294A'] { stroke: #F4F1EA; }
+:root[data-theme='dark'] .cara-nueva svg [fill='#14294A'] { fill: #F4F1EA; }
