@@ -81,10 +81,10 @@ export const ActoresDelExpediente: React.FC<{
   const grupos = [...new Set(PAPELES_EN_ORDEN.map((p) => p.grupo))];
 
   return (
-    <section className="card p-4">
+    <section className="cn-exp-panel cn-exp-piel">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h2 className="text-subtitle text-ink-900">Quién es quién</h2>
+          <h2 className="cn-exp-h3">Quién es quién</h2>
           <p className="text-meta text-ink-500">
             Las partes, los testigos y el perito. Es de aquí de donde salen las preguntas con nombre propio.
           </p>

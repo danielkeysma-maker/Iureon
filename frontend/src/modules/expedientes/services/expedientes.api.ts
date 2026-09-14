@@ -282,6 +282,32 @@ export const expedientesApi = {
     return revisar(data, 'No se pudo crear la carpeta.').carpeta;
   },
 
+  /**
+   * Cambia el nombre de una carpeta. La ruta PATCH existía en el servidor sin
+   * método cliente —«un endpoint que existe no prueba que alguien lo llame»—, y
+   * por eso la pantalla no ofrecía renombrar.
+   */
+  async renombrarCarpeta(expedienteId: string, carpetaId: string, nombre: string): Promise<Carpeta> {
+    const data = await httpClient.patch<Respuesta & { carpeta: Carpeta }>(
+      `/api/expedientes/${expedienteId}/carpetas/${carpetaId}`,
+      { body: { nombre } }
+    );
+    return revisar(data, 'No se pudo renombrar la carpeta.').carpeta;
+  },
+
+  /**
+   * Mueve una carpeta dentro de otra, o a la raíz con `null`. El servidor
+   * rechaza meterla dentro de sí misma o de una descendiente; la pantalla
+   * tampoco lo ofrece, pero la guarda que manda es la del servidor.
+   */
+  async moverCarpeta(expedienteId: string, carpetaId: string, padreId: string | null): Promise<Carpeta> {
+    const data = await httpClient.patch<Respuesta & { carpeta: Carpeta }>(
+      `/api/expedientes/${expedienteId}/carpetas/${carpetaId}`,
+      { body: { padreId } }
+    );
+    return revisar(data, 'No se pudo mover la carpeta.').carpeta;
+  },
+
   /** Qué se llevaría por delante borrar esta carpeta. Lo pide el diálogo ANTES de borrar. */
   async contenidoDeCarpeta(expedienteId: string, carpetaId: string): Promise<ContenidoDeCarpeta> {
     const data = await httpClient.get<Respuesta & { contenido: ContenidoDeCarpeta }>(

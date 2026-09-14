@@ -23,8 +23,14 @@ import type { ExpedienteConDetalle } from '../types';
 export const TraerAlExpediente: React.FC<{
   expediente: ExpedienteConDetalle;
   onCambio: () => Promise<void>;
-}> = ({ expediente, onCambio }) => {
-  const [abierto, setAbierto] = React.useState(false);
+  /*
+   * DENTRO DEL DIÁLOGO «Traer al caso» el título lo pone el diálogo y la lista
+   * abre sola: repetir la cabecera y exigir «Ver lo que hay» sería pedir dos
+   * clics para lo que el abogado ya pidió con uno.
+   */
+  enDialogo?: boolean;
+}> = ({ expediente, onCambio, enDialogo = false }) => {
+  const [abierto, setAbierto] = React.useState(enDialogo);
   const [candidatos, setCandidatos] = React.useState<Candidato[]>([]);
   const [cargando, setCargando] = React.useState(false);
   const [error, setError] = React.useState('');
@@ -71,7 +77,8 @@ export const TraerAlExpediente: React.FC<{
     : candidatos;
 
   return (
-    <section className="card p-4">
+    <section className={enDialogo ? 'cn-exp-piel' : 'cn-exp-panel cn-exp-piel'}>
+      {!enDialogo && (
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h2 className="text-subtitle text-ink-900">Traer al expediente</h2>
@@ -84,6 +91,7 @@ export const TraerAlExpediente: React.FC<{
           {abierto ? 'Cerrar' : 'Ver lo que hay'}
         </button>
       </div>
+      )}
 
       {abierto && (
         <div className="mt-3">

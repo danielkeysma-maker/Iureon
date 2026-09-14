@@ -86,10 +86,10 @@ export const ClienteDelExpediente: React.FC<{
   };
 
   return (
-    <section className="card p-4">
+    <section className="cn-exp-panel cn-exp-piel">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
-          <h2 className="text-subtitle text-ink-900">De quién es el asunto</h2>
+          <h2 className="cn-exp-h3">De quién es el asunto</h2>
           {expediente.clienteNombre ? (
             <p className="mt-1 flex items-center gap-1.5 text-body">
               <UserRound className="h-3.5 w-3.5 shrink-0 text-ink-500" />

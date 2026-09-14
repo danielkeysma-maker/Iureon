@@ -63,13 +63,20 @@ export const PARA_INDEXAR: LimitesDeLectura = { maxCaracteres: 4_000_000, maxPag
 
 export type TextoDelArchivo =
   | { ok: true; texto: string; caracteres: number; recortado: boolean }
-  | { ok: false; motivo: string };
+  /*
+   * `sinTexto` marca el único rechazo que tiene pantalla propia —el escaneado,
+   * por debajo de MINIMO_UTIL—. Se marca con un campo y no comparando el texto
+   * del motivo: una frase corregida mañana dejaría de reconocerse sin que nada
+   * fallara.
+   */
+  | { ok: false; motivo: string; sinTexto?: true };
 
 const recortar = (bruto: string, maxCaracteres = MAX_CARACTERES): TextoDelArchivo => {
   const limpio = bruto.replace(/\r\n/g, '\n').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
   if (limpio.length < MINIMO_UTIL) {
     return {
       ok: false,
+      sinTexto: true,
       motivo:
         'El archivo no trae texto que se pueda leer. Si es un PDF escaneado o una foto, son imágenes: copie y pegue el texto en su lugar.'
     };

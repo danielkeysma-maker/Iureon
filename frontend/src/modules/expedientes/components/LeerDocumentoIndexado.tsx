@@ -1,42 +1,50 @@
 import React from 'react';
-import { AlertTriangle, Download, Loader2 } from 'lucide-react';
-import { Dialog } from '../../../design/Dialog';
+import { AlertTriangle, ArrowRight, ChevronLeft, Download, Loader2, Trash2 } from 'lucide-react';
 import { expedientesApi } from '../services/expedientes.api';
 import { VisorDeArchivo } from '../../workspace/components/VisorDeArchivo';
 
 /**
- * LEER UN DOCUMENTO INDEXADO.
+ * LEER UN DOCUMENTO DEL CASO, A PANTALLA COMPLETA.
+ *
+ * Maqueta: `public/handoff/app-expedientes.html` — lector claro (:322), oscuro
+ * (:403) y teléfono (:601); la barra de «Pruebas › Documentales» sale de
+ * `app-carpetas-y-vista-previa.html` (:300). Antes era un diálogo L: el papel
+ * quedaba en 58 % del alto de un recuadro, dentro de otro recuadro.
  *
  * ─── EL HUECO QUE TAPA ─────────────────────────────────────────────────────
  *
- * Un documento indexado se podía listar y no abrir. La pantalla mostraba su
- * nombre y sus «56 fragmentos buscables», y al pulsarlo no pasaba nada: el
- * abogado tenía que CREERLE a la aplicación que ahí dentro estaba lo que él
- * subió, sin forma de comprobarlo.
+ * Un documento indexado se podía listar y no abrir: el abogado tenía que
+ * CREERLE a la aplicación que ahí dentro estaba lo que subió. Y es justo la
+ * pregunta que se hace cuando una búsqueda no encuentra algo.
  *
- * Y esa es justo la pregunta que se hace cuando una búsqueda no encuentra
- * algo: «¿de verdad quedó esto adentro?». Sin poder mirar, la única salida era
- * volver a indexar por si acaso — y un documento indexado dos veces sale
- * repetido en las búsquedas y desplaza a otro que sí hacía falta.
+ * ─── DOS PESTAÑAS, Y NO SON DOS PINTURAS DE LO MISMO ───────────────────────
  *
- * ─── LO QUE MUESTRA NO ES EL PDF, Y SE DICE ANTES ──────────────────────────
+ * «El documento» es el archivo tal como se subió: lo que el abogado reconoce.
+ * «El texto indexado» es lo que la aplicación guardó —sin sangrías ni saltos—
+ * y es EXACTAMENTE lo que leen la búsqueda y el interrogatorio. La segunda
+ * contesta «¿por qué la búsqueda no encontró esto?», que mirar el PDF no dice.
  *
- * El archivo NUNCA sale del navegador: se lee ahí y solo viaja su texto. Así
- * que no hay copia del original en el servidor y no hay nada que
- * previsualizar. Llamar a esto «vista previa del documento» sería prometer una
- * fidelidad que no existe.
+ * ─── LO QUE LA MAQUETA DIBUJA Y AQUÍ NO ESTÁ, CON LA RAZÓN ─────────────────
  *
- * Lo que se muestra es el texto tal como la aplicación lo guardó, sin saltos
- * de párrafo ni sangría —el troceo parte por espacios en blanco—. Y eso, que
- * suena a limitación, es la respuesta correcta a la pregunta de arriba: es
- * EXACTAMENTE lo que ven la búsqueda y el interrogatorio. Un visor bonito que
- * mostrara el PDF original no diría nada sobre lo que el motor tiene.
+ *  · Miniaturas de página, «Toque uno para ir a su página» y la búsqueda de
+ *    palabra exacta con página: el texto guardado no conserva páginas.
+ *  · Citar en un escrito: no hay camino que lleve un pasaje a un borrador.
+ *  · «Lo que Iureon leyó aquí»: nadie analiza el documento al indexarlo;
+ *    esas tarjetas serían conclusiones inventadas sobre un papel del caso.
+ *  · La paginación en la barra: la lleva el visor del archivo (compartido con
+ *    el taller), sobre el papel, y solo cuando el PDF tiene más de una página.
  */
 export const LeerDocumentoIndexado: React.FC<{
   expedienteId: string;
   documentId: string | null;
   onCerrar: () => void;
-}> = ({ expedienteId, documentId, onCerrar }) => {
+  /** Nombre del caso, para el botón de volver. */
+  caratula?: string;
+  /** «Pruebas › Documentales» o «Raíz del expediente». */
+  ubicacion?: string;
+  onMover?: () => void;
+  onQuitar?: () => void;
+}> = ({ expedienteId, documentId, onCerrar, caratula, ubicacion, onMover, onQuitar }) => {
   const [cargando, setCargando] = React.useState(false);
   const [error, setError] = React.useState('');
   const [doc, setDoc] = React.useState<{ titulo: string; texto: string; fragmentos: number } | null>(null);
@@ -49,12 +57,13 @@ export const LeerDocumentoIndexado: React.FC<{
   const [original, setOriginal] = React.useState<{
     dato: { url: string; nombre: string; tipo: string } | null;
   } | null>(null);
-  /*
-   * QUE SE VE PRIMERO. El original, cuando lo hay: es el documento del
-   * abogado. El texto extraido es lo que ve el MOTOR, y esa es otra pregunta
-   * —util, pero segunda—. Sin archivo guardado solo queda el texto.
-   */
+  /* QUÉ SE VE PRIMERO. El original, cuando lo hay: es el documento del abogado. */
   const [vista, setVista] = React.useState<'original' | 'texto'>('original');
+  const panel = React.useRef<HTMLDivElement>(null);
+  const alCerrarRef = React.useRef(onCerrar);
+  React.useEffect(() => {
+    alCerrarRef.current = onCerrar;
+  });
 
   React.useEffect(() => {
     if (!documentId) {
@@ -98,109 +107,139 @@ export const LeerDocumentoIndexado: React.FC<{
     };
   }, [expedienteId, documentId]);
 
+  /*
+   * LA ANATOMÍA DE UN DIÁLOGO, AUNQUE SEA PANTALLA COMPLETA: `Esc` cierra, el
+   * foco entra al lector y vuelve a la fila que lo abrió, y el fondo no se
+   * desplaza. Es la misma regla de `design/Dialog.tsx`; cambia el tamaño.
+   */
+  React.useEffect(() => {
+    if (!documentId) return;
+    const invocador = document.activeElement as HTMLElement | null;
+    panel.current?.focus();
+    const alPulsar = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') alCerrarRef.current();
+    };
+    document.addEventListener('keydown', alPulsar);
+    const overflowPrevio = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', alPulsar);
+      document.body.style.overflow = overflowPrevio;
+      invocador?.focus?.();
+    };
+  }, [documentId]);
+
+  if (!documentId) return null;
+
   /* Una página de escrito ronda las 350 palabras; sirve para que el tamaño se entienda. */
   const palabras = doc ? doc.texto.split(/\s+/).filter(Boolean).length : 0;
+  const meta = [
+    ubicacion,
+    doc ? `${palabras.toLocaleString('es-CO')} palabras` : null,
+    doc ? `${doc.fragmentos.toLocaleString('es-CO')} fragmentos buscables` : null
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
   return (
-    <Dialog
-      abierto={documentId !== null}
-      onCerrar={onCerrar}
-      titulo={doc?.titulo ?? 'Documento del expediente'}
-      subtitulo={
-        doc
-          ? `${palabras.toLocaleString('es-CO')} palabras · ${doc.fragmentos.toLocaleString('es-CO')} fragmentos buscables`
-          : 'Lo que la aplicación guardó de este documento'
-      }
-      tamano="L"
+    <div
+      ref={panel}
+      tabIndex={-1}
+      className="cn-exp-lector"
+      role="dialog"
+      aria-modal="true"
+      aria-label={doc?.titulo ?? 'Documento del caso'}
     >
-      {cargando && (
-        <p className="flex items-center gap-2 text-meta text-ink-500">
-          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          Armando el documento…
-        </p>
-      )}
-
-      {error && (
-        <p className="notice-unverified" role="status">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-unverified" />
-          <span className="min-w-0 text-justify [overflow-wrap:anywhere]">{error}</span>
-        </p>
-      )}
-
-      {doc && (
-        <>
-          {/*
-            SE DICE QUÉ ES ESTO ANTES DE LEERLO. Quien abra esperando su PDF y
-            encuentre un bloque de texto sin sangrías concluirá que la
-            aplicación le estropeó el documento. Lo que ve es lo que el motor
-            tiene, que es otra cosa y es la que importa aquí.
-          */}
-          {/*
-            DOS PESTANAS, Y NO SON DOS PINTURAS DE LO MISMO.
-
-            «El documento» es el archivo tal como se subio: es lo que el
-            abogado reconoce y lo que veria el juez. «El texto indexado» es lo
-            que la aplicacion guardo — sin sangrias ni saltos— y es
-            EXACTAMENTE lo que leen la busqueda y el interrogatorio.
-
-            La segunda existe porque contesta una pregunta que la primera no
-            puede: «¿por que la busqueda no encontro esto?». Mirar el PDF no lo
-            dice; mirar lo indexado, si.
-          */}
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            <div className="flex overflow-hidden rounded-control border border-line-200">
-              {(['original', 'texto'] as const)
-                .filter((v) => v !== 'original' || Boolean(original?.dato))
-                .map((v) => (
-                  <button
-                    key={v}
-                    type="button"
-                    onClick={() => setVista(v)}
-                    className={`px-3 py-1 text-[12px] ${
-                      vista === v ? 'bg-brand-50 font-semibold text-brand-700' : 'text-ink-700 hover:text-ink-900'
-                    }`}
-                  >
-                    {v === 'original' ? 'El documento' : 'El texto indexado'}
-                  </button>
-                ))}
+      <header className="cn-exp-lector-barra">
+        <button type="button" onClick={onCerrar} className="cn-exp-lector-volver" aria-label="Volver al caso">
+          <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+          {caratula && <span className="cn-exp-lector-volver-texto">{caratula}</span>}
+        </button>
+        <div className="cn-exp-lector-titulos">
+          <p className="cn-exp-lector-titulo">{doc?.titulo ?? 'Documento del caso'}</p>
+          {meta && <p className="cn-exp-lector-meta">{meta}</p>}
+        </div>
+        <div className="cn-exp-lector-acciones">
+          {original?.dato && (
+            <div className="cn-exp-segmento cn-exp-segmento--texto" role="tablist" aria-label="Qué ver">
+              {(['original', 'texto'] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  role="tab"
+                  aria-selected={vista === v}
+                  onClick={() => setVista(v)}
+                  className="cn-exp-segmento-boton"
+                >
+                  {v === 'original' ? 'El documento' : 'El texto indexado'}
+                </button>
+              ))}
             </div>
-            {original?.dato && (
-              <a
-                href={original.dato.url}
-                target="_blank"
-                rel="noreferrer"
-                className="btn-secondary btn-sm ml-auto gap-1.5"
-              >
-                <Download className="h-3.5 w-3.5" />
-                Descargar
-              </a>
-            )}
-          </div>
+          )}
+          {original?.dato && (
+            <a href={original.dato.url} target="_blank" rel="noreferrer" className="cn-ini-boton cn-ini-boton--suave cn-exp-boton">
+              <Download className="h-4 w-4" aria-hidden="true" />
+              Descargar
+            </a>
+          )}
+          {onMover && (
+            <button type="button" onClick={onMover} className="cn-ini-boton cn-ini-boton--suave cn-exp-boton">
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              Mover
+            </button>
+          )}
+          {onQuitar && (
+            <button type="button" onClick={onQuitar} className="cn-ini-boton cn-ini-boton--texto cn-exp-boton">
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
+              Quitar del caso
+            </button>
+          )}
+        </div>
+      </header>
 
-          {original && original.dato === null && (
-            <p className="mb-3 rounded-card border border-line-200 bg-canvas px-3 py-2 text-meta text-ink-500 text-justify [text-wrap:pretty]">
-              De este documento no se guardó el archivo: se indexó pegando el texto, o antes de que el
-              expediente los conservara. Lo de abajo es el texto guardado, que es lo que leen la búsqueda y
-              el interrogatorio.
+      <div className="cn-exp-lector-mesa">
+        <div className="cn-exp-lector-columna">
+          {cargando && (
+            <p className="cn-exp-cargando" role="status">
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              Armando el documento…
             </p>
           )}
 
-          {vista === 'original' && original?.dato && <VisorDeArchivo fuente={{ de: 'enlace', ...original.dato }} />}
+          {error && (
+            <p className="cn-aviso cn-exp-lector-aviso" role="status">
+              <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+              <span className="min-w-0 [overflow-wrap:anywhere]">{error}</span>
+            </p>
+          )}
+
+          {doc && original && original.dato === null && (
+            <p className="cn-exp-nota cn-exp-nota--caja">
+              De este documento no se guardó el archivo: se indexó pegando el texto, o antes de que el expediente los
+              conservara. Lo de abajo es el texto guardado, que es lo que leen la búsqueda y el interrogatorio.
+            </p>
+          )}
+
+          {doc && vista === 'original' && original?.dato && (
+            <div className="cn-exp-lector-hoja cn-exp-lector-hoja--visor">
+              <VisorDeArchivo fuente={{ de: 'enlace', ...original.dato }} />
+            </div>
+          )}
 
           {/*
             En la tipografía del documento y con las líneas separadas: son
             varias páginas de prosa jurídica seguidas, y leerlas en la letra de
             interfaz cansa a los dos párrafos.
           */}
-          {vista === 'texto' && (
-          <div className="max-h-[60vh] overflow-y-auto rounded-card border border-line-200 bg-paper p-4">
-            <p className="whitespace-pre-wrap text-justify font-legal text-[13.5px] leading-[1.75] text-paper-ink [text-wrap:pretty] [overflow-wrap:anywhere]">
-              {doc.texto}
-            </p>
-          </div>
+          {doc && vista === 'texto' && (
+            <div className="cn-exp-lector-hoja">
+              <p className="cn-exp-lector-texto whitespace-pre-wrap text-justify font-legal [text-wrap:pretty] [overflow-wrap:anywhere]">
+                {doc.texto}
+              </p>
+            </div>
           )}
-        </>
-      )}
-    </Dialog>
+        </div>
+      </div>
+    </div>
   );
 };

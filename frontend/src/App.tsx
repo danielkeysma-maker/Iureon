@@ -1684,7 +1684,17 @@ export function App() {
                 modulo="EXPEDIENTES"
                 quePuede="Sus expedientes se conservan y vuelven a estar disponibles en cuanto renueve."
               >
-                <ExpedientesView />
+                {/*
+                  El aviso del término del caso abre la agenda por el mismo
+                  camino que Inicio: Herramientas con el remonte incluido.
+                */}
+                <ExpedientesView
+                  onIrAAgenda={() => {
+                    recordar(PANTALLAS.herramienta, 'agenda');
+                    setHerramientasEpoca((n) => n + 1);
+                    setMainView('tools');
+                  }}
+                />
               </ModuloBloqueado>
             </div>
           )}
