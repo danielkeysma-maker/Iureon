@@ -90,7 +90,8 @@
     "check:comprobaciones-informe": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/comprobacionesDelInforme.check.ts",
     "check:glosa-informe":"npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosaDelInforme.check.ts",
     "check:glosa": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosa.check.ts",
-    "check:glosa-red": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosa.check.ts --red"
+    "check:glosa-red": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosa.check.ts --red",
+    "check:sin-aprendizaje-falso": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/sinAprendizajeFalso.check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

@@ -71,7 +71,9 @@ export const ACCIONES: Record<string, string> = {
   NOMBRE_ACTUALIZADO: 'Fijó su nombre',
   EMAIL_SENT: 'Correo enviado',
   AGENDA_TERM_CREATED: 'Puso un término en la agenda',
-  AGENDA_TERM_DELETED: 'Retiró un término de la agenda'
+  AGENDA_TERM_DELETED: 'Retiró un término de la agenda',
+  ESTILO_ENSENADO: 'Enseñó una lección de estilo',
+  ESTILO_RETIRADO: 'Retiró una lección de estilo'
 };
 
 /** Las preguntas reales que estos datos pueden responder hoy. */

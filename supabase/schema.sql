@@ -156,8 +156,12 @@ CREATE INDEX IF NOT EXISTS idx_transcriptions_firm ON public.transcriptions(firm
 CREATE INDEX IF NOT EXISTS idx_transcriptions_firm_user ON public.transcriptions(firm_id, user_email);
 
 -- ==============================================================================
--- 5. FIRM_STYLE_PROFILES — "Enseñar Estilo" learned formatting per firm
+-- 5. FIRM_STYLE_PROFILES — SIN USO, en retiro
 -- ==============================================================================
+-- Nació para un «Enseñar estilo» que nunca guardó nada: ningún código la lee ni
+-- la escribe. La reemplaza `estilo_lecciones` (5b). Se retira a mano cuando se
+-- compruebe vacía: ver el bloque comentado al final de
+-- migration-estilo-de-la-firma.sql.
 CREATE TABLE IF NOT EXISTS public.firm_style_profiles (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     firm_id TEXT UNIQUE NOT NULL,
@@ -166,6 +170,30 @@ CREATE TABLE IF NOT EXISTS public.firm_style_profiles (
     custom_format TEXT,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- ==============================================================================
+-- 5b. ESTILO_LECCIONES — el estilo de la firma, por rol y rama
+-- ==============================================================================
+-- Una fila por lección que enseña el socio administrador: la FORMA anonimizada
+-- de un escrito (estructura, fórmulas, jerga), nunca su texto ni datos del
+-- caso. Alcance firma × rol × rama; `rama` NULL es el estilo general del rol,
+-- que se usa cuando la rama no tiene lecciones. Sin UPDATE para authenticated:
+-- una lección se retira y se enseña otra. El backend entra con la llave de
+-- servicio, así que TODA consulta suya filtra por firm_id.
+-- Detalle y razones: migration-estilo-de-la-firma.sql.
+CREATE TABLE IF NOT EXISTS public.estilo_lecciones (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    firm_id TEXT NOT NULL,
+    rol TEXT NOT NULL CHECK (rol IN ('LITIGANTE', 'DESPACHO', 'SECRETARIA')),
+    rama TEXT NULL,
+    fuente TEXT NOT NULL CHECK (fuente IN ('BORRADOR', 'ESCRITO_SUBIDO', 'EDICION')),
+    contenido JSONB NOT NULL,
+    taught_by TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_estilo_lecciones_alcance
+    ON public.estilo_lecciones(firm_id, rol, rama, created_at DESC);
 
 -- ==============================================================================
 -- 6. AUDIT_LOGS — immutable B2B compliance trail
@@ -231,7 +259,8 @@ ALTER TABLE public.document_embeddings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.saved_drafts        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.transcriptions      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.firm_style_profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.audit_logs          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.estilo_lecciones    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.audit_logs         ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.catalog_verifications ENABLE ROW LEVEL SECURITY;
 
 CREATE OR REPLACE FUNCTION public.current_firm_id()
@@ -293,6 +322,12 @@ CREATE POLICY "tenant_isolation_saved_drafts"
 DROP POLICY IF EXISTS "tenant_isolation_firm_style_profiles" ON public.firm_style_profiles;
 CREATE POLICY "tenant_isolation_firm_style_profiles"
     ON public.firm_style_profiles FOR ALL
+    USING (firm_id = public.current_firm_id())
+    WITH CHECK (firm_id = public.current_firm_id());
+
+DROP POLICY IF EXISTS "tenant_isolation_estilo_lecciones" ON public.estilo_lecciones;
+CREATE POLICY "tenant_isolation_estilo_lecciones"
+    ON public.estilo_lecciones FOR ALL
     USING (firm_id = public.current_firm_id())
     WITH CHECK (firm_id = public.current_firm_id());
 
@@ -416,3 +451,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public
 -- archivo. Una tabla creada a mano en el SQL Editor le queda a anon con el
 -- juego completo, incluido TRUNCATE.
 REVOKE ALL ON ALL TABLES IN SCHEMA public FROM anon;
+
+-- Las lecciones de estilo no se editan: se retiran y se enseña otra. El GRANT
+-- general de arriba le dio UPDATE a authenticated; aquí se quita.
+REVOKE UPDATE ON public.estilo_lecciones FROM authenticated;

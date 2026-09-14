@@ -24,7 +24,15 @@ import { PlanError, exigirPlanVigente } from '../subscriptions/plan.service';
  * cannot answer a client asking why their balance moved.
  */
 
-export type Operation = 'BORRADOR' | 'TRANSCRIPCION' | 'BUSQUEDA' | 'ORIENTACION' | 'RESUMEN' | 'REVISION' | 'CONSULTA_REVISION';
+export type Operation =
+  | 'BORRADOR'
+  | 'TRANSCRIPCION'
+  | 'BUSQUEDA'
+  | 'ORIENTACION'
+  | 'RESUMEN'
+  | 'REVISION'
+  | 'CONSULTA_REVISION'
+  | 'ESTILO';
 
 export class BillingError extends Error {
   readonly code: string;
@@ -138,7 +146,19 @@ export const PRICE_COP: Record<Operation, number> = {
    * porque el precio sube con el costo real (priceFor). Una revision completa
    * nueva sigue siendo REVISION.
    */
-  CONSULTA_REVISION: 300
+  CONSULTA_REVISION: 300,
+  /*
+   * «Leer el formato» de «Enseñar estilo»: el motor lee UN escrito de la firma
+   * y devuelve su forma anonimizada. Decisión del dueño, 14/09/2026: piso de
+   * $100 por escrito, y el botón lo dice ANTES de correr.
+   *
+   * La cuenta: en Gemini Flash la lectura cuesta unos US$0,011 por escrito, o
+   * sea ≈ $44 COP a COP_PER_USD; al margen estándar (MARKUP 2,3) son ≈ $101, y
+   * se fija la cifra legible de $100. Un escrito muy largo cuesta más y se
+   * cobra lo medido (`priceFor`), igual que un borrador. Todavía no lo usa
+   * ninguna ruta: se declara aquí para que el precio exista antes que el botón.
+   */
+  ESTILO: 100
 };
 
 /**

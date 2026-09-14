@@ -131,8 +131,12 @@ interface ClaudeUserMessageInput {
  * `**bold**` as real bold and strip markdown headings, so emitting `##` or
  * `---` would surface as literal noise in the signed document.
  *
- * A firm's taught format ("Enseñar Estilo") replaces the reference structure
- * entirely rather than being appended to it.
+ * No taught style reaches this prompt. An earlier comment here claimed that a
+ * firm's format taught through «Enseñar estilo» replaced the reference
+ * structure; nothing ever did that — the endpoint behind the button only logged
+ * a line. What shapes the document today is the catalogue entry and the firm's
+ * Membrete format. When lessons from `estilo_lecciones` are applied, this is
+ * where the rule for how they combine with the reference structure belongs.
  */
 /**
  * Renders the jurisprudence section — including, above all, its absence.

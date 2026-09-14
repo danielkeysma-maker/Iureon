@@ -53,6 +53,14 @@ export type AuditAction =
   | 'FIRM_ACTUACION_CREATED'
   | 'FIRM_ACTUACION_DELETED'
   /*
+   * El socio administrador enseñó o retiró una lección de estilo. Van al rastro
+   * porque cambian cómo sale el próximo escrito de TODOS los abogados de la
+   * firma en ese rol y rama, y quien lo note tiene derecho a saber quién lo
+   * decidió. Declaradas antes de que exista la función que las escribe.
+   */
+  | 'ESTILO_ENSENADO'
+  | 'ESTILO_RETIRADO'
+  /*
    * Agenda de terminos. Solo el alta y la baja: son los dos hechos que cambian
    * lo que la firma va a recibir en el telefono. Marcar cumplida no va al
    * rastro — es trabajo ordinario y su repeticion diaria ahogaria lo demas.

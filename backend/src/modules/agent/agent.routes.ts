@@ -13,11 +13,6 @@ import {
   setStorageConsentController
 } from './review/documentReview.controller';
 import { escritoChatController } from './review/escritoChat.controller';
-import {
-  getStyleProfileController,
-  saveLawyerEditsController,
-  suggestTerminologyController
-} from './learning.controller';
 
 const router = Router();
 
@@ -39,9 +34,15 @@ router.post('/agent/reviews/:id/rerevisar', bloquearSiPlanVencido, reReviewContr
 /* La guia conversa sobre un escrito generado en Redaccion: sin informe ni id; el navegador manda texto e historial. */
 router.post('/agent/escrito/chat', bloquearSiPlanVencido, escritoChatController as any);
 
-// Aprendizaje de Jerga y Sugerencia Inteligente de Vocabulario
-router.get('/agent/style-profile', getStyleProfileController);
-router.post('/agent/learn-edits', bloquearSiPlanVencido, saveLawyerEditsController);
-router.post('/agent/suggest-terminology', bloquearSiPlanVencido, suggestTerminologyController);
+/*
+ * AQUÍ ESTUVIERON TRES RUTAS DE «APRENDIZAJE» Y NINGUNA HACÍA LO QUE DECÍA.
+ * `/agent/style-profile` devolvía un perfil inventado («18 ediciones
+ * analizadas»), `/agent/learn-edits` solo escribía una línea en la consola y
+ * `/agent/suggest-terminology` fabricaba frases con apariencia jurídica que
+ * ninguna firma había escrito. Se retiraron el 14 de septiembre de 2026, junto
+ * con su servicio y su controlador. «Enseñar estilo» y «Sugerir jerga» se
+ * construyen de nuevo sobre `estilo_lecciones` (supabase/migration-estilo-de-la-firma.sql),
+ * y `check:sin-aprendizaje-falso` impide que las rutas o las frases vuelvan.
+ */
 
 export const agentRoutes = router;

@@ -2,9 +2,7 @@ import { estiloDelLienzo, type FormatoDelEscrito } from '../formatoEnPantalla';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { BrainCircuit, ClipboardCheck, Check, Eye, FolderOpen, Pencil, Save, Sparkles } from 'lucide-react';
 import DOMPurify from 'dompurify';
-import { JargonSuggestionModal } from './JargonSuggestionModal';
 import { markdownBoldToHtml } from '../services/documentExport.service';
-import { learningApi } from '../../agent/services/learning.api';
 import { ControlDeLetra, useTamanoDeLetra } from '../../../design/TamanoDeLetra';
 import { useFuncionHabilitada } from '../../subscriptions/PlanContext';
 import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
@@ -59,11 +57,17 @@ interface LegalDraftViewerProps {
  * «Aprendido» mientras el servidor solo escribía una línea en el registro: no
  * guardaba nada ni lo usaba en el siguiente escrito. «Sugerir jerga» abría tres
  * sugerencias escritas a mano —las mismas para cualquier palabra— con la marca
- * «Aprendido de tu Firma». Se eligió lo honesto: siguen a la vista y cableados a
- * lo mismo, pero APAGADOS y con «Próximamente» escrito debajo, hasta que exista
- * el aprendizaje del formato de la firma. Quitarlos borraría la promesa del
- * README (§2, «el taller conserva todas sus acciones»); dejarlos encendidos
- * seguiría afirmando un aprendizaje que no ocurre.
+ * «Aprendido de tu Firma». Se eligió lo honesto: siguen a la vista, APAGADOS y
+ * con «Próximamente» escrito debajo. Quitarlos borraría la promesa del README
+ * (§2, «el taller conserva todas sus acciones»); dejarlos encendidos seguiría
+ * afirmando algo que no ocurre.
+ *
+ * YA NO ESTÁN CABLEADOS A NADA (14 de septiembre de 2026). El diálogo de
+ * sugerencias escritas a mano, el cliente de `learning.api` y las tres rutas
+ * del servidor que fingían aprender se borraron: un botón apagado que apunta a
+ * un simulacro es un simulacro esperando que alguien quite el `disabled`. Las
+ * funciones de verdad se construyen sobre `estilo_lecciones`, con el socio
+ * administrador como único que enseña, y se conectan aquí cuando existan.
  *
  * EN MODO OSCURO EL PAPEL SE OSCURECE PERO EL .DOCX NO, y el pie lo dice.
  */
@@ -130,8 +134,6 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
       vaciar();
     };
   }, [haySalida]);
-  const [selectedText, setSelectedText] = useState('');
-  const [isJargonModalOpen, setIsJargonModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
   const renderedHtml = useMemo(() => {
@@ -146,26 +148,6 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
   useEffect(() => {
     setEditableText(draft.legalText);
   }, [draft.legalText]);
-
-  const handleSelection = () => {
-    const selection = window.getSelection();
-    if (selection && selection.toString().trim().length > 0) {
-      setSelectedText(selection.toString().trim());
-    }
-  };
-
-  const handleApplyReplacement = (replacement: string) => {
-    if (!selectedText) {
-      setEditableText((prev) => `${prev}\n\n${replacement}`);
-      return;
-    }
-    setEditableText((prev) => prev.replace(selectedText, replacement));
-  };
-
-  /* Cableado a lo mismo de siempre; el botón está apagado mientras el servidor no aprenda nada (ver arriba). */
-  const handleSaveAndTeachStyle = () => {
-    void learningApi.teachStyle(draft.legalText, editableText);
-  };
 
   /*
    * IR AL PÁRRAFO. La columna sabe en qué párrafo aparece un rótulo; el papel
@@ -239,11 +221,11 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
           </button>
         )}
 
-        <button type="button" onClick={handleSaveAndTeachStyle} disabled className="cn-red-trabajar-boton">
+        <button type="button" disabled className="cn-red-trabajar-boton">
           <BrainCircuit className="cn-red-herr-icono" strokeWidth={1.8} aria-hidden />
           Enseñar estilo
         </button>
-        <button type="button" onClick={() => setIsJargonModalOpen(true)} disabled className="cn-red-trabajar-boton">
+        <button type="button" disabled className="cn-red-trabajar-boton">
           <Sparkles className="cn-red-herr-icono" strokeWidth={1.8} aria-hidden />
           Sugerir jerga
         </button>
@@ -254,13 +236,6 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
 
   return (
     <>
-      <JargonSuggestionModal
-        isOpen={isJargonModalOpen}
-        onClose={() => setIsJargonModalOpen(false)}
-        selectedText={selectedText || 'rechazar'}
-        onApplyReplacement={handleApplyReplacement}
-      />
-
       <div className={`cn-red-borrador ${isFocusMode ? 'cn-red-borrador--foco' : ''}`}>
         {/*
           816 px COMO MÁXIMO: el ancho de una carta a 96 dpi. El visor existe para
@@ -309,8 +284,6 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
               <textarea
                 value={editableText}
                 onChange={(e) => setEditableText(e.target.value)}
-                onMouseUp={handleSelection}
-                onKeyUp={handleSelection}
                 className="min-h-[540px] w-full resize-y break-words border-0 bg-transparent font-legal leading-[1.8] text-paper-ink focus:outline-none"
                 style={estiloLectura}
               />
@@ -319,7 +292,6 @@ export const LegalDraftViewer: React.FC<LegalDraftViewerProps> = ({
                 ref={papelRef}
                 className="min-h-[540px] break-words font-legal leading-[1.8] text-paper-ink [text-wrap:pretty]"
                 style={estiloLectura}
-                onMouseUp={handleSelection}
                 dangerouslySetInnerHTML={{ __html: renderedHtml }}
               />
             )}
