@@ -33,6 +33,7 @@ import { manualReadsRoutes } from './modules/help/manualReads.routes';
 import { pushRoutes } from './modules/push/push.routes';
 import { agendaPublicRoutes, agendaRoutes } from './modules/agenda/agenda.routes';
 import { firmsRoutes } from './modules/firms/firms.routes';
+import { estiloRoutes } from './modules/estilo/estilo.routes';
 import { embeddingsService } from './modules/embeddings/embeddings.service';
 import { EMBEDDING_DIMENSIONS } from './modules/embeddings/types';
 
@@ -169,6 +170,8 @@ app.use('/api', privacyRoutes);
 app.use('/api', jurisprudenceRoutes);
 app.use('/api', catalogRoutes);
 app.use('/api', preferencesRoutes);
+/* El estilo de la firma: dato de la firma, siempre tras la sesión. */
+app.use('/api', estiloRoutes);
 
 // Servidor Express
 app.listen(config.port, () => {

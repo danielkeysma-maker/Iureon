@@ -93,14 +93,45 @@ for (const { que, patron } of PROHIBIDO) {
   check(`ningún fuente trae ${que}`, donde.length === 0, donde.join(', '));
 }
 
-/* ─── 3. Los dos botones siguen a la vista, apagados ───────────────────── */
+/* ─── 3. «Enseñar este formato» y «Sugerir jerga» son de verdad ────────── */
 
+/*
+ * CAMBIÓ EL 14 DE SEPTIEMBRE DE 2026, a propósito y dos veces el mismo día.
+ * Primero «Enseñar estilo» dejó de estar apagado porque lo reemplaza la versión
+ * real —«Enseñar este formato», sobre `estilo_lecciones`—. Después «Sugerir
+ * jerga» dejó de estar apagado con «Próximamente»: abre «Jerga de su firma»
+ * (`JergaDeLaFirma`), que busca en el borrador el glosario que la firma YA
+ * enseñó. Lo que se exige ahora: el botón lleva a ESE panel, el panel no llama
+ * a ningún modelo ni a la red —solo lee el perfil—, y no queda ni el botón
+ * apagado ni la promesa.
+ */
 const visor = TODOS.find((f) => f.ruta.endsWith('documents/components/LegalDraftViewer.tsx'))?.codigo ?? '';
 check(
-  '«Enseñar estilo» y «Sugerir jerga» siguen en el visor, apagados',
-  visor.includes('Enseñar estilo') &&
-    visor.includes('Sugerir jerga') &&
-    (visor.match(/<button type="button" disabled className="cn-red-trabajar-boton">/g) ?? []).length === 2
+  '«Enseñar este formato» abre el diálogo real y «Sugerir jerga» abre la jerga real, sin «Próximamente»',
+  visor.includes('<EnsenarFormatoDialog') &&
+    visor.includes('TEXTO_BOTON_ENSENAR') &&
+    visor.includes('<JergaDeLaFirma') &&
+    !visor.includes('Próximamente') &&
+    !/<button type="button" disabled className="cn-red-trabajar-boton">/.test(visor)
+);
+const panelDeJerga = TODOS.find((f) => f.ruta.endsWith('estilo/components/JergaDeLaFirma.tsx'))?.codigo ?? '';
+const jergaPura = TODOS.find((f) => f.ruta.endsWith('frontend/src/modules/estilo/jerga.ts'))?.codigo ?? '';
+check(
+  'la jerga no llama a ningún modelo ni cobra: solo lee el perfil de la firma',
+  panelDeJerga.includes('usePerfilDeEstilo(') &&
+    jergaPura.length > 0 &&
+    !/estiloApi|httpClient|fetch\(|\/api\//.test(panelDeJerga + jergaPura)
+);
+const apiDelEstilo = TODOS.find((f) => f.ruta.endsWith('estilo/services/estilo.api.ts'))?.codigo ?? '';
+check(
+  'el diálogo habla con /api/estilo y el servidor la monta',
+  apiDelEstilo.includes("'/api/estilo/leer'") &&
+    apiDelEstilo.includes("'/api/estilo/lecciones'") &&
+    (TODOS.find((f) => f.ruta.endsWith('backend/src/index.ts'))?.codigo ?? '').includes("app.use('/api', estiloRoutes)")
+);
+check(
+  'ninguna frase afirma que la plataforma aprende: el éxito dice «Guardado»',
+  TODOS.filter((f) => f.ruta.includes('/estilo/')).every((f) => !/Aprendid[oa]|Estilo aprendido/.test(f.codigo))
 );
 
 /* ─── 4. Lo que lo reemplaza: precio y borrado de firma ────────────────── */

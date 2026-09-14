@@ -1,6 +1,7 @@
 import { leerTodasLasFilas } from '../../config/leerTodasLasFilas';
 import { supabase } from '../../config/supabase.config';
 import { hoyEnColombia } from '../agenda/avisos';
+import { leerEnTandas, type FilaDeActorDeLaLista, type FilaDeClienteDeLaLista } from './busquedaDeLaLista';
 import { posicionSegunElExpediente } from './posicionDelExpediente';
 import {
   armarMisCasos,
@@ -203,7 +204,9 @@ export const listarExpedientes = async (firmId: string, ahora: Date = new Date()
       hoy,
       expedientes: [],
       terminos: { filas: [], falla: null },
-      fragmentos: { filas: [], falla: null }
+      fragmentos: { filas: [], falla: null },
+      clientes: { filas: [], falla: null },
+      actores: { filas: [], falla: null }
     });
   }
 
@@ -212,44 +215,51 @@ export const listarExpedientes = async (firmId: string, ahora: Date = new Date()
    * Un despacho con cuarenta asuntos haría ciento sesenta viajes a la base para
    * pintar una pantalla — es el mismo criterio con el que `listClients` cuenta
    * entrevistas.
+   *
+   * CLIENTES Y ACTORES POR TANDAS DE IDS Y SIN TOPE DE MIL. Traen lo que la
+   * búsqueda de la lista necesita —el documento del cliente, el nombre y la
+   * identificación de cada persona—, y una firma con mil casos tiene más de mil
+   * actores: sin `leerTodasLasFilas` la contraparte del caso mil y uno no se
+   * encontraría, y sin tandas la URL del `.in()` no cabe. Una falla ya no se
+   * traga en silencio: viaja a `armarMisCasos`, que la vuelve aviso.
    */
   const idsDeCliente = [...new Set(filas.map((f) => f.cliente_id).filter((x): x is string => Boolean(x)))];
-  const leerClientes = async (): Promise<Map<string, string>> => {
-    const nombres = new Map<string, string>();
-    if (idsDeCliente.length === 0) return nombres;
-    const { data: clientes } = await db()
-      .from('clients')
-      .select('id, full_name')
-      .eq('firm_id', firmId)
-      .in('id', idsDeCliente);
-    for (const c of (clientes ?? []) as { id: string; full_name: string }[]) {
-      nombres.set(c.id, c.full_name);
-    }
-    return nombres;
-  };
 
-  const [nombres, actores, terminos, fragmentos] = await Promise.all([
-    leerClientes(),
-    db()
-      .from('expediente_actores')
-      .select('expediente_id')
-      .in('expediente_id', filas.map((f) => f.id)),
+  const [clientes, actores, terminos, fragmentos] = await Promise.all([
+    leerEnTandas(idsDeCliente, (tanda) =>
+      leerTodasLasFilas<FilaDeClienteDeLaLista>((desde, hasta) =>
+        db()
+          .from('clients')
+          .select('id, firm_id, full_name, document_id')
+          .eq('firm_id', firmId)
+          .in('id', tanda)
+          .order('id')
+          .range(desde, hasta)
+      )
+    ),
+    leerEnTandas(
+      filas.map((f) => f.id),
+      (tanda) =>
+        leerTodasLasFilas<FilaDeActorDeLaLista>((desde, hasta) =>
+          db()
+            .from('expediente_actores')
+            .select('id, expediente_id, nombre, identificacion, papel, lado')
+            .in('expediente_id', tanda)
+            .order('id')
+            .range(desde, hasta)
+        )
+    ),
     leerTerminosPendientes(firmId),
     leerFragmentosDeCasos(firmId)
   ]);
   registrarFallas(terminos, fragmentos);
+  if (clientes.falla) console.error('[EXPEDIENTES] No se pudieron leer los clientes de los casos:', clientes.falla);
+  if (actores.falla) console.error('[EXPEDIENTES] No se pudieron leer las personas de los casos:', actores.falla);
 
-  const cuantos = new Map<string, number>();
-  for (const a of (actores.data ?? []) as { expediente_id: string }[]) {
-    cuantos.set(a.expediente_id, (cuantos.get(a.expediente_id) ?? 0) + 1);
-  }
+  /* El nombre del cliente y la cuenta de actores los resuelve `armarMisCasos` con estas lecturas. */
+  const expedientes: Expediente[] = filas.map((f) => aExpediente(f));
 
-  const expedientes: Expediente[] = filas.map((f) => ({
-    ...aExpediente(f, f.cliente_id ? nombres.get(f.cliente_id) ?? null : null),
-    actores: cuantos.get(f.id) ?? 0
-  }));
-
-  return armarMisCasos({ firmId, hoy, expedientes, terminos, fragmentos });
+  return armarMisCasos({ firmId, hoy, expedientes, terminos, fragmentos, clientes, actores });
 };
 
 /**

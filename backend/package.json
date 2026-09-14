@@ -87,6 +87,7 @@
     "check:material-expediente": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/materialDelExpediente.check.ts",
     "check:posicion-expediente": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/posicionDelExpediente.check.ts",
     "check:proximo-termino": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/proximoTermino.check.ts",
+    "check:busqueda-lista": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/busquedaDeLaLista.check.ts",
     "check:renombrar-documento": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/renombrarDocumento.check.ts",
     "check:carpetas-guardas": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/carpetasGuardas.check.ts",
     "check:borrado-firma-completo": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/firms/__checks__/borradoFirmaCompleto.check.ts",
@@ -96,7 +97,11 @@
     "check:glosa": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosa.check.ts",
     "check:glosa-red": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosa.check.ts --red",
     "check:sin-aprendizaje-falso": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/__checks__/sinAprendizajeFalso.check.ts",
-    "check:recuperacion": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/auth/__checks__/recuperacion.check.ts"
+    "check:recuperacion": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/auth/__checks__/recuperacion.check.ts",
+    "check:estilo-saneamiento": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/estilo/__checks__/saneamiento.check.ts",
+    "check:estilo-guarda": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/estilo/__checks__/guarda.check.ts",
+    "check:estilo-consolidar": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/estilo/__checks__/consolidar.check.ts",
+    "check:estilo-prompt": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/estilo/__checks__/prompt.check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

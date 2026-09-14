@@ -58,7 +58,9 @@ const COMO_SE_REGISTRA: Record<string, string> = {
   'modules/catalog/triage.service.ts':
     'devuelve TriageResult.usage y lo registra triage.controller.ts',
   'modules/transcription/resumen.service.ts':
-    'devuelve usage y lo registra transcription.controller.ts'
+    'devuelve usage y lo registra transcription.controller.ts',
+  'modules/estilo/estilo.service.ts':
+    'llama a recordUsage (operación ESTILO) desde el registrarUso que estilo.casos.ts invoca antes de liquidar «Leer el formato»'
 };
 
 /** Los que SUBEN el gasto en vez de registrarlo, y quién lo registra por ellos. */

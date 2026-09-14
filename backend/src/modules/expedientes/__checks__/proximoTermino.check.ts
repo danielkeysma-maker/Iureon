@@ -319,8 +319,8 @@ const expediente = (over: Partial<Expediente> = {}): Expediente => ({
 {
   // Sin términos leídos, «Activos» cae al orden por lo tocado más reciente.
   const casos: ExpedienteEnLista[] = [
-    { ...expediente({ id: 'viejo', updatedAt: '2026-01-01T00:00:00Z' }), terminosLeidos: false, proximoTermino: null, terminoVencido: null, terminosPendientes: null, documentos: null },
-    { ...expediente({ id: 'nuevo', updatedAt: '2026-09-01T00:00:00Z' }), terminosLeidos: false, proximoTermino: null, terminoVencido: null, terminosPendientes: null, documentos: null }
+    { ...expediente({ id: 'viejo', updatedAt: '2026-01-01T00:00:00Z' }), terminosLeidos: false, proximoTermino: null, terminoVencido: null, terminosPendientes: null, documentos: null, clienteDocumento: null, personas: null },
+    { ...expediente({ id: 'nuevo', updatedAt: '2026-09-01T00:00:00Z' }), terminosLeidos: false, proximoTermino: null, terminoVencido: null, terminosPendientes: null, documentos: null, clienteDocumento: null, personas: null }
   ];
   const p = clasificarEnPestanas(casos, false);
   check('sin agenda, «Activos» ordena por lo tocado más reciente', JSON.stringify(p.activos) === JSON.stringify(['nuevo', 'viejo']));

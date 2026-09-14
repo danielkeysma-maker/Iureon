@@ -1,5 +1,10 @@
 import type { LecturaCompleta } from '../../config/leerTodasLasFilas';
 import { diasQueFaltan } from '../agenda/avisos';
+import {
+  datosDeBusquedaPorExpediente,
+  type FilaDeActorDeLaLista,
+  type FilaDeClienteDeLaLista
+} from './busquedaDeLaLista';
 import type {
   EstadoDeExpediente,
   Expediente,
@@ -228,13 +233,40 @@ export const armarMisCasos = (entrada: {
   expedientes: readonly Expediente[];
   terminos: LecturaCompleta<FilaDeTerminoPendiente>;
   fragmentos: LecturaCompleta<FilaDeFragmento>;
+  /*
+   * LAS LECTURAS DE BÚSQUEDA SON OPCIONALES PARA QUIEN ARMA LA LISTA SIN ELLAS
+   * —los checks del próximo término—, y no pasarlas cuenta como no leídas: la
+   * lista sale con `personas: null` y el aviso, nunca con «nadie en el caso».
+   */
+  clientes?: LecturaCompleta<FilaDeClienteDeLaLista>;
+  actores?: LecturaCompleta<FilaDeActorDeLaLista>;
 }): MisCasos => {
   const terminos =
     entrada.terminos.falla === null ? terminosPorExpediente(entrada.terminos.filas, entrada.firmId, entrada.hoy) : null;
   const documentos =
     entrada.fragmentos.falla === null ? documentosPorExpediente(entrada.fragmentos.filas, entrada.firmId) : null;
 
-  const expedientes = entrada.expedientes.map((e) => ({ ...e, ...resumenDelCaso(e.id, terminos, documentos) }));
+  const noSeLeyo = { filas: [], falla: 'no se leyó' };
+  const clientes = entrada.clientes ?? noSeLeyo;
+  const busqueda = datosDeBusquedaPorExpediente({
+    firmId: entrada.firmId,
+    expedientes: entrada.expedientes,
+    clientes,
+    actores: entrada.actores ?? noSeLeyo
+  });
+
+  const expedientes: ExpedienteEnLista[] = entrada.expedientes.map((e) => {
+    const b = busqueda.porExpediente.get(e.id);
+    return {
+      ...e,
+      /* Sin clientes leídos se conserva lo que traía el expediente, que es lo de antes. */
+      clienteNombre: clientes.falla === null ? b?.clienteNombre ?? null : e.clienteNombre,
+      ...(b?.actores !== undefined ? { actores: b.actores } : {}),
+      clienteDocumento: b?.clienteDocumento ?? null,
+      personas: b?.personas ?? null,
+      ...resumenDelCaso(e.id, terminos, documentos)
+    };
+  });
 
   return {
     expedientes,
@@ -245,6 +277,7 @@ export const armarMisCasos = (entrada: {
         ? 'No se pudieron leer los términos de la agenda: esta lista no puede decir qué vence en cada caso.'
         : null,
     avisoDocumentos:
-      documentos === null ? 'No se pudieron contar los documentos indexados de los casos.' : null
+      documentos === null ? 'No se pudieron contar los documentos indexados de los casos.' : null,
+    avisoBusqueda: busqueda.aviso
   };
 };

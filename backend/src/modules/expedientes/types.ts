@@ -284,7 +284,33 @@ export interface ResumenDelCaso {
   documentos: number | null;
 }
 
-export type ExpedienteEnLista = Expediente & ResumenDelCaso;
+/**
+ * UNA PERSONA DEL CASO, VISTA DESDE LA LISTA: lo justo para encontrar el caso
+ * por su nombre o su documento. Ni `sobreQue` ni `notas`: eso es contenido del
+ * caso y la lista no lo necesita para buscar.
+ */
+export interface PersonaEnLista {
+  nombre: string;
+  /** Tal como se escribió en la ficha del actor: con o sin puntos. */
+  identificacion: string | null;
+  papel: PapelEnElExpediente;
+  lado: LadoEnElExpediente;
+}
+
+/**
+ * LO QUE LA LISTA NECESITA PARA BUSCAR UN CASO POR CÉDULA, NIT O PERSONA.
+ *
+ * Mismo criterio que `ResumenDelCaso`: `personas: null` es «no se pudo leer»,
+ * nunca «el caso no tiene personas». La fecha de registro no se repite aquí:
+ * ya viaja como `createdAt`.
+ */
+export interface DatosDeBusquedaDelCaso {
+  /** `clients.document_id` del cliente atado, guardado sin puntos ni guiones. Null sin cliente o sin lectura. */
+  clienteDocumento: string | null;
+  personas: PersonaEnLista[] | null;
+}
+
+export type ExpedienteEnLista = Expediente & ResumenDelCaso & DatosDeBusquedaDelCaso;
 
 /**
  * LAS TRES PESTAÑAS DE «MIS CASOS», como listas de ids ya ordenadas.
@@ -310,6 +336,12 @@ export interface MisCasos {
   avisoTerminos: string | null;
   /** Texto para la pantalla si los documentos no se pudieron contar; null si sí. */
   avisoDocumentos: string | null;
+  /**
+   * Texto para la pantalla si las personas o los documentos de los clientes no
+   * se pudieron leer: la búsqueda por cédula o por nombre de persona puede no
+   * encontrar un caso que sí existe. Null si se leyó todo.
+   */
+  avisoBusqueda: string | null;
 }
 
 export interface DatosDeExpediente {

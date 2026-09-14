@@ -23,6 +23,7 @@ import {
   renderJurisprudencia
 } from './claudeDraft.prompt';
 import { buildCatalogGuidanceForFirm, resolverProcedencia } from './catalogGuidance';
+import { estiloParaRedactar } from '../estilo/estilo.service';
 import { revisarCitacionNormativa } from './citacionNormativa';
 import {
   SEPARADOR_DE_AVISOS,
@@ -44,6 +45,13 @@ import type { LegalBranch } from '../catalog/types';
  * draft must cite published jurisprudence, not another client's document.
  */
 const SHARED_CORPUS = 'SYSTEM_CORPUS';
+
+/**
+ * Cuánto se espera al estilo de la firma antes de redactar sin él. Son dos
+ * lecturas de la base; si tardan más que esto, algo anda mal y el escrito no
+ * puede pagarlo.
+ */
+const PLAZO_ESTILO_MS = 5_000;
 
 /**
  * A workflow request with the billing context attached.
@@ -80,6 +88,18 @@ export interface WorkflowRequest {
   legalPrompt: string;
   customFormatInstruction?: string;
   existingDraft?: string;
+  /**
+   * El interruptor del paso 3 del asistente. Solo `true` aplica el estilo
+   * enseñado: un cliente viejo que no lo manda redacta como antes.
+   */
+  usarEstilo?: boolean;
+  /** El rol del taller, que decide el estilo solo cuando la actuación no resuelve en el catálogo. */
+  rolDelTaller?: string;
+  /**
+   * El bloque del estilo, resuelto EN EL SERVIDOR por el pipeline. El
+   * controlador no lo llena nunca: el texto del estilo no viene del navegador.
+   */
+  estiloDeLaFirma?: string;
   /**
    * What was read from the files the lawyer attached, already rendered as the
    * «DATOS DE LOS ADJUNTOS» block (see `adjuntos/renderBloqueAdjuntos`).
@@ -267,8 +287,38 @@ export class OpenRouterService {
       PLAZO_ESQUEMA_MS,
       ''
     );
+    /*
+     * ─── EL ESTILO DE LA FIRMA, SI EL ABOGADO NO LO APAGÓ ────────────────────
+     *
+     * Se resuelve aquí y no en el controlador porque necesita la ficha (su rol
+     * y su rama mandan sobre los del taller) y la firma del token. Va con
+     * `conPlazo` y nunca lanza: una lectura lenta de la base no puede tumbar un
+     * borrador que ya pagó hechos y jurisprudencia; sin estilo se redacta con
+     * el formato por defecto, como antes.
+     */
+    const estilo = await conPlazo(
+      estiloParaRedactar({
+        firmId: req.firmId,
+        documentType: req.documentType,
+        legalBranch: req.legalBranch,
+        usarEstilo: req.usarEstilo === true,
+        rolDelTaller: req.rolDelTaller
+      }),
+      PLAZO_ESTILO_MS,
+      null
+    );
+    if (estilo) {
+      onStepLog({
+        stage: 'STAGE_3_REDACCION',
+        engine: 'CLAUDE',
+        message: `Se aplica el formato que su firma enseñó (${estilo.aplicado.lecciones} ${estilo.aplicado.lecciones === 1 ? 'escrito' : 'escritos'}).`,
+        timestamp: new Date().toISOString()
+      });
+    }
+    const reqDeRedaccion: PipelineRequest = { ...req, estiloDeLaFirma: estilo?.bloque };
+
     const legalText = await conPresupuesto(
-      this.runDrafting(req, geminiExtraction, jurisprudencia, gptStructure, onStepLog),
+      this.runDrafting(reqDeRedaccion, geminiExtraction, jurisprudencia, gptStructure, onStepLog),
       PLAZO_REDACCION_MS,
       'redaccion del escrito'
     );
@@ -465,7 +515,13 @@ export class OpenRouterService {
        * per model call, so this field has nothing true to say and says nothing.
        */
       tokensConsumed: 0,
-      procedencia,
+      /*
+       * EL ESTILO APLICADO VIAJA EN LA PROCEDENCIA —que es lo que el borrador
+       * guarda— y también suelto, porque una actuación sin catalogar trae
+       * procedencia null y aun así pudo redactarse con el estilo del rol.
+       */
+      procedencia: procedencia ? { ...procedencia, estiloAplicado: estilo?.aplicado ?? null } : procedencia,
+      estiloAplicado: estilo?.aplicado ?? null,
       isContinuation
     };
   }
@@ -899,7 +955,8 @@ export class OpenRouterService {
       existingDraft: req.existingDraft,
       catalogGuidance,
       adjuntos: req.bloqueAdjuntos,
-      expediente: req.bloqueExpediente
+      expediente: req.bloqueExpediente,
+      estiloDeLaFirma: req.estiloDeLaFirma
     });
 
     const userMessage = buildClaudeUserMessage({

@@ -114,8 +114,13 @@ const CODIGOS: Array<{ re: RegExp; clave: string; etiqueta: string }> = [
   }
 ];
 
-/** «Ley 820 de 2003», «Decreto Ley 2591 de 1991». Cualquier norma con año. */
-const NORMA_CON_ANIO = /\b(ley|decreto(?:\s+ley)?)\s*(\d{1,5})\s*de\s*(\d{4})/gi;
+/**
+ * «Ley 820 de 2003», «Decreto Ley 2591 de 1991». Cualquier norma con año.
+ * Exportada para la guarda del estilo de la firma (`estilo/guardaJuridica.ts`),
+ * que tiene que reconocer una norma igual que este cedazo. Es global (`g`):
+ * quien la use afuera construye su propia RegExp desde `source`.
+ */
+export const NORMA_CON_ANIO =/\b(ley|decreto(?:\s+ley)?)\s*(\d{1,5})\s*de\s*(\d{4})/gi;
 
 const sinTildes = (t: string): string => t.normalize('NFD').replace(/[̀-ͯ]/g, '');
 
@@ -169,7 +174,8 @@ const marcasDeNorma = (texto: string): Marca[] => {
   return out.sort((a, b) => a.indice - b.indice);
 };
 
-const CABEZA_DE_ARTICULO = /\b(?:art[íi]culos?|arts?\.)\s*/gi;
+/** Exportada por la misma razón que `NORMA_CON_ANIO`; mismo cuidado con la bandera `g`. */
+export const CABEZA_DE_ARTICULO = /\b(?:art[íi]culos?|arts?\.)\s*/gi;
 
 /**
  * Lee la cola de una cita («82, 84 y 90», «384 num. 2», «1613 y siguientes») y

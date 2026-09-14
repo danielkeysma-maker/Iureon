@@ -96,7 +96,14 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
     legalPrompt,
     existingDraft,
     customFormatInstruction,
-    expedienteId
+    expedienteId,
+    /*
+     * Del estilo de la firma solo llegan el INTERRUPTOR y el rol del taller.
+     * El texto del estilo lo resuelve el pipeline desde la base: si viniera en
+     * el cuerpo, cualquiera podría meterle al prompt «fórmulas» con plazos.
+     */
+    usarEstilo,
+    rolDelTaller
   } = req.body;
 
   if (!legalPrompt) {
@@ -298,6 +305,8 @@ export const streamAgentDraftController = async (req: Request, res: Response): P
          * y nadie se lo enviaba: era un ajuste que se guardaba y no hacia nada.
          */
         customFormatInstruction,
+        usarEstilo: usarEstilo === true,
+        rolDelTaller: typeof rolDelTaller === 'string' ? rolDelTaller : undefined,
         bloqueAdjuntos,
         bloqueExpediente
       },

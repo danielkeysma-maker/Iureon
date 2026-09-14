@@ -47,6 +47,13 @@ interface ClaudePromptInput {
    * atado a un expediente o cuando el expediente no tiene nada indexado.
    */
   expediente?: string;
+  /**
+   * El bloque del estilo que enseñó la firma (`estilo/bloqueDelEstilo.ts`), ya
+   * resuelto en el servidor desde `estilo_lecciones`. Ausente cuando el abogado
+   * apagó el interruptor o cuando la firma no ha enseñado nada para ese rol.
+   * Nunca llega del navegador.
+   */
+  estiloDeLaFirma?: string;
 }
 
 /**
@@ -131,12 +138,14 @@ interface ClaudeUserMessageInput {
  * `**bold**` as real bold and strip markdown headings, so emitting `##` or
  * `---` would surface as literal noise in the signed document.
  *
- * No taught style reaches this prompt. An earlier comment here claimed that a
- * firm's format taught through «Enseñar estilo» replaced the reference
- * structure; nothing ever did that — the endpoint behind the button only logged
- * a line. What shapes the document today is the catalogue entry and the firm's
- * Membrete format. When lessons from `estilo_lecciones` are applied, this is
- * where the rule for how they combine with the reference structure belongs.
+ * EL ESTILO ENSEÑADO VA DESPUÉS DEL FORMATO DE LA FIRMA, Y DICE QUE PIERDE.
+ * Hasta el 14 de septiembre de 2026 ningún estilo enseñado llegaba aquí (el
+ * botón de antes solo escribía una línea en el registro). Hoy llega el bloque
+ * de `estilo/bloqueDelEstilo.ts`, justo después del FORMATO DE LA FIRMA, y abre
+ * con su propia regla de precedencia: la ficha, la estructura obligatoria y la
+ * regla de citación mandan sobre los campos explícitos de Membrete, y estos
+ * sobre el estilo enseñado, que solo gobierna la redacción. Va último para que
+ * sus fórmulas estén frescas, y por eso mismo tiene que decir que no manda.
  */
 /**
  * Renders the jurisprudence section — including, above all, its absence.
@@ -171,7 +180,8 @@ export const buildClaudeDraftPrompt = ({
   existingDraft,
   catalogGuidance,
   adjuntos,
-  expediente
+  expediente,
+  estiloDeLaFirma
 }: ClaudePromptInput): string => {
   // A catalogued actuación supplies the article, the deadline and the
   // norm-mandated sections. Only when the actuación is not catalogued yet does
@@ -280,6 +290,7 @@ ${renderJurisprudencia(citations)}
 
 ${`ESTRUCTURA ${esTitulo ? `DEL ESCRITO QUE BUSCA "${encargo}"` : `DE "${encargo}"`} — obligatoria. Las secciones marcadas [OBLIGATORIA] no pueden omitirse y la de petición/pretensiones/resuelve JAMÁS se omite. Cada sección abre con su título en su propia línea, en mayúscula sostenida y entre **dobles asteriscos**:\n${estructuraObligatoria}`}
 ${customFormat ? `\n⚠️ FORMATO DE LA FIRMA — manda sobre la PRESENTACIÓN (numeración, títulos, orden de secciones, bloque de firma). NO autoriza omitir ninguna sección marcada [OBLIGATORIA] arriba: esas las exige la norma, no el estilo de la casa.\n${customFormat}` : ''}
+${estiloDeLaFirma ? `\n${estiloDeLaFirma}` : ''}
     `;
 };
 
