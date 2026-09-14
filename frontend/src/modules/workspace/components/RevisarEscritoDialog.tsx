@@ -24,7 +24,10 @@ import { GuiaEligeActuacionDialog } from './GuiaEligeActuacionDialog';
 import { ActuacionPropiaDialog } from './ActuacionPropiaDialog';
 import { textoDelArchivo } from '../services/textoDelArchivo';
 import { etiquetaDeAtaque, puntosDeAtaqueDe } from '../services/ataque';
-import { LecturaDelDocumentoRecibido, SeccionDeInforme } from './LecturaDelDocumentoRecibido';
+import { LecturaDelDocumentoRecibido } from './LecturaDelDocumentoRecibido';
+import { BandaDeComprobacion, MarcasDelHallazgo, SeccionConMarcas } from './ComprobacionAutomatica';
+import { lineaDePasajes, lineasDeLaBanda, marcasDelHallazgo, normalizarInforme, rotuloDeMarca } from '../services/comprobaciones';
+import type { SeccionDelInforme } from '../services/review.api';
 import { PuenteAlAtaque } from './PuenteAlAtaque';
 import type { ActuacionRole } from '../../catalog/types';
 import { COMO_SE_REPRESENTA, PAPELES_REPRESENTABLES } from '../../expedientes/types';
@@ -700,23 +703,48 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
         .join('\n');
     }
     if (!respuesta.informe) return respuesta.informeLibre ?? '';
-    const i = respuesta.informe;
-    const bloque = (t: string, xs: string[]) => (xs.length ? `${t}\n${xs.map((x) => `- ${x}`).join('\n')}\n` : '');
+    /*
+     * NORMALIZADO, como la pantalla y el PDF: lo copiado lleva la comprobación
+     * en su bloque y junto a cada hallazgo, y un informe guardado con corchetes
+     * no los repite dentro del párrafo.
+     */
+    const normal = normalizarInforme(respuesta.informe);
+    const i = normal.informe;
+    const marcasEn = (seccion: SeccionDelInforme, k: number): string =>
+      marcasDelHallazgo(normal.comprobaciones, seccion, k)
+        .map((m) => `\n  Advertencia (${rotuloDeMarca(m)}): ${m.mensaje}`)
+        .join('');
+    const bloque = (t: string, xs: string[], seccion: SeccionDelInforme) =>
+      xs.length ? `${t}\n${xs.map((x, k) => `- ${x}${marcasEn(seccion, k)}`).join('\n')}\n` : '';
+    const banda = lineasDeLaBanda(normal);
+    const pasajes = lineaDePasajes({ pasajesDelCaso: respuesta.pasajesDelCaso ?? normal.pasajesDelCaso });
     return [
       `REVISIÓN · ${tipo}`,
+      pasajes ?? '',
       '',
-      i.resumen,
+      banda
+        ? [
+            banda.titulo.toUpperCase(),
+            banda.cuenta.map((x) => `${x.etiqueta}: ${x.cantidad}`).join(' · '),
+            banda.nota ?? '',
+            ...banda.avisos,
+            ...banda.noComprobadas.map((x) => `- Sin respuesta de las fuentes oficiales: ${x}`)
+          ]
+            .filter(Boolean)
+            .join('\n') + '\n'
+        : '',
+      `${i.resumen}${marcasEn('resumen', 0)}`,
       '',
-      bloque('SECCIONES QUE LA NORMA EXIGE Y FALTAN', i.seccionesFaltantes),
-      bloque('FORTALEZAS', i.fortalezas),
-      bloque('DEBILIDADES', i.debilidades),
+      bloque('SECCIONES QUE LA NORMA EXIGE Y FALTAN', i.seccionesFaltantes, 'seccionesFaltantes'),
+      bloque('FORTALEZAS', i.fortalezas, 'fortalezas'),
+      bloque('DEBILIDADES', i.debilidades, 'debilidades'),
       i.erroresDeAplicacion.length
-        ? `ERRORES DE APLICACIÓN\n${i.erroresDeAplicacion.map((e) => `- ${e.donde}: ${e.problema} → ${e.correccion}`).join('\n')}\n`
+        ? `ERRORES DE APLICACIÓN\n${i.erroresDeAplicacion.map((e, k) => `- ${e.donde}: ${e.problema} → ${e.correccion}${marcasEn('erroresDeAplicacion', k)}`).join('\n')}\n`
         : '',
       (i.correccionesTextuales ?? []).length
-        ? `CITAS DEL ESCRITO Y REEMPLAZO PROPUESTO\n${(i.correccionesTextuales ?? []).map((c) => `- Dice: «${c.cita}»\n  Problema: ${c.problema}\n  Reemplazo: «${c.reemplazo}»`).join('\n')}\n`
+        ? `CITAS DEL ESCRITO Y REEMPLAZO PROPUESTO\n${(i.correccionesTextuales ?? []).map((c, k) => `- Dice: «${c.cita}»\n  Problema: ${c.problema}\n  Reemplazo: «${c.reemplazo}»${marcasEn('correccionesTextuales', k)}`).join('\n')}\n`
         : '',
-      bloque('RECOMENDACIONES', i.recomendaciones)
+      bloque('RECOMENDACIONES', i.recomendaciones, 'recomendaciones')
     ]
       .filter((s) => s !== '')
       .join('\n');
@@ -1475,11 +1503,11 @@ export const RevisarEscritoDialog: React.FC<RevisarEscritoDialogProps> = ({
 /* ─── EL INFORME ──────────────────────────────────────────────────────────── */
 
 /*
- * La sección con viñetas vive en `LecturaDelDocumentoRecibido`, porque el
- * taller la necesita y no puede importar este diálogo. Aquí se le deja el
- * nombre corto de siempre para no reescribir el informe del escrito propio.
+ * Las secciones del escrito propio se pintan con `SeccionConMarcas`
+ * (`ComprobacionAutomatica.tsx`): la misma lista con viñetas de
+ * `SeccionDeInforme`, más la marca de la comprobación automática debajo de
+ * cada hallazgo afectado.
  */
-const Seccion = SeccionDeInforme;
 
 interface InformeProps {
   respuesta: RespuestaDeRevision;
@@ -1506,7 +1534,15 @@ const Informe: React.FC<InformeProps> = ({
   onRedactar
 }) => {
   const esRecibido = modo === 'DOCUMENTO_RECIBIDO';
-  const i = respuesta.informe;
+  /*
+   * EL INFORME SE NORMALIZA: la comprobación automática llega como dato desde
+   * el 14 de septiembre de 2026, y un informe guardado antes la trae dentro del
+   * texto. Las dos formas se dibujan igual —banda arriba, marca junto al
+   * hallazgo— y ninguna advertencia se ve dos veces.
+   */
+  const normal = respuesta.informe ? normalizarInforme(respuesta.informe) : null;
+  const i = normal?.informe ?? null;
+  const comprobaciones = normal?.comprobaciones ?? null;
   const r = respuesta.informeRecibido ?? null;
   return (
     <div className="space-y-4 [overflow-wrap:anywhere]">
@@ -1553,8 +1589,11 @@ const Informe: React.FC<InformeProps> = ({
             }
           />
         )
-      ) : !i ? (
+      ) : !i || !normal ? (
         <>
+          {lineaDePasajes({ pasajesDelCaso: respuesta.pasajesDelCaso ?? null }) && (
+            <p className="text-meta text-ink-500">{lineaDePasajes({ pasajesDelCaso: respuesta.pasajesDelCaso ?? null })}</p>
+          )}
           <p className="rounded-control border border-line-200 bg-canvas px-3 py-2 text-[12px] leading-snug text-ink-700 text-justify">
             El revisor respondió en un formato que no se pudo ordenar por secciones; abajo está su texto completo. El cobro
             es el mismo y el contenido también.
@@ -1563,10 +1602,13 @@ const Informe: React.FC<InformeProps> = ({
         </>
       ) : (
         <>
+          {/* La comprobación automática va ARRIBA de las secciones: es lo que dice qué del informe no se puede usar tal cual. */}
+          <BandaDeComprobacion normal={normal} pasajesDelCaso={respuesta.pasajesDelCaso ?? normal.pasajesDelCaso} />
           <p className="text-[14px] leading-relaxed text-ink-900 text-justify">{i.resumen}</p>
-          <Seccion titulo="Secciones que la norma exige y faltan" items={i.seccionesFaltantes} tono="aviso" />
-          <Seccion titulo="Fortalezas" items={i.fortalezas} tono="ok" />
-          <Seccion titulo="Debilidades" items={i.debilidades} tono="aviso" />
+          <MarcasDelHallazgo comprobaciones={comprobaciones} seccion="resumen" indice={0} />
+          <SeccionConMarcas titulo="Secciones que la norma exige y faltan" items={i.seccionesFaltantes} tono="aviso" seccion="seccionesFaltantes" comprobaciones={comprobaciones} />
+          <SeccionConMarcas titulo="Fortalezas" items={i.fortalezas} tono="ok" seccion="fortalezas" comprobaciones={comprobaciones} />
+          <SeccionConMarcas titulo="Debilidades" items={i.debilidades} tono="aviso" seccion="debilidades" comprobaciones={comprobaciones} />
           {i.erroresDeAplicacion.length > 0 && (
             <section>
               <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Errores de aplicación</h4>
@@ -1576,6 +1618,7 @@ const Informe: React.FC<InformeProps> = ({
                     <p className="font-mono text-[10.5px] font-semibold text-ink-500">{e.donde}</p>
                     <p className="mt-0.5 text-ui leading-snug text-ink-900 text-justify">{e.problema}</p>
                     {e.correccion && <p className="mt-1 text-ui leading-snug text-brand-700 text-justify">Corrección: {e.correccion}</p>}
+                    <MarcasDelHallazgo comprobaciones={comprobaciones} seccion="erroresDeAplicacion" indice={k} />
                   </div>
                 ))}
               </div>
@@ -1606,12 +1649,14 @@ const Informe: React.FC<InformeProps> = ({
                         <p className="mt-0.5 text-ui leading-snug text-ink-900 text-justify">«{c.reemplazo}»</p>
                       </>
                     )}
+                    {/* Debajo de la tarjeta, nunca dentro de la cita del abogado. */}
+                    <MarcasDelHallazgo comprobaciones={comprobaciones} seccion="correccionesTextuales" indice={k} />
                   </div>
                 ))}
               </div>
             </section>
           )}
-          <Seccion titulo="Recomendaciones" items={i.recomendaciones} />
+          <SeccionConMarcas titulo="Recomendaciones" items={i.recomendaciones} seccion="recomendaciones" comprobaciones={comprobaciones} />
         </>
       )}
 

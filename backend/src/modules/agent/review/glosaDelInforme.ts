@@ -7,7 +7,6 @@ import {
   type RevisionDeGlosa
 } from './verificarGlosa';
 import { etiquetaDeNorma } from '../citacionNormativa';
-import { marcarVarios } from './verificarVigencia';
 import type { VigenciaDeArticulo } from '../../legislation/officialArticle.service';
 
 /**
@@ -119,73 +118,34 @@ const nombre = (r: GlosaJuzgada): string =>
   `${etiquetaDeNorma(r.referencia.codigo)}, art. ${r.referencia.articulo}`;
 
 /**
- * Las marcas en línea. SOLO LO NO SOSTENIDO, igual que en el borrador: meter
- * también las dudosas llenaría de corchetes un informe en el que casi todo está
- * bien y volvería invisible la marca que importa. Las dudosas se declaran en la
- * cabecera, que es donde se hojea.
+ * El extracto del texto oficial que acompaña a una glosa. 200 caracteres, como
+ * llevaba el corchete: dos líneas que explican el veredicto, no un muro.
  */
-const marcasDe = (revision: RevisionDeGlosa): Array<{ articulo: number; marca: string }> => {
-  const puestos = new Set<number>();
-  const marcas: Array<{ articulo: number; marca: string }> = [];
-  for (const r of revision.resultados.filter((x) => x.veredicto === 'NO_SOSTENIDA')) {
-    if (puestos.has(r.referencia.articulo)) continue;
-    puestos.add(r.referencia.articulo);
-    marcas.push({
-      articulo: r.referencia.articulo,
-      marca: `[LO QUE ESTA REVISIÓN AFIRMA NO LO DICE ESE ARTÍCULO — el texto oficial dice: «${extractoOficial(
-        r.textoOficial,
-        r.apoyo,
-        200
-      )}». ${r.motivo} No se apoye en este punto sin leer la norma.]`
-    });
-  }
-  return marcas;
-};
+export const extractoDeGlosa = (r: GlosaJuzgada): string => extractoOficial(r.textoOficial, r.apoyo, 200);
 
 /**
- * El informe con las marcas puestas donde el revisor habla.
+ * EL MENSAJE DE UNA GLOSA NO SOSTENIDA, con la redacción del corchete que este
+ * archivo pegaba en el informe hasta el 14 de septiembre de 2026, sin los
+ * corchetes. Ya no se pega: viaja como dato en `comprobacionesDelInforme.ts`.
+ * La redacción no cambia porque los informes guardados antes la traen dentro
+ * del texto y el frontend la reconoce por su apertura y su cierre exactos.
  *
- * Devuelve un informe NUEVO: el original no se toca, porque es lo que se pagó y
- * lo que hay que poder volver a leer tal como salió. Y `cita` sale intacta —es
- * del abogado, verbatim—, que es la misma regla que en la vigencia.
+ * SOLO LO NO SOSTENIDO SE MARCA SOBRE EL HALLAZGO, igual que antes en línea:
+ * marcar también las dudosas volvería invisible la marca que importa. Las
+ * dudosas se cuentan en la banda y se declaran en el aviso.
  */
-export const marcarGlosaEnInforme = (
-  informe: InformeDeRevision,
-  revision: RevisionDeGlosa
-): InformeDeRevision => {
-  const marcas = marcasDe(revision);
-  if (marcas.length === 0) return informe;
-  const m = (t: string): string => marcarVarios(t, marcas);
-
-  return {
-    resumen: m(informe.resumen),
-    fortalezas: informe.fortalezas.map(m),
-    debilidades: informe.debilidades.map(m),
-    seccionesFaltantes: informe.seccionesFaltantes.map(m),
-    erroresDeAplicacion: informe.erroresDeAplicacion.map((e) => ({
-      donde: m(e.donde),
-      problema: m(e.problema),
-      correccion: m(e.correccion)
-    })),
-    correccionesTextuales: informe.correccionesTextuales.map((c) => ({
-      /* La cita es del abogado, verbatim. No se le escribe encima. */
-      cita: c.cita,
-      problema: m(c.problema),
-      reemplazo: m(c.reemplazo)
-    })),
-    recomendaciones: informe.recomendaciones.map(m)
-  };
-};
+export const mensajeDeGlosa = (r: GlosaJuzgada): string =>
+  `LO QUE ESTA REVISIÓN AFIRMA NO LO DICE ESE ARTÍCULO — el texto oficial dice: «${extractoDeGlosa(r)}». ${r.motivo} No se apoye en este punto sin leer la norma.`;
 
 /**
  * El aviso de cabecera, para quien hojea el informe en vez de leerlo entero.
  *
  * SOLO HABLA DE LO QUE HAY QUE MIRAR — lo no sostenido y lo dudoso. Lo
- * comprobado y correcto no se anuncia: en el borrador esa lista sirve porque el
- * escrito es largo y el abogado quiere saber qué se revisó, pero aquí iría
- * dentro de `recomendaciones`, que es una lista de cosas por hacer. «No haga
- * nada con estas cuatro» no es una recomendación; es ruido delante de las que
- * sí lo son.
+ * comprobado y correcto no se anuncia en el aviso: iba dentro de
+ * `recomendaciones`, una lista de cosas por hacer, y hoy va en la banda de la
+ * comprobación (`comprobaciones.avisos`) con la misma redacción, porque los
+ * informes guardados antes la traen en el texto. Lo sostenido sí viaja, como
+ * dato, en `comprobaciones.articulos`, para quien quiera saber qué se revisó.
  *
  * Nulo cuando no hay nada que avisar: un encabezado seguido de nada es una
  * casilla, y este repositorio ya sabe cómo terminan.

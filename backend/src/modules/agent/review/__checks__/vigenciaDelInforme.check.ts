@@ -1,11 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { InformeDeRevision } from '../documentReview';
-import {
-  avisoDeVigencia,
-  marcarVigenciaEnInforme,
-  verificarVigenciaDelInforme
-} from '../vigenciaDelInforme';
+import { avisoDeVigencia, mensajeDeVigencia, verificarVigenciaDelInforme } from '../vigenciaDelInforme';
+import { construirComprobaciones } from '../comprobacionesDelInforme';
 import type { RevisionDeVigencia } from '../verificarVigencia';
 import type { VigenciaDeArticulo } from '../../../legislation/officialArticle.service';
 import { LIMITE_LLAMADA_MS, PLAZO_VIGENCIA_INFORME_MS } from '../documentReview.controller';
@@ -28,16 +25,15 @@ const PLAZO_DESCARGA_MS = 30_000;
  * salida es texto LISTO PARA PEGAR con botón «Aplicar», y el defecto medido
  * —citar artículos reales pero MUERTOS— era exactamente el que nadie miraba.
  *
- * Duele más que en Redacción: el abogado sabe que un borrador es un borrador,
- * pero aquí la aplicación se presenta como EL REVISOR que le dice qué está mal
- * y le entrega el reemplazo hecho. Después de que el revisor habló, ya no
- * vuelve a mirar.
+ * ─── LO QUE CAMBIÓ EL 14 DE SEPTIEMBRE DE 2026 («opción 2») ────────────────
  *
- * ─── LA REGLA QUE MÁS IMPORTA AQUÍ ES LA DE NO TOCAR LA CITA ───────────────
- *
- * `correccionesTextuales.cita` es un pedazo VERBATIM del escrito del abogado.
- * Meterle un corchete la deja de ser textual. El artículo muerto igual sale
- * señalado, en `problema`, que es la casilla de al lado.
+ * El resultado ya NO se escribe dentro del informe: ni corchetes donde el
+ * revisor nombra el artículo ni aviso antepuesto a las recomendaciones. Viaja
+ * como dato (`comprobacionesDelInforme.ts`, con su propia guarda). Aquí se
+ * sostiene lo que es de la vigencia: qué estado produce qué mensaje, cuándo
+ * hay aviso de cabecera, que se comprueba lo que hay que comprobar y que la
+ * tubería está enchufada y cabe en el reloj. Las aserciones que exigían el
+ * corchete en el texto se cambiaron por las que exigen el dato.
  */
 
 let fallos = 0;
@@ -73,6 +69,7 @@ const INFORME: InformeDeRevision = {
   ],
   recomendaciones: ['Aportar el contrato de arrendamiento.']
 };
+const TEXTO_ORIGINAL = JSON.stringify(INFORME);
 
 const vigenciaDe = (
   articulo: number,
@@ -98,82 +95,64 @@ const REVISION: RevisionDeVigencia = {
 
 /* ─── 1. EL CASO REAL: EL ARTÍCULO MUERTO QUEDA SEÑALADO DONDE SE PROPONE ── */
 
-const marcado = marcarVigenciaEnInforme(INFORME, REVISION);
+const comprobado = construirComprobaciones(INFORME, REVISION, null);
+const art2035 = comprobado.articulos[0];
+const lugares = JSON.stringify(art2035.dondeAparece);
 
 check(
-  'el artículo derogado queda marcado donde el revisor lo propone como corrección',
-  /NORMA DEROGADA/.test(marcado.erroresDeAplicacion[0].correccion),
-  marcado.erroresDeAplicacion[0].correccion.slice(0, 110)
+  'el artículo derogado queda señalado en la corrección que lo propone',
+  art2035.dondeAparece.some((l) => l.seccion === 'erroresDeAplicacion' && l.campo === 'correccion'),
+  lugares
 );
 check(
   'y también en la debilidad, que es donde el abogado lee el diagnóstico',
-  /NORMA DEROGADA/.test(marcado.debilidades[0]),
-  marcado.debilidades[0].slice(0, 100)
+  art2035.dondeAparece.some((l) => l.seccion === 'debilidades' && l.indice === 0),
+  lugares
+);
+/*
+ * EL REEMPLAZO NUNCA LLEVA LA MARCA DENTRO. Era texto listo para pegar y el
+ * corchete terminaba en el memorial. Hoy ni se escribe: el lugar dice
+ * «reemplazo» y la pantalla pinta el aviso junto a él.
+ */
+check(
+  'lo que nombra el reemplazo se señala por su lugar, sin escribir en él',
+  art2035.dondeAparece.some((l) => l.seccion === 'correccionesTextuales' && l.campo === 'reemplazo') &&
+    JSON.stringify(INFORME) === TEXTO_ORIGINAL,
+  lugares
 );
 check(
-  'y en el reemplazo, que es el texto que se va a pegar en el escrito',
-  /NORMA DEROGADA/.test(marcado.correccionesTextuales[0].reemplazo),
-  marcado.correccionesTextuales[0].reemplazo.slice(0, 110)
-);
-check(
-  'la marca nombra la norma que lo derogó, no solo que está derogado',
-  /Ley 820 de 2003/.test(marcado.debilidades[0])
+  'el mensaje nombra la norma que lo derogó, no solo que está derogado',
+  art2035.mensajes.some((m) => m.clase === 'DEROGADA' && /Ley 820 de 2003/.test(m.texto)),
+  JSON.stringify(art2035.mensajes)
 );
 
 /* ─── 2. LA CITA DEL ABOGADO NO SE TOCA ───────────────────────────────────── */
 
 /*
- * Es verbatim del escrito revisado. Escribirle dentro la deja de ser una cita,
- * y este producto tiene escrito que no reescribe lo que no es suyo — la misma
- * doctrina por la que la vigencia MARCA el borrador en vez de corregirlo.
+ * Es verbatim del escrito revisado. Se usa para UBICAR el artículo —si solo
+ * aparece ahí, la tarjeta de esa corrección se marca— pero nunca se escribe.
  */
 check(
-  'la cita textual del escrito del abogado NO se toca: sigue siendo verbatim',
-  marcado.correccionesTextuales[0].cita === INFORME.correccionesTextuales[0].cita,
-  marcado.correccionesTextuales[0].cita
+  'la cita textual del escrito del abogado se ubica, y sigue siendo verbatim',
+  art2035.dondeAparece.some((l) => l.campo === 'cita') &&
+    INFORME.correccionesTextuales[0].cita === 'con fundamento en el artículo 2035 del Código Civil'
 );
 
-/* ─── 3. NO SE BORRA NI SE REORDENA NADA: SOLO SE INSERTA ────────────────── */
+/* ─── 3. NADA DEL TEXTO CAMBIA ───────────────────────────────────────────── */
 
+check('el informe no se muta ni gana una palabra', JSON.stringify(INFORME) === TEXTO_ORIGINAL);
 check(
-  'el texto original sobrevive entero dentro del marcado: se inserta, no se reescribe',
-  marcado.debilidades[0].startsWith(
-    'La causal de terminación no está bien fundada: debe invocarse el artículo 2035'
-  ) && marcado.debilidades[0].includes('del Código Civil.'),
-  marcado.debilidades[0]
-);
-check(
-  'y no se pierde ningún elemento de ninguna lista',
-  marcado.fortalezas.length === INFORME.fortalezas.length &&
-    marcado.recomendaciones.length === INFORME.recomendaciones.length &&
-    marcado.erroresDeAplicacion.length === INFORME.erroresDeAplicacion.length
-);
-check(
-  'lo que no cita normas queda idéntico',
-  marcado.fortalezas[0] === INFORME.fortalezas[0] &&
-    marcado.recomendaciones[0] === INFORME.recomendaciones[0]
+  'lo que no cita normas no tiene lugar',
+  !art2035.dondeAparece.some((l) => l.seccion === 'fortalezas' || l.seccion === 'recomendaciones'),
+  lugares
 );
 
-/* ─── 4. EL INFORME ORIGINAL NO SE MUTA ───────────────────────────────────── */
-
-/*
- * Es lo que salió del motor y hay que poder volver a leerlo tal cual. Mutar el
- * objeto de entrada haría imposible distinguir después qué dijo el revisor de
- * qué añadió el sistema.
- */
-check(
-  'el informe original no se muta: el marcado devuelve uno nuevo',
-  INFORME.debilidades[0] ===
-    'La causal de terminación no está bien fundada: debe invocarse el artículo 2035 del Código Civil.',
-  INFORME.debilidades[0]
-);
-
-/* ─── 5. SIN NADA QUE AVISAR, EL INFORME SALE IDÉNTICO ───────────────────── */
+/* ─── 4. SIN NADA QUE AVISAR, NO HAY CABECERA ────────────────────────────── */
 
 /*
  * Un encabezado seguido de nada es una casilla, y este repositorio ya sabe
  * cómo terminan: el abogado aprende a saltárselo y el día que dice algo, no lo
- * lee. Si todas las citas están vivas, no se añade una sola palabra.
+ * lee.
  */
 const TODO_VIVO: RevisionDeVigencia = {
   resultados: [vigenciaDe(2035, 'VIGENTE', 'La fuente oficial no lo marca derogado.')],
@@ -181,23 +160,16 @@ const TODO_VIVO: RevisionDeVigencia = {
   noVerificables: 0,
   discrepantes: 0
 };
+check('sin nada que avisar no hay cabecera', avisoDeVigencia(TODO_VIVO) === null, String(avisoDeVigencia(TODO_VIVO)));
 check(
-  'sin nada que avisar no hay cabecera',
-  avisoDeVigencia(TODO_VIVO) === null,
-  String(avisoDeVigencia(TODO_VIVO))
-);
-check(
-  'y el informe sale idéntico, sin una marca de más',
-  JSON.stringify(marcarVigenciaEnInforme(INFORME, TODO_VIVO)) === JSON.stringify(INFORME)
+  'y lo vigente no trae mensaje ni clase: viaja como comprobado, no como aviso',
+  mensajeDeVigencia(TODO_VIVO.resultados[0]) === null &&
+    construirComprobaciones(INFORME, TODO_VIVO, null).articulos[0].clases.length === 0
 );
 const VACIA: RevisionDeVigencia = { resultados: [], derogados: 0, noVerificables: 0, discrepantes: 0 };
-check(
-  'y sin citas fuera de ficha tampoco',
-  avisoDeVigencia(VACIA) === null &&
-    JSON.stringify(marcarVigenciaEnInforme(INFORME, VACIA)) === JSON.stringify(INFORME)
-);
+check('y sin citas fuera de ficha tampoco', avisoDeVigencia(VACIA) === null);
 
-/* ─── 6. LOS OTROS DOS ESTADOS TAMBIÉN AVISAN ────────────────────────────── */
+/* ─── 5. LOS OTROS ESTADOS ───────────────────────────────────────────────── */
 
 /*
  * El MODULADO es el que más lo necesita: se abre, se lee entero y dice
@@ -205,46 +177,41 @@ check(
  * quitó, y eso no está en el texto.
  */
 const MODULADA: RevisionDeVigencia = {
-  resultados: [
-    vigenciaDe(2035, 'MODULADO', 'Nota del artículo: «Aparte subrayado CONDICIONALMENTE exequible».')
-  ],
+  resultados: [vigenciaDe(2035, 'MODULADO', 'Nota del artículo: «Aparte subrayado CONDICIONALMENTE exequible».')],
   derogados: 0,
   noVerificables: 0,
   discrepantes: 0
 };
-const conModulada = marcarVigenciaEnInforme(INFORME, MODULADA);
+const msgModulada = mensajeDeVigencia(MODULADA.resultados[0]) ?? '';
 check(
   'un artículo modulado por la Corte se señala, y NO como derogado',
-  /MODULADA POR LA CORTE/.test(conModulada.debilidades[0]) &&
-    !/NORMA DEROGADA/.test(conModulada.debilidades[0]),
-  conModulada.debilidades[0].slice(0, 120)
+  /MODULADA POR LA CORTE/.test(msgModulada) && !/NORMA DEROGADA/.test(msgModulada),
+  msgModulada.slice(0, 120)
 );
 check(
   'y el aviso de cabecera lo nombra sin llamarlo muerto',
-  /MODULADO/.test(avisoDeVigencia(MODULADA) ?? '') &&
-    !/DEROGADO/.test(avisoDeVigencia(MODULADA) ?? ''),
+  /MODULADO/.test(avisoDeVigencia(MODULADA) ?? '') && !/DEROGADO/.test(avisoDeVigencia(MODULADA) ?? ''),
   (avisoDeVigencia(MODULADA) ?? '').slice(0, 140)
 );
 
 const DISCREPANTE: RevisionDeVigencia = {
-  resultados: [
-    vigenciaDe(2035, 'DISCREPANCIA_ENTRE_FUENTES', 'El Senado lo da por VIGENTE y Función Pública por DEROGADO.')
-  ],
+  resultados: [vigenciaDe(2035, 'DISCREPANCIA_ENTRE_FUENTES', 'El Senado lo da por VIGENTE y Función Pública por DEROGADO.')],
   derogados: 0,
   noVerificables: 0,
   discrepantes: 1
 };
 check(
   'la discrepancia entre fuentes se declara y no se resuelve',
-  /NO COINCIDEN/.test(marcarVigenciaEnInforme(INFORME, DISCREPANTE).debilidades[0]),
-  marcarVigenciaEnInforme(INFORME, DISCREPANTE).debilidades[0].slice(0, 120)
+  /NO COINCIDEN/.test(mensajeDeVigencia(DISCREPANTE.resultados[0]) ?? ''),
+  mensajeDeVigencia(DISCREPANTE.resultados[0]) ?? ''
 );
 
 /*
- * EL NO_VERIFICABLE NO SE MARCA EN LÍNEA, y es deliberado. «No pude
+ * EL NO_VERIFICABLE NO SE MARCA SOBRE EL HALLAZGO, y es deliberado. «No pude
  * comprobarlo» pegado a cada cita convertiría un mal minuto del Senado en un
- * informe lleno de corchetes, y la falsa alarma es peor que el silencio: el
- * abogado dejaría de leer también los corchetes verdaderos.
+ * informe lleno de avisos, y la falsa alarma es peor que el silencio. Hoy se
+ * CUENTA en la banda como «no comprobada» —que es verdad y no acusa a nadie—,
+ * pero no trae mensaje de marca ni cabecera.
  */
 const SIN_RESPUESTA: RevisionDeVigencia = {
   resultados: [vigenciaDe(2035, 'NO_VERIFICABLE', 'Ninguna fuente oficial respondió.')],
@@ -253,12 +220,13 @@ const SIN_RESPUESTA: RevisionDeVigencia = {
   discrepantes: 0
 };
 check(
-  'un NO_VERIFICABLE no llena el informe de corchetes: no hay marca ni cabecera',
+  'un NO_VERIFICABLE no trae cabecera ni mensaje de marca; solo se cuenta',
   avisoDeVigencia(SIN_RESPUESTA) === null &&
-    JSON.stringify(marcarVigenciaEnInforme(INFORME, SIN_RESPUESTA)) === JSON.stringify(INFORME)
+    mensajeDeVigencia(SIN_RESPUESTA.resultados[0]) === null &&
+    construirComprobaciones(INFORME, SIN_RESPUESTA, null).cuenta.noComprobada === 1
 );
 
-/* ─── 7. EL AVISO VA PRIMERO EN LAS RECOMENDACIONES ──────────────────────── */
+/* ─── 6. EL AVISO DE CABECERA ────────────────────────────────────────────── */
 
 const aviso = avisoDeVigencia(REVISION);
 check(
@@ -266,13 +234,10 @@ check(
   aviso !== null && /COMPROBACIÓN AUTOMÁTICA DE VIGENCIA/.test(aviso),
   (aviso ?? '').slice(0, 90)
 );
-check(
-  'y nombra el artículo concreto, no un conteo suelto',
-  /art\. 2035/.test(aviso ?? ''),
-  (aviso ?? '').slice(0, 160)
-);
+check('y nombra el artículo concreto, no un conteo suelto', /art\. 2035/.test(aviso ?? ''), (aviso ?? '').slice(0, 160));
+check('y viaja en la comprobación, no en las recomendaciones', comprobado.avisos[0] === aviso && INFORME.recomendaciones.length === 1);
 
-/* ─── 8. LA TUBERÍA ESTÁ CONECTADA, Y NO SOLO ESCRITA ────────────────────── */
+/* ─── 7. LA TUBERÍA ESTÁ CONECTADA, Y NO SOLO ESCRITA ────────────────────── */
 
 /*
  * `verificarGlosa.ts` y `verificarVigencia.ts` llevaban meses viviendo en esta
@@ -289,9 +254,9 @@ check(
   'documentReview.controller.ts'
 );
 check(
-  'y guarda el informe ANOTADO, no el crudo: el aviso sigue ahí cuando el abogado vuelve',
-  /informe: informeAnotado/.test(controlador),
-  'se guarda y se responde el anotado'
+  'y guarda el informe CON su comprobación: el aviso sigue ahí cuando el abogado vuelve',
+  /informe: informeComprobado/.test(controlador),
+  'se guarda y se responde el comprobado'
 );
 /*
  * NUNCA PUEDE TUMBAR LA REVISIÓN. Llega cuando el informe ya está escrito y ya
@@ -308,7 +273,7 @@ check(
   'la comprobación está protegida'
 );
 
-/* ─── 9. Y LO QUE AÑADE AL RELOJ CABE ─────────────────────────────────────── */
+/* ─── 8. Y LO QUE AÑADE AL RELOJ CABE ─────────────────────────────────────── */
 
 /*
  * ESTA COMPROBACIÓN LE SUMA TIEMPO A UNA PETICIÓN QUE YA ERA LARGA, y el
@@ -329,7 +294,7 @@ check(
   `${conTope} ms de ${TOPE_DE_FUNCION_MS} ms — queda margen para la extracción del archivo, que no tiene tope propio`
 );
 
-/* ─── 10. LO QUE SE MANDA A COMPROBAR SALE DEL INFORME ENTERO ────────────── */
+/* ─── 9. LO QUE SE MANDA A COMPROBAR SALE DEL INFORME ENTERO ─────────────── */
 
 /*
  * Con una lista de autorizados que ya contiene el 2035, no queda nada por

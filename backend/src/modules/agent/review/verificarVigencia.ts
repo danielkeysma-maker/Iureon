@@ -189,13 +189,27 @@ export const marcarEnLinea = (texto: string, articulo: number, marca: string): s
  * inserciones se aplican de atrás hacia adelante, para que ninguna corra a las
  * demás.
  */
+/**
+ * DÓNDE SE CITA UN ARTÍCULO: cabeza de cita («artículo», «arts.») a menos de 60
+ * caracteres del número, sin punto de por medio. Es la única definición: la usa
+ * `marcarVarios` para pegar el corchete en el borrador y
+ * `comprobacionesDelInforme.ts` para decir en qué punto del informe aparece el
+ * artículo. Si fueran dos expresiones, la marca del hallazgo y «Ir al punto»
+ * podrían señalar sitios distintos sin que nada fallara.
+ */
+const patronDeCita = (articulo: number): RegExp =>
+  new RegExp(`\\b(?:art[íi]culos?|arts?\\.)[^.;\\n]{0,60}?\\b${articulo}\\b`, 'gi');
+
+/** Si el texto cita el artículo, con la misma ventana con la que se marca. */
+export const mencionaElArticulo = (texto: string, articulo: number): boolean => patronDeCita(articulo).test(texto);
+
 export const marcarVarios = (
   texto: string,
   marcas: Array<{ articulo: number; marca: string }>
 ): string => {
   const inserciones: Array<{ en: number; marca: string }> = [];
   for (const { articulo, marca } of marcas) {
-    const re = new RegExp(`\\b(?:art[íi]culos?|arts?\\.)[^.;\\n]{0,60}?\\b${articulo}\\b`, 'gi');
+    const re = patronDeCita(articulo);
     let m: RegExpExecArray | null;
     while ((m = re.exec(texto))) inserciones.push({ en: m.index + m[0].length, marca });
   }

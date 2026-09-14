@@ -24,7 +24,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import type { Anotacion, EdicionPropuesta, InformeDeDocumentoRecibido, InformeDeRevision, RespuestaDelChat, TurnoDelTaller, VersionDelTexto } from '../services/review.api';
-import { aplicarReemplazo, capasTipograficas, esCapaTipografica, localizarCitas, marcasDeAnotaciones, reflujoDeSecciones, segmentarCapas, type MarcaEnCapa } from '../services/marcas';
+import { aplicarReemplazo, capasTipograficas, esCapaTipografica, localizarCitas, marcasDeAnotaciones, reemplazoParaPegar, reflujoDeSecciones, segmentarCapas, type MarcaEnCapa } from '../services/marcas';
 import { diferencias, resumenDeCambios } from '../services/diff';
 import { ApiError } from '../../../config/httpClient';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
@@ -34,6 +34,8 @@ import type { FuenteDelOriginal } from '../services/originalDelEscrito';
 import type { CapaDeResaltado } from '../services/resaltadoNativo';
 import { VisorDelOriginal, type SuperficieDeSeleccion } from './VisorDelOriginal';
 import { LecturaDelDocumentoRecibido } from './LecturaDelDocumentoRecibido';
+import { BandaDeComprobacion, MarcasDelHallazgo } from './ComprobacionAutomatica';
+import { marcasDelHallazgo, normalizarInforme } from '../services/comprobaciones';
 import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
 
 /**
@@ -124,13 +126,14 @@ export interface TallerDeEscritoProps {
   precioConsultaCop: number;
   precioRevisionCop?: number;
   guardado: { activo: boolean; aviso: React.ReactNode; accion?: { etiqueta: string; onClick: () => Promise<void> | void } };
-  onGuardar?: (texto: string, conversacion: TurnoDelTaller[], anotaciones: Anotacion[], versiones: VersionDelTexto[]) => Promise<boolean>;
+  /** `versiones` llega `undefined` cuando no cambió o no cabe: quien guarda debe OMITIRLA, nunca mandar `[]`. */
+  onGuardar?: (texto: string, conversacion: TurnoDelTaller[], anotaciones: Anotacion[], versiones: VersionDelTexto[] | undefined) => Promise<boolean>;
   /**
    * El último guardado cuando la pestaña se oculta o se cierra con un cambio
    * todavía en el retardo. Debe salir con keepalive: una petición corriente
    * lanzada en `pagehide` muere con la página. Sin él, ese cambio se pierde.
    */
-  onGuardarAlSalir?: (texto: string, conversacion: TurnoDelTaller[], anotaciones: Anotacion[], versiones: VersionDelTexto[]) => void;
+  onGuardarAlSalir?: (texto: string, conversacion: TurnoDelTaller[], anotaciones: Anotacion[], versiones: VersionDelTexto[] | undefined) => void;
   onChat: (mensaje: string, textoActual: string, historial: TurnoDelTaller[], anotaciones: Anotacion[]) => Promise<RespuestaDelChat>;
   onRerevisar?: (textoActual: string) => Promise<{ informe: InformeDeRevision | null; informeLibre: string | null }>;
   onExportarTexto: (formato: 'pdf' | 'word', texto: string) => void;
@@ -185,7 +188,19 @@ export interface TallerDeEscritoProps {
 }
 
 const pesos = (n: number): string => `$${Math.round(n).toLocaleString('es-CO')}`;
-const MAX_VERSIONES = 15;
+/*
+ * LAS VERSIONES NO TIENEN TOPE. Se conservaban las últimas quince y la
+ * decimosexta borraba la primera sin aviso; el titular decidió el 14 de
+ * septiembre de 2026 que ninguna versión se sobreescribe.
+ *
+ * Lo que sí tiene tope es el CUERPO de cada guardado: Vercel rechaza más de
+ * 4,5 MB, y cada versión lleva el texto completo. Por eso la lista solo viaja
+ * cuando cambió desde el último guardado bueno, y si ya no cabe, se guarda el
+ * texto sin ella y se dice en la cinta. Nunca se manda una lista recortada ni
+ * vacía: el servidor la tomaría como la nueva y borraría las guardadas.
+ */
+const LIMITE_DEL_GUARDADO = 4_000_000;
+const bytesDe = (valor: unknown): number => new Blob([JSON.stringify(valor)]).size;
 
 const COLORES: { id: ColorDeResaltado; nombre: string; clase: string; muestra: string }[] = [
   { id: 'amarillo', nombre: 'Amarillo', clase: 'bg-yellow-200/80', muestra: 'bg-yellow-300' },
@@ -383,6 +398,15 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const contenedor = React.useRef<HTMLDivElement | null>(null);
   const textoDeUltimaVersion = React.useRef<string>(datos.versiones.length ? datos.versiones[datos.versiones.length - 1].texto : datos.texto);
 
+  /*
+   * EL INFORME, NORMALIZADO UNA VEZ. La comprobación automática llega como dato
+   * desde el 14 de septiembre de 2026; un informe guardado antes la trae dentro
+   * del texto. `normal.informe` es el texto del revisor sin marcas ni avisos, y
+   * es lo que se pinta — la comprobación va en su banda y junto al hallazgo.
+   * Las citas salen igual del informe original: nunca llevaron marca.
+   */
+  const normal = React.useMemo(() => (informe ? normalizarInforme(informe) : null), [informe]);
+
   /* ─── Las marcas, en sus capas ───────────────────────────────────────────── */
   const citas = React.useMemo(() => (informe?.correccionesTextuales ?? []).map((c) => c.cita), [informe]);
   const marcasDeCitas = React.useMemo(() => localizarCitas(texto, citas), [texto, citas]);
@@ -443,6 +467,20 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const guardarAlSalir = React.useRef(onGuardarAlSalir);
   guardarAlSalir.current = onGuardarAlSalir;
   const hayGuardado = Boolean(onGuardar) && guardado.activo;
+  /*
+   * La lista de versiones que el servidor YA tiene, por identidad. Mientras
+   * sea la misma, los guardados de texto no la vuelven a mandar: con las
+   * versiones sin tope, reenviarla entera cada 1,5 s acabaría chocando con el
+   * límite del cuerpo y tumbaría también el guardado del texto.
+   */
+  const versionesGuardadas = React.useRef<VersionDelTexto[]>(datos.versiones);
+  const [versionesNoCaben, setVersionesNoCaben] = React.useState(false);
+  const versionesParaEnviar = (instantanea: { texto: string; conversacion: TurnoDelTaller[]; anotaciones: Anotacion[]; versiones: VersionDelTexto[] }): VersionDelTexto[] | undefined => {
+    if (instantanea.versiones === versionesGuardadas.current) return undefined;
+    const caben = bytesDe(instantanea) <= LIMITE_DEL_GUARDADO;
+    setVersionesNoCaben(!caben);
+    return caben ? instantanea.versiones : undefined;
+  };
   React.useEffect(() => {
     if (primeraPasada.current) {
       primeraPasada.current = false;
@@ -455,8 +493,10 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       const instantanea = estadoActual.current;
       const fn = guardar.current;
       if (!fn) return;
-      fn(instantanea.texto, instantanea.conversacion, instantanea.anotaciones, instantanea.versiones)
+      const versionesEnviadas = versionesParaEnviar(instantanea);
+      fn(instantanea.texto, instantanea.conversacion, instantanea.anotaciones, versionesEnviadas)
         .then((ok) => {
+          if (ok && versionesEnviadas) versionesGuardadas.current = versionesEnviadas;
           /* Solo se da por guardado lo que sigue siendo lo último; si cambió en vuelo, el efecto siguiente ya lo tiene. */
           if (estadoActual.current === instantanea) pendiente.current = !ok;
           setEstadoGuardado(ok ? 'guardado' : 'fallo');
@@ -472,7 +512,8 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       const fn = guardarAlSalir.current;
       if (!pendiente.current || !fn) return;
       const { texto: t, conversacion: c, anotaciones: a, versiones: v } = estadoActual.current;
-      fn(t, c, a, v);
+      /* Sin cambios en las versiones no se mandan; si cambiaron, `cuerpoQueCabeEnKeepalive` las deja fuera cuando no caben. */
+      fn(t, c, a, v === versionesGuardadas.current ? undefined : v);
       pendiente.current = false;
     };
     const alCambiarVisibilidad = () => {
@@ -505,7 +546,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
   const tomarVersion = (motivo: string, resumen?: string): boolean => {
     if (texto === textoDeUltimaVersion.current) return false;
     const nueva: VersionDelTexto = { fecha: new Date().toISOString(), motivo, texto, resumen };
-    setVersiones((v) => [...v, nueva].slice(-MAX_VERSIONES));
+    setVersiones((v) => [...v, nueva]);
     textoDeUltimaVersion.current = texto;
     return true;
   };
@@ -514,7 +555,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     tomarVersion('antes de restaurar');
     setTexto(v.texto);
     textoDeUltimaVersion.current = v.texto;
-    setVersiones((xs) => [...xs, { fecha: new Date().toISOString(), motivo: `restaurada la versión de ${fechaCorta(v.fecha)}`, texto: v.texto }].slice(-MAX_VERSIONES));
+    setVersiones((xs) => [...xs, { fecha: new Date().toISOString(), motivo: `restaurada la versión de ${fechaCorta(v.fecha)}`, texto: v.texto }]);
     setVersionAbierta(null);
     setModo('marcas');
   };
@@ -765,6 +806,12 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
         {guardado.activo && estadoGuardado === 'guardando' && ' · Guardando…'}
         {guardado.activo && estadoGuardado === 'guardado' && ' · Guardado hace un momento'}
         {guardado.activo && estadoGuardado === 'fallo' && <span className="font-semibold text-danger"> · No se pudo guardar el último cambio</span>}
+        {guardado.activo && versionesNoCaben && (
+          <span className="font-semibold text-danger">
+            {' '}
+            · Las versiones nuevas ya no caben en un guardado: siguen en esta pantalla y las que ya estaban guardadas no se tocaron. El texto sí se guarda.
+          </span>
+        )}
       </span>
       {guardado.accion && (
         <button type="button" onClick={() => void guardado.accion?.onClick()} className="btn-secondary btn-sm">
@@ -1083,14 +1130,33 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
                 );
               })}
             </p>
-            {citaAbierta !== null && informe?.correccionesTextuales?.[citaAbierta] && (
+            {citaAbierta !== null && normal?.informe.correccionesTextuales?.[citaAbierta] && (() => {
+              /*
+               * La corrección del informe NORMALIZADO: sin los corchetes que un
+               * informe guardado traía en el problema o en el reemplazo. Esas
+               * advertencias no desaparecen: salen como marcas de esta
+               * corrección, debajo de «Por qué». Y lo que se pega pasa además
+               * por `reemplazoParaPegar`, por si algún corchete quedara.
+               */
+              const correccion = normal.informe.correccionesTextuales[citaAbierta];
+              const limpio = reemplazoParaPegar(correccion.reemplazo);
+              return (
               <div className="sticky bottom-0 mt-4 rounded-card border border-line-200 bg-surface p-3 font-sans shadow-lg">
                 <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">Por qué</p>
-                <p className="mt-0.5 text-[12.5px] leading-snug text-ink-700 text-justify">{informe.correccionesTextuales[citaAbierta].problema}</p>
+                <p className="mt-0.5 text-[12.5px] leading-snug text-ink-700 text-justify">{correccion.problema}</p>
+                <MarcasDelHallazgo comprobaciones={normal.comprobaciones} seccion="correccionesTextuales" indice={citaAbierta} />
+                {limpio.avisos.length > 0 && (
+                  <div className="mt-1.5">
+                    <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-400">Advertencia sobre el reemplazo propuesto</p>
+                    {limpio.avisos.map((a, k) => (
+                      <p key={k} className="mt-0.5 text-[12.5px] font-semibold leading-snug text-ink-900 text-justify">{a}</p>
+                    ))}
+                  </div>
+                )}
                 <p className="mt-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-brand-700">Reemplazo propuesto</p>
-                <p className="mt-0.5 text-[13px] leading-snug text-ink-900 text-justify">«{informe.correccionesTextuales[citaAbierta].reemplazo}»</p>
+                <p className="mt-0.5 text-[13px] leading-snug text-ink-900 text-justify">«{limpio.texto}»</p>
                 <div className="mt-2 flex gap-2">
-                  <button type="button" onClick={() => aplicar(informe.correccionesTextuales![citaAbierta].cita, informe.correccionesTextuales![citaAbierta].reemplazo)} className="btn-primary btn-sm">
+                  <button type="button" onClick={() => aplicar(correccion.cita, limpio.texto)} className="btn-primary btn-sm">
                     <Check className="h-3.5 w-3.5" />
                     Aplicar reemplazo
                   </button>
@@ -1099,7 +1165,8 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
                   </button>
                 </div>
               </div>
-            )}
+              );
+            })()}
           </>
         )
       )}
@@ -1110,11 +1177,19 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     <div className="mt-2 space-y-1.5">
       {ediciones.map((e, k) => {
         const aplicable = localizarCitas(texto, [e.cita]).marcas.length > 0;
+        /*
+         * LA GUÍA PUEDE COPIAR UN CORCHETE. En un informe guardado antes del 14
+         * de septiembre de 2026 el resumen que recibe la guía trae las marcas de
+         * la comprobación dentro del texto, y una edición propuesta puede
+         * arrastrarlas. Lo que «Aplicar» pega pasa por el mismo limpiador que el
+         * reemplazo del informe: ninguna advertencia termina en el memorial.
+         */
+        const reemplazo = reemplazoParaPegar(e.reemplazo).texto;
         return (
           <div key={k} className="rounded-control border border-line-200 bg-surface px-2.5 py-2 font-sans">
             <p className="text-[11px] italic leading-snug text-ink-500 text-justify">«{e.cita}»</p>
-            <p className="mt-1 text-[12.5px] leading-snug text-ink-900 text-justify">«{e.reemplazo}»</p>
-            <button type="button" onClick={() => aplicar(e.cita, e.reemplazo)} disabled={!aplicable} className="btn-secondary btn-sm mt-1.5 disabled:opacity-50" title={aplicable ? 'Sustituir el pasaje en el texto' : 'El pasaje citado ya no está en el texto actual'}>
+            <p className="mt-1 text-[12.5px] leading-snug text-ink-900 text-justify">«{reemplazo}»</p>
+            <button type="button" onClick={() => aplicar(e.cita, reemplazo)} disabled={!aplicable} className="btn-secondary btn-sm mt-1.5 disabled:opacity-50" title={aplicable ? 'Sustituir el pasaje en el texto' : 'El pasaje citado ya no está en el texto actual'}>
               <Check className="h-3 w-3" />
               {aplicable ? 'Aplicar' : 'Ya no está en el texto'}
             </button>
@@ -1261,7 +1336,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
             </p>
             <LecturaDelDocumentoRecibido informe={datos.informeRecibido} pie={pieDelInformeRecibido} />
           </>
-        ) : !informe ? (
+        ) : !informe || !normal ? (
           informeLibre ? (
             <>
               <p className="rounded-control border border-line-200 bg-canvas px-2.5 py-1.5 text-[11.5px] leading-snug text-ink-700 text-justify">
@@ -1274,37 +1349,64 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
           )
         ) : (
           <>
-            <p className="leading-relaxed text-ink-900 text-justify">{informe.resumen}</p>
+            {/* La comprobación automática, ARRIBA de las secciones. */}
+            <BandaDeComprobacion normal={normal} />
+            <p className="leading-relaxed text-ink-900 text-justify">{normal.informe.resumen}</p>
+            <MarcasDelHallazgo comprobaciones={normal.comprobaciones} seccion="resumen" indice={0} />
             {(
               [
-                ['Secciones que la norma exige y faltan', informe.seccionesFaltantes],
-                ['Debilidades', informe.debilidades],
-                ['Fortalezas', informe.fortalezas],
-                ['Recomendaciones', informe.recomendaciones]
+                ['Secciones que la norma exige y faltan', normal.informe.seccionesFaltantes, 'seccionesFaltantes'],
+                ['Debilidades', normal.informe.debilidades, 'debilidades'],
+                ['Fortalezas', normal.informe.fortalezas, 'fortalezas'],
+                ['Recomendaciones', normal.informe.recomendaciones, 'recomendaciones']
               ] as const
-            ).map(([t, items]) =>
+            ).map(([t, items, seccion]) =>
               items.length ? (
                 <section key={t}>
                   <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">{t}</h4>
                   <ul className="mt-1 list-disc space-y-1 pl-4 text-ink-900">
                     {items.map((x, k) => (
-                      <li key={k} className="text-justify [text-wrap:pretty]">{x}</li>
+                      <li key={k} className="text-justify [text-wrap:pretty]">
+                        {x}
+                        <MarcasDelHallazgo comprobaciones={normal.comprobaciones} seccion={seccion} indice={k} />
+                      </li>
                     ))}
                   </ul>
                 </section>
               ) : null
             )}
-            {informe.erroresDeAplicacion.length > 0 && (
+            {normal.informe.erroresDeAplicacion.length > 0 && (
               <section>
                 <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Errores de aplicación</h4>
                 <ul className="mt-1 space-y-1.5">
-                  {informe.erroresDeAplicacion.map((e, k) => (
+                  {normal.informe.erroresDeAplicacion.map((e, k) => (
                     <li key={k} className="rounded-control border border-line-100 bg-canvas px-2.5 py-1.5">
                       <span className="font-mono text-[10px] text-ink-500">{e.donde}</span>
                       <p className="text-ink-900 text-justify">{e.problema}</p>
                       {e.correccion && <p className="text-brand-700">Corrección: {e.correccion}</p>}
+                      <MarcasDelHallazgo comprobaciones={normal.comprobaciones} seccion="erroresDeAplicacion" indice={k} />
                     </li>
                   ))}
+                </ul>
+              </section>
+            )}
+            {/*
+              LAS MARCAS DE LAS CORRECCIONES TEXTUALES también se listan aquí, y
+              no solo al tocar el pasaje en el papel: un reemplazo cuya cita ya
+              no está en el texto no se puede tocar, y su advertencia se perdería.
+            */}
+            {(normal.informe.correccionesTextuales ?? []).some((_, k) => marcasDelHallazgo(normal.comprobaciones, 'correccionesTextuales', k).length > 0) && (
+              <section>
+                <h4 className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-ink-400">Citas del escrito con advertencia</h4>
+                <ul className="mt-1 space-y-1.5">
+                  {(normal.informe.correccionesTextuales ?? []).map((c, k) =>
+                    marcasDelHallazgo(normal.comprobaciones, 'correccionesTextuales', k).length > 0 ? (
+                      <li key={k} className="rounded-control border border-line-100 bg-canvas px-2.5 py-1.5">
+                        <span className="text-[11px] italic leading-snug text-ink-500">«{c.cita.length > 140 ? `${c.cita.slice(0, 140)}…` : c.cita}»</span>
+                        <MarcasDelHallazgo comprobaciones={normal.comprobaciones} seccion="correccionesTextuales" indice={k} />
+                      </li>
+                    ) : null
+                  )}
                 </ul>
               </section>
             )}
@@ -1354,7 +1456,7 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
       {versiones.length === 0 ? (
         <p className="text-ink-500 text-justify">
           Todavía no hay versiones. Se guarda una sola antes de cada revisión nueva y antes de cada consulta a la guía si el texto cambió; también con
-          «Guardar versión». Se conservan las últimas {MAX_VERSIONES}.
+          «Guardar versión». Se conservan todas, sin borrar ninguna.
         </p>
       ) : (
         <ul className="space-y-1.5">

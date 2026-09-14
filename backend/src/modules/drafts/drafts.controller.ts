@@ -168,7 +168,13 @@ export const updateDraftController = async (req: Request, res: Response): Promis
   // El taller: solo listas; cualquier otra cosa se ignora en vez de guardarse.
   if (Array.isArray(conversacion)) cambios.conversacion = conversacion;
   if (Array.isArray(anotaciones)) cambios.anotaciones = anotaciones;
-  if (Array.isArray(versiones)) cambios.versiones = (versiones as unknown[]).slice(-15);
+  /*
+   * Las versiones se guardan TODAS, sin tope. Antes se conservaban las últimas
+   * quince y la decimosexta borraba la primera en silencio; el titular decidió
+   * el 14 de septiembre de 2026 que ninguna versión se sobreescribe. El taller
+   * solo manda la lista cuando cambió, así que un guardado de texto no la toca.
+   */
+  if (Array.isArray(versiones)) cambios.versiones = versiones as unknown[];
 
   try {
     // Quien edita sale del token: queda en `updated_by_email` y no recibe su propio aviso.

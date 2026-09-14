@@ -1,6 +1,7 @@
 import type { jsPDF } from 'jspdf';
 import { etiquetaDeAtaque } from './ataque';
-import type { InformeDeDocumentoRecibido, InformeDeRevision } from './review.api';
+import type { InformeDeDocumentoRecibido, InformeDeRevision, SeccionDelInforme } from './review.api';
+import { lineaDePasajes, lineasDeLaBanda, marcasDelHallazgo, normalizarInforme, rotuloDeMarca } from './comprobaciones';
 
 /**
  * El informe de revisión, dibujado en PDF con la misma estructura del diálogo.
@@ -370,37 +371,87 @@ export const dibujarInformeEnPdf = (doc: jsPDF, F: string, d: DatosDeExportacion
   }
 
   /* ─── Cuerpo del escrito propio, en el orden del diálogo ───────────────── */
-  const i = d.informe;
-  if (i.resumen) bloque(i.resumen, cuerpoPt + 0.5);
+  /*
+   * EL INFORME SE NORMALIZA ANTES DE DIBUJARLO, igual que en la pantalla: la
+   * comprobación automática va en su banda y junto a cada hallazgo, y un
+   * informe guardado antes del 14 de septiembre de 2026 —con sus corchetes y
+   * avisos dentro del texto— se lee con la misma función. Sin esto el papel
+   * repetiría la advertencia: una vez en la banda y otra dentro del párrafo.
+   */
+  const normal = normalizarInforme(d.informe);
+  const i = normal.informe;
+  const comprobaciones = normal.comprobaciones;
 
-  seccion('Secciones que la norma exige y faltan', i.seccionesFaltantes);
-  seccion('Fortalezas', i.fortalezas);
-  seccion('Debilidades', i.debilidades);
+  const marcasJunto = (seccionDelInforme: SeccionDelInforme, indice: number) => {
+    for (const m of marcasDelHallazgo(comprobaciones, seccionDelInforme, indice)) {
+      bloque(rotuloDeMarca(m), cuerpoPt - 2, 'bold', 6, TITULO, false);
+      bloque(m.mensaje, cuerpoPt - 2, 'normal', 6, NOTA);
+    }
+  };
+  const seccionConMarcas = (t: string, items: string[], clave: SeccionDelInforme) => {
+    if (items.length === 0) return;
+    titulo(t);
+    items.forEach((it, k) => {
+      lista([it]);
+      marcasJunto(clave, k);
+    });
+  };
+
+  const pasajes = lineaDePasajes(normal);
+  if (pasajes) bloque(pasajes, cuerpoPt - 2, 'italic', 0, NOTA, false);
+
+  const banda = lineasDeLaBanda(normal);
+  if (banda) {
+    titulo(banda.titulo);
+    if (banda.cuenta.length > 0) {
+      bloque(banda.cuenta.map((x) => `${x.etiqueta}: ${x.cantidad}`).join(' · '), cuerpoPt - 1, 'bold', 0, TITULO, false);
+    }
+    if (banda.nota) bloque(banda.nota, cuerpoPt - 1, 'italic', 0, NOTA);
+    for (const aviso of banda.avisos) {
+      bloque(aviso, cuerpoPt - 1, 'normal', 0, TINTA);
+      y += 1;
+    }
+    if (banda.noComprobadas.length > 0) {
+      bloque('Sin respuesta de las fuentes oficiales:', cuerpoPt - 1.5, 'bold', 0, NOTA, false);
+      lista(banda.noComprobadas);
+    }
+    y += 2;
+  }
+
+  if (i.resumen) bloque(i.resumen, cuerpoPt + 0.5);
+  marcasJunto('resumen', 0);
+
+  seccionConMarcas('Secciones que la norma exige y faltan', i.seccionesFaltantes, 'seccionesFaltantes');
+  seccionConMarcas('Fortalezas', i.fortalezas, 'fortalezas');
+  seccionConMarcas('Debilidades', i.debilidades, 'debilidades');
 
   if (i.erroresDeAplicacion.length > 0) {
     titulo('Errores de aplicación');
-    for (const e of i.erroresDeAplicacion) {
+    i.erroresDeAplicacion.forEach((e, k) => {
       if (e.donde) bloque(e.donde, cuerpoPt - 1, 'bold', 0, TITULO, false);
       if (e.problema) bloque(e.problema, cuerpoPt);
       if (e.correccion) bloque(`Corrección: ${e.correccion}`, cuerpoPt, 'italic', 4);
+      marcasJunto('erroresDeAplicacion', k);
       y += 1.5;
-    }
+    });
   }
   const citas = i.correccionesTextuales ?? [];
   if (citas.length > 0) {
     titulo('Citas del escrito y reemplazo propuesto');
-    for (const c of citas) {
+    citas.forEach((c, k) => {
       bloque('Dice:', cuerpoPt - 1.5, 'bold', 0, NOTA, false);
+      /* La cita del abogado va tal cual: nunca lleva marca dentro. */
       bloque(`«${c.cita}»`, cuerpoPt, 'italic', 4, TINTA);
       if (c.problema) bloque(c.problema, cuerpoPt - 1, 'normal', 4, NOTA);
       if (c.reemplazo) {
         bloque('Reemplazo propuesto:', cuerpoPt - 1.5, 'bold', 0, TITULO, false);
         bloque(`«${c.reemplazo}»`, cuerpoPt, 'normal', 4, TINTA);
       }
+      marcasJunto('correccionesTextuales', k);
       y += 2;
-    }
+    });
   }
-  seccion('Recomendaciones', i.recomendaciones);
+  seccionConMarcas('Recomendaciones', i.recomendaciones, 'recomendaciones');
 
   /* ─── Pie ──────────────────────────────────────────────────────────────── */
   y += 4;

@@ -32,6 +32,72 @@ export interface InformeDeRevision {
   /** Puede faltar en informes guardados antes de que existiera. */
   correccionesTextuales?: CorreccionTextual[];
   recomendaciones: string[];
+  /**
+   * La comprobación automática de vigencia y glosa, como DATO (desde el 14 de
+   * septiembre de 2026). AUSENTE en informes anteriores, que la traen escrita
+   * en el texto y se leen con `services/comprobaciones.ts`; `null` cuando la
+   * revisión no la repitió («Volver a revisar»). Espejo de
+   * backend/src/modules/agent/review/comprobacionesDelInforme.ts.
+   */
+  comprobaciones?: ComprobacionesDelInforme | null;
+  /** Pasajes del expediente que se cruzaron con el escrito. Ausente en informes viejos. */
+  pasajesDelCaso?: number;
+}
+
+/* ─── LA COMPROBACIÓN AUTOMÁTICA, COMO LLEGA DEL SERVIDOR ─────────────────── */
+
+export type SeccionDelInforme =
+  | 'resumen'
+  | 'fortalezas'
+  | 'debilidades'
+  | 'seccionesFaltantes'
+  | 'erroresDeAplicacion'
+  | 'correccionesTextuales'
+  | 'recomendaciones';
+
+/** `cita` solo UBICA: la cita del abogado nunca lleva marca. */
+export type CampoDelInforme = 'donde' | 'problema' | 'correccion' | 'cita' | 'reemplazo';
+
+export interface LugarDelInforme {
+  seccion: SeccionDelInforme;
+  indice: number;
+  campo?: CampoDelInforme;
+}
+
+export type ClaseDeComprobacion = 'DEROGADA' | 'MODULADA' | 'FUENTES_EN_DESACUERDO' | 'NO_LO_DICE_EL_ARTICULO' | 'NO_COMPROBADA';
+
+export interface ComprobacionDeArticulo {
+  codigo: string;
+  norma: string;
+  articulo: number;
+  vigencia: {
+    estado: 'VIGENTE' | 'DEROGADO' | 'MODULADO' | 'DISCREPANCIA_ENTRE_FUENTES' | 'NO_VERIFICABLE';
+    detalle: string;
+    fuentes: string[];
+    url?: string;
+    consultadoEn: string;
+  };
+  glosa: GlosaComprobada | null;
+  glosas: GlosaComprobada[];
+  clases: ClaseDeComprobacion[];
+  mensajes: Array<{ clase: ClaseDeComprobacion; texto: string }>;
+  dondeAparece: LugarDelInforme[];
+}
+
+export interface GlosaComprobada {
+  veredicto: 'SOSTENIDA' | 'NO_SOSTENIDA' | 'DUDOSA';
+  frase: string;
+  extractoOficial: string;
+  motivo: string;
+  url?: string;
+}
+
+export interface ComprobacionesDelInforme {
+  articulos: ComprobacionDeArticulo[];
+  cuenta: { derogada: number; modulada: number; fuentesEnDesacuerdo: number; noLoDiceElArticulo: number; noComprobada: number };
+  avisos: string[];
+  vigenciaComprobada: boolean;
+  glosaComprobada: boolean;
 }
 
 /* ─── LOS DOS MODOS DE REVISIÓN ─────────────────────────────────────────────
@@ -143,6 +209,8 @@ export interface RespuestaDeRevision {
   informeRecibido?: InformeDeDocumentoRecibido | null;
   /** Cuando el revisor no devolvió JSON legible: su texto tal cual. */
   informeLibre: string | null;
+  /** Pasajes del expediente cruzados; también fuera del informe, porque el informe libre no lo lleva. */
+  pasajesDelCaso?: number;
   /** Si la actuación tenía ficha verificada y la revisión objetiva se apoyó en ella. */
   conFicha: boolean;
   truncado: boolean;
@@ -322,7 +390,7 @@ export const reviewApi = {
    * a unos 64 KB, las versiones se dejan fuera si no caben — ya viajaron en el
    * guardado con retardo — y el texto y la conversación van siempre.
    */
-  guardarTextoAlSalir: (id: string, texto: string, anotaciones: Anotacion[], versiones: VersionDelTexto[], conversacion: TurnoDelTaller[]) => {
+  guardarTextoAlSalir: (id: string, texto: string, anotaciones: Anotacion[], versiones: VersionDelTexto[] | undefined, conversacion: TurnoDelTaller[]) => {
     const cuerpo = cuerpoQueCabeEnKeepalive({ texto, anotaciones, versiones, conversacion });
     return httpClient
       .put<{ guardado: boolean }>(`/api/agent/reviews/${encodeURIComponent(id)}/texto`, { body: cuerpo, keepalive: true })

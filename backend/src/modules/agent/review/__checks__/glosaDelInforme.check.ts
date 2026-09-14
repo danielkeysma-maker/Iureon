@@ -26,11 +26,8 @@
  */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import {
-  avisoDeGlosa,
-  marcarGlosaEnInforme,
-  verificarGlosaDelInforme
-} from '../glosaDelInforme';
+import { avisoDeGlosa, verificarGlosaDelInforme } from '../glosaDelInforme';
+import { construirComprobaciones } from '../comprobacionesDelInforme';
 import type { InformeDeRevision } from '../documentReview';
 import type { JuezDeGlosa, RespuestaDelJuez, RevisionDeGlosa } from '../verificarGlosa';
 import type { VigenciaDeArticulo } from '../../../legislation/officialArticle.service';
@@ -151,36 +148,95 @@ const asincronos = async (): Promise<void> => {
     'lo que no llega a `ai_usage` queda fuera de la liquidación: el gasto invisible, ya medido'
   );
 
-  /* ─── 3. LA MARCA VA DONDE EL REVISOR HABLA, Y NO EN LA CITA ──────────── */
-
-  const marcado = marcarGlosaEnInforme(informe, juzgado);
+  /* ─── 3. LA MARCA VA SOBRE EL HALLAZGO DEL REVISOR, COMO DATO ─────────── */
+  /*
+   * Desde el 14 de septiembre de 2026 («opción 2») nada se escribe dentro del
+   * informe: el veredicto viaja en `comprobaciones` con el punto donde aparece
+   * el artículo. Estas aserciones exigían antes el corchete en el texto; ahora
+   * exigen el dato y que el texto quede como lo escribió el revisor.
+   */
+  const vigenciaDelArt8 = { resultados: [ART_8], derogados: 0, noVerificables: 0, discrepantes: 0 };
+  const textoAntes = JSON.stringify(informe);
+  const comprobado = construirComprobaciones(informe, vigenciaDelArt8, juzgado);
+  const art8 = comprobado.articulos[0];
+  const mensajeArt8 = art8.mensajes.find((m) => m.clase === 'NO_LO_DICE_EL_ARTICULO')?.texto ?? '';
 
   check(
-    'la debilidad del revisor queda marcada',
-    marcado.debilidades[0].includes('NO LO DICE ESE ARTÍCULO'),
-    marcado.debilidades[0].slice(0, 80)
+    'la debilidad del revisor queda señalada',
+    art8.clases.includes('NO_LO_DICE_EL_ARTICULO') && art8.dondeAparece.some((l) => l.seccion === 'debilidades'),
+    JSON.stringify(art8.dondeAparece)
   );
   check(
-    'la marca trae el texto oficial para que el abogado vea por qué',
-    marcado.debilidades[0].includes('Son obligaciones del arrendador'),
+    'el mensaje trae el texto oficial para que el abogado vea por qué',
+    mensajeArt8.includes('Son obligaciones del arrendador') && (art8.glosa?.extractoOficial ?? '').includes('Son obligaciones del arrendador'),
     'sin el texto al lado, la marca es una afirmación más que hay que creer'
   );
   check(
-    'la cita del abogado sale INTACTA aunque nombre el mismo artículo',
-    marcado.correccionesTextuales[0].cita === informe.correccionesTextuales[0].cita,
+    'la cita del abogado sigue INTACTA aunque nombre el mismo artículo',
+    JSON.stringify(informe) === textoAntes && informe.correccionesTextuales[0].cita.startsWith('con fundamento en el art. 8'),
     'un corchete dentro de una cita textual la deja de ser textual'
   );
   check(
-    'pero el problema, que sí es del revisor, se marca',
-    marcado.correccionesTextuales[0].problema.includes('NO LO DICE ESE ARTÍCULO')
+    'el problema, que sí es del revisor, es un lugar del artículo',
+    art8.dondeAparece.some((l) => l.seccion === 'correccionesTextuales' && l.campo === 'problema')
   );
+  check(
+    'y la corrección aparece UNA vez por campo, no una por mención',
+    art8.dondeAparece.filter((l) => l.seccion === 'correccionesTextuales' && l.campo === 'problema').length === 1
+  );
+
+  /*
+   * EL REEMPLAZO NO SE ESCRIBE. Es texto listo para pegar: «Aplicar reemplazo»
+   * lo pega tal cual en el escrito. Si el artículo solo aparece en el
+   * reemplazo, el lugar lo dice y la pantalla pinta el aviso al lado.
+   */
+  const enElReemplazo = informeCon({
+    correccionesTextuales: [
+      {
+        cita: 'solicito la restitución del inmueble',
+        problema: 'Falta el fundamento.',
+        reemplazo: `solicito la restitución del inmueble. ${LA_FRASE}`
+      },
+      {
+        cita: 'con fundamento en la ley',
+        problema: `Fundamento impreciso. ${LA_FRASE}`,
+        reemplazo: `con fundamento en la ley. ${LA_FRASE}`
+      }
+    ]
+  });
+  const juzgadoReemplazo = await verificarGlosaDelInforme(
+    enElReemplazo,
+    [ART_8],
+    5_000,
+    juezDeFixture(RESPUESTA_NO_SOSTENIDA)
+  );
+  const textoReemplazo = JSON.stringify(enElReemplazo);
+  const comprobadoReemplazo = construirComprobaciones(enElReemplazo, vigenciaDelArt8, juzgadoReemplazo);
+  const lugaresReemplazo = comprobadoReemplazo.articulos[0].dondeAparece;
+  check(
+    'el reemplazo sale como lo escribió el revisor: listo para pegar',
+    JSON.stringify(enElReemplazo) === textoReemplazo,
+    enElReemplazo.correccionesTextuales[0].reemplazo.slice(0, 120)
+  );
+  check(
+    'el artículo que solo nombra el reemplazo apunta al reemplazo de esa corrección',
+    lugaresReemplazo.some((l) => l.indice === 0 && l.campo === 'reemplazo') &&
+      !lugaresReemplazo.some((l) => l.indice === 0 && l.campo === 'problema'),
+    JSON.stringify(lugaresReemplazo)
+  );
+  check(
+    'cuando problema y reemplazo nombran el mismo artículo, los dos son lugares y ninguno se repite',
+    lugaresReemplazo.filter((l) => l.indice === 1).length === 2,
+    JSON.stringify(lugaresReemplazo)
+  );
+
   check(
     'el informe original no se toca',
     informe.debilidades[0] === LA_FRASE,
     'es lo que se pagó y hay que poder volver a leerlo tal como salió'
   );
 
-  /* ─── 4. LO DUDOSO SE DECLARA, PERO NO SE MARCA DENTRO ────────────────── */
+  /* ─── 4. LO DUDOSO SE DECLARA, PERO NO SE MARCA SOBRE EL HALLAZGO ─────── */
 
   const dudoso = await verificarGlosaDelInforme(informe, [ART_8], 5_000, juezDeFixture(null));
   check(
@@ -189,10 +245,10 @@ const asincronos = async (): Promise<void> => {
     'agotar el plazo no puede costar el informe que ya se pagó'
   );
 
-  const marcadoDudoso = marcarGlosaEnInforme(informe, dudoso);
+  const comprobadoDudoso = construirComprobaciones(informe, vigenciaDelArt8, dudoso);
   check(
-    'lo dudoso NO llena el informe de corchetes',
-    marcadoDudoso.debilidades[0] === LA_FRASE,
+    'lo dudoso NO trae la clase que se marca sobre el hallazgo: se cuenta como no comprobado',
+    !comprobadoDudoso.articulos[0].clases.includes('NO_LO_DICE_EL_ARTICULO') && comprobadoDudoso.cuenta.noComprobada === 1,
     'marcar también las dudosas volvería invisible la marca que importa'
   );
   check(
@@ -276,10 +332,16 @@ check(
   /No se pudo comprobar la glosa del informe/.test(controlador),
   'llegados ahí el informe ya está escrito y ya se pagó'
 );
+/*
+ * CAMBIÓ EL 14 DE SEPTIEMBRE DE 2026: esta aserción exigía que los dos avisos
+ * se antepusieran a las recomendaciones. Hoy viajan en `comprobaciones.avisos`
+ * —en el orden escrito a mano de `construirComprobaciones`— y las
+ * recomendaciones quedan con las palabras del revisor.
+ */
 check(
-  'los dos avisos se anteponen juntos, en orden escrito a mano',
-  /recomendaciones: \[\.\.\.avisos, \.\.\.anotado\.recomendaciones\]/.test(controlador),
-  'con un `unshift` por comprobación, el orden lo decide cuál corre última'
+  'los avisos ya no se anteponen a las recomendaciones: viajan en la comprobación',
+  !/recomendaciones: \[\.\.\.avisos/.test(controlador) && /construirComprobaciones\(informe, vigencia, glosa\)/.test(controlador),
+  'el texto del informe es del revisor'
 );
 check(
   'la glosa corre DESPUÉS de la vigencia',

@@ -34,18 +34,17 @@ import { exigirFuncion, responderPlanError } from '../../subscriptions/plan.serv
 import { buildCatalogGuidanceForFirm } from '../catalogGuidance';
 import { universoCitable } from '../andamiaje';
 import { catalogService } from '../../catalog/catalog.service';
-import {
-  avisoDeVigencia,
-  marcarVigenciaEnInforme,
-  verificarVigenciaDelInforme
-} from './vigenciaDelInforme';
+import { verificarVigenciaDelInforme } from './vigenciaDelInforme';
+import { construirComprobaciones, informeConComprobaciones, informeSinComprobar } from './comprobacionesDelInforme';
+import type { RevisionDeVigencia } from './verificarVigencia';
+import type { RevisionDeGlosa } from './verificarGlosa';
 import { ENGINE, callOpenRouterWithUsage } from '../openrouter.client';
 import { aQuienLeToca, esPapelRepresentable } from './posicionProcesal';
 import { esExpedienteDeLaFirma } from '../../expedientes/expedientes.service';
 import type { VigenciaDeArticulo } from '../../legislation/officialArticle.service';
-import { avisoDeGlosa, marcarGlosaEnInforme, verificarGlosaDelInforme } from './glosaDelInforme';
+import { verificarGlosaDelInforme } from './glosaDelInforme';
 import { resumenDeGlosa } from './verificarGlosa';
-import { traerMaterialDelExpediente } from '../../expedientes/materialDelExpediente';
+import { traerPasajesDelExpediente } from '../../expedientes/materialDelExpediente';
 import type { PapelEnElExpediente } from '../../expedientes/types';
 import {
   ETIQUETA_DOCUMENTO_RECIBIDO,
@@ -461,9 +460,16 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
      * NO TUMBA NADA. Sin proveedor, sin índice o con la red caída, el bloque
      * llega vacío y la revisión sigue igual.
      */
-    const bloqueExpediente = esRecibido
-      ? undefined
-      : await traerMaterialDelExpediente(firmId, expedienteId, `${documentType} ${pregunta}`);
+    /*
+     * EL NÚMERO DE PASAJES VIAJA CON EL INFORME, para que la pantalla diga «se
+     * cruzó con N pasajes del caso». Sin él, un informe que cotejó el
+     * expediente y uno que no lo tocó se leían igual.
+     */
+    const material = esRecibido
+      ? { bloque: undefined, pasajes: 0 }
+      : await traerPasajesDelExpediente(firmId, expedienteId, `${documentType} ${pregunta}`);
+    const bloqueExpediente = material.bloque;
+    const pasajesDelCaso = material.pasajes;
     if (bloqueExpediente) {
       console.log('[REVIEW] Pasajes del expediente indexado incorporados al cotejo.');
     }
@@ -553,40 +559,33 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
      * hay ficha ni universo citable contra el que medir; y su prompt ya le
      * prohíbe citar artículos de memoria, que es la otra mitad del problema.
      */
-    let informeAnotado = informe;
     /*
-     * LOS AVISOS DE CABECERA SE JUNTAN Y SE PONEN UNA VEZ, AL FINAL.
-     *
-     * Cada comprobación los ponía por su cuenta con un `unshift`, y encadenados
-     * el orden lo decidía el orden en que corren: la última en hablar quedaba
-     * primera. Aquí se acumulan y se anteponen juntos, en un orden escrito a
-     * mano — la vigencia antes que la glosa, porque un artículo derogado
-     * invalida el punto entero y una glosa mal explicada invalida una frase.
+     * EL TEXTO DEL INFORME NO SE TOCA (decisión del 14 de septiembre de 2026,
+     * «opción 2»). Hasta entonces las dos comprobaciones pegaban corchetes donde
+     * el revisor nombraba el artículo y anteponían dos avisos a las
+     * recomendaciones. Hoy sus resultados viajan como DATO en
+     * `informe.comprobaciones` —con el punto exacto del informe donde aparece
+     * cada artículo— y la pantalla y el PDF los dibujan en una banda propia y
+     * sobre el hallazgo. Ver `comprobacionesDelInforme.ts`.
      */
-    const avisos: string[] = [];
+    let informeComprobado = informe;
     let citasComprobadas: VigenciaDeArticulo[] = [];
 
     if (informe) {
-      /*
-       * Una sola variable estrechada para las dos comprobaciones: cada una toma
-       * el informe que dejó la anterior y le añade sus marcas, así que las dos
-       * marcas conviven en el mismo informe en vez de pisarse.
-       */
-      let anotado = informe;
+      /* null = la consulta falló, que no es lo mismo que «nada que avisar». */
+      let vigencia: RevisionDeVigencia | null = null;
+      let glosa: RevisionDeGlosa | null = null;
 
       try {
         const actuacion = catalogService.findByDocumentType(documentType, legalBranch);
         const autorizados = actuacion ? universoCitable(actuacion) : [];
-        const vigencia = await verificarVigenciaDelInforme(
+        vigencia = await verificarVigenciaDelInforme(
           informe,
           autorizados,
           PLAZO_VIGENCIA_INFORME_MS
         );
         citasComprobadas = vigencia.resultados;
-        const aviso = avisoDeVigencia(vigencia);
-        if (aviso) {
-          anotado = marcarVigenciaEnInforme(anotado, vigencia);
-          avisos.push(aviso);
+        if (vigencia.resultados.length > 0) {
           console.log(
             `[REVIEW] Vigencia del informe: ${vigencia.resultados.length} citas fuera de ficha, ` +
               `${vigencia.derogados} derogadas, ${vigencia.discrepantes} con discrepancia, ` +
@@ -624,33 +623,28 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
        */
       if (citasComprobadas.length > 0) {
         try {
-          const glosa = await verificarGlosaDelInforme(informe, citasComprobadas, PLAZO_GLOSA_INFORME_MS);
+          glosa = await verificarGlosaDelInforme(informe, citasComprobadas, PLAZO_GLOSA_INFORME_MS);
 
           for (const usage of glosa.usos) {
             await recordUsage({ firmId, userEmail, operation: 'REVISION', operationId, usage });
           }
 
-          const avisoGlosa = avisoDeGlosa(glosa);
-          if (avisoGlosa) {
-            anotado = marcarGlosaEnInforme(anotado, glosa);
-            avisos.push(avisoGlosa);
-          }
           if (glosa.resultados.length > 0) {
             console.log(`[REVIEW] Glosa del informe: ${resumenDeGlosa(glosa)}`);
           }
         } catch (err) {
           console.warn(`[REVIEW] No se pudo comprobar la glosa del informe: ${(err as Error).message}`);
         }
+      } else if (vigencia) {
+        /* Nada fuera de ficha: no había qué juzgar, y eso es haber comprobado. */
+        glosa = { resultados: [], noSostenidas: 0, dudosas: 0, usos: [] };
       }
 
-      /*
-       * Y AL FRENTE DE LAS RECOMENDACIONES, que es donde se hojea. No son
-       * recomendaciones más: son las líneas que dicen que una parte del propio
-       * informe no se puede usar tal como está, y detrás de siete consejos no
-       * las lee nadie.
-       */
-      informeAnotado =
-        avisos.length > 0 ? { ...anotado, recomendaciones: [...avisos, ...anotado.recomendaciones] } : anotado;
+      informeComprobado = informeConComprobaciones(
+        informe,
+        construirComprobaciones(informe, vigencia, glosa),
+        pasajesDelCaso
+      );
     }
 
     const cobro = await settleOperation({
@@ -691,8 +685,8 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       caracteres: preparado.caracteres,
       truncado: preparado.truncado,
       conFicha: guidance !== null,
-      /* El ANOTADO, no el crudo: el aviso tiene que seguir ahí cuando vuelva. */
-      informe: informeAnotado,
+      /* Con su comprobación al lado: tiene que seguir ahí cuando vuelva. */
+      informe: informeComprobado,
       informeRecibido,
       informeLibre: seOrdeno ? null : llamada.text,
       cobradoCop: cobro.charged,
@@ -730,8 +724,10 @@ export const reviewDocumentController = async (req: Request, res: Response): Pro
       guardaTexto: consentimiento.guarda,
       /** Cuál de los dos se leyó: la pantalla lo rotula y no lo adivina por la forma del informe. */
       modo,
-      /* El ANOTADO, igual que en el guardado: la pantalla y la base ven lo mismo. */
-      informe: informeAnotado,
+      /* El mismo que se guardó: la pantalla y la base ven lo mismo. */
+      informe: informeComprobado,
+      /* También fuera del informe: el informe libre no tiene dónde llevarlo. */
+      pasajesDelCaso,
       informeRecibido,
       informeLibre: seOrdeno ? null : llamada.text,
       conFicha: guidance !== null,
@@ -845,6 +841,12 @@ export const saveWorkingTextController = async (req: Request, res: Response): Pr
         .filter((a) => a.cita && /^(amarillo|verde|azul|rosa|tachado|comentario)$/.test(a.color))
         .slice(0, 500)
     : undefined;
+  /*
+   * Las versiones se guardan TODAS, sin tope: ninguna se sobreescribe (decisión
+   * del titular, 14 de septiembre de 2026). Antes se cortaba a las últimas
+   * quince y la más antigua desaparecía sin aviso. Si `versiones` no llega, la
+   * guardada queda como estaba: el taller la omite cuando no cambió.
+   */
   const versiones = Array.isArray(req.body.versiones)
     ? (req.body.versiones as unknown[])
         .map((v) => {
@@ -852,7 +854,6 @@ export const saveWorkingTextController = async (req: Request, res: Response): Pr
           return { fecha: String(o.fecha ?? ''), motivo: String(o.motivo ?? '').slice(0, 80), texto: String(o.texto ?? '').slice(0, 200_000), resumen: o.resumen ? String(o.resumen).slice(0, 400) : undefined };
         })
         .filter((v) => v.fecha && v.texto)
-        .slice(-15)
     : undefined;
   const conversacion = Array.isArray(req.body.conversacion)
     ? (req.body.conversacion as unknown[])
@@ -1111,7 +1112,16 @@ export const reReviewController = async (req: Request, res: Response): Promise<v
       res.status(502).json({ success: false, error: 'REVIEW_FAILED', message: 'El revisor no respondió. No se descontó saldo.' });
       return;
     }
-    const informe = parsearInforme(llamada.text);
+    /*
+     * LA NUEVA REVISIÓN NO REPITE LA COMPROBACIÓN AUTOMÁTICA NI CRUZA EL
+     * EXPEDIENTE, y lo declara: `comprobaciones: null` y cero pasajes. Añadirle
+     * vigencia y glosa suma hasta treinta segundos de fuentes oficiales y ocho
+     * llamadas al motor a una petición que ya es larga; esa decisión de costo y
+     * de reloj no está tomada. Lo que no se puede es callarlo: un informe sin
+     * comprobación que no lo dijera se leería como uno comprobado y limpio.
+     */
+    const parseado = parsearInforme(llamada.text);
+    const informe = parseado ? informeSinComprobar(parseado) : null;
     const cobro = await settleOperation({
       firmId,
       userEmail,

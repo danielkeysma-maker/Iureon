@@ -121,6 +121,138 @@ export const aplicarReemplazo = (texto: string, cita: string, reemplazo: string)
   return texto.slice(0, m.inicio) + reemplazo + texto.slice(m.fin);
 };
 
+/*
+ * ─── EL REEMPLAZO SE PEGA LIMPIO ─────────────────────────────────────────────
+ *
+ * Las comprobaciones automáticas de vigencia y de glosa del backend escribían
+ * sus corchetes de advertencia también dentro de `reemplazo`, y «Aplicar
+ * reemplazo» pega ese texto tal cual: la advertencia terminaba dentro del
+ * escrito que el abogado radica. El backend ya no marca el reemplazo, pero los
+ * informes guardados antes lo siguen trayendo marcado, y esos no se reescriben.
+ *
+ * SE RECONOCE CADA MARCA POR SU APERTURA Y SU CIERRE EXACTOS, y no por un `[`
+ * cualquiera hasta un `]`: el detalle de la fuente, el extracto oficial y el
+ * motivo del juez son texto libre y pueden traer corchetes y comillas «». Un
+ * reemplazo del revisor también puede traer corchetes propios, y esos se pegan.
+ * Las plantillas viven en backend/src/modules/agent/review/vigenciaDelInforme.ts
+ * y glosaDelInforme.ts; si allá cambian, esta lista cambia con ellas (la guarda
+ * reemplazoLimpio.check.ts las copia).
+ *
+ * LO QUITADO NO SE DESCARTA: vuelve en `avisos` para que la pantalla lo muestre
+ * junto al reemplazo. Quitar la advertencia en silencio sería cambiar un texto
+ * sucio por un abogado que no se entera de que la norma está derogada.
+ */
+/*
+ * Desde el 14 de septiembre de 2026 el backend ya no escribe NINGUNA de estas
+ * marcas: manda la comprobación como dato (`informe.comprobaciones`). La lista
+ * sigue aquí para leer los informes guardados antes, y la guarda del backend
+ * `comprobacionesDelInforme.check.ts` lee este archivo para comprobar que sus
+ * mensajes nuevos, puestos entre corchetes, siguen casando con estas parejas.
+ */
+const MARCAS_DEL_INFORME: ReadonlyArray<{ apertura: string; cierre: string; clase: ClaseDeMarcaGuardada }> = [
+  {
+    apertura: '[NORMA DEROGADA — este artículo NO está vigente: ',
+    cierre: '. La revisión lo nombró de todos modos; no se apoye en él.]',
+    clase: 'DEROGADA'
+  },
+  {
+    apertura: '[NORMA VIGENTE PERO MODULADA POR LA CORTE — rige, pero su texto publicado no es el que rige: ',
+    cierre: ' Léalo en la sentencia antes de usarlo.]',
+    clase: 'MODULADA'
+  },
+  {
+    apertura: '[LAS FUENTES OFICIALES NO COINCIDEN sobre este artículo — ',
+    cierre: ' Esta casa no elige: compruébelo usted.]',
+    clase: 'FUENTES_EN_DESACUERDO'
+  },
+  {
+    apertura: '[LO QUE ESTA REVISIÓN AFIRMA NO LO DICE ESE ARTÍCULO — el texto oficial dice: «',
+    cierre: ' No se apoye en este punto sin leer la norma.]',
+    clase: 'NO_LO_DICE_EL_ARTICULO'
+  }
+];
+
+export type ClaseDeMarcaGuardada = 'DEROGADA' | 'MODULADA' | 'FUENTES_EN_DESACUERDO' | 'NO_LO_DICE_EL_ARTICULO';
+
+export interface MarcaGuardada {
+  clase: ClaseDeMarcaGuardada;
+  /** La marca tal como estaba, con sus corchetes. */
+  marca: string;
+  /** El artículo junto al que el backend la pegó; null si no se puede leer. */
+  articulo: number | null;
+  /**
+   * Si era el aviso que el arreglo del 14 de septiembre subía al `problema`
+   * con «Sobre el artículo N que cita el reemplazo propuesto:». Entonces la
+   * marca es del REEMPLAZO, aunque viviera en el problema.
+   */
+  delReemplazo: boolean;
+  /** Posición en el texto original, para devolverlas en orden. */
+  en: number;
+}
+
+/* El prefijo con que `correccionTextualMarcada.ts` subía al problema el aviso del reemplazo. */
+const PREFIJO_DEL_REEMPLAZO = /\s?Sobre el artículo (\d+) que cita el reemplazo propuesto:\s?$/;
+
+/**
+ * Las marcas de las comprobaciones automáticas en un texto guardado, y el texto
+ * sin ellas.
+ *
+ * Se quita siempre la apertura que empieza MÁS A LA DERECHA: si una marca cayó
+ * dentro de otra (la glosa corría sobre el informe ya marcado por la vigencia),
+ * la de adentro sale primero y la de afuera encuentra después su propio cierre.
+ * Una apertura sin su cierre exacto no se toca: sin cierre no hay certeza de
+ * dónde termina, y borrar de más dañaría el texto que sí es del revisor.
+ *
+ * EL ARTÍCULO se lee de lo que va justo antes: el backend insertaba « » + marca
+ * inmediatamente después del número («artículo 2035 [NORMA…]»).
+ */
+export const extraerMarcasGuardadas = (original: string): { texto: string; marcas: MarcaGuardada[] } => {
+  let texto = original;
+  const marcas: MarcaGuardada[] = [];
+  let tope = texto.length;
+  while (tope >= 0) {
+    let mejor: { inicio: number; cierre: string; clase: ClaseDeMarcaGuardada } | null = null;
+    for (const { apertura, cierre, clase } of MARCAS_DEL_INFORME) {
+      const inicio = texto.lastIndexOf(apertura, tope);
+      if (inicio !== -1 && (mejor === null || inicio > mejor.inicio)) mejor = { inicio, cierre, clase };
+    }
+    if (mejor === null) break;
+    const finDelCierre = texto.indexOf(mejor.cierre, mejor.inicio);
+    if (finDelCierre === -1) {
+      tope = mejor.inicio - 1;
+      continue;
+    }
+    const fin = finDelCierre + mejor.cierre.length;
+    /* El backend inserta « » + marca: se quita también ese espacio. */
+    let desde = mejor.inicio > 0 && texto[mejor.inicio - 1] === ' ' ? mejor.inicio - 1 : mejor.inicio;
+    const antes = texto.slice(0, desde);
+    const prefijo = PREFIJO_DEL_REEMPLAZO.exec(antes);
+    const numero = /(\d+)\s*$/.exec(antes);
+    if (prefijo) desde = prefijo.index;
+    marcas.push({
+      clase: mejor.clase,
+      marca: texto.slice(mejor.inicio, fin),
+      articulo: prefijo ? Number(prefijo[1]) : numero ? Number(numero[1]) : null,
+      delReemplazo: Boolean(prefijo),
+      en: mejor.inicio
+    });
+    texto = texto.slice(0, desde) + texto.slice(fin);
+    tope = Math.min(desde, texto.length);
+  }
+  return { texto, marcas: marcas.sort((a, b) => a.en - b.en) };
+};
+
+/**
+ * El reemplazo sin las marcas de las comprobaciones automáticas, y las marcas
+ * quitadas, en el orden en que aparecían. Se aplica a TODO lo que se pega en
+ * el escrito: el reemplazo del informe y las ediciones que propone la guía en
+ * el chat, que pueden copiar un corchete de un informe viejo.
+ */
+export const reemplazoParaPegar = (reemplazo: string): { texto: string; avisos: string[] } => {
+  const { texto, marcas } = extraerMarcasGuardadas(reemplazo);
+  return { texto, avisos: marcas.map((m) => m.marca) };
+};
+
 /* ─── CAPAS: citas del revisor, resaltados del abogado y referencias a la vez ─── */
 
 export interface MarcaEnCapa extends Marca {

@@ -1,3 +1,5 @@
+import type { ComprobacionesDelInforme } from './comprobacionesDelInforme';
+
 /**
  * Revisar un escrito: the pure half.
  *
@@ -427,6 +429,18 @@ export interface InformeDeRevision {
   erroresDeAplicacion: ErrorDeAplicacion[];
   correccionesTextuales: CorreccionTextual[];
   recomendaciones: string[];
+  /**
+   * La comprobación automática de vigencia y glosa, como dato. Ver
+   * `comprobacionesDelInforme.ts`: AUSENTE en informes anteriores al 14 de
+   * septiembre de 2026 (traen corchetes en el texto), `null` cuando la revisión
+   * no la repitió («Volver a revisar»), un objeto cuando se comprobó.
+   */
+  comprobaciones?: ComprobacionesDelInforme | null;
+  /**
+   * Cuántos pasajes del expediente se cruzaron con el escrito. 0 sin
+   * expediente, sin índice o en una nueva revisión; ausente en informes viejos.
+   */
+  pasajesDelCaso?: number;
 }
 
 const cadena = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim();

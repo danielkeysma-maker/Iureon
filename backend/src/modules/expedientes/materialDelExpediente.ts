@@ -132,7 +132,22 @@ export const traerMaterialDelExpediente = async (
   firmId: string,
   expedienteId: string | null | undefined,
   consulta: string
-): Promise<string | undefined> => {
+): Promise<string | undefined> => (await traerPasajesDelExpediente(firmId, expedienteId, consulta)).bloque;
+
+/**
+ * El bloque y CUÁNTOS pasajes útiles lleva.
+ *
+ * Revisión necesita el número para decirle al abogado «se cruzó con N pasajes
+ * del caso»: sin él, un informe que cotejó el expediente y uno que no lo tocó se
+ * leen igual. Se cuenta con el mismo filtro con que se rinde el bloque —pasajes
+ * con texto—, para que el número nunca diga más de lo que el motor leyó.
+ */
+export const traerPasajesDelExpediente = async (
+  firmId: string,
+  expedienteId: string | null | undefined,
+  consulta: string
+): Promise<{ bloque: string | undefined; pasajes: number }> => {
   const pasajes = await buscarPasajesDelExpediente(firmId, expedienteId, consulta);
-  return renderBloqueExpediente(pasajes) || undefined;
+  const bloque = renderBloqueExpediente(pasajes) || undefined;
+  return { bloque, pasajes: bloque ? pasajes.filter((p) => p.texto.trim().length > 0).length : 0 };
 };

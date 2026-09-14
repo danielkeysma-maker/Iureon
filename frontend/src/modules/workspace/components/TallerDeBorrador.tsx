@@ -32,9 +32,10 @@ interface TallerDeBorradorProps {
   datos: DatosDelBorrador;
   precioConsultaCop: number;
   precioRevisionCop: number;
-  onGuardar: (texto: string, conversacion: TurnoDelTaller[], anotaciones: Anotacion[], versiones: VersionDelTexto[]) => Promise<boolean>;
+  /** `versiones` llega `undefined` cuando no cambió o no cabe: se omite del PATCH, nunca se manda vacía. */
+  onGuardar: (texto: string, conversacion: TurnoDelTaller[], anotaciones: Anotacion[], versiones: VersionDelTexto[] | undefined) => Promise<boolean>;
   /** El último guardado al ocultar o cerrar la pestaña, con keepalive. */
-  onGuardarAlSalir?: (texto: string, conversacion: TurnoDelTaller[], anotaciones: Anotacion[], versiones: VersionDelTexto[]) => void;
+  onGuardarAlSalir?: (texto: string, conversacion: TurnoDelTaller[], anotaciones: Anotacion[], versiones: VersionDelTexto[] | undefined) => void;
   /** Guardar el borrador por primera vez, para que el taller tenga dónde vivir. */
   onGuardarBorradorNuevo: () => Promise<void>;
   onCerrar: (textoFinal: string) => void;

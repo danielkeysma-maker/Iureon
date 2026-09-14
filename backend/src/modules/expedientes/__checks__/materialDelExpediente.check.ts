@@ -240,14 +240,19 @@ check(
 const revision = readFileSync(join(__dirname, '..', '..', 'agent', 'review', 'documentReview.controller.ts'), 'utf8');
 const promptRevision = readFileSync(join(__dirname, '..', '..', 'agent', 'review', 'documentReview.ts'), 'utf8');
 
+/*
+ * Desde el 14 de septiembre de 2026 la revisión pide los pasajes CON SU CUENTA
+ * (`traerPasajesDelExpediente`), para decirle al abogado con cuántos se cruzó;
+ * el documento recibido sigue sin recibir ninguno —bloque vacío y cero—.
+ */
 check(
   'la revisión de escrito propio trae los pasajes del caso',
-  /traerMaterialDelExpediente\(firmId, expedienteId/.test(revision),
+  /traerPasajesDelExpediente\(firmId, expedienteId/.test(revision),
   'sin ellos nadie coteja el radicado ni el nombre de las partes contra el proceso'
 );
 check(
   'y el documento recibido NO los recibe',
-  /esRecibido[\s\S]{0,20}\?\s*undefined/.test(revision),
+  /esRecibido[\s\S]{0,20}\?\s*\{ bloque: undefined, pasajes: 0 \}/.test(revision),
   'su prompt solo puede afirmar lo que el documento dice; un pasaje del expediente lo contradice'
 );
 check(

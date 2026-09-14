@@ -62,6 +62,7 @@
     "check:cupo": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/orientacionQuota.check.ts",
     "check:prefs": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/preferences/__checks__/preferences.check.ts",
     "check:drafts": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/drafts/__checks__/drafts.check.ts",
+    "check:versiones-sin-tope": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/versionesSinTope.check.ts",
     "check:relojes": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/relojes.check.ts",
     "check:prosa": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/catalog/__checks__/prosa.check.ts",
     "check:cndj": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/jurisprudence/__checks__/cndjRuling.check.ts",
@@ -83,7 +84,8 @@
     "check:material-expediente": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/materialDelExpediente.check.ts",
     "check:posicion-expediente": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/expedientes/__checks__/posicionDelExpediente.check.ts",
     "check:posicion": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/posicion.check.ts",
-    "check:glosa-informe": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosaDelInforme.check.ts",
+    "check:comprobaciones-informe": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/comprobacionesDelInforme.check.ts",
+    "check:glosa-informe":"npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosaDelInforme.check.ts",
     "check:glosa": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosa.check.ts",
     "check:glosa-red": "npx ts-node -P tsconfig.check.json --transpile-only src/modules/agent/review/__checks__/glosa.check.ts --red"
   },

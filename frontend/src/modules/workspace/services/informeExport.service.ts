@@ -5,6 +5,8 @@ import { registrarFuenteDelEscrito } from '../../documents/services/pdfFonts';
 import { etiquetaDeAtaque } from './ataque';
 import { getMarcaActual } from '../../tenant/services/branding.api';
 import { dibujarInformeEnPdf, type DatosDeExportacion } from './informeLayout';
+import { lineaDePasajes, lineasDeLaBanda, marcasDelHallazgo, normalizarInforme, rotuloDeMarca } from './comprobaciones';
+import type { SeccionDelInforme } from './review.api';
 
 /**
  * Exportar el informe de una revisión a PDF y a Word, con la estructura del
@@ -278,23 +280,62 @@ export const exportarInformeAWord = async (d: DatosDeExportacion): Promise<void>
     return;
   }
 
-  const i = d.informe;
+  /*
+   * NORMALIZADO, como el PDF y la pantalla: la comprobación va en su banda y
+   * junto a cada hallazgo, y un informe guardado con corchetes y avisos en el
+   * texto se lee con la misma función, sin repetir la advertencia.
+   */
+  const normal = normalizarInforme(d.informe);
+  const i = normal.informe;
+  const marcasJunto = (clave: SeccionDelInforme, indice: number) => {
+    for (const m of marcasDelHallazgo(normal.comprobaciones, clave, indice)) {
+      hijos.push(p(rotuloDeMarca(m), { bold: true, size: base - 3, color: titulos, indent: 360, after: 20, justificar: false }));
+      hijos.push(p(m.mensaje, { size: base - 3, color: gris, indent: 360, after: 80 }));
+    }
+  };
+  const seccionConMarcas = (t: string, items: string[], clave: SeccionDelInforme) => {
+    if (!items.length) return;
+    hijos.push(titulo(t));
+    items.forEach((x, k) => {
+      hijos.push(vineta(x));
+      marcasJunto(clave, k);
+    });
+  };
+
+  const pasajes = lineaDePasajes(normal);
+  if (pasajes) hijos.push(p(pasajes, { italics: true, size: base - 4, color: gris, after: 120, justificar: false }));
+  const banda = lineasDeLaBanda(normal);
+  if (banda) {
+    hijos.push(titulo(banda.titulo));
+    if (banda.cuenta.length) {
+      hijos.push(p(banda.cuenta.map((x) => `${x.etiqueta}: ${x.cantidad}`).join(' · '), { bold: true, size: base - 2, color: titulos, after: 60, justificar: false }));
+    }
+    if (banda.nota) hijos.push(p(banda.nota, { italics: true, size: base - 2, color: gris, after: 80 }));
+    banda.avisos.forEach((a) => hijos.push(p(a, { size: base - 2, after: 80 })));
+    if (banda.noComprobadas.length) {
+      hijos.push(p('Sin respuesta de las fuentes oficiales:', { bold: true, size: base - 3, color: gris, after: 20, justificar: false }));
+      banda.noComprobadas.forEach((x) => hijos.push(vineta(x)));
+    }
+  }
+
   if (i.resumen) hijos.push(p(i.resumen, { size: base + 1, after: 160 }));
-  seccion('Secciones que la norma exige y faltan', i.seccionesFaltantes);
-  seccion('Fortalezas', i.fortalezas);
-  seccion('Debilidades', i.debilidades);
+  marcasJunto('resumen', 0);
+  seccionConMarcas('Secciones que la norma exige y faltan', i.seccionesFaltantes, 'seccionesFaltantes');
+  seccionConMarcas('Fortalezas', i.fortalezas, 'fortalezas');
+  seccionConMarcas('Debilidades', i.debilidades, 'debilidades');
   if (i.erroresDeAplicacion.length) {
     hijos.push(titulo('Errores de aplicación'));
-    for (const e of i.erroresDeAplicacion) {
+    i.erroresDeAplicacion.forEach((e, k) => {
       if (e.donde) hijos.push(p(e.donde, { bold: true, size: base - 2, color: titulos, after: 40, justificar: false }));
       if (e.problema) hijos.push(p(e.problema, { after: 40 }));
       if (e.correccion) hijos.push(p(`Corrección: ${e.correccion}`, { italics: true, indent: 360, after: 160 }));
-    }
+      marcasJunto('erroresDeAplicacion', k);
+    });
   }
   const citas = i.correccionesTextuales ?? [];
   if (citas.length) {
     hijos.push(titulo('Citas del escrito y reemplazo propuesto'));
-    for (const c of citas) {
+    citas.forEach((c, k) => {
       hijos.push(p('Dice:', { bold: true, size: base - 3, color: gris, after: 20, justificar: false }));
       hijos.push(p(`«${c.cita}»`, { italics: true, indent: 360, after: 40 }));
       if (c.problema) hijos.push(p(c.problema, { size: base - 2, color: gris, indent: 360, after: 40 }));
@@ -302,9 +343,10 @@ export const exportarInformeAWord = async (d: DatosDeExportacion): Promise<void>
         hijos.push(p('Reemplazo propuesto:', { bold: true, size: base - 3, color: titulos, after: 20, justificar: false }));
         hijos.push(p(`«${c.reemplazo}»`, { indent: 360, after: 160 }));
       }
-    }
+      marcasJunto('correccionesTextuales', k);
+    });
   }
-  seccion('Recomendaciones', i.recomendaciones);
+  seccionConMarcas('Recomendaciones', i.recomendaciones, 'recomendaciones');
   hijos.push(
     new Paragraph({
       spacing: { before: 320 },

@@ -1,10 +1,7 @@
 import type { ReferenciaNormativa } from '../citacionNormativa';
 import type { InformeDeRevision } from './documentReview';
-import {
-  marcarVarios,
-  verificarVigenciaDelEscrito,
-  type RevisionDeVigencia
-} from './verificarVigencia';
+import { verificarVigenciaDelEscrito, type RevisionDeVigencia } from './verificarVigencia';
+import type { VigenciaDeArticulo } from '../../legislation/officialArticle.service';
 
 /**
  * ¿SIGUEN VIVOS LOS ARTÍCULOS QUE EL REVISOR CITA? Se comprueba contra la
@@ -49,15 +46,16 @@ import {
  * Por eso entra antes que la comprobación de glosa, que sí son hasta ocho
  * llamadas al motor por informe.
  *
- * ─── QUÉ SE MARCA Y QUÉ NO ────────────────────────────────────────────────
+ * ─── QUÉ SE ESCRIBE EN EL INFORME: NADA ────────────────────────────────────
  *
- * Se marca donde el revisor HABLA, y no dentro de `cita`, que es un pedazo
- * VERBATIM del escrito del abogado. Meterle un corchete a una cita textual la
- * deja de ser textual, y este producto tiene escrito que no reescribe lo que
- * no es suyo. El artículo muerto que el abogado citó igual sale señalado: en
- * `problema`, que es la casilla de al lado y es donde el revisor explica.
+ * Hasta el 14 de septiembre de 2026 esto pegaba corchetes donde el revisor
+ * nombraba el artículo y anteponía un aviso a `recomendaciones`. Ya no: el
+ * resultado viaja como DATO (`comprobacionesDelInforme.ts`), con el punto
+ * exacto del informe donde aparece cada artículo, y la pantalla y el PDF lo
+ * dibujan aparte. El texto queda con las palabras del revisor y ninguna otra.
  *
- * Como en Redacción, SE INSERTA y no se borra ni se reordena una palabra.
+ * La regla de fondo no cambió: `cita` es VERBATIM del escrito del abogado y
+ * nunca lleva marca; ahora tampoco la lleva nada más.
  */
 
 /** Los pedazos del informe donde el REVISOR habla con voz propia. */
@@ -97,70 +95,51 @@ export const verificarVigenciaDelInforme = async (
 ): Promise<RevisionDeVigencia> =>
   verificarVigenciaDelEscrito(textoParaComprobar(informe), autorizados, limiteMs);
 
-/** Las marcas que se pegan al lado de cada artículo problemático. */
-const marcasDe = (revision: RevisionDeVigencia): Array<{ articulo: number; marca: string }> => [
-  ...revision.resultados
-    .filter((r) => r.estado === 'DEROGADO')
-    .map((r) => ({
-      articulo: r.referencia.articulo,
-      marca: `[NORMA DEROGADA — este artículo NO está vigente: ${r.detalle}. La revisión lo nombró de todos modos; no se apoye en él.]`
-    })),
-  ...revision.resultados
-    .filter((r) => r.estado === 'MODULADO')
-    .map((r) => ({
-      articulo: r.referencia.articulo,
-      marca: `[NORMA VIGENTE PERO MODULADA POR LA CORTE — rige, pero su texto publicado no es el que rige: ${r.detalle} Léalo en la sentencia antes de usarlo.]`
-    })),
-  ...revision.resultados
-    .filter((r) => r.estado === 'DISCREPANCIA_ENTRE_FUENTES')
-    .map((r) => ({
-      articulo: r.referencia.articulo,
-      marca: `[LAS FUENTES OFICIALES NO COINCIDEN sobre este artículo — ${r.detalle} Esta casa no elige: compruébelo usted.]`
-    }))
-];
-
 /**
- * El informe con las marcas puestas donde el revisor habla.
+ * EL MENSAJE DE CADA ESTADO, con la redacción de los corchetes que este archivo
+ * pegaba en el informe hasta el 14 de septiembre de 2026, SIN los corchetes.
  *
- * Devuelve un informe NUEVO: el original no se toca, porque es lo que se
- * guardó y lo que hay que poder volver a leer tal como salió.
+ * ─── POR QUÉ YA NO SE PEGAN ────────────────────────────────────────────────
+ *
+ * Decisión del dueño («opción 2»): la comprobación viaja como DATO
+ * (`comprobacionesDelInforme.ts`) y la pantalla y el PDF la dibujan como una
+ * banda propia y una marca sobre el hallazgo. El texto del informe queda con
+ * las palabras del revisor y ninguna otra. Mientras era texto, un corchete
+ * podía terminar pegado en el memorial por «Aplicar reemplazo», repetido en
+ * cada mención y en cada casilla, y nada podía contarlo ni llevar a él.
+ *
+ * ─── POR QUÉ LA REDACCIÓN NO CAMBIA ────────────────────────────────────────
+ *
+ * Los informes guardados antes siguen trayendo el corchete dentro del texto, y
+ * el frontend los lee por su apertura y su cierre exactos (`marcas.ts`). Si el
+ * mensaje nuevo dijera otra cosa, un informe de ayer y uno de hoy advertirían
+ * lo mismo con palabras distintas. La guarda `comprobacionesDelInforme.check.ts`
+ * compara las dos mitades.
+ *
+ * Nulo para lo que nunca se marcó en línea: VIGENTE y NO_VERIFICABLE.
  */
-export const marcarVigenciaEnInforme = (
-  informe: InformeDeRevision,
-  revision: RevisionDeVigencia
-): InformeDeRevision => {
-  const marcas = marcasDe(revision);
-  if (marcas.length === 0) return informe;
-  const m = (t: string): string => marcarVarios(t, marcas);
-
-  return {
-    resumen: m(informe.resumen),
-    fortalezas: informe.fortalezas.map(m),
-    debilidades: informe.debilidades.map(m),
-    seccionesFaltantes: informe.seccionesFaltantes.map(m),
-    erroresDeAplicacion: informe.erroresDeAplicacion.map((e) => ({
-      donde: m(e.donde),
-      problema: m(e.problema),
-      correccion: m(e.correccion)
-    })),
-    correccionesTextuales: informe.correccionesTextuales.map((c) => ({
-      /* La cita es del abogado, verbatim. No se le escribe encima. */
-      cita: c.cita,
-      problema: m(c.problema),
-      reemplazo: m(c.reemplazo)
-    })),
-    recomendaciones: informe.recomendaciones.map(m)
-  };
+export const mensajeDeVigencia = (r: VigenciaDeArticulo): string | null => {
+  if (r.estado === 'DEROGADO') {
+    return `NORMA DEROGADA — este artículo NO está vigente: ${r.detalle}. La revisión lo nombró de todos modos; no se apoye en él.`;
+  }
+  if (r.estado === 'MODULADO') {
+    return `NORMA VIGENTE PERO MODULADA POR LA CORTE — rige, pero su texto publicado no es el que rige: ${r.detalle} Léalo en la sentencia antes de usarlo.`;
+  }
+  if (r.estado === 'DISCREPANCIA_ENTRE_FUENTES') {
+    return `LAS FUENTES OFICIALES NO COINCIDEN sobre este artículo — ${r.detalle} Esta casa no elige: compruébelo usted.`;
+  }
+  return null;
 };
 
 /**
  * El aviso de cabecera, para quien hojea el informe en vez de leerlo entero.
  *
- * Se añade a `recomendaciones` y va PRIMERO. No es una recomendación más: es
- * la única línea del informe que dice que una parte del propio informe no se
- * puede usar tal como está, y detrás de una lista de siete consejos no la lee
- * nadie. Vacío cuando no hay nada que avisar — un encabezado seguido de nada
- * es una casilla, y este repositorio ya sabe cómo terminan.
+ * Iba antepuesto a `recomendaciones`; hoy viaja en `comprobaciones.avisos` y se
+ * dibuja en la banda de la comprobación, ENCIMA de las secciones, que es donde
+ * se hojea. La redacción es la misma de siempre: los informes guardados antes
+ * la traen en sus recomendaciones y el frontend la reconoce por su comienzo.
+ * Vacío cuando no hay nada que avisar — un encabezado seguido de nada es una
+ * casilla, y este repositorio ya sabe cómo terminan.
  */
 export const avisoDeVigencia = (revision: RevisionDeVigencia): string | null => {
   const nombre = (articulo: number, codigo: string): string => `${codigo}, art. ${articulo}`;

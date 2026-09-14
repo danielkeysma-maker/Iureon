@@ -170,5 +170,77 @@ const doc10 = new jsPDF({ unit: 'mm', format: 'letter' });
 dibujarInformeEnPdf(doc10, 'helvetica', libreLargo, 11);
 check('un informe largo sin secciones pagina en vez de salirse de la hoja', doc10.getNumberOfPages() >= 3, String(doc10.getNumberOfPages()));
 
+/* ─── LA COMPROBACIÓN AUTOMÁTICA EN EL PAPEL (14 de septiembre de 2026) ─────
+ *
+ * El servidor ya no escribe corchetes ni avisos dentro del informe: manda la
+ * comprobación como dato. El papel tiene que dibujar la banda arriba y la marca
+ * junto al hallazgo. Y un informe guardado ANTES, con sus corchetes, tiene que
+ * salir con la advertencia UNA vez —junto al hallazgo— y no además dentro del
+ * párrafo, que es lo que haría dibujar su texto tal cual.
+ */
+const cuantas = (texto: string, re: RegExp): number => (texto.match(new RegExp(re.source, 'g')) ?? []).length;
+
+const MENSAJE_DEROGADA = 'NORMA DEROGADA — este artículo NO está vigente: Derogado por la Ley 820 de 2003. La revisión lo nombró de todos modos; no se apoye en él.';
+const conComprobacion: DatosDelInforme = {
+  ...base,
+  informe: {
+    ...base.informe,
+    debilidades: ['Debe invocarse el artículo 2035 del Código Civil.'],
+    pasajesDelCaso: 4,
+    comprobaciones: {
+      articulos: [
+        {
+          codigo: 'CODIGO CIVIL',
+          norma: 'Código Civil',
+          articulo: 2035,
+          vigencia: { estado: 'DEROGADO', detalle: 'Derogado por la Ley 820 de 2003', fuentes: ['SENADO'], consultadoEn: '2026-09-14' },
+          glosa: null,
+          glosas: [],
+          clases: ['DEROGADA'],
+          mensajes: [{ clase: 'DEROGADA', texto: MENSAJE_DEROGADA }],
+          dondeAparece: [{ seccion: 'debilidades', indice: 0 }]
+        }
+      ],
+      cuenta: { derogada: 1, modulada: 0, fuentesEnDesacuerdo: 0, noLoDiceElArticulo: 0, noComprobada: 0 },
+      avisos: ['COMPROBACIÓN AUTOMÁTICA DE VIGENCIA — 1 DEROGADO(S): CODIGO CIVIL, art. 2035.'],
+      vigenciaComprobada: true,
+      glosaComprobada: true
+    }
+  }
+};
+const doc11 = new jsPDF({ unit: 'mm', format: 'letter' });
+dibujarInformeEnPdf(doc11, 'helvetica', conComprobacion, 11);
+const salidaComprobada = textoDe(doc11);
+check('el PDF lleva la banda de comprobación automática', /COMPROBACI.{1,6}N AUTOM.{1,6}TICA/.test(salidaComprobada));
+check('con el conteo por clase', /Derogada: 1/.test(salidaComprobada));
+check('y la marca junto al hallazgo, con su rótulo y su mensaje', /Derogada .{1,6} C.{1,6}digo Civil, art\. 2035/.test(salidaComprobada) && cuantas(salidaComprobada, /NORMA DEROGADA/) === 1, String(cuantas(salidaComprobada, /NORMA DEROGADA/)));
+check('y dice con cuántos pasajes del caso se cruzó', /Se cruz.{1,6} con 4 pasajes del caso/.test(salidaComprobada));
+
+const guardadoConCorchetes: DatosDelInforme = {
+  ...base,
+  informe: {
+    ...base.informe,
+    debilidades: [`Debe invocarse el artículo 2035 [${MENSAJE_DEROGADA}] del Código Civil.`],
+    recomendaciones: [
+      'COMPROBACIÓN AUTOMÁTICA DE VIGENCIA — esta revisión citó artículos por fuera de la ficha verificada, y el sistema los consultó uno por uno en las fuentes normativas oficiales (la Secretaría del Senado y el Gestor Normativo de Función Pública): 1 DEROGADO(S): CODIGO CIVIL, art. 2035. Cada uno queda señalado en el punto donde la revisión lo nombra. El resto del informe no cambia; lo señalado no se puede usar tal como está.',
+      'Formular la petición como orden concreta.'
+    ]
+  }
+};
+const doc12 = new jsPDF({ unit: 'mm', format: 'letter' });
+dibujarInformeEnPdf(doc12, 'helvetica', guardadoConCorchetes, 11);
+const salidaGuardada = textoDe(doc12);
+check('un informe guardado con corchetes no los imprime dentro del párrafo', !/\[NORMA DEROGADA/.test(salidaGuardada));
+check('pero su advertencia sigue: UNA vez, junto al hallazgo', cuantas(salidaGuardada, /NORMA DEROGADA/) === 1, String(cuantas(salidaGuardada, /NORMA DEROGADA/)));
+check(
+  'y su aviso sale una vez, en la banda, no además en las recomendaciones',
+  cuantas(salidaGuardada, /COMPROBACI.{1,6}N AUTOM.{1,6}TICA DE VIGENCIA/) === 1 && /Derogada: 1/.test(salidaGuardada),
+  String(cuantas(salidaGuardada, /COMPROBACI.{1,6}N AUTOM.{1,6}TICA DE VIGENCIA/))
+);
+
+const doc13 = new jsPDF({ unit: 'mm', format: 'letter' });
+dibujarInformeEnPdf(doc13, 'helvetica', { ...base, informe: { ...base.informe, comprobaciones: null, pasajesDelCaso: 0 } }, 11);
+check('una nueva revisión dice en el papel que no repitió la comprobación', /no repiti.{1,6} la comprobaci/.test(textoDe(doc13)));
+
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

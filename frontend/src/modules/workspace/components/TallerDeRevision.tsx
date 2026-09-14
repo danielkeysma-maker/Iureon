@@ -285,7 +285,8 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
         onGuardar={
           datos.revisionId
             ? async (texto, conversacion, anotaciones, versiones) => {
-                ultimoEstado.current = { texto, conversacion, anotaciones, versiones };
+                /* `undefined` = sin cambios: se conserva la lista conocida para guardarla entera si la firma autoriza. */
+                ultimoEstado.current = { texto, conversacion, anotaciones, versiones: versiones ?? ultimoEstado.current.versiones };
                 const r = await reviewApi.guardarTexto(datos.revisionId as string, texto, anotaciones, versiones, conversacion);
                 return r.guardado;
               }
@@ -294,7 +295,7 @@ export const TallerDeRevision: React.FC<TallerDeRevisionProps> = ({
         onGuardarAlSalir={
           datos.revisionId
             ? (texto, conversacion, anotaciones, versiones) => {
-                ultimoEstado.current = { texto, conversacion, anotaciones, versiones };
+                ultimoEstado.current = { texto, conversacion, anotaciones, versiones: versiones ?? ultimoEstado.current.versiones };
                 void reviewApi.guardarTextoAlSalir(datos.revisionId as string, texto, anotaciones, versiones, conversacion);
               }
             : undefined
