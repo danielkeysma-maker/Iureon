@@ -1,4 +1,5 @@
 import { supabase } from '../../config/supabase.config';
+import { rangoDeLaPagina, type PedidoDePagina } from './paginaDeAuditoria';
 
 /**
  * The audit trail. It records what actually happened.
@@ -39,6 +40,13 @@ export type AuditAction =
    * derecho a saber quién lo cambió y cómo se llamaba.
    */
   | 'EXPEDIENTE_DOCUMENT_RENAMED'
+  /*
+   * Se editaron los datos del caso: carátula, radicado, despacho, rama,
+   * contraparte, notas, estado o cliente. El recurso nombra la carátula y QUÉ
+   * campos cambiaron —con el valor anterior y el nuevo de carátula, radicado,
+   * rama y estado—; el contenido de las notas nunca va al rastro.
+   */
+  | 'EXPEDIENTE_UPDATED'
   /*
    * Las carpetas del expediente. Cambian dónde encuentran todos los abogados de
    * la firma los papeles del caso, y borrar una se lleva sus documentos
@@ -225,6 +233,46 @@ export class AuditService {
     if (error) {
       console.error('[AUDIT] No se pudo registrar la acción:', input.action, error.message);
     }
+  }
+
+  /**
+   * UNA PÁGINA DEL RASTRO DE LA FIRMA, la más reciente primero, con su total.
+   *
+   * Es lo que lee la pantalla de Auditoría. Se separa de `getAuditLogs` —que
+   * sigue sirviendo a la ficha de firma de la consola de operación— por dos
+   * razones que esa lectura no cumple: pasa de las mil filas que corta
+   * PostgREST (`range` más total exacto) y FALLA HABLANDO. Una auditoría que no
+   * se pudo leer no puede llegar a la pantalla como una lista vacía, porque se
+   * leería como «la firma no ha hecho nada».
+   *
+   * El orden desempata por `id`: dos eventos escritos en el mismo instante no
+   * tienen orden garantizado entre dos consultas, y sin desempate una fila
+   * podría salir en dos páginas o en ninguna.
+   */
+  async leerPagina(
+    firmId: string,
+    pedido: PedidoDePagina
+  ): Promise<{ logs: AuditLogEntry[]; total: number | null }> {
+    if (!supabase) throw new Error('La base de datos no está configurada.');
+
+    const [desde, hasta] = rangoDeLaPagina(pedido);
+    let consulta = supabase
+      .from('audit_logs')
+      .select('*', { count: 'exact' })
+      .eq('firm_id', firmId);
+    if (pedido.inicio) consulta = consulta.gte('created_at', pedido.inicio);
+
+    const { data, error, count } = await consulta
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
+      .range(desde, hasta);
+
+    if (error) {
+      console.error('[AUDIT] No se pudo leer la página de auditoría:', error.message);
+      throw new Error(`No se pudo leer la auditoría: ${error.message}`);
+    }
+
+    return { logs: ((data ?? []) as AuditRow[]).map(toEntry), total: typeof count === 'number' ? count : null };
   }
 
   /**

@@ -9,11 +9,13 @@ import {
   borrarActor,
   borrarExpediente,
   crearExpediente,
+  datosGuardadosDelExpediente,
   listarExpedientes,
   obtenerExpediente,
   resumenDelExpediente
 } from './expedientes.service';
 import { TIPOS_DE_PIEZA, type DatosDeActor, type TipoDePieza } from './types';
+import { resumenDeLaEdicion } from './edicionDelExpediente';
 import {
   candidatosDeLaFirma,
   documentosDelExpediente,
@@ -152,7 +154,33 @@ export const actualizarExpedienteController = async (req: Request, res: Response
       if (campo in (req.body ?? {})) datos[campo] = req.body[campo];
     }
 
-    const expediente = await actualizarExpediente(firmId, String(req.params.id), datos);
+    const id = String(req.params.id);
+    const userEmail = req.user?.email ?? 'desconocido';
+    /*
+     * Se lee lo guardado ANTES de escribir, para que el rastro diga de qué
+     * valor a cuál. Si el expediente no es de la firma, esta lectura responde
+     * el mismo 404 que respondería la escritura.
+     */
+    const antes = await datosGuardadosDelExpediente(firmId, id);
+    const expediente = await actualizarExpediente(firmId, id, datos);
+
+    /*
+     * EL RASTRO VA DESPUÉS DE QUE LA ESCRITURA TUVO ÉXITO, y solo si algo
+     * cambió de verdad. El recurso es la carátula YA GUARDADA y el resumen de
+     * campos; el contenido de las notas no viaja nunca (ver
+     * `edicionDelExpediente.ts`).
+     */
+    const resumen = resumenDeLaEdicion(antes, datos);
+    if (resumen) {
+      await auditService.record({
+        firmId,
+        userEmail,
+        action: 'EXPEDIENTE_UPDATED',
+        resource: `${expediente.caratula} · ${resumen}`,
+        ipAddress: ipDe(req)
+      });
+    }
+
     res.json({ success: true, expediente });
   } catch (err) {
     fallar(res, err, 'No se pudo guardar el expediente.');

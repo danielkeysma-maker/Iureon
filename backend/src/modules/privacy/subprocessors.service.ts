@@ -203,6 +203,42 @@ export const subprocessors = (): Subprocessor[] => {
     });
   }
 
+  /*
+   * EL CORREO SALIENTE TAMBIÉN ES UN SUBENCARGADO, y faltaba. `mail.service.ts`
+   * manda confirmaciones de pago, cuentas de cobro en PDF, avisos de la firma y
+   * enlaces de recuperación de contraseña: el proveedor recibe el correo del
+   * destinatario y el mensaje. Se declara el que corre —`config.mail.provider`,
+   * la misma decisión que toma el envío: Resend si hay llave, Gmail si no—, y
+   * ninguno si el correo está apagado. Nunca los dos.
+   */
+  if (config.mail.provider === 'resend') {
+    list.push({
+      nombre: 'Resend',
+      proposito:
+        'Envía los correos de la aplicación: confirmaciones de pago y cuentas de cobro, avisos de la firma y enlaces para cambiar la contraseña.',
+      datos: ['IDENTIFICACION', 'METADATOS_DE_USO'],
+      ubicacion: 'Estados Unidos',
+      baseDeTransferencia: 'Acuerdo de tratamiento de datos (DPA) del proveedor · transferencia internacional, Ley 1581 art. 26',
+      retiene: true,
+      retencion: 'Registro de entregas según la política del proveedor.',
+      atravesDe: null,
+      sitio: 'https://resend.com/legal/privacy-policy'
+    });
+  } else if (config.mail.provider === 'gmail') {
+    list.push({
+      nombre: 'Google LLC (Gmail)',
+      proposito:
+        'Envía los correos de la aplicación desde la cuenta del titular: confirmaciones de pago y cuentas de cobro, avisos de la firma y enlaces para cambiar la contraseña.',
+      datos: ['IDENTIFICACION', 'METADATOS_DE_USO'],
+      ubicacion: 'Estados Unidos',
+      baseDeTransferencia: 'Acuerdo de tratamiento de datos (DPA) del proveedor · transferencia internacional, Ley 1581 art. 26',
+      retiene: true,
+      retencion: 'Los mensajes enviados quedan en la cuenta remitente, según la política del proveedor.',
+      atravesDe: null,
+      sitio: 'https://policies.google.com/privacy'
+    });
+  }
+
   list.push({
     nombre: 'Vercel, Inc.',
     proposito: 'Aloja la aplicación y su API. Toda petición pasa por su infraestructura.',
@@ -235,6 +271,17 @@ export const disclosure = () => ({
     'No se guarda el audio de una audiencia: solo su transcrito. Un audio de dos horas pesa 50 MB y su transcrito 300 KB, y guardar grabaciones acumula material privilegiado sin fecha de caducidad.',
     'Ningún operador de Iureon puede abrir un transcrito, un borrador ni un expediente. La consola de operador gestiona firmas y saldos, y eso es todo lo que puede hacer.',
     'Iureon no usa el contenido de una firma para entrenar ningún modelo.'
+  ],
+  /*
+   * LO QUE SÍ SE QUEDA, dicho al lado de lo que no. Una lista que solo cuenta
+   * lo que se borra deja creer que borrar la firma lo borra todo, y no es así:
+   * `audit_logs` es inalterable por disparador (migration-auditoria-inmutable
+   * .sql) y la función de borrado completo no la toca
+   * (migration-borrar-firma-completa-v3.sql, «LO QUE NO SE BORRA»). No se
+   * promete purga ni plazo, porque no existen.
+   */
+  loQueSeConserva: [
+    'La auditoría de la firma no se edita ni se borra, tampoco al eliminar la firma: conserva el correo de cada usuario, la IP y una descripción breve de cada acción.'
   ],
   advertencia:
     'Esta lista se genera desde la configuración que la aplicación está ejecutando, no desde un documento que alguien mantiene a mano. Un proveedor que aparezca aquí está recibiendo datos; uno que no aparezca, no está configurado.'

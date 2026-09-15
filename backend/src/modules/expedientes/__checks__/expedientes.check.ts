@@ -18,6 +18,7 @@ import {
   tecnicaPara
 } from '../preguntasDelExpediente';
 import type { ActorDelExpediente, ExpedienteConDetalle } from '../types';
+import { resumenDeLaEdicion, type DatosAntesDeLaEdicion } from '../edicionDelExpediente';
 
 /**
  * GUARDA DEL EXPEDIENTE.
@@ -824,6 +825,85 @@ check(
   'y el modo escogido se recuerda, sin que un fallo del almacenamiento tumbe la pantalla',
   /localStorage/.test(pantallaCarpetas) && /catch/.test(pantallaCarpetas),
   'una ventana privada no puede dejar sin expediente al abogado'
+);
+
+/* ─── EDITAR LOS DATOS DEL CASO QUEDA EN LA AUDITORÍA ────────────────────── */
+
+/*
+ * Hasta el 14 de septiembre de 2026 el PATCH del expediente no dejaba rastro:
+ * cambiar la carátula o el radicado de un caso —lo que el abogado y el motor
+ * leen al citarlo— no se podía atribuir a nadie. El resumen dice QUÉ campos
+ * cambiaron, con el valor anterior y el nuevo de los que identifican el caso,
+ * y nunca el contenido de las notas, que son del cliente.
+ */
+const antesDeEditar: DatosAntesDeLaEdicion = {
+  caratula: 'Caso 00',
+  radicado: null,
+  despacho: 'Juzgado 00',
+  rama: null,
+  contraparte: null,
+  notas: 'Nota privada 00',
+  estado: 'ACTIVO',
+  clienteId: null
+};
+const resumenRamaRadicado = resumenDeLaEdicion(antesDeEditar, { rama: 'LABORAL', radicado: '11001' });
+check(
+  'el resumen nombra el radicado y la rama con su valor anterior y el nuevo',
+  resumenRamaRadicado === 'radicado «—» → «11001» · rama «—» → «LABORAL»',
+  String(resumenRamaRadicado)
+);
+check(
+  'la carátula va con su valor anterior y el nuevo',
+  resumenDeLaEdicion(antesDeEditar, { caratula: 'Caso 01' }) === 'carátula «Caso 00» → «Caso 01»'
+);
+const resumenNotas = resumenDeLaEdicion(antesDeEditar, { notas: 'Secreto del cliente 00' }) ?? '';
+check(
+  'las notas se nombran pero su contenido NO va al rastro',
+  resumenNotas === 'notas' && !resumenNotas.includes('Secreto') && !resumenNotas.includes('privada'),
+  resumenNotas
+);
+check(
+  'el despacho y la contraparte se nombran sin su texto',
+  resumenDeLaEdicion(antesDeEditar, { despacho: 'Juzgado 01', contraparte: 'Entidad 00' }) === 'despacho · contraparte'
+);
+check(
+  'un campo enviado sin cambio real no se anota',
+  resumenDeLaEdicion(antesDeEditar, { caratula: '  Caso 00 ', despacho: 'Juzgado 00' }) === null
+);
+check('vaciar un campo es un cambio', resumenDeLaEdicion(antesDeEditar, { despacho: null }) === 'despacho');
+check(
+  'el estado también se anota con su valor anterior y el nuevo',
+  resumenDeLaEdicion(antesDeEditar, { estado: 'TERMINADO' }) === 'estado «ACTIVO» → «TERMINADO»'
+);
+
+const cuerpoDelControlador = (fuente: string, declaracion: string): string => {
+  const inicio = fuente.indexOf(declaracion);
+  if (inicio === -1) return '';
+  const fin = fuente.indexOf('export ', inicio + declaracion.length);
+  return fuente.slice(inicio, fin === -1 ? undefined : fin);
+};
+const actualizarCtl = cuerpoDelControlador(
+  sinComentarios(leer('modules/expedientes/expedientes.controller.ts')),
+  'export const actualizarExpedienteController'
+);
+check(
+  'EXPEDIENTE_UPDATED está declarada en el tipo de auditoría',
+  leer('modules/audit/audit.service.ts').includes("'EXPEDIENTE_UPDATED'")
+);
+check(
+  'el PATCH del expediente registra EXPEDIENTE_UPDATED con el resumen',
+  actualizarCtl.includes('auditService.record(') &&
+    actualizarCtl.includes("'EXPEDIENTE_UPDATED'") &&
+    actualizarCtl.includes('resumenDeLaEdicion(')
+);
+check(
+  'y lo registra DESPUÉS de que la escritura tuvo éxito',
+  actualizarCtl.indexOf('actualizarExpediente(') !== -1 &&
+    actualizarCtl.indexOf('actualizarExpediente(') < actualizarCtl.indexOf('auditService.record(')
+);
+check(
+  'el rastro nunca lleva el cuerpo de la petición ni las notas',
+  !/resource:[^\n]*(req\.body|notas)/.test(actualizarCtl)
 );
 
 console.log('');

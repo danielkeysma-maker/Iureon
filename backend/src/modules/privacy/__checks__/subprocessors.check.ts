@@ -89,6 +89,22 @@ check(
   `configurado=${config.backblaze.enabled} declarado=${declara('Backblaze')}`
 );
 
+/*
+ * El correo saliente: el proveedor que `mail.service.ts` usa de verdad. Resend
+ * manda si hay llave, Gmail si no; declarar los dos, o ninguno con el correo
+ * encendido, sería describir un sistema que no corre.
+ */
+check(
+  'Resend aparece si y solo si el correo sale por Resend',
+  declara('Resend') === (config.mail.provider === 'resend'),
+  `provider=${config.mail.provider}`
+);
+check(
+  'Gmail aparece si y solo si el correo sale por Gmail',
+  declara('Gmail') === (config.mail.provider === 'gmail'),
+  `provider=${config.mail.provider}`
+);
+
 // El proveedor de vectores declarado tiene que ser el que corre, no los dos.
 check(
   'solo se declara el proveedor de embeddings realmente seleccionado',
@@ -121,6 +137,16 @@ check('se declara qué NO se hace con los datos', d.loQueNoHacemos.length >= 3);
 check(
   'se declara expresamente que el audio de una audiencia no se guarda',
   d.loQueNoHacemos.some((linea) => /audio/i.test(linea) && /no se guarda/i.test(linea))
+);
+
+/*
+ * Lo que se conserva tiene que decirse junto a lo que no. La auditoría es
+ * inalterable y sobrevive al borrado de la firma; una pantalla de privacidad
+ * que lo callara dejaría creer que eliminar la firma lo borra todo.
+ */
+check(
+  'se declara que la auditoría se conserva al eliminar la firma',
+  d.loQueSeConserva.some((linea) => /auditor/i.test(linea) && /eliminar la firma/i.test(linea) && /IP/.test(linea))
 );
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);

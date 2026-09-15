@@ -3,6 +3,7 @@ import { supabase } from '../../config/supabase.config';
 import { hoyEnColombia } from '../agenda/avisos';
 import { leerEnTandas, type FilaDeActorDeLaLista, type FilaDeClienteDeLaLista } from './busquedaDeLaLista';
 import { posicionSegunElExpediente } from './posicionDelExpediente';
+import type { DatosAntesDeLaEdicion } from './edicionDelExpediente';
 import {
   armarMisCasos,
   documentosPorExpediente,
@@ -408,6 +409,42 @@ export const crearExpediente = async (
   }
 
   return aExpediente(data as FilaDeExpediente);
+};
+
+/**
+ * Lo que el expediente tiene guardado HOY en los campos que el PATCH puede
+ * cambiar. Lo pide el controlador antes de escribir para que la auditoría diga
+ * de qué valor a cuál; se leen solo esas columnas y no el detalle completo,
+ * que además cuenta actores y piezas.
+ */
+export const datosGuardadosDelExpediente = async (
+  firmId: string,
+  id: string
+): Promise<DatosAntesDeLaEdicion> => {
+  const { data, error } = await db()
+    .from('expedientes')
+    .select('caratula, radicado, despacho, rama, contraparte, notas, estado, cliente_id')
+    .eq('firm_id', firmId)
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) {
+    console.error('[EXPEDIENTES] No se pudo leer antes de actualizar:', error.message);
+    throw new ExpedienteError('UPDATE_FAILED', 'No se pudo guardar el expediente.', 502);
+  }
+  if (!data) throw new ExpedienteError('NOT_FOUND', 'Ese expediente no existe.', 404);
+
+  const fila = data as Pick<FilaDeExpediente, 'caratula' | 'radicado' | 'despacho' | 'rama' | 'contraparte' | 'notas' | 'estado' | 'cliente_id'>;
+  return {
+    caratula: fila.caratula,
+    radicado: fila.radicado,
+    despacho: fila.despacho,
+    rama: fila.rama,
+    contraparte: fila.contraparte,
+    notas: fila.notas,
+    estado: fila.estado,
+    clienteId: fila.cliente_id
+  };
 };
 
 export const actualizarExpediente = async (
