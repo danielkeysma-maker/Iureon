@@ -3,10 +3,13 @@
  *
  * ─── LAS DOS FORMAS QUE PUEDE TRAER ────────────────────────────────────────
  *
- * 1. La de Iureon (la que manda el backend): `/?restablecer=1#token_hash=…`.
+ * 1. La de Iureon (la que manda el backend): `/restablecer#token_hash=…`.
  *    El token va en el fragmento y la aplicación lo canjea por POST junto con
  *    la contraseña nueva. Un filtro de correo que abra el enlace antes que la
- *    persona no gasta nada: abrir la página no canjea.
+ *    persona no gasta nada: abrir la página no canjea. Los correos enviados
+ *    antes del 14 de septiembre de 2026 traen la forma vieja, con la marca en
+ *    la consulta (`restablecer=1`); `rutas.ts` la traduce a `/restablecer`
+ *    conservando el fragmento, y este lector reconoce las dos marcas.
  *
  * 2. La de Supabase, de respaldo (un correo enviado desde su propio panel):
  *    Supabase canjea el token en su servidor y redirige con
@@ -85,7 +88,8 @@ export const leerEnlaceDeRecuperacion = (href: string): Lectura => {
   const consulta = url.searchParams;
   const leer = (clave: string): string | null => fragmento.get(clave) ?? consulta.get(clave);
 
-  const marcada = consulta.has('restablecer');
+  /* La dirección `/restablecer` es la marca; la clave de consulta, la de los correos viejos. */
+  const marcada = url.pathname === '/restablecer' || consulta.has('restablecer');
   const tokenHash = leer('token_hash');
   const accessToken = leer('access_token');
   const tipo = leer('type');
@@ -97,7 +101,7 @@ export const leerEnlaceDeRecuperacion = (href: string): Lectura => {
   } else if (accessToken && tipo === 'recovery') {
     enlace = { tipo: 'SESION', accessToken };
   } else if (marcada || (errorCode && (tipo === 'recovery' || errorCode === 'otp_expired'))) {
-    // `/?restablecer=1` sin token usable (fragmento perdido, `code` de PKCE que
+    // `/restablecer` sin token usable (fragmento perdido, `code` de PKCE que
     // aquí no se puede canjear, error de Supabase): el enlace no sirve.
     enlace = { tipo: 'VENCIDO' };
   }

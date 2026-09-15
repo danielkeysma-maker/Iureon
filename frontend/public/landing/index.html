@@ -3,6 +3,34 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>
+/*
+ * ANTES DE PINTAR NADA (14 sep 2026). Esta página se sirve en `/`.
+ *
+ * 1. Una visita con las claves de consulta con las que la aplicación se abría
+ *    antes (entrar, restablecer con el token en el fragmento…) es de la
+ *    aplicación, no de la portada. `vercel.json` ya la manda allá; si igual llega aquí, se
+ *    devuelve por `/legado` CON su fragmento, que es donde viaja el token del
+ *    correo de recuperación. La lista es la de `CLAVES_LEGADAS` en
+ *    `src/modules/tenant/rutas.ts` y `check:rutas` las compara.
+ * 2. Quien ya tiene sesión en este navegador va a su Inicio y no ve la
+ *    portada. Solo se mira que la clave exista, nunca el token: la aplicación
+ *    decide si la sesión sirve, y si no sirve pide entrar desde `/inicio`, que
+ *    no vuelve aquí, así que no hay bucle.
+ */
+(function () {
+  var CLAVES = ['entrar', 'ir', 'prueba', 'registro', 'recuperar', 'restablecer', 'plan', 'vista'];
+  try {
+    var q = new URLSearchParams(location.search);
+    for (var i = 0; i < CLAVES.length; i++) {
+      if (q.has(CLAVES[i])) { location.replace('/legado' + location.search + location.hash); return; }
+    }
+    if (localStorage.getItem('iureon_session')) location.replace('/inicio');
+  } catch (e) {
+    /* Sin almacenamiento (ventana privada estricta): se muestra la portada. */
+  }
+})();
+</script>
 <title>Iureon — Inteligencia jurídica para firmas en Colombia</title>
 <meta name="description" content="Iureon redacta el primer borrador, revisa el escrito que usted ya hizo y reúne el expediente. Lo cotejado con el texto oficial lo dice; lo que no se pudo cotejar, también.">
 <meta name="theme-color" content="#FFFFFF">
@@ -13,13 +41,13 @@
 <link rel="icon" type="image/svg+xml" href="/brand/favicon.svg">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="canonical" href="https://www.iureoncolombia.com/landing/">
+<link rel="canonical" href="https://www.iureoncolombia.com/">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_CO">
 <meta property="og:site_name" content="Iureon">
 <meta property="og:title" content="Iureon — Cada término, con el artículo que lo respalda">
 <meta property="og:description" content="Redacción, revisión de escritos y expediente para abogados y firmas en Colombia. Lo cotejado con el texto oficial lo dice; lo que no se pudo cotejar, también.">
-<meta property="og:url" content="https://www.iureoncolombia.com/landing/">
+<meta property="og:url" content="https://www.iureoncolombia.com/">
 <meta property="og:image" content="https://www.iureoncolombia.com/pwa/icon-512.png">
 <meta property="og:image:width" content="512">
 <meta property="og:image:height" content="512">
@@ -505,11 +533,11 @@ svg{display:block}
       <a href="#modulos">Módulos</a>
       <a href="#verificacion">Verificación</a>
       <a href="#planes">Planes</a>
-      <a href="/?entrar=1&amp;ir=manual">Manual</a>
+      <a href="/manual">Manual</a>
     </nav>
   </div>
   <div class="cabecera__der">
-    <a class="btn btn--terciario btn--sm solo-ancho" href="/?entrar=1">Iniciar sesión</a>
+    <a class="btn btn--terciario btn--sm solo-ancho" href="/entrar">Iniciar sesión</a>
     <a class="btn btn--primario btn--sm" href="#planes">Contratar</a>
     <!-- Sin JavaScript <details> abre y cierra solo: los enlaces siguen al alcance. -->
     <details class="menu-movil">
@@ -519,10 +547,10 @@ svg{display:block}
           <a href="#modulos">Módulos</a>
           <a href="#verificacion">Verificación</a>
           <a href="#planes">Planes</a>
-          <a href="/?entrar=1&amp;ir=manual">Manual</a>
+          <a href="/manual">Manual</a>
         </nav>
         <div class="menu-movil__acciones">
-          <a class="btn btn--secundario" href="/?entrar=1">Iniciar sesión</a>
+          <a class="btn btn--secundario" href="/entrar">Iniciar sesión</a>
         </div>
       </div>
     </details>
@@ -541,7 +569,7 @@ svg{display:block}
       <a class="btn btn--primario" href="#planes">Ver planes</a>
       <a class="btn btn--secundario" href="#verificacion">Cómo verifica</a>
     </div>
-    <p class="hero__prueba">o <a href="/?prueba=1">pruebe Esencial gratis 7 días</a></p>
+    <p class="hero__prueba">o <a href="/prueba">pruebe Esencial gratis 7 días</a></p>
     <div class="cifras">
       <div><div class="cifra__valor">883</div><div class="cifra__texto">actuaciones con su fundamento y su fuente</div></div>
       <div><div class="cifra__valor">28</div><div class="cifra__texto">ramas del derecho</div></div>
@@ -781,8 +809,8 @@ svg{display:block}
         <div class="plan__nota">No trae Orientación, Audiencias ni Entrevistas.</div>
       </div>
       <div class="plan__acciones">
-        <a class="btn btn--secundario btn--bloque" href="/?registro=ESENCIAL">Contratar Esencial</a>
-        <a class="btn btn--terciario btn--bloque" href="/?prueba=1">Probar Esencial 7 días gratis</a>
+        <a class="btn btn--secundario btn--bloque" href="/registro/esencial">Contratar Esencial</a>
+        <a class="btn btn--terciario btn--bloque" href="/prueba">Probar Esencial 7 días gratis</a>
       </div>
     </article>
 
@@ -803,7 +831,7 @@ svg{display:block}
         </ul>
       </div>
       <div class="plan__acciones">
-        <a class="btn btn--crema btn--bloque" href="/?registro=PREMIUM">Contratar Premium</a>
+        <a class="btn btn--crema btn--bloque" href="/registro/premium">Contratar Premium</a>
       </div>
     </article>
 
@@ -822,7 +850,7 @@ svg{display:block}
         <div class="plan__nota">Los mismos módulos de Premium: lo que cambia son los puestos.</div>
       </div>
       <div class="plan__acciones">
-        <a class="btn btn--secundario btn--bloque" href="/?registro=FIRMA">Contratar Firma</a>
+        <a class="btn btn--secundario btn--bloque" href="/registro/firma">Contratar Firma</a>
       </div>
     </article>
   </div>
@@ -856,9 +884,9 @@ svg{display:block}
     <span class="marca__palabra">IUREON</span><span>· Sincelejo, Sucre, Colombia</span>
   </div>
   <nav class="pie__links" aria-label="Enlaces del pie">
-    <a href="/?entrar=1&amp;ir=manual">Manual</a>
+    <a href="/manual">Manual</a>
     <a href="#planes">Planes</a>
-    <a href="/?entrar=1&amp;ir=privacidad">Tratamiento de datos</a>
+    <a href="/privacidad">Tratamiento de datos</a>
     <a href="https://wa.me/573011750316" target="_blank" rel="noopener">WhatsApp</a>
   </nav>
   <span>Los precios incluyen IVA. Nada se radica desde Iureon.</span>

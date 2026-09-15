@@ -7,7 +7,7 @@ import { MINUTOS_DE_VIGENCIA_DEL_ENLACE } from '../../auth/enlaceDeRecuperacion'
 import '../../../design/cara-nueva.css';
 
 /**
- * PEDIR EL ENLACE PARA PONER UNA CONTRASEÑA NUEVA (`/?recuperar=1`).
+ * PEDIR EL ENLACE PARA PONER UNA CONTRASEÑA NUEVA (`/recuperar`).
  *
  * Marco «Recuperar el acceso» de `public/handoff/app-entrada-y-sesion.html`.
  * Móvil 375 derivado de «Entrar»: el botón pegado al borde inferior.
@@ -128,7 +128,7 @@ export const RecuperarContrasenaView: React.FC = () => {
           </div>
 
           <div className="cn-pie-flujo">
-            <a href="/?entrar=1" className="cn-volver">
+            <a href="/entrar" className="cn-volver">
               ← Volver a entrar
             </a>
           </div>

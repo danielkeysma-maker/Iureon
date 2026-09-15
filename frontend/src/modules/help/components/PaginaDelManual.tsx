@@ -301,6 +301,17 @@ export const PaginaDelManual: React.FC<PaginaDelManualProps> = ({
   });
   const [consulta, setConsulta] = React.useState('');
 
+  /*
+   * Un artículo que llegó por la dirección (`/manual/<id>`) y ya no existe se
+   * olvida, para que la dirección vuelva a `/manual` y diga lo que se ve: el
+   * índice. Solo se borra; lo válido se sigue anotando al navegar.
+   */
+  React.useEffect(() => {
+    if (activo === null && recordado(PANTALLAS.manual)) recordar(PANTALLAS.manual, null);
+    // Una vez al montar.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const abrir = React.useCallback((id: string | null) => {
     setActivo(id);
     recordar(PANTALLAS.manual, id);

@@ -151,9 +151,13 @@ export const baseDelEnlace = (origen: string | undefined, opciones: { desarrollo
  * Links y similares) abren cada enlace antes que la persona, así que el
  * abogado recibiría un enlace ya usado. Esta página, abierta por un robot, no
  * canjea nada: el canje exige un POST con la contraseña nueva.
+ *
+ * `/restablecer` es la dirección de esa pantalla desde el 14 de septiembre de
+ * 2026. Los correos enviados antes llevan la marca en la consulta y la
+ * aplicación los sigue atendiendo, con el fragmento intacto.
  */
 export const enlaceDeRestablecimiento = (base: string, tokenHash: string): string =>
-  `${base}/?restablecer=1#token_hash=${encodeURIComponent(tokenHash)}`;
+  `${base}/restablecer#token_hash=${encodeURIComponent(tokenHash)}`;
 
 /** Cuánto falta para llegar al piso. Cero si ya se pasó. */
 export const esperaRestante = (inicioMs: number, ahoraMs: number, piso = PISO_DE_RESPUESTA_MS): number =>

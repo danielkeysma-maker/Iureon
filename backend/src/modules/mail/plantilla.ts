@@ -34,22 +34,23 @@ export const SITIO = 'https://www.iureoncolombia.com';
 /*
  * ENLACES QUE DE VERDAD ABREN ALGO.
  *
- * La aplicación es una sola página sin enrutador: se navega con `?ir=<vista>`,
- * y `App.tsx` acepta EXACTAMENTE `soporte`, `borradores`, `manual`,
- * `privacidad`, `agenda` y `administrar`. Cualquier otra ruta escrita en un
- * correo —`/plan`, `/saldo`, `/facturas`, `/exportar`, `/preferencias`,
- * `/datos`— deja al abogado en una pantalla que no pidió. Un enlace roto en un
- * correo de facturación es peor que no tenerlo, así que lo que no existe se
- * nombra en prosa («Saldo › Recargar») y no se enlaza.
+ * Desde el 14 de septiembre de 2026 cada pantalla tiene su dirección
+ * (`frontend/src/modules/tenant/rutas.ts`): `/entrar`, `/manual`, `/soporte`,
+ * `/privacidad`, `/borradores`. Quien abre una sin sesión pasa por Entrar y
+ * aterriza en ella. Saldo y Plan NO son pantallas —son diálogos—, así que un
+ * correo que escribiera `/plan`, `/saldo`, `/facturas` o `/exportar` dejaría al
+ * abogado en Inicio sin lo que pidió. Un enlace roto en un correo de
+ * facturación es peor que no tenerlo: lo que no es pantalla se nombra en prosa
+ * («Saldo › Recargar») y no se enlaza.
  *
- * `?entrar=1` no es una vista: le dice a la aplicación que quien llega viene a
- * entrar y no debe ser desviado a la portada pública.
+ * Los correos ya enviados con la forma vieja (`?ir=manual` sobre la raíz)
+ * siguen funcionando: la aplicación los traduce.
  */
-export const URL_ENTRAR = `${SITIO}/?entrar=1`;
-export const URL_MANUAL = `${SITIO}/?ir=manual`;
-export const URL_SOPORTE = `${SITIO}/?ir=soporte`;
-export const URL_PRIVACIDAD = `${SITIO}/?ir=privacidad`;
-export const URL_BORRADORES = `${SITIO}/?ir=borradores`;
+export const URL_ENTRAR = `${SITIO}/entrar`;
+export const URL_MANUAL = `${SITIO}/manual`;
+export const URL_SOPORTE = `${SITIO}/soporte`;
+export const URL_PRIVACIDAD = `${SITIO}/privacidad`;
+export const URL_BORRADORES = `${SITIO}/borradores`;
 
 /**
  * El pie: la ciudad, sin la calle.

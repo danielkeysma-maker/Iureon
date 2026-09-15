@@ -143,7 +143,8 @@ export const solicitarRecuperacion = async (s: SolicitudDeRecuperacion): Promise
     generado = await supabase.auth.admin.generateLink({
       type: 'recovery',
       email: correo,
-      options: { redirectTo: `${base}/?restablecer=1` }
+      /* La lista de redirecciones de Supabase admite `/**`: `/restablecer` ya cabe. */
+      options: { redirectTo: `${base}/restablecer` }
     });
   } catch (err) {
     console.error(`[RECUPERACION] ${caso} no se pudo generar el enlace: ${describirError(err)}`);

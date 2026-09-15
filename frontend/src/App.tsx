@@ -89,30 +89,15 @@ import { RecuperarContrasenaView } from './modules/tenant/components/RecuperarCo
 import { RestablecerContrasenaView } from './modules/tenant/components/RestablecerContrasenaView';
 import { capturarEnlaceDeRecuperacion } from './modules/auth/enlaceDeRecuperacion';
 import type { MainView } from './modules/tenant/types';
-import { NAV_MODULES, vistasOcultasPorPlan } from './modules/tenant/navigation';
+import { navModule, vistasOcultasPorPlan } from './modules/tenant/navigation';
+import { TITULO_DE_PAGINA, consultaQueSeConserva, destinoSeguro, leerRuta, rutaDeVista } from './modules/tenant/rutas';
+import { dejarDetalleDe, useRutaDePantalla, vistaInicialDeLaDireccion, type RutaDeApp } from './modules/tenant/useRutaDePantalla';
 import { InicioView } from './modules/inicio/components/InicioView';
 import { useVisitaGuiada } from './modules/inicio/visitaGuiada/useVisitaGuiada';
 import { VisitaGuiada } from './modules/inicio/visitaGuiada/VisitaGuiada';
 import { useNovedadesNuevas } from './modules/help/useNovedades';
 import { NovedadesView } from './modules/help/components/NovedadesView';
 import { PANTALLAS as PANTALLAS_RECORDADAS, recordar as recordarPantalla } from './modules/tenant/pantallaRecordada';
-
-/**
- * Los módulos que la aplicación puede mostrar, para validar el que quedó
- * guardado. SE DERIVA DEL REGISTRO, no se escribe a mano.
- *
- * Era una lista literal y ya se había desincronizado: tenía once de los trece
- * módulos: faltaban `borradores` y `ajustes`. Como esta lista es la que decide
- * si se restaura el módulo guardado en `sessionStorage`, quien recargaba la
- * página estando en Borradores o en Ajustes era devuelto en silencio al taller
- * de redacción — y recargar es justo el reflejo de alguien a quien la pantalla
- * le falló.
- *
- * Derivarla de `NAV_MODULES` hace imposible que vuelva a pasar: un módulo nuevo
- * entra al registro para poder pintarse en la barra lateral, así que ya no hay
- * un segundo sitio del que alguien pueda olvidarse.
- */
-const MAIN_VIEWS: MainView[] = NAV_MODULES.map((m) => m.id);
 
 
 const EMPTY_FIRM_PLACEHOLDER: LawFirmTenant = {
@@ -160,41 +145,26 @@ export function App() {
   const isAuthenticated = Boolean(session);
   /*
    * EL ENLACE DE RECUPERACIÓN SE LEE ANTES QUE NADA, y en esa misma lectura se
-   * borra de la barra de direcciones (`enlaceDeRecuperacion.ts`). Antes de la
-   * decisión de la portada, porque una redirección de Supabase puede llegar a
-   * la raíz con el token solo en el fragmento, y mandar a `/landing/` perdería
-   * el enlace. Recordado: llamarlo en cada render no vuelve a leer la barra.
+   * borra de la barra de direcciones (`enlaceDeRecuperacion.ts`). La forma vieja
+   * del correo ya llegó aquí traducida a `/restablecer` con su fragmento intacto
+   * (`main.tsx` → `modules/tenant/entrada.ts`). Recordado: llamarlo en cada
+   * render no vuelve a leer la barra.
    */
   const enlaceDeRecuperacion = capturarEnlaceDeRecuperacion();
   /*
-   * PORTADA PÚBLICA. Quien llega a la raíz SIN sesión y sin decir a qué viene
-   * (`?entrar=1`, `?prueba=1`, `?registro=PLAN`, `?ir=…` o `?vista=1`) va a `/landing/`, la página pública que
-   * vive en `public/landing/` y que Vercel sirve como archivo antes de la
-   * reescritura a `index.html`. Se decide una sola vez, al montar: la sesión
-   * que se cierra dentro de la aplicación no debe expulsar a la portada.
-   * `?plan=` viaja desde los botones «Contratar …» de la portada y se guarda
-   * para abrir la pantalla de planes en cuanto la sesión exista.
+   * LA PORTADA YA NO LA DECIDE LA APLICACIÓN (14 sep 2026). Vive en `/` y la
+   * sirve Vercel (`vercel.json`); aquí solo llegan las pantallas y las páginas
+   * públicas `/entrar`, `/registro/<plan>`, `/prueba`, `/recuperar` y
+   * `/restablecer`. `?plan=` sigue llegando por los enlaces viejos «Contratar …»
+   * y se guarda para abrir la pantalla de planes en cuanto exista la sesión.
    */
-  const [debeIrALaPortada] = useState(() => {
-    if (session || typeof window === 'undefined') return false;
-    const params = new URLSearchParams(window.location.search);
-    const plan = params.get('plan');
-    if (plan) sessionStorage.setItem(PLAN_ELEGIDO_KEY, plan.toUpperCase());
-    if (
-      capturarEnlaceDeRecuperacion() ||
-      params.has('entrar') ||
-      params.has('recuperar') ||
-      params.has('prueba') ||
-      params.has('registro') ||
-      params.has('ir') ||
-      params.has('vista')
-    )
-      return false;
-    return window.location.pathname === '/';
-  });
   useEffect(() => {
-    if (debeIrALaPortada) window.location.replace('/landing/index.html');
-  }, [debeIrALaPortada]);
+    if (session) return;
+    const plan = new URLSearchParams(window.location.search).get('plan');
+    if (plan) sessionStorage.setItem(PLAN_ELEGIDO_KEY, plan.toUpperCase());
+    // Una vez, al montar: es lo que traía la dirección de llegada.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const currentUserEmail = session?.user.email ?? '';
   /*
    * EL NOMBRE DE LA PERSONA, guardado en su cuenta.
@@ -270,36 +240,17 @@ export function App() {
   const [herramientasEpoca, setHerramientasEpoca] = useState(0);
 
   /*
-   * The module survives a RELOAD, and only a reload.
+   * EL MÓDULO LO DICE LA DIRECCIÓN (14 sep 2026).
    *
-   * Refreshing while reading a two-hour transcript used to throw the lawyer back
-   * to the drafting workspace — the one screen they were not looking at — and a
-   * reload is exactly what somebody does when a page misbehaves, so the app
-   * punished the reflex it had provoked.
-   *
-   * But opening the application afresh should open it at the beginning. Those
-   * are different intentions and `sessionStorage` is exactly the line between
-   * them: it belongs to the tab, so it survives F5 and is empty in a new tab or
-   * after the browser is closed. `localStorage` cannot tell the two apart —
-   * it would have carried yesterday's module into tomorrow's first visit.
-   *
-   * The stored value is checked against the modules that exist, because a
-   * renamed one would otherwise render an empty shell with no way back.
+   * Recargar mientras se leía un transcrito de dos horas devolvía al abogado a
+   * Redacción, y recargar es justo el reflejo de quien ve fallar una pantalla;
+   * por eso el módulo se guardaba en `sessionStorage`. Hoy cada pantalla tiene
+   * su dirección (`modules/tenant/rutas.ts`) y la recarga la conserva: ya no
+   * hace falta una segunda memoria que pueda contradecirla. Una dirección que
+   * no es de un módulo (la aplicación recién entrada) empieza en Inicio.
+   * `useRutaDePantalla` mantiene la dirección al día al navegar.
    */
-  const [mainView, setMainViewState] = useState<MainView>(() => {
-    try {
-      // Left behind by the first version of this, which used localStorage and
-      // therefore followed the user into every new tab.
-      localStorage.removeItem('iureon_main_view');
-
-      const guardado = sessionStorage.getItem('iureon_main_view');
-      return guardado && MAIN_VIEWS.includes(guardado as MainView)
-        ? (guardado as MainView)
-        : 'inicio';
-    } catch {
-      return 'inicio';
-    }
-  });
+  const [mainView, setMainViewState] = useState<MainView>(() => vistaInicialDeLaDireccion() ?? 'inicio');
 
   /*
    * The manual article Soporte handed over, so the reader lands on the answer
@@ -315,11 +266,24 @@ export function App() {
 
   const setMainView = (view: MainView): void => {
     setMainViewState(view);
-    try {
-      sessionStorage.setItem('iureon_main_view', view);
-    } catch {
-      /* The module still changes for this session; only the memory is lost. */
-    }
+  };
+
+  /*
+   * IR A UNA DIRECCIÓN DE LA APLICACIÓN SIN RECARGAR: lo que hacen Atrás y
+   * Adelante, un aviso push y el destino recordado al entrar. El detalle se
+   * deja donde el módulo lo busca al montarse y, si el módulo ya estaba a la
+   * vista, se vuelve a montar para que lo lea — los módulos deciden qué abrir
+   * al montarse, no escuchan cambios. Herramientas conserva su propia época
+   * (`herramientasEpoca`), la que ya usaba el aviso de la agenda. El artículo
+   * que Soporte hubiera entregado se suelta: manda la dirección.
+   */
+  const [epocaDeRuta, setEpocaDeRuta] = useState(0);
+  const aplicarRuta = (ruta: RutaDeApp): void => {
+    dejarDetalleDe(ruta);
+    if (ruta.vista === 'manual') setManualArticulo(undefined);
+    if (ruta.vista === 'tools') setHerramientasEpoca((n) => n + 1);
+    else if (ruta.vista === mainView) setEpocaDeRuta((n) => n + 1);
+    setMainView(ruta.vista);
   };
 
   /*
@@ -774,44 +738,31 @@ export function App() {
 
   /*
    * ADÓNDE LLEVA UN AVISO. Dos caminos y un solo destino:
-   *  · `?ir=<vista>` en la URL, cuando el aviso abre una pestaña nueva;
+   *  · la dirección con que el aviso abre una pestaña nueva (`/borradores`,
+   *    `/herramientas/agenda`), o la forma vieja `?ir=<clave>` de los avisos y
+   *    correos anteriores al 14 sep 2026;
    *  · el mensaje {type:'abrir', url} del service worker, cuando ya había una
    *    pestaña y se prefirió enfocarla a abrir otra.
-   * Se usa `ir` y no `vista`: `?vista=1` ya es la vista previa sin sesión.
-   * `administrar` abre la consola de operación y solo para el superusuario;
-   * para cualquier otro no hace nada, porque no tiene esa pantalla.
+   * Las claves viejas y las direcciones pasan por `destinoSeguro`, que solo deja
+   * salir pantallas de esta aplicación. `administrar` no es pantalla: abre la
+   * consola de operación, y solo para el superusuario.
+   *
+   * EL AVISO DE UN TÉRMINO ABRE LA AGENDA, no solo Herramientas: la agenda es un
+   * diálogo que decide si abrirse al montarse, y `aplicarRuta` hace el remonte.
+   * Un aviso que se toca y no lleva a ninguna parte es peor que ningún aviso.
    */
   useEffect(() => {
     if (!session) return;
 
     const irA = (destino: string | null) => {
-      if (
-        destino === 'soporte' ||
-        destino === 'borradores' ||
-        destino === 'manual' ||
-        destino === 'privacidad'
-      ) {
-        setMainView(destino);
-      } else if (destino === SECCION_ESTILO) {
-        /* Ajustes → Estilo de la firma: la sección se deja recordada y Ajustes abre en ella. */
-        recordar(PANTALLAS.ajustes, SECCION_ESTILO);
-        setMainView('ajustes');
-      } else if (destino === 'agenda') {
-        /*
-         * EL AVISO DE UN TERMINO ABRE LA AGENDA, no solo Herramientas.
-         *
-         * La agenda es un dialogo dentro de Herramientas y decide si abrirse al
-         * montarse, leyendo la pantalla recordada del modulo. Por eso hace falta
-         * el remonte: quien ya estaba en Herramientas cuando toco el aviso
-         * habria visto la reticula de tarjetas y nada mas — un aviso que se toca
-         * y no lleva a ninguna parte es peor que ningun aviso.
-         */
-        recordar(PANTALLAS.herramienta, 'agenda');
-        setHerramientasEpoca((n) => n + 1);
-        setMainView('tools');
-      } else if (destino === 'administrar' && esSuperusuario) {
-        setIsUserManagementModalOpen(true);
+      if (destino === 'administrar') {
+        if (esSuperusuario) setIsUserManagementModalOpen(true);
+        return;
       }
+      const ruta = destinoSeguro(destino);
+      if (!ruta) return;
+      const leida = leerRuta(ruta);
+      if (leida.tipo === 'app') aplicarRuta(leida);
     };
 
     const desdeUrl = () => {
@@ -831,16 +782,53 @@ export function App() {
       const datos = evento.data as { type?: string; url?: string } | null;
       if (!datos || datos.type !== 'abrir' || !datos.url) return;
       try {
-        irA(new URL(datos.url, window.location.origin).searchParams.get('ir'));
+        const url = new URL(datos.url, window.location.origin);
+        irA(url.searchParams.get('ir') ?? url.pathname);
       } catch {
         /* Una URL malformada no navega a ninguna parte. */
       }
     };
     navigator.serviceWorker.addEventListener('message', alMensaje);
     return () => navigator.serviceWorker.removeEventListener('message', alMensaje);
-    // setMainView es estable en la práctica (setState + sessionStorage); no se lista para no re-suscribir en cada render.
+    // aplicarRuta usa setters estables; no se lista para no re-suscribir en cada render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, esSuperusuario]);
+
+  /*
+   * LA DIRECCIÓN SIGUE A LA PANTALLA, Y ATRÁS/ADELANTE A LA DIRECCIÓN. Va
+   * DESPUÉS del efecto de `?ir=`: los efectos corren en orden, y ese tiene que
+   * leer la clave antes de que esta capa reescriba la dirección.
+   */
+  useRutaDePantalla({
+    activa: isAuthenticated && !enlaceDeRecuperacion,
+    mainView,
+    alMoverseEnElHistorial: aplicarRuta
+  });
+
+  /*
+   * SIN SESIÓN, LA DIRECCIÓN ES LA DE LA PÁGINA PÚBLICA QUE SE VE, y la pestaña
+   * se titula como ella: «Entrar · Iureon» y no el nombre genérico, que es lo
+   * que muestran el buscador, el historial y la lista de pestañas. Una pantalla
+   * que perdió la sesión (vencida, o cerrada desde otra pestaña) pasa a
+   * `/entrar` recordando a dónde iba.
+   */
+  useEffect(() => {
+    if (enlaceDeRecuperacion) {
+      document.title = TITULO_DE_PAGINA.restablecer;
+      return;
+    }
+    if (isAuthenticated) {
+      document.title = `${navModule(mainView).label} · Iureon`;
+      return;
+    }
+    const ruta = leerRuta(window.location.pathname);
+    if (ruta.tipo === 'app') {
+      window.history.replaceState(null, '', `/entrar?ir=${rutaDeVista(ruta.vista, ruta.detalle)}`);
+    } else if (ruta.tipo !== 'publica') {
+      window.history.replaceState(null, '', `/entrar${consultaQueSeConserva(window.location.search)}`);
+    }
+    document.title = TITULO_DE_PAGINA[ruta.tipo === 'publica' ? ruta.pagina : 'entrar'];
+  }, [isAuthenticated, mainView, enlaceDeRecuperacion]);
 
   /*
    * «ABRIR AJUSTES → ESTILO DE LA FIRMA» DESDE EL DIÁLOGO DE ENSEÑAR. El pie de
@@ -1072,18 +1060,29 @@ export function App() {
   }, [savedDrafts]);
 
   /*
-   * ENTRAR ABRE INICIO. La pestaña recuerda su módulo para sobrevivir a una
-   * recarga, no para que quien entra con otra cuenta —o vuelve tras cerrar
-   * sesión— aterrice en la pantalla que dejó otro. Iniciar sesión es empezar,
-   * y empezar es Inicio; los enlaces con `?ir=` corren después y siguen
-   * mandando a donde apuntan.
+   * ENTRAR ABRE INICIO, O LA PANTALLA A LA QUE SE IBA. La pestaña recuerda
+   * pantallas interiores para sobrevivir a una recarga, no para que quien entra
+   * con otra cuenta aterrice en lo que dejó otro: se olvida todo. Si se llegó a
+   * Entrar desde una dirección (`/entrar?ir=/expedientes/…`, un enlace del
+   * correo, la portada), se va a ella — solo si `destinoSeguro` la reconoce como
+   * pantalla de esta aplicación. La clave se retira de la dirección para que el
+   * efecto de avisos no la aplique dos veces; `ir=administrar` se deja, porque
+   * ese sí lo atiende él.
    */
   const handleLoginSuccess = (fresh: Session) => {
     olvidarTodo();
     setTallerActivo(null);
     setTallerBorrador(null);
     setManualArticulo(undefined);
-    setMainView('inicio');
+    const pedido = destinoSeguro(new URLSearchParams(window.location.search).get('ir'));
+    const destino = leerRuta(pedido ?? '/inicio');
+    if (destino.tipo === 'app') {
+      dejarDetalleDe(destino);
+      setMainView(destino.vista);
+    } else {
+      setMainView('inicio');
+    }
+    if (pedido) window.history.replaceState(null, '', `${window.location.pathname}${consultaQueSeConserva(window.location.search)}`);
     setSession(saveSession(fresh));
     setActiveFirm(firmFromSession(fresh));
   };
@@ -1099,33 +1098,33 @@ export function App() {
   }
 
   if (!isAuthenticated) {
-    if (debeIrALaPortada) return null;
     /*
-     * `?prueba=1` viene de la portada y del enlace bajo el formulario de
-     * entrada: abre la prueba gratuita de Esencial. `?registro=PREMIUM` viene
-     * de «Contratar» en la portada: crea la cuenta para pagar ese plan. El
-     * servidor devuelve la misma sesión que el login, así que la cuenta
-     * recién creada entra por el mismo camino y sin segunda pantalla. Un
-     * plan desconocido en la URL cae a Esencial, nunca a un error en blanco.
+     * LA PÁGINA LA DICE LA DIRECCIÓN. `/prueba` viene de la portada y del enlace
+     * bajo el formulario de entrada: abre la prueba gratuita de Esencial.
+     * `/registro/premium` viene de «Contratar» en la portada: crea la cuenta
+     * para pagar ese plan. El servidor devuelve la misma sesión que el login,
+     * así que la cuenta recién creada entra por el mismo camino y sin segunda
+     * pantalla. Un plan desconocido cae a Esencial, nunca a un error en blanco.
+     * Todo lo demás —`/entrar` y una pantalla que pide sesión— es Entrar.
      */
-    const parametros = new URLSearchParams(window.location.search);
+    const ruta = leerRuta(window.location.pathname);
     // «¿Olvidó su contraseña?» en Entrar, y «Pedir otro enlace» del enlace vencido.
-    if (parametros.has('recuperar')) {
+    if (ruta.tipo === 'publica' && ruta.pagina === 'recuperar') {
       return <RecuperarContrasenaView />;
     }
-    if (parametros.has('prueba')) {
+    if (ruta.tipo === 'publica' && ruta.pagina === 'prueba') {
       return <RegistroView modo="PRUEBA" plan="ESENCIAL" onLoginSuccess={handleLoginSuccess} />;
     }
-    if (parametros.has('registro')) {
-      const pedido = (parametros.get('registro') ?? '').toUpperCase();
-      const plan = pedido === 'PREMIUM' || pedido === 'FIRMA' ? pedido : 'ESENCIAL';
-      return <RegistroView modo="COMPRA" plan={plan} onLoginSuccess={handleLoginSuccess} />;
+    if (ruta.tipo === 'publica' && ruta.pagina === 'registro') {
+      return <RegistroView modo="COMPRA" plan={ruta.plan ?? 'ESENCIAL'} onLoginSuccess={handleLoginSuccess} />;
     }
     return <LoginPortalView onLoginSuccess={handleLoginSuccess} />;
   }
 
   const handleLogout = () => {
     clearSession();
+    /* Salir es volver a Entrar, sin destino: quien sale no pidió regresar a la pantalla que dejó. */
+    window.history.replaceState(null, '', '/entrar');
     setSession(null);
     setActiveFirm(EMPTY_FIRM_PLACEHOLDER);
   };
@@ -1774,6 +1773,7 @@ export function App() {
                     setHerramientasEpoca((n) => n + 1);
                     setMainView('tools');
                   }}
+                  key={epocaDeRuta}
                 />
               </ModuloBloqueado>
             </div>
@@ -1902,6 +1902,7 @@ export function App() {
           {mainView === 'manual' && (
             <div className="flex min-h-0 min-w-0 flex-1 lg:hidden">
               <ManualMobileView
+                key={epocaDeRuta}
                 articuloInicial={manualArticulo}
                 onSoporte={() => setMainView('soporte')}
                 onNovedades={() => setMainView('novedades')}
@@ -1913,6 +1914,7 @@ export function App() {
           {mainView === 'manual' && (
             <div className="hidden min-h-0 flex-1 lg:flex">
             <ManualView
+              key={epocaDeRuta}
               articuloInicial={manualArticulo}
               onSoporte={() => setMainView('soporte')}
               onNovedades={() => setMainView('novedades')}
@@ -1972,7 +1974,7 @@ export function App() {
             />
             </div>
           )}
-          {mainView === 'ajustes' && <SettingsView onLogout={handleLogout} onIr={setMainView} />}
+          {mainView === 'ajustes' && <SettingsView key={epocaDeRuta} onLogout={handleLogout} onIr={setMainView} />}
           {mainView === 'taller' && tallerBorrador && (
             <TallerDeBorrador
               key={tallerBorrador.draftId ?? 'borrador-sesion'}
@@ -2143,8 +2145,8 @@ export function App() {
 
       {/*
         Pull-to-refresh on the phone and in the installed app, where the browser
-        has no reload button. Safe to refresh because the module and the screen
-        inside it come back from sessionStorage.
+        has no reload button. Safe to refresh because the module comes back from
+        the address and the screen inside it from the address or sessionStorage.
       */}
       <TirarParaActualizar />
 

@@ -14,6 +14,14 @@ import './modules/pwa/instalable';
  */
 aplicarLoUltimoConocido()
 import App from './App.tsx'
+import { ponerEnOrdenLaDireccion } from './modules/tenant/entrada'
+
+/*
+ * La dirección se pone en orden ANTES de montar: los enlaces viejos se traducen
+ * y una pantalla sin sesión pasa a `/entrar` recordando a dónde iba. Ver
+ * `modules/tenant/entrada.ts`.
+ */
+const seQuedaEnLaAplicacion = ponerEnOrdenLaDireccion()
 
 /*
  * El service worker existe para dos cosas: que el navegador ofrezca «Instalar»
@@ -30,8 +38,10 @@ if ('serviceWorker' in navigator && (import.meta.env.PROD || location.hostname =
   });
 }
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+if (seQuedaEnLaAplicacion) {
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  )
+}

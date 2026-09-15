@@ -131,6 +131,17 @@ export const ToolsView: React.FC = () => {
   );
   const [busqueda, setBusqueda] = useState('');
 
+  /*
+   * La herramienta que se ve queda anotada al montar: una inventada en la
+   * dirección (`/herramientas/xyz`) se olvida, y la agenda que abre un pendiente
+   * se anota, así la dirección dice lo que está a la vista.
+   */
+  React.useEffect(() => {
+    recordar(PANTALLAS.herramienta, abierta);
+    // Una vez al montar; al navegar anotan `abrir` y `cerrar`.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const abrir = (id: IdDeHerramienta) => {
     setAbierta(id);
     recordar(PANTALLAS.herramienta, id);

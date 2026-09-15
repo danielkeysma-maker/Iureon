@@ -17,8 +17,8 @@ interface RegistroViewProps {
 /**
  * La puerta pública: una sola pantalla para dos entradas.
  *
- * `?prueba=1` abre la prueba gratuita de Esencial (`DIAS_DE_PRUEBA_GRATUITA`
- * días, un usuario, sin tarjeta). `?registro=PREMIUM` crea la cuenta para
+ * `/prueba` abre la prueba gratuita de Esencial (`DIAS_DE_PRUEBA_GRATUITA`
+ * días, un usuario, sin tarjeta). `/registro/premium` crea la cuenta para
  * CONTRATAR ese plan: la firma nace con el plan vencido, entra en solo lectura
  * y la pantalla del plan se abre sola con el plan elegido; el primer pago en
  * Wompi la activa.
@@ -358,7 +358,7 @@ export const RegistroView: React.FC<RegistroViewProps> = ({ modo, plan, onLoginS
               <input type="checkbox" checked={acepta} onChange={(e) => setAcepta(e.target.checked)} required />
               <span>
                 Acepto el{' '}
-                <a href="/?entrar=1&ir=privacidad" target="_blank" rel="noreferrer">
+                <a href="/privacidad" target="_blank" rel="noreferrer">
                   tratamiento de mis datos
                 </a>{' '}
                 conforme a la Ley 1581 de 2012. La dirección desde la que creo la cuenta se conserva para prevenir
@@ -380,25 +380,25 @@ export const RegistroView: React.FC<RegistroViewProps> = ({ modo, plan, onLoginS
 
           <div className="cn-texto" style={{ marginTop: 20 }}>
             <p>
-              ¿Ya tiene cuenta? <a href="/?entrar=1">Entrar</a>
+              ¿Ya tiene cuenta? <a href="/entrar">Entrar</a>
             </p>
             {esCompra ? (
               <p>
                 ¿Prefiere probar primero?{' '}
-                <a href="/?prueba=1">
+                <a href="/prueba">
                   {DIAS_DE_PRUEBA_GRATUITA} días de Esencial gratis
                 </a>
               </p>
             ) : (
               <p>
                 ¿Necesita Premium o Firma para varios abogados?{' '}
-                <a href="/landing/index.html#planes">Contrátelo desde la página principal</a>
+                <a href="/#planes">Contrátelo desde la página principal</a>
               </p>
             )}
           </div>
 
           <div className="cn-pie-flujo">
-            <a href="/landing/index.html" className="cn-volver">
+            <a href="/" className="cn-volver">
               ← Volver a la página principal
             </a>
           </div>

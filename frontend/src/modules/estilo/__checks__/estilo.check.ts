@@ -263,10 +263,15 @@ check(
   DIALOGO.includes('irAlEstiloDeLaFirma();') &&
     APP.includes('alPedirElEstiloDeLaFirma(') &&
     /recordar\(PANTALLAS\.ajustes, SECCION_ESTILO\);\s*setMainView\('ajustes'\);/.test(APP) &&
-    AJUSTES.includes('recordado(PANTALLAS.ajustes) === SECCION_ESTILO') &&
-    /useState<Seccion>\(pedida \? 'estilo' : 'cuenta'\)/.test(AJUSTES)
+    AJUSTES.includes('const pedida = recordado(PANTALLAS.ajustes);') &&
+    /useState<Seccion>\(inicial \?\? 'cuenta'\)/.test(AJUSTES) &&
+    /const SECCIONES: readonly Seccion\[\] = \[[^\]]*'estilo'/.test(AJUSTES)
 );
-check('y `?ir=estilo` hace lo mismo', /destino === SECCION_ESTILO\) \{[\s\S]{0,200}setMainView\('ajustes'\)/.test(APP));
+/* Desde el 14 sep 2026 `?ir=estilo` es `/ajustes/estilo`: la tabla de rutas lo traduce y App lo aplica. */
+check(
+  'y `?ir=estilo` hace lo mismo',
+  leer('modules/tenant/rutas.ts').includes("estilo: '/ajustes/estilo'") && APP.includes('const ruta = destinoSeguro(destino);')
+);
 
 /* Leer el estilo es de cualquier usuario de la firma; enseñar y quitar, del socio. */
 const bloquePerfil = /async perfil\([\s\S]*?(?=async retirarLeccion)/.exec(CASOS)?.[0] ?? '';

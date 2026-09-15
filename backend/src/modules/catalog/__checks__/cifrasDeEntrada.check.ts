@@ -217,7 +217,7 @@ const ofreceRecuperar = /olvid[óo] su contrase[ñn]a|\?[^'"]*recuperar/i.test(E
 check(
   'Entrar: «¿Olvidó su contraseña?» solo lleva a una recuperación que el servidor atiende',
   !ofreceRecuperar ||
-    (ENTRAR.includes('href="/?recuperar=1"') &&
+    (ENTRAR.includes('href="/recuperar"') &&
       RUTAS_AUTH.includes("publicRouter.post('/auth/recuperar'") &&
       RUTAS_AUTH.includes("publicRouter.post('/auth/restablecer'")),
   ofreceRecuperar ? 'Entrar ofrece el enlace' : 'Entrar no lo ofrece'

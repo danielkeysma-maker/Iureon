@@ -148,7 +148,8 @@ export const correrAvisosDelDia = async (ahora: Date = new Date()): Promise<Resu
     const cuerpo = {
       title,
       body,
-      url: '/?ir=agenda',
+      /* La agenda vive dentro de Herramientas: su dirección es la de esa herramienta. */
+      url: '/herramientas/agenda',
       /* Dos avisos de la misma entrada se reemplazan en la bandeja en vez de apilarse. */
       tag: `agenda-${entrada.id}`
     };

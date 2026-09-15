@@ -17,6 +17,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { leerRuta } from '../../modules/tenant/rutas';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const FRONTEND = join(AQUI, '..', '..', '..');
@@ -167,10 +168,10 @@ check(
 );
 check(
   'el bloque de Esencial ofrece la prueba con sus días',
-  Boolean(bloqueDe('ESENCIAL')?.contenido.includes('/?prueba=1')) &&
+  Boolean(bloqueDe('ESENCIAL')?.contenido.includes('href="/prueba"')) &&
     new RegExp(`\\b${diasDePrueba}\\s*d[ií]as`).test(bloqueDe('ESENCIAL')?.contenido ?? '')
 );
-const enlacesDePrueba = [...CODIGO.matchAll(/<a\b[^>]*href="[^"]*[?&]prueba=[^"]*"[^>]*>([\s\S]*?)<\/a>/g)];
+const enlacesDePrueba = [...CODIGO.matchAll(/<a\b[^>]*href="\/prueba"[^>]*>([\s\S]*?)<\/a>/g)];
 const pruebaSuelta = enlacesDePrueba.filter((m) => !dentroDe('ESENCIAL', m.index ?? 0) && !/Esencial/.test(m[1]));
 check(
   'todo enlace a la prueba está junto a Esencial o lo nombra',
@@ -228,21 +229,22 @@ check('«siete días antes» no aparece en ninguna parte', !/siete\s+d[ií]as\s+
 
 /* ─── 3. LOS ENLACES QUE LA APLICACIÓN SABE ATENDER ─────────────────────── */
 /*
- * App.tsx: `debeIrALaPortada` solo reconoce entrar, prueba, registro, ir y
- * vista; el manejador de `?ir=` (`irA`) solo atiende soporte, borradores,
- * manual, privacidad, agenda y administrar. Un valor fuera de estas listas
- * lleva a una pantalla que no hace nada.
+ * Desde el 14 de septiembre de 2026 la portada enlaza DIRECCIONES LIMPIAS
+ * (`/entrar`, `/registro/premium`, `/manual`). Cada enlace interno tiene que ser
+ * una dirección que `leerRuta` reconoce —página pública o pantalla de la
+ * aplicación—, sin consulta: una desconocida lleva a Inicio o de vuelta aquí,
+ * no a donde dice el botón. `/manual` y `/privacidad` son pantallas de la
+ * aplicación: sin sesión pasan por Entrar y aterrizan en ellas. Y cada
+ * `/registro/<plan>` va dentro del bloque de ese plan.
  */
-const CLAVES_PERMITIDAS = new Set(['entrar', 'prueba', 'registro', 'ir', 'vista']);
-const IR_PERMITIDOS = new Set(['soporte', 'borradores', 'manual', 'privacidad', 'agenda', 'administrar']);
 const REQUERIDOS = [
-  '/?entrar=1',
-  '/?prueba=1',
-  '/?registro=ESENCIAL',
-  '/?registro=PREMIUM',
-  '/?registro=FIRMA',
-  '/?entrar=1&ir=manual',
-  '/?entrar=1&ir=privacidad',
+  '/entrar',
+  '/prueba',
+  '/registro/esencial',
+  '/registro/premium',
+  '/registro/firma',
+  '/manual',
+  '/privacidad',
   'https://wa.me/573011750316'
 ];
 const hrefs = [...CODIGO.matchAll(/\bhref="([^"]*)"/g)].map((m) => ({ href: m[1].replace(/&amp;/g, '&'), i: m.index ?? 0 }));
@@ -250,24 +252,27 @@ const faltan = REQUERIDOS.filter((r) => !hrefs.some((h) => h.href === r));
 check('están todos los enlaces que la portada debe ofrecer', faltan.length === 0, faltan.join(', '));
 
 const malos: string[] = [];
-for (const { href, i } of hrefs.filter((h) => h.href.startsWith('/?'))) {
-  const params = new URLSearchParams(href.slice(2));
-  for (const [clave, valor] of params) {
-    if (!CLAVES_PERMITIDAS.has(clave)) malos.push(`${href} (clave ${clave})`);
-    if (clave === 'ir' && !IR_PERMITIDOS.has(valor)) malos.push(`${href} (ir=${valor})`);
-    if (clave === 'registro') {
-      if (!PLANES.includes(valor as PlanId)) malos.push(`${href} (plan ${valor})`);
-      else if (!dentroDe(valor, i)) malos.push(`${href} fuera del bloque de ${valor}`);
-    }
+/* Los archivos (`/brand/favicon.svg`, `/manifest.webmanifest`) llevan extensión y no son pantallas. */
+for (const { href, i } of hrefs.filter((h) => h.href.startsWith('/') && !h.href.split(/[?#]/)[0].includes('.'))) {
+  const url = new URL(href, 'https://www.iureoncolombia.com');
+  if (url.search) malos.push(`${href} (lleva consulta)`);
+  if (url.pathname === '/') continue;
+  const ruta = leerRuta(url.pathname);
+  if (ruta.tipo !== 'publica' && ruta.tipo !== 'app') malos.push(`${href} (dirección desconocida)`);
+  if (ruta.tipo === 'publica' && ruta.pagina === 'registro') {
+    const plan = ruta.plan ?? 'ESENCIAL';
+    if (!PLANES.includes(plan as PlanId) || url.pathname !== `/registro/${plan.toLowerCase()}`) malos.push(`${href} (plan)`);
+    else if (!dentroDe(plan, i)) malos.push(`${href} fuera del bloque de ${plan}`);
   }
 }
-check('todo /?… usa claves y destinos que App.tsx atiende', malos.length === 0, malos.join(' · '));
+check('todo enlace interno es una dirección que la aplicación atiende', malos.length === 0, malos.join(' · '));
 
 const internos = new Set([...CODIGO.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
 const anclasRotas = hrefs.filter((h) => h.href.startsWith('#') && !internos.has(h.href.slice(1))).map((h) => h.href);
 check('toda ancla #… apunta a un id que existe', anclasRotas.length === 0, anclasRotas.join(', '));
 
-const DOMINIO = 'https://www.iureoncolombia.com/landing/';
+/* La portada vive en la raíz desde el 14 sep 2026; su dirección vieja redirige a ella (vercel.json). */
+const DOMINIO = 'https://www.iureoncolombia.com/';
 check(
   'canonical y og:url apuntan al dominio real',
   CODIGO.includes(`<link rel="canonical" href="${DOMINIO}">`) && CODIGO.includes(`<meta property="og:url" content="${DOMINIO}">`)

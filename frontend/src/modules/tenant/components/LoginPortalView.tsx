@@ -27,7 +27,7 @@ interface LoginPortalViewProps {
  * pegado al borde inferior. Los estilos viven en `design/cara-nueva.css`, bajo
  * `.cara-nueva`, para que el resto de la aplicación no cambie todavía.
  *
- * «¿Olvidó su contraseña?» lleva a `/?recuperar=1` (`RecuperarContrasenaView`):
+ * «¿Olvidó su contraseña?» lleva a `/recuperar` (`RecuperarContrasenaView`):
  * la recuperación por correo de SPEC §2 ya existe. La vía de antes —un socio
  * pide a operación que la restablezca— sigue y la nombra esa pantalla, para
  * cuando el correo no llega.
@@ -145,7 +145,7 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
                 <label htmlFor="clave" className="cn-etiqueta">
                   Contraseña
                 </label>
-                <a href="/?recuperar=1" className="cn-nota-campo" style={{ fontWeight: 600, color: 'var(--brand)', textDecoration: 'none' }}>
+                <a href="/recuperar" className="cn-nota-campo" style={{ fontWeight: 600, color: 'var(--brand)', textDecoration: 'none' }}>
                   ¿Olvidó su contraseña?
                 </a>
               </div>
@@ -199,7 +199,7 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
             <p>
               {DIAS_DE_PRUEBA_GRATUITA} días del plan Esencial gratis, para un usuario. Sin tarjeta.
             </p>
-            <a href="/?prueba=1" className="cn-boton-sec h-soft">
+            <a href="/prueba" className="cn-boton-sec h-soft">
               Registrar la firma y probar Esencial
             </a>
           </div>
@@ -210,7 +210,7 @@ export const LoginPortalView: React.FC<LoginPortalViewProps> = ({ onLoginSuccess
           </div>
 
           <div className="cn-pie-flujo">
-            <a href="/landing/index.html" className="cn-volver">
+            <a href="/" className="cn-volver">
               ← Volver a la página principal
             </a>
           </div>

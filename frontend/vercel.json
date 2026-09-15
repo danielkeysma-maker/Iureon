@@ -1,8 +1,30 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "redirects": [
+    { "source": "/landing", "destination": "/", "permanent": true },
+    { "source": "/landing/", "destination": "/", "permanent": true },
+    { "source": "/landing/index", "destination": "/", "permanent": true },
+    { "source": "/landing/index.html", "destination": "/", "permanent": true }
+  ],
   "rewrites": [
+    { "source": "/", "has": [{ "type": "query", "key": "entrar" }], "destination": "/app" },
+    { "source": "/", "has": [{ "type": "query", "key": "ir" }], "destination": "/app" },
+    { "source": "/", "has": [{ "type": "query", "key": "prueba" }], "destination": "/app" },
+    { "source": "/", "has": [{ "type": "query", "key": "registro" }], "destination": "/app" },
+    { "source": "/", "has": [{ "type": "query", "key": "recuperar" }], "destination": "/app" },
+    { "source": "/", "has": [{ "type": "query", "key": "restablecer" }], "destination": "/app" },
+    { "source": "/", "has": [{ "type": "query", "key": "plan" }], "destination": "/app" },
+    { "source": "/", "has": [{ "type": "query", "key": "vista" }], "destination": "/app" },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+      "source": "/",
+      "has": [
+        { "type": "query", "key": "id" },
+        { "type": "query", "key": "env" }
+      ],
+      "destination": "/app"
+    },
+    { "source": "/", "destination": "/portada" },
+    { "source": "/(.*)", "destination": "/app" }
   ]
 }

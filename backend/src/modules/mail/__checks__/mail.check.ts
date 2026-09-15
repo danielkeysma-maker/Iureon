@@ -271,8 +271,9 @@ check('todos llevan asunto', TODOS.every((p) => p.asunto.trim().length > 10));
  * `iureon.co/manual`, `iureon.co/datos`, `iureon.co/preferencias`,
  * `app.iureon.co/plan`, `app.iureon.co/saldo`, `app.iureon.co/facturas`,
  * `app.iureon.co/eliminacion`, `app.iureon.co/exportar` y un WhatsApp con
- * número de marcador. NINGUNA de esas rutas existe: la aplicación es una sola
- * página que navega con `?ir=<vista>` sobre un dominio distinto. Un enlace roto
+ * número de marcador. NINGUNA de esas rutas existe: las pantallas de la
+ * aplicación son las de `frontend/src/modules/tenant/rutas.ts`, sobre un
+ * dominio distinto, y Plan o Saldo son diálogos sin dirección. Un enlace roto
  * en un correo de facturación es peor que no tenerlo, así que la lista blanca
  * es exacta y se compara contra ella, no contra un patrón.
  */

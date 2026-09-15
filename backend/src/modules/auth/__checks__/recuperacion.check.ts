@@ -83,7 +83,8 @@ check('localhost sí en desarrollo', R.baseDelEnlace('http://localhost:5173', { 
 
 const enlace = R.enlaceDeRestablecimiento(SITIO, 'abc123');
 const urlDelEnlace = new URL(enlace);
-check('el enlace lleva ?restablecer=1', urlDelEnlace.searchParams.get('restablecer') === '1');
+check('el enlace abre la pantalla /restablecer', urlDelEnlace.pathname === '/restablecer' && urlDelEnlace.search === '');
+check('muerde: la forma vieja (marca en la consulta) no pasaría', new URL(`${SITIO}/?restablecer=1#token_hash=abc123`).pathname !== '/restablecer');
 check('el token NO va en la consulta (viajaría al servidor y a los registros)', !urlDelEnlace.search.includes('abc123'));
 check('el token va en el fragmento', urlDelEnlace.hash === '#token_hash=abc123');
 

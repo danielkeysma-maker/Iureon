@@ -101,7 +101,8 @@ const avisarAlOperador = async (firmId: string, subject: string, body: string, c
   await enviarAlOperador({
     title: `${firma}: nuevo mensaje de soporte`,
     body: body || subject,
-    url: '/?ir=administrar',
+    /* La consola de operación es un diálogo, no una pantalla: se abre desde Inicio con `ir`. */
+    url: '/inicio?ir=administrar',
     tag: `soporte-${conversationId}`
   });
 };
@@ -112,7 +113,7 @@ const avisarALaFirma = async (firmId: string, body: string, conversationId: stri
     aviso: {
       title: 'Soporte de Iureon respondió',
       body,
-      url: '/?ir=soporte',
+      url: '/soporte',
       tag: `soporte-${conversationId}`
     }
   });

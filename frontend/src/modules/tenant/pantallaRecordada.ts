@@ -22,6 +22,26 @@
 
 const PREFIJO = 'iureon.pantalla.';
 
+/**
+ * EL AVISO DE QUE CAMBIÓ LA PANTALLA INTERIOR.
+ *
+ * Desde el 14 de septiembre de 2026 algunas pantallas interiores van en la
+ * dirección (`/expedientes/<id>`, `/manual/<articulo>`…). Cada módulo ya pasaba
+ * por aquí al abrir y cerrar lo suyo, así que este es el único punto donde
+ * enterarse sin tocar los módulos: `useRutaDePantalla` escucha el evento y
+ * vuelve a escribir la dirección. Se emite también cuando el valor no cambia;
+ * quien escucha compara y no hace nada si la dirección ya es la correcta.
+ */
+export const EVENTO_PANTALLA_RECORDADA = 'iureon:pantalla-recordada';
+
+const avisar = (): void => {
+  try {
+    if (typeof window !== 'undefined') window.dispatchEvent(new Event(EVENTO_PANTALLA_RECORDADA));
+  } catch {
+    /* Sin ventana (un check en node) no hay dirección que actualizar. */
+  }
+};
+
 /** Records the open item of a module; `null` forgets it. */
 export const recordar = (clave: string, valor: string | null): void => {
   try {
@@ -30,6 +50,7 @@ export const recordar = (clave: string, valor: string | null): void => {
   } catch {
     /* Private mode or storage disabled: the screen still works, only the memory is lost. */
   }
+  avisar();
 };
 
 /** The remembered item of a module, or `null` when nothing is remembered. */
@@ -58,6 +79,7 @@ export const olvidarTodo = (): void => {
   } catch {
     /* Nothing to forget where nothing could be stored. */
   }
+  avisar();
 };
 
 /** The keys each module uses, in one place so two modules never share one by accident. */
@@ -76,6 +98,12 @@ export const PANTALLAS = {
   manual: 'manual',
   /** Id of the Novedades entry whose detail is open. */
   novedad: 'novedad',
-  /** Section Ajustes must open on (e.g. `estilo`), set by whoever navigates there; Ajustes forgets it once read. */
-  ajustes: 'ajustes'
+  /**
+   * Section open in Ajustes (e.g. `estilo`). Whoever navigates there may set it
+   * first; Ajustes keeps it while it is open —it is `/ajustes/<seccion>`— and
+   * forgets it when it closes, so coming back another time opens as always.
+   */
+  ajustes: 'ajustes',
+  /** Id of the case open in Expedientes (`/expedientes/<id>`). */
+  expediente: 'expediente'
 } as const;

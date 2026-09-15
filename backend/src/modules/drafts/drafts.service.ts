@@ -199,7 +199,8 @@ export class DraftsService {
       aviso: {
         title: `${creado.user_email} creó un borrador`,
         body: creado.title,
-        url: '/?ir=borradores',
+        /* La dirección de la pantalla (14 sep 2026); la aplicación también atiende la forma vieja `?ir=`. */
+        url: '/borradores',
         tag: `borrador-${creado.id}`
       }
     });
@@ -307,7 +308,7 @@ export class DraftsService {
         aviso: {
           title: `${actorEmail} editó un borrador`,
           body: actualizado.title,
-          url: '/?ir=borradores',
+          url: '/borradores',
           tag: `borrador-${actualizado.id}`
         }
       });

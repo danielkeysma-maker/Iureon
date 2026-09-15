@@ -171,7 +171,7 @@ export const RestablecerContrasenaView: React.FC<RestablecerContrasenaViewProps>
                 {motivoDelVencido ||
                   `Los enlaces vencen a los ${MINUTOS_DE_VIGENCIA_DEL_ENLACE} minutos y solo se usan una vez. Pida otro, o pídale a un socio administrador de su firma que le ponga una contraseña nueva.`}
               </p>
-              <a href="/?recuperar=1" className="cn-boton-sec h-soft">
+              <a href="/recuperar" className="cn-boton-sec h-soft">
                 Pedir otro enlace
               </a>
             </div>
@@ -195,14 +195,14 @@ export const RestablecerContrasenaView: React.FC<RestablecerContrasenaViewProps>
                   </p>
                 </div>
               )}
-              <a href="/?entrar=1" className="cn-boton h-solid">
+              <a href="/entrar" className="cn-boton h-solid">
                 Entrar
               </a>
             </div>
           )}
 
           <div className="cn-pie-flujo">
-            <a href="/?entrar=1" className="cn-volver">
+            <a href="/entrar" className="cn-volver">
               ← Volver a entrar
             </a>
           </div>

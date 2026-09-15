@@ -34,6 +34,7 @@ import { IndexarEnExpediente } from './IndexarEnExpediente';
 import { ClienteDelExpediente } from './ClienteDelExpediente';
 import { BuscarEnExpediente } from './BuscarEnExpediente';
 import { CarpetasDelExpediente } from './CarpetasDelExpediente';
+import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
 
 /**
  * LOS EXPEDIENTES DE LA FIRMA.
@@ -195,15 +196,30 @@ export const ExpedientesView: React.FC<{
     try {
       const detalle = await expedientesApi.obtener(id);
       setAbierto(detalle);
+      recordar(PANTALLAS.expediente, detalle.id);
       setVista('documentos');
       setAqui(null);
       setCargado(null);
     } catch (err) {
+      recordar(PANTALLAS.expediente, null);
       setError((err as Error).message);
     } finally {
       setAbriendo(null);
     }
   };
+
+  /*
+   * EL CASO DE LA DIRECCIÓN (`/expedientes/<id>`, 14 sep 2026). Se abre por el
+   * mismo camino que la fila de la lista, así que un caso borrado o de otra
+   * firma responde con el mensaje del servidor y queda la lista —nunca una
+   * ficha vacía—, y la dirección vuelve a `/expedientes`.
+   */
+  React.useEffect(() => {
+    const id = recordado(PANTALLAS.expediente);
+    if (id) void abrir(id);
+    // Una vez al montar: `abrir` cambia en cada render y no debe reabrir el caso.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /*
    * Se relee del servidor en vez de remendar el objeto en memoria. Las cuentas
@@ -261,6 +277,7 @@ export const ExpedientesView: React.FC<{
         try {
           const mensaje = await expedientesApi.borrar(abierto.id);
           setAbierto(null);
+          recordar(PANTALLAS.expediente, null);
           await cargar();
           /*
            * El mensaje del servidor se muestra tal cual: dice que lo que estaba
@@ -350,6 +367,7 @@ export const ExpedientesView: React.FC<{
               type="button"
               onClick={() => {
                 setAbierto(null);
+                recordar(PANTALLAS.expediente, null);
                 setGuardadoDelCaso('');
               }}
               className="cn-exp-volver"

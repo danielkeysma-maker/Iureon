@@ -37,7 +37,26 @@ const igual = (a: EnlaceDeRecuperacion | null, b: EnlaceDeRecuperacion | null) =
 
 const casos: Array<{ nombre: string; href: string; enlace: EnlaceDeRecuperacion | null; limpia: string | null }> = [
   {
-    nombre: 'enlace de Iureon: token_hash en el fragmento',
+    nombre: 'enlace de Iureon: /restablecer con token_hash en el fragmento',
+    href: `${SITIO}/restablecer#token_hash=abc123`,
+    enlace: { tipo: 'TOKEN_HASH', tokenHash: 'abc123' },
+    limpia: '/restablecer'
+  },
+  {
+    nombre: 'redirección de Supabase a /restablecer con sesión de recuperación',
+    href: `${SITIO}/restablecer#access_token=FAKE&refresh_token=R1&type=recovery`,
+    enlace: { tipo: 'SESION', accessToken: 'FAKE' },
+    limpia: '/restablecer'
+  },
+  {
+    nombre: '/restablecer sin token: el enlace no sirve',
+    href: `${SITIO}/restablecer`,
+    enlace: { tipo: 'VENCIDO' },
+    limpia: '/restablecer'
+  },
+  /* La forma de los correos enviados antes del 14 sep 2026: se sigue leyendo. */
+  {
+    nombre: 'enlace viejo: token_hash con la marca en la consulta',
     href: `${SITIO}/?restablecer=1#token_hash=abc123`,
     enlace: { tipo: 'TOKEN_HASH', tokenHash: 'abc123' },
     limpia: '/'
@@ -152,7 +171,7 @@ for (const [nombre, texto] of [
   );
 }
 
-check('Entrar enlaza a la recuperación', entrar.includes('href="/?recuperar=1"') && entrar.includes('¿Olvidó su contraseña?'));
+check('Entrar enlaza a la recuperación', entrar.includes('href="/recuperar"') && entrar.includes('¿Olvidó su contraseña?'));
 check('Entrar ya no manda a pedir la contraseña a operación como única salida', !entrar.includes('nos pide que se la restablezcamos'));
 check(
   'la confirmación no confirma que el correo exista',
@@ -168,11 +187,16 @@ check(
   api.includes("'/api/auth/restablecer'") && !api.includes('restablecer?') && !api.includes('token_hash=')
 );
 check(
-  'App lee el enlace ANTES de decidir la portada (una redirección a la raíz perdería el token)',
+  'App lee el enlace ANTES de decidir qué página pública pintar',
   app.indexOf('capturarEnlaceDeRecuperacion()') > -1 &&
-    app.indexOf('capturarEnlaceDeRecuperacion()') < app.indexOf('const [debeIrALaPortada]')
+    app.indexOf('capturarEnlaceDeRecuperacion()') < app.indexOf('if (!isAuthenticated) {')
 );
-check('App abre la solicitud con ?recuperar=1', app.includes("parametros.has('recuperar')") && app.includes("params.has('recuperar')"));
+const main = leer('main.tsx');
+check(
+  'y la dirección vieja se traduce antes de montar (el fragmento con el token llega a /restablecer)',
+  main.indexOf('ponerEnOrdenLaDireccion()') > -1 && main.indexOf('ponerEnOrdenLaDireccion()') < main.indexOf('createRoot(')
+);
+check('App abre la solicitud en /recuperar', app.includes("ruta.pagina === 'recuperar'"));
 
 console.log('');
 if (fallos > 0) {

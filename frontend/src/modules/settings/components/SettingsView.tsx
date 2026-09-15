@@ -11,7 +11,7 @@ import { usePlan } from '../../subscriptions/PlanContext';
 import { lineaDelVencimiento, nombreDelPlanActual } from '../../subscriptions/planEnPantalla';
 import { EstiloDeLaFirmaSection } from '../../estilo/components/EstiloDeLaFirmaSection';
 import { TITULO_SECCION_AJUSTES } from '../../estilo/estiloEnPantalla';
-import { SECCION_ESTILO, alPedirElEstiloDeLaFirma } from '../../estilo/irAlEstilo';
+import { alPedirElEstiloDeLaFirma } from '../../estilo/irAlEstilo';
 import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
 
 /**
@@ -51,6 +51,11 @@ import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
  */
 
 type Seccion = 'cuenta' | 'apariencia' | 'avisos' | 'instalar' | 'atajos' | 'plan' | 'estilo';
+
+const SECCIONES: readonly Seccion[] = ['cuenta', 'apariencia', 'avisos', 'instalar', 'atajos', 'plan', 'estilo'];
+
+/* Una sección que llega por la dirección se comprueba: una inventada abre Ajustes como siempre. */
+const esSeccion = (valor: string | null): valor is Seccion => valor !== null && (SECCIONES as readonly string[]).includes(valor);
 
 interface Entrada {
   id: Seccion | 'documento' | 'membrete' | 'usuarios' | 'privacidad' | 'audit';
@@ -94,19 +99,34 @@ interface SettingsViewProps {
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ onLogout, onIr }) => {
-  /* En escritorio abre en «Su cuenta», como el artboard; en el teléfono manda `abiertaEnTelefono`. */
-  const pedida = recordado(PANTALLAS.ajustes) === SECCION_ESTILO;
-  const [seccion, setSeccion] = useState<Seccion>(pedida ? 'estilo' : 'cuenta');
-  const [abiertaEnTelefono, setAbiertaEnTelefono] = useState(pedida);
-  /* La sección pedida se usa una vez: volver a Ajustes otro día abre donde siempre. */
+  /*
+   * LA SECCIÓN VA EN LA DIRECCIÓN (`/ajustes/<seccion>`, 14 sep 2026). Quien
+   * llega con una —un enlace, Atrás, una recarga, o el diálogo de Enseñar que
+   * pide «Estilo de la firma»— la encuentra abierta. Sin sección, en escritorio
+   * abre en «Su cuenta», como el artboard; en el teléfono manda
+   * `abiertaEnTelefono`, y la lista es lo primero.
+   */
+  const pedida = recordado(PANTALLAS.ajustes);
+  const inicial = esSeccion(pedida) ? pedida : null;
+  const [seccion, setSeccion] = useState<Seccion>(inicial ?? 'cuenta');
+  const [abiertaEnTelefono, setAbiertaEnTelefono] = useState(inicial !== null);
+  React.useEffect(
+    () =>
+      alPedirElEstiloDeLaFirma(() => {
+        setSeccion('estilo');
+        setAbiertaEnTelefono(true);
+      }),
+    []
+  );
+  /*
+   * Se anota la sección ELEGIDA, no la de por defecto: entrar a Ajustes es
+   * `/ajustes`, y solo abrir una sección la escribe. Al salir de Ajustes se
+   * olvida, para que volver otro día abra donde siempre y no donde se dejó.
+   */
   React.useEffect(() => {
-    recordar(PANTALLAS.ajustes, null);
-    return alPedirElEstiloDeLaFirma(() => {
-      recordar(PANTALLAS.ajustes, null);
-      setSeccion('estilo');
-      setAbiertaEnTelefono(true);
-    });
-  }, []);
+    recordar(PANTALLAS.ajustes, abiertaEnTelefono ? seccion : null);
+  }, [seccion, abiertaEnTelefono]);
+  React.useEffect(() => () => recordar(PANTALLAS.ajustes, null), []);
   const { prefs, cambiar } = usePreferences();
   const { activeFirm } = useTenant();
   const { plan, abrirPlan, puedePagar } = usePlan();

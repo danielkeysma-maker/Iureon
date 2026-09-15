@@ -3,7 +3,7 @@
   "short_name": "Iureon",
   "description": "Redacción de escritos, transcripción de audiencias y catálogo de actuaciones para firmas de abogados.",
   "id": "/",
-  "start_url": "/",
+  "start_url": "/inicio",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
