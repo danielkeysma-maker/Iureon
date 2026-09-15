@@ -74,6 +74,28 @@ export interface ManualEntry {
 }
 
 /**
+ * One entry of Novedades: something that reached the application.
+ *
+ * `modulos` are navigation ids (`MainView`), not display names: the filter,
+ * «Le afecta» and «Ir a…» all derive from them, and a label can be renamed
+ * without an entry pointing at nothing. `comoUsarlo` is a manual article id,
+ * never a title — the manual is rewritten independently and ids are the only
+ * stable handle. `soloOperacion` marks what only the platform operator sees.
+ */
+export interface Novedad {
+  readonly id: string;
+  /** ISO date, YYYY-MM-DD: the day the change reached the application. */
+  readonly fecha: string;
+  readonly modulos: readonly import('../tenant/types').MainView[];
+  readonly titulo: string;
+  /** Two to four short sentences, for a lawyer: what they can do now, or what stopped going wrong. */
+  readonly queCambio: string;
+  readonly tipo: 'nuevo' | 'mejora' | 'correccion';
+  readonly comoUsarlo?: string;
+  readonly soloOperacion?: true;
+}
+
+/**
  * A way to reach support.
  *
  * `disponible` is not decoration: WhatsApp only exists once a number is

@@ -1,7 +1,13 @@
-import { BRANCH_LABELS } from '../../catalog/branchLabels';
 import { compararEnEspanol } from '../../workspace/services/fichaEnLaLista';
 import type { ExpedienteEnLista } from '../types';
-import { buscarCasos, indexarCaso } from './buscarCasos';
+import { CLAVE_SIN_RAMA, buscarCasos, etiquetaDeRama, indexarCaso, ramaLimpia } from './buscarCasos';
+
+/*
+ * La rama —su llave y su nombre— vive en `buscarCasos.ts` desde que también se
+ * busca y se filtra por ella: el filtro y el agrupado tienen que usar la misma
+ * llave, o «Laboral» filtraría un grupo distinto del que se pinta.
+ */
+export { SIN_RAMA, etiquetaDeRama } from './buscarCasos';
 
 /**
  * LA LISTA DE EXPEDIENTES POR CLIENTE Y, DENTRO DE CADA CLIENTE, POR RAMA.
@@ -19,10 +25,8 @@ import { buscarCasos, indexarCaso } from './buscarCasos';
  */
 
 export const SIN_CLIENTE = 'Sin cliente registrado';
-export const SIN_RAMA = 'Sin rama registrada';
 
 const CLAVE_SIN_CLIENTE = '__sin-cliente__';
-const CLAVE_SIN_RAMA = '__sin-rama__';
 
 export interface GrupoDeRama {
   clave: string;
@@ -41,26 +45,6 @@ export interface GrupoDeCliente {
   /** `null` si algún caso no se pudo contar: una suma parcial afirmaría un total que no se conoce. */
   documentos: number | null;
 }
-
-/* ─── LA RAMA ─────────────────────────────────────────────────────────────── */
-
-const ramaLimpia = (rama: string | null | undefined): string | null => {
-  const r = rama?.trim();
-  return r ? r : null;
-};
-
-/**
- * El nombre de la rama tal como la reconoce el catálogo, o el texto guardado.
- *
- * `Object.hasOwn` y no `BRANCH_LABELS[r]` a secas: una rama escrita a mano que
- * se llame como una propiedad de todo objeto —«constructor»— devolvería una
- * función en vez de caer al texto guardado.
- */
-export const etiquetaDeRama = (rama: string | null | undefined): string => {
-  const r = ramaLimpia(rama);
-  if (r === null) return SIN_RAMA;
-  return Object.hasOwn(BRANCH_LABELS, r) ? BRANCH_LABELS[r] : r;
-};
 
 /* ─── LA URGENCIA ─────────────────────────────────────────────────────────── */
 

@@ -10,6 +10,8 @@ import { usePlan } from '../../subscriptions/PlanContext';
 import { useTenant } from '../../tenant/TenantContext';
 import { ETIQUETA_DE_PERIODO, NOMBRE_DE_PLAN, type Modulo } from '../../subscriptions/types';
 import { NOVEDADES } from '../../help/content/novedades';
+import { esNueva, fechaMasReciente, paraInicio, visiblesParaRol } from '../../help/novedades.logica';
+import { vistasHasta } from '../../help/useNovedades';
 import { PUERTAS_DE_INICIO } from '../puertas';
 import { textoDeLaVisitaCompleta } from '../visitaGuiada/capitulos';
 import { dejarDocumentoParaLeer } from '../../workspace/documentoParaLeer';
@@ -62,7 +64,10 @@ interface InicioViewProps {
   /** Opens a saved review in its taller, through the Revisiones module. */
   onAbrirRevision: (id: string) => void;
   onRecargar: () => void;
-  onVerNovedades: () => void;
+  /** Abre Novedades; con id, en el detalle de esa entrada. */
+  onVerNovedades: (id?: string) => void;
+  /** Superusuario: sus novedades de operación también cuentan. */
+  esOperador: boolean;
   visita: {
     invitacionPendiente: boolean;
     iniciar: () => void;
@@ -122,6 +127,7 @@ export const InicioView: React.FC<InicioViewProps> = ({
   onAbrirRevision,
   onRecargar,
   onVerNovedades,
+  esOperador,
   visita,
   escritosRestantes,
   onRedactarActuacion,
@@ -534,17 +540,34 @@ export const InicioView: React.FC<InicioViewProps> = ({
                 <h2 id="inicio-novedades" className="cn-ini-h3">
                   Novedades
                 </h2>
-                <button type="button" onClick={onVerNovedades} className="cn-ini-enlace">
+                <button type="button" onClick={() => onVerNovedades()} className="cn-ini-enlace">
                   Ver todas
                 </button>
               </div>
+              {/*
+                LAS MISMAS QUE NOVEDADES LLAMA «LE AFECTA». Con el plan leído, las
+                más recientes que tocan un módulo de su plan; sin plan, las más
+                recientes, sin afirmar nada sobre él. Lo de operación solo para el
+                superusuario. Cada una abre su detalle, y el punto azul es el
+                mismo «Nuevo» de la lista (`novedades.logica.ts`).
+              */}
               <ul className="cn-ini-novedades">
-                {NOVEDADES.slice(0, MAXIMO_NOVEDADES).map((n) => (
-                  <li key={`${n.fecha}-${n.titulo}`}>
-                    <span className="cn-ini-mono cn-ini-novedad-fecha">{fechaCorta(n.fecha)}</span>
-                    <span>{n.titulo}</span>
-                  </li>
-                ))}
+                {paraInicio(visiblesParaRol(NOVEDADES, esOperador), plan?.modulosPermitidos ?? null, MAXIMO_NOVEDADES).map(
+                  (n) => (
+                    <li key={n.id}>
+                      <button type="button" className="cn-nov-inicio-fila" onClick={() => onVerNovedades(n.id)}>
+                        <span className="cn-ini-mono cn-ini-novedad-fecha">{fechaCorta(n.fecha)}</span>
+                        <span className="cn-nov-inicio-titulo">{n.titulo}</span>
+                        {esNueva(n.fecha, vistasHasta(), fechaMasReciente(NOVEDADES)) && (
+                          <span className="cn-nov-inicio-nuevo">
+                            <span className="cn-nov-inicio-punto" aria-hidden="true" />
+                            Nuevo
+                          </span>
+                        )}
+                      </button>
+                    </li>
+                  )
+                )}
               </ul>
             </section>
 

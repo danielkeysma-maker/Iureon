@@ -130,7 +130,7 @@ const NingunoCoincide: React.FC<{ filtros: string[]; onLimpiarFiltros: () => voi
     <p className="cn-exp-vacio-titulo">Ninguno coincide</p>
     <p className="cn-exp-vacio-texto [overflow-wrap:anywhere]">
       Ningún caso de esta pestaña coincide con {filtros.join(' · ')}. Se busca por nombre del cliente, del caso o de
-      cualquier persona registrada, por cédula o NIT, por radicado y por despacho.
+      cualquier persona registrada, por cédula o NIT, por radicado, por despacho y por rama.
     </p>
     <button type="button" className="cn-ini-boton cn-ini-boton--suave cn-exp-boton" onClick={onLimpiarFiltros}>
       Limpiar filtros

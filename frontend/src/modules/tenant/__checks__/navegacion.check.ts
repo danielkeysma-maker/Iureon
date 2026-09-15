@@ -230,8 +230,12 @@ for (const grupo of MANUAL) {
   }
 }
 
-/* El manual se documenta a si mismo, y al estrado no se le escribe un articulo. */
-const SIN_ARTICULO_PROPIO = new Set<MainView>(['manual']);
+/*
+ * El manual se documenta a si mismo, y al estrado no se le escribe un articulo.
+ * Novedades tampoco lleva articulo propio: es la lista de lo que cambio, y cada
+ * entrada remite al articulo del modulo que toca con «Como usarlo».
+ */
+const SIN_ARTICULO_PROPIO = new Set<MainView>(['manual', 'novedades']);
 const sinManual = NAV_MODULES.filter(
   (m) => !administrar.has(m.id) && !SIN_ARTICULO_PROPIO.has(m.id) && !enRutas.has(m.label)
 );

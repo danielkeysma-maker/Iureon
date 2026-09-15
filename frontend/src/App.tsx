@@ -93,7 +93,9 @@ import { NAV_MODULES, vistasOcultasPorPlan } from './modules/tenant/navigation';
 import { InicioView } from './modules/inicio/components/InicioView';
 import { useVisitaGuiada } from './modules/inicio/visitaGuiada/useVisitaGuiada';
 import { VisitaGuiada } from './modules/inicio/visitaGuiada/VisitaGuiada';
-import { solicitarAbrirNovedades } from './modules/help/useNovedades';
+import { useNovedadesNuevas } from './modules/help/useNovedades';
+import { NovedadesView } from './modules/help/components/NovedadesView';
+import { PANTALLAS as PANTALLAS_RECORDADAS, recordar as recordarPantalla } from './modules/tenant/pantallaRecordada';
 
 /**
  * Los módulos que la aplicación puede mostrar, para validar el que quedó
@@ -501,6 +503,8 @@ export function App() {
     () => vistasOcultasPorPlan(planDeFirma?.modulosPermitidos ?? null),
     [planDeFirma]
   );
+  /* Lo nuevo de Novedades que el panel cuenta junto al módulo: por rol y, con plan, lo que le afecta. */
+  const novedadesNuevas = useNovedadesNuevas(planDeFirma?.modulosPermitidos ?? null, esSuperusuario);
   const [isUserManagementModalOpen, setIsUserManagementModalOpen] = useState(false);
   /*
    * AL VOLVER DE WOMPI, SALDO SE ABRE SOLO. El checkout es otra página y la
@@ -1325,7 +1329,7 @@ export function App() {
         onOpenUserManagementModal={() => setIsUserManagementModalOpen(true)}
         onOpenRechargeModal={() => setIsRechargeModalOpen(true)}
         isSuperUser={esSuperusuario}
-        pendientes={{ soporte: sinLeerSoporte }}
+        pendientes={{ soporte: sinLeerSoporte, novedades: novedadesNuevas }}
         ocultas={vistasOcultas}
       />
       </div>
@@ -1426,10 +1430,12 @@ export function App() {
                 setMainView('taller');
               }}
               onRecargar={() => setIsRechargeModalOpen(true)}
-              onVerNovedades={() => {
-                solicitarAbrirNovedades();
-                setMainView('manual');
+              onVerNovedades={(id) => {
+                /* Con id, Novedades abre ese detalle: se deja recordado como tras una recarga. */
+                recordarPantalla(PANTALLAS_RECORDADAS.novedad, id ?? null);
+                setMainView('novedades');
               }}
+              esOperador={esSuperusuario}
               visita={visita}
               escritosRestantes={escritosRestantes}
               /* El mismo paso a Redacción que usan Orientación y Revisiones. */
@@ -1872,7 +1878,20 @@ export function App() {
               <AuditView />
             </div>
           )}
-          {mainView === 'privacidad' && <SubprocessorsView />}
+          {/*
+            Privacidad compone «Seguridad», que muestra el acceso de soporte.
+            La decisión se abre en el MISMO diálogo que la franja, y solo el
+            socio la toma: el servidor lo impone igual, y la pantalla no
+            ofrece a un abogado un botón que el servidor le negaría.
+          */}
+          {mainView === 'privacidad' && (
+            <SubprocessorsView
+              puedeDecidirAcceso={Boolean(esSocio)}
+              onAbrirSolicitud={setSolicitudAbierta}
+              refrescoAcceso={refrescoSoporte}
+              onIrAuditoria={() => setMainView('audit')}
+            />
+          )}
           {/*
             9d rehace el manual para el telefono: indice agrupado con filete,
             tarjeta por articulo con su numero y sus minutos, y el articulo como
@@ -1885,6 +1904,7 @@ export function App() {
               <ManualMobileView
                 articuloInicial={manualArticulo}
                 onSoporte={() => setMainView('soporte')}
+                onNovedades={() => setMainView('novedades')}
                 onVisitaGuiada={visita.iniciar}
               />
             </div>
@@ -1895,8 +1915,29 @@ export function App() {
             <ManualView
               articuloInicial={manualArticulo}
               onSoporte={() => setMainView('soporte')}
+              onNovedades={() => setMainView('novedades')}
               onVisitaGuiada={visita.iniciar}
             />
+            </div>
+          )}
+          {/*
+            Novedades (módulo 13): una sola página para los dos anchos; lo que
+            cambia en el teléfono lo decide su CSS. El plan llega del mismo
+            estado que oculta módulos, y mientras no llega es `null`: la página
+            no afirma nada sobre el plan.
+          */}
+          {mainView === 'novedades' && (
+            <div className="flex min-h-0 min-w-0 flex-1">
+              <NovedadesView
+                modulosPermitidos={planDeFirma?.modulosPermitidos ?? null}
+                esOperador={esSuperusuario}
+                ocultas={vistasOcultas}
+                onIr={setMainView}
+                onManual={(id) => {
+                  setManualArticulo(id);
+                  setMainView('manual');
+                }}
+              />
             </div>
           )}
           {/*
@@ -1931,7 +1972,7 @@ export function App() {
             />
             </div>
           )}
-          {mainView === 'ajustes' && <SettingsView onLogout={handleLogout} />}
+          {mainView === 'ajustes' && <SettingsView onLogout={handleLogout} onIr={setMainView} />}
           {mainView === 'taller' && tallerBorrador && (
             <TallerDeBorrador
               key={tallerBorrador.draftId ?? 'borrador-sesion'}

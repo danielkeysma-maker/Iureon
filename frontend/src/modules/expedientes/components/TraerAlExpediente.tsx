@@ -98,11 +98,11 @@ export const TraerAlExpediente: React.FC<{
           <label className="sr-only" htmlFor="filtro-candidatos">
             Buscar
           </label>
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-500" />
+          <div className="cn-exp-filtro">
+            <Search className="cn-exp-filtro-icono h-4 w-4" aria-hidden="true" />
             <input
               id="filtro-candidatos"
-              className="field pl-8"
+              className="cn-exp-entrada cn-exp-entrada--con-icono"
               value={filtro}
               onChange={(e) => setFiltro(e.target.value)}
               placeholder="Buscar por nombre"

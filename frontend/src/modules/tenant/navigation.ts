@@ -158,6 +158,15 @@ export const NAV_MODULES: NavModule[] = [
    */
   { id: 'manual', label: 'Manual de uso', description: 'Cómo se usa, por tarea', icon: BookMarked },
   { id: 'soporte', label: 'Soporte', description: 'Cómo pedir ayuda', icon: LifeBuoy },
+  /*
+   * NOVEDADES, 13 · APRENDER, después de Soporte (`app-novedades.html`:269).
+   * Informativo y de TODA firma: no está en `VISTA_POR_MODULO`, así que ningún
+   * plan ni rol la oculta, igual que Manual y Soporte. Vivía como una página
+   * dentro del Manual; ahora es módulo propio porque el panel cuenta lo nuevo
+   * a su lado y porque una lista que crece no es un artículo que se lee una vez.
+   * Las chispas son el mismo dibujo que ya tenía su entrada en el Manual.
+   */
+  { id: 'novedades', label: 'Novedades', description: 'Qué cambió y cuándo', icon: Sparkles },
   { id: 'ajustes', label: 'Ajustes', description: 'Apariencia y firma', icon: SlidersHorizontal }
 ];
 
@@ -198,7 +207,7 @@ export const NAV_GROUPS: NavGroup[] = [
   { titulo: 'Producir', modulos: ['workspace', 'borradores', 'taller', 'orientacion'] },
   { titulo: 'Registrar', modulos: ['expedientes', 'audiencias', 'entrevistas'] },
   { titulo: 'Consultar', modulos: ['search', 'catalogo', 'tools'] },
-  { titulo: 'Aprender', modulos: ['manual', 'soporte'] },
+  { titulo: 'Aprender', modulos: ['manual', 'soporte', 'novedades'] },
   { titulo: 'Administrar', modulos: ['audit', 'privacidad', 'ajustes'], plegable: true }
 ];
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Plus, UserRound, X } from 'lucide-react';
 import { expedientesApi } from '../services/expedientes.api';
+import { SelectorDelFormulario } from '../../workspace/components/SelectorDelFormulario';
 import {
   NOMBRE_DE_LADO,
   NOMBRE_DE_PAPEL,
@@ -10,6 +11,15 @@ import {
   type LadoEnElExpediente,
   type PapelEnElExpediente
 } from '../types';
+
+/* El tipo de la opción se deduce del componente que se compone (ver `SelectorDeExpediente`). */
+type OpcionEnCascada = React.ComponentProps<typeof SelectorDelFormulario>['opciones'][number];
+
+/* En el orden de `NOMBRE_DE_LADO`: primero el propio, que es lo que más se registra. */
+const OPCIONES_DE_LADO: OpcionEnCascada[] = (['PROPIO', 'CONTRARIO', 'NEUTRAL'] as const).map((lado) => ({
+  valor: lado,
+  etiqueta: NOMBRE_DE_LADO[lado]
+}));
 
 /**
  * QUIÉN ES QUIÉN EN EL ASUNTO.
@@ -77,8 +87,15 @@ export const ActoresDelExpediente: React.FC<{
     }
   };
 
-  /* Los grupos salen del orden declarado en `types.ts`, no de un `sort`. */
-  const grupos = [...new Set(PAPELES_EN_ORDEN.map((p) => p.grupo))];
+  /*
+   * Los grupos salen del orden declarado en `types.ts`, no de un `sort`: el
+   * selector pinta la cabecera donde el grupo empieza.
+   */
+  const opcionesDePapel: OpcionEnCascada[] = PAPELES_EN_ORDEN.map((p) => ({
+    valor: p.papel,
+    etiqueta: p.nombre,
+    grupo: { titulo: p.grupo }
+  }));
 
   return (
     <section className="cn-exp-panel cn-exp-piel">
@@ -89,89 +106,79 @@ export const ActoresDelExpediente: React.FC<{
             Las partes, los testigos y el perito. Es de aquí de donde salen las preguntas con nombre propio.
           </p>
         </div>
-        <button type="button" onClick={() => setAgregando((v) => !v)} className="btn-secondary btn-sm gap-1.5">
+        <button type="button" onClick={() => setAgregando((v) => !v)} className="btn-secondary min-h-[44px] gap-1.5 px-4">
           <Plus className="h-3.5 w-3.5" />
           Agregar
         </button>
       </div>
 
       {agregando && (
-        <form onSubmit={agregar} className="mt-3 space-y-3 rounded-card border border-line-200 bg-canvas p-3">
-          <div>
-            <label className="field-label" htmlFor="actor-nombre">
+        /*
+          LA CARA NUEVA DEL FORMULARIO (14 de septiembre de 2026): rótulos en
+          letra normal y los dos desplegables con `SelectorDelFormulario` —en
+          escritorio la lista en cascada en línea, con los grupos del papel
+          como cabeceras; en el teléfono la lista del sistema con la pintura de
+          la casa—. Antes eran `<select>` nativos con la lista azul del sistema.
+        */
+        <form onSubmit={agregar} className="cn-exp-subform">
+          <div className="cn-exp-campo">
+            <label className="cn-exp-rotulo" htmlFor="actor-nombre">
               Nombre
             </label>
             <input
               id="actor-nombre"
-              className="field"
+              className="cn-exp-entrada"
               value={nuevo.nombre}
               onChange={(e) => setNuevo({ ...nuevo, nombre: e.target.value })}
               autoFocus
             />
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label className="field-label" htmlFor="actor-papel">
-                Qué es en el proceso
-              </label>
-              <select
+          <div className="cn-exp-campos-2">
+            <div className="cn-exp-campo">
+              <SelectorDelFormulario
                 id="actor-papel"
-                className="field"
-                value={nuevo.papel}
-                onChange={(e) => setNuevo({ ...nuevo, papel: e.target.value as PapelEnElExpediente })}
-              >
-                {grupos.map((g) => (
-                  <optgroup key={g} label={g}>
-                    {PAPELES_EN_ORDEN.filter((p) => p.grupo === g).map((p) => (
-                      <option key={p.papel} value={p.papel}>
-                        {p.nombre}
-                      </option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
+                etiqueta="Qué es en el proceso"
+                valor={nuevo.papel}
+                opciones={opcionesDePapel}
+                onChange={(v) => setNuevo({ ...nuevo, papel: v as PapelEnElExpediente })}
+              />
             </div>
-            <div>
-              <label className="field-label" htmlFor="actor-lado">
-                De qué lado
-              </label>
-              <select
+            <div className="cn-exp-campo">
+              <SelectorDelFormulario
                 id="actor-lado"
-                className="field"
-                value={nuevo.lado}
-                onChange={(e) => setNuevo({ ...nuevo, lado: e.target.value as LadoEnElExpediente })}
-              >
-                <option value="PROPIO">De mi lado</option>
-                <option value="CONTRARIO">De la contraparte</option>
-                <option value="NEUTRAL">De ninguno</option>
-              </select>
+                etiqueta="De qué lado"
+                valor={nuevo.lado}
+                opciones={OPCIONES_DE_LADO}
+                onChange={(v) => setNuevo({ ...nuevo, lado: v as LadoEnElExpediente })}
+                conBusqueda={false}
+              />
               {/*
                 El lado decide la técnica, así que se dice para qué sirve. Un
                 abogado que lo deja en el valor por defecto porque no sabe qué
                 cambia recibe preguntas con la técnica equivocada.
               */}
-              <p className="mt-1 text-meta text-ink-500">
+              <p className="cn-exp-ayuda">
                 Decide cómo se le pregunta: al propio se le interroga, al de enfrente se le contrainterroga.
               </p>
             </div>
           </div>
-          <div>
-            <label className="field-label" htmlFor="actor-sobre">
-              Sobre qué declara <span className="font-normal text-ink-500">(opcional, pero es el que más sirve)</span>
+          <div className="cn-exp-campo">
+            <label className="cn-exp-rotulo" htmlFor="actor-sobre">
+              Sobre qué declara <span className="cn-exp-opcional">(opcional, pero es el que más sirve)</span>
             </label>
             <input
               id="actor-sobre"
-              className="field"
+              className="cn-exp-entrada"
               value={nuevo.sobreQue}
               onChange={(e) => setNuevo({ ...nuevo, sobreQue: e.target.value })}
               placeholder="la entrega del inmueble y el estado en que estaba"
             />
           </div>
           <div className="flex flex-wrap gap-2">
-            <button type="submit" className="btn-primary btn-sm" disabled={guardando || !nuevo.nombre.trim()}>
+            <button type="submit" className="cn-ini-boton cn-ini-boton--primario cn-exp-boton" disabled={guardando || !nuevo.nombre.trim()}>
               {guardando ? 'Agregando…' : 'Agregar'}
             </button>
-            <button type="button" className="btn-ghost btn-sm" onClick={() => setAgregando(false)}>
+            <button type="button" className="cn-ini-boton cn-ini-boton--texto cn-exp-boton" onClick={() => setAgregando(false)}>
               Cancelar
             </button>
           </div>

@@ -14,6 +14,7 @@ export type MainView =
   | 'orientacion'
   | 'manual'
   | 'soporte'
+  | 'novedades'
   | 'ajustes'
   | 'taller';
 

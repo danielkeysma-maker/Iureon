@@ -40,3 +40,5 @@ __pycache__/
 # Entrega de diseno: vive en public/ para abrirla en el navegador, pero TODO lo que
 # se sube desde public/ queda publicado en el dominio. Es material interno.
 frontend/public/handoff/
+
+.avance-agentes/

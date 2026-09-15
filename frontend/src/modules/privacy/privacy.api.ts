@@ -38,6 +38,12 @@ export interface Disclosure {
   posicionDeIureon: string;
   posicionDeEstosTerceros: string;
   loQueNoHacemos: string[];
+  /**
+   * Lo que sí se queda, dicho junto a lo que no. Opcional porque el frontend y
+   * el backend despliegan por separado: un servidor que aún no lo manda no
+   * puede tumbar la pantalla.
+   */
+  loQueSeConserva?: string[];
   advertencia: string;
 }
 

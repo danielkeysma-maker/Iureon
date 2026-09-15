@@ -1,11 +1,18 @@
 import React from 'react';
-import { AlertCircle, ChevronLeft, EllipsisVertical, Loader2, Plus, Search } from 'lucide-react';
+import { AlertCircle, ChevronLeft, EllipsisVertical, Loader2, Pencil, Plus, Search } from 'lucide-react';
+import { usePlanSoloLectura } from '../../subscriptions/PlanContext';
+import { EditarDatosDelCaso } from './EditarDatosDelCaso';
+import { aplicarGuardado, type CampoDelCaso } from '../services/datosDelCaso';
+import { etiquetaDeRama, ramaLimpia } from '../services/buscarCasos';
+import { SelectorEnCascada } from '../../workspace/components/SelectorEnCascada';
+import { useVentanaAncha } from '../../workspace/components/SelectorDelFormulario';
 import { Dialog } from '../../../design/Dialog';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { expedientesApi, type Carpeta, type DocumentoIndexado } from '../services/expedientes.api';
 import {
   ESTADOS,
   NOMBRE_DE_ESTADO,
+  type Expediente,
   type ExpedienteConDetalle,
   type ExpedienteEnLista,
   type MisCasos
@@ -19,7 +26,7 @@ import {
 } from '../services/casoEnPantalla';
 import { ListaDeLaSemana, ListaPorCliente } from './CasosEnLaLista';
 import { FiltrosDeLaLista } from './FiltrosDeLaLista';
-import { buscarCasos, filtrarPorRegistro, filtrosEnPalabras, indexarCaso } from '../services/buscarCasos';
+import { buscarCasos, filtrarPorRama, filtrarPorRegistro, filtrosEnPalabras, indexarCaso } from '../services/buscarCasos';
 import { ActoresDelExpediente } from './ActoresDelExpediente';
 import { PreguntasDelExpedientePanel } from './PreguntasDelExpedientePanel';
 import { TraerAlExpediente } from './TraerAlExpediente';
@@ -76,6 +83,8 @@ type VistaDelCaso = 'documentos' | 'personas';
 
 const NUEVO_VACIO = { caratula: '', radicado: '', despacho: '', contraparte: '' };
 
+const OPCIONES_DE_ESTADO = ESTADOS.map((e) => ({ valor: e, etiqueta: NOMBRE_DE_ESTADO[e] }));
+
 /*
  * LA BÚSQUEDA ES INMEDIATA HASTA 300 CASOS y espera 120 ms por encima: con mil
  * casos cada tecla recalcularía la lista entera mientras se escribe una
@@ -99,6 +108,8 @@ export const ExpedientesView: React.FC<{
    */
   const [anio, setAnio] = React.useState<number | null>(null);
   const [mes, setMes] = React.useState<number | null>(null);
+  /* La rama, igual: dura lo que la pantalla y sobrevive al cambio de pestaña. */
+  const [rama, setRama] = React.useState<string | null>(null);
   const [abierto, setAbierto] = React.useState<ExpedienteConDetalle | null>(null);
   const [abriendo, setAbriendo] = React.useState<string | null>(null);
   const [vista, setVista] = React.useState<VistaDelCaso>('documentos');
@@ -112,6 +123,16 @@ export const ExpedientesView: React.FC<{
   const [trayendo, setTrayendo] = React.useState(false);
   const [agregando, setAgregando] = React.useState(false);
   const [confirmacion, setConfirmacion] = React.useState<Confirmacion | null>(null);
+  /*
+   * EDITAR LOS DATOS DEL CASO. `null` = cerrado; si está abierto, `foco` dice
+   * en qué campo cae el cursor («Sin rama registrada · Agregar» abre en la
+   * rama). Con el plan vencido no se ofrece: el servidor rechaza la escritura
+   * y un botón que siempre falla enseña a desconfiar de todos.
+   */
+  const [edicion, setEdicion] = React.useState<{ foco: CampoDelCaso | null } | null>(null);
+  const [guardadoDelCaso, setGuardadoDelCaso] = React.useState('');
+  const soloLectura = usePlanSoloLectura();
+  const ventanaAncha = useVentanaAncha();
   /*
    * Una señal, no un objeto: las carpetas y los documentos los carga el panel
    * de carpetas por su cuenta, y lo único que necesita de aquí es enterarse de
@@ -265,6 +286,30 @@ export const ExpedientesView: React.FC<{
     }
   };
 
+  const abrirEdicion = (foco: CampoDelCaso | null = null): void => {
+    setMenu(false);
+    setGuardadoDelCaso('');
+    setEdicion({ foco });
+  };
+
+  /*
+   * LO GUARDADO SE PINTA SIN VOLVER A PEDIR NADA. La respuesta del PATCH trae
+   * los campos editados; se aplican al caso abierto y a su fila de la lista, y
+   * como el agrupado por rama se calcula de la lista, un caso que cambia de
+   * rama aparece en su grupo nuevo al volver. Las cuentas —documentos,
+   * términos, personas— no las toca una edición de datos y se conservan.
+   */
+  const alGuardarDatos = (guardado: Expediente): void => {
+    setAbierto((caso) => (caso && caso.id === guardado.id ? aplicarGuardado(caso, guardado) : caso));
+    setMisCasos((mis) =>
+      mis
+        ? { ...mis, expedientes: mis.expedientes.map((c) => (c.id === guardado.id ? aplicarGuardado(c, guardado) : c)) }
+        : mis
+    );
+    setEdicion(null);
+    setGuardadoDelCaso('Se guardaron los datos del caso.');
+  };
+
   const errorEnPantalla = error && (
     <p className="cn-error" role="alert">
       <AlertCircle className="h-4 w-4" />
@@ -301,7 +346,14 @@ export const ExpedientesView: React.FC<{
         <div className="cn-exp-caso-trabajo">
           {/* ─── DÓNDE ESTOY ─────────────────────────────────────────────── */}
           <header className="cn-exp-caso-cabeza">
-            <button type="button" onClick={() => setAbierto(null)} className="cn-exp-volver">
+            <button
+              type="button"
+              onClick={() => {
+                setAbierto(null);
+                setGuardadoDelCaso('');
+              }}
+              className="cn-exp-volver"
+            >
               <ChevronLeft className="h-5 w-5" aria-hidden="true" />
               Todos los expedientes
             </button>
@@ -325,21 +377,56 @@ export const ExpedientesView: React.FC<{
                 )}
               </div>
               <div className="cn-exp-caso-controles">
-                <label className="sr-only" htmlFor="estado-exp">
-                  Estado del caso
-                </label>
-                <select
-                  id="estado-exp"
-                  className="cn-exp-select"
-                  value={abierto.estado}
-                  onChange={(e) => void cambiarEstado(e.target.value)}
-                >
-                  {ESTADOS.map((e) => (
-                    <option key={e} value={e}>
-                      {NOMBRE_DE_ESTADO[e]}
-                    </option>
-                  ))}
-                </select>
+                {/*
+                  «EDITAR» A LA VISTA EN ESCRITORIO, junto al título que edita.
+                  En el teléfono se esconde y queda en «Más opciones»: tres
+                  controles en la ficha le quitan el renglón a la carátula.
+                */}
+                {!soloLectura && (
+                  <button
+                    type="button"
+                    className="cn-ini-boton cn-ini-boton--texto cn-exp-boton cn-exp-editar"
+                    onClick={() => abrirEdicion()}
+                  >
+                    <Pencil className="h-4 w-4" aria-hidden="true" />
+                    Editar
+                  </button>
+                )}
+                {/*
+                  EL ESTADO, CON LA LISTA DE LA CASA EN ESCRITORIO. La lista azul
+                  del sistema era la cara vieja que el dueño reportó en el
+                  cliente; aquí se pinta igual que los demás selectores y su
+                  rótulo queda solo para lectores de pantalla. En el teléfono,
+                  la lista del sistema con la pintura de la casa.
+                */}
+                {ventanaAncha ? (
+                  <SelectorEnCascada
+                    etiqueta="Estado del caso"
+                    valor={abierto.estado}
+                    opciones={OPCIONES_DE_ESTADO}
+                    onChange={(v) => void cambiarEstado(v)}
+                    conBusqueda={false}
+                    anchoCampo="cn-exp-estado"
+                  />
+                ) : (
+                  <>
+                    <label className="sr-only" htmlFor="estado-exp">
+                      Estado del caso
+                    </label>
+                    <select
+                      id="estado-exp"
+                      className="cn-exp-select cn-exp-select-movil"
+                      value={abierto.estado}
+                      onChange={(e) => void cambiarEstado(e.target.value)}
+                    >
+                      {ESTADOS.map((e) => (
+                        <option key={e} value={e}>
+                          {NOMBRE_DE_ESTADO[e]}
+                        </option>
+                      ))}
+                    </select>
+                  </>
+                )}
                 <div className="relative">
                   <button
                     type="button"
@@ -359,6 +446,16 @@ export const ExpedientesView: React.FC<{
                         onClick={() => setMenu(false)}
                       />
                       <div className="cn-exp-menu" role="menu">
+                        {!soloLectura && (
+                          <button
+                            type="button"
+                            role="menuitem"
+                            className="cn-exp-menu-item"
+                            onClick={() => abrirEdicion()}
+                          >
+                            Editar datos del caso
+                          </button>
+                        )}
                         <button
                           type="button"
                           role="menuitem"
@@ -436,6 +533,12 @@ export const ExpedientesView: React.FC<{
             </section>
           )}
 
+          {guardadoDelCaso && (
+            <p className="cn-exp-nota" role="status">
+              {guardadoDelCaso}
+            </p>
+          )}
+
           {abierto.terminosLeidos === false && (
             <p className="cn-exp-nota">No se pudo leer la agenda de este caso: sus términos no se muestran aquí.</p>
           )}
@@ -501,10 +604,41 @@ export const ExpedientesView: React.FC<{
           <dl className="cn-exp-datos">
             <div>
               <dt>Radicado</dt>
-              {/* Mono porque es citable: lo que se pega en un escrito. */}
-              <dd className={abierto.radicado ? 'cn-exp-mono' : 'cn-exp-falta'}>
-                {abierto.radicado ?? 'Todavía sin radicado'}
-              </dd>
+              {/*
+                Mono porque es citable: lo que se pega en un escrito. Si falta,
+                la falta ofrece llenarla ahí mismo, con el diálogo abierto en
+                ese campo; con el plan vencido solo se dice que falta.
+              */}
+              {abierto.radicado ? (
+                <dd className="cn-exp-mono">{abierto.radicado}</dd>
+              ) : !soloLectura ? (
+                <dd className="cn-exp-dato-falta">
+                  <span className="cn-exp-falta">Sin radicado</span>
+                  <span className="cn-exp-falta" aria-hidden="true">·</span>
+                  <button type="button" className="cn-exp-agregar" onClick={() => abrirEdicion('radicado')} aria-label="Agregar el radicado">
+                    Agregar
+                  </button>
+                </dd>
+              ) : (
+                <dd className="cn-exp-falta">Todavía sin radicado</dd>
+              )}
+            </div>
+            <div>
+              <dt>Rama</dt>
+              {/* Una rama escrita a mano se lee como se guardó: `etiquetaDeRama` no la traduce. */}
+              {ramaLimpia(abierto.rama) ? (
+                <dd>{etiquetaDeRama(abierto.rama)}</dd>
+              ) : !soloLectura ? (
+                <dd className="cn-exp-dato-falta">
+                  <span className="cn-exp-falta">Sin rama registrada</span>
+                  <span className="cn-exp-falta" aria-hidden="true">·</span>
+                  <button type="button" className="cn-exp-agregar" onClick={() => abrirEdicion('rama')} aria-label="Agregar la rama">
+                    Agregar
+                  </button>
+                </dd>
+              ) : (
+                <dd className="cn-exp-falta">Sin rama registrada</dd>
+              )}
             </div>
             {abierto.despacho && (
               <div>
@@ -610,6 +744,16 @@ export const ExpedientesView: React.FC<{
           <TraerAlExpediente expediente={abierto} onCambio={refrescarAbierto} enDialogo />
         </Dialog>
 
+        {!soloLectura && (
+          <EditarDatosDelCaso
+            expediente={abierto}
+            abierto={edicion !== null}
+            foco={edicion?.foco ?? null}
+            onCerrar={() => setEdicion(null)}
+            onGuardado={alGuardarDatos}
+          />
+        )}
+
         {confirmar}
       </div>
     );
@@ -626,16 +770,22 @@ export const ExpedientesView: React.FC<{
   const casos: ExpedienteEnLista[] = indicesDeLaPestana.map((x) => x.caso);
   const total = misCasos?.expedientes.length ?? 0;
 
-  /* Pestaña, luego año y mes, luego el texto: los tres se combinan. */
-  const resultadosPara = (texto: string) => buscarCasos(filtrarPorRegistro(indicesDeLaPestana, { anio, mes }), texto);
+  /*
+   * Pestaña, luego año y mes, luego rama, luego el texto: todos se combinan. En
+   * «Activos» y «Cerrados» la rama filtra ANTES de agrupar, así que un cliente
+   * sin casos de esa rama no queda como cabecera vacía.
+   */
+  const resultadosPara = (texto: string) =>
+    buscarCasos(filtrarPorRama(filtrarPorRegistro(indicesDeLaPestana, { anio, mes }), rama), texto);
   const resultados = resultadosPara(busquedaAplicada);
-  const filtros = filtrosEnPalabras({ busqueda: busquedaAplicada, anio, mes });
-  const hayFiltros = busqueda.trim() !== '' || anio !== null;
+  const filtros = filtrosEnPalabras({ busqueda: busquedaAplicada, anio, mes, rama });
+  const hayFiltros = busqueda.trim() !== '' || anio !== null || rama !== null;
   const limpiarFiltros = (): void => {
     setBusqueda('');
     setBusquedaAplicada('');
     setAnio(null);
     setMes(null);
+    setRama(null);
   };
 
   const PESTANAS: { id: Pestana; nombre: string }[] = [
@@ -718,12 +868,15 @@ export const ExpedientesView: React.FC<{
         <div className="cn-exp-lista-filtros">
           <FiltrosDeLaLista
             indices={indices}
+            indicesDeLaPestana={indicesDeLaPestana}
             anio={anio}
             mes={mes}
+            rama={rama}
             onCambiar={(a, m) => {
               setAnio(a);
               setMes(m);
             }}
+            onCambiarRama={setRama}
           />
           {hayFiltros && (
             <>

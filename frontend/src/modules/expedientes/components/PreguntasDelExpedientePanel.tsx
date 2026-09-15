@@ -138,7 +138,7 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
       </p>
 
       <fieldset className="mt-3">
-        <legend className="field-label">A quién</legend>
+        <legend className="cn-exp-rotulo">A quién</legend>
         <ul className="space-y-1.5">
           {interrogables.map((a) => {
             const marcado = escogidos.includes(a.id);
@@ -176,24 +176,24 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
 
       <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
-          <label className="field-label" htmlFor="que-probar">
-            Qué quiere probar <span className="font-normal text-ink-500">(opcional)</span>
+          <label className="cn-exp-rotulo" htmlFor="que-probar">
+            Qué quiere probar <span className="cn-exp-opcional">(opcional)</span>
           </label>
           <input
             id="que-probar"
-            className="field"
+            className="cn-exp-entrada"
             value={quiereProbar}
             onChange={(e) => setQuiereProbar(e.target.value)}
             placeholder="que el inmueble se entregó en mal estado"
           />
         </div>
         <div>
-          <label className="field-label" htmlFor="tipo-audiencia">
-            Tipo de audiencia <span className="font-normal text-ink-500">(opcional)</span>
+          <label className="cn-exp-rotulo" htmlFor="tipo-audiencia">
+            Tipo de audiencia <span className="cn-exp-opcional">(opcional)</span>
           </label>
           <input
             id="tipo-audiencia"
-            className="field"
+            className="cn-exp-entrada"
             value={audiencia}
             onChange={(e) => setAudiencia(e.target.value)}
             placeholder="audiencia inicial"

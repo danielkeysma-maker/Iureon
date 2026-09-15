@@ -19,6 +19,7 @@
     "check:borradores-cara": "npx tsx src/modules/documents/__checks__/borradoresCara.check.ts",
     "check:expedientes-cara": "npx tsx src/modules/expedientes/__checks__/expedientesCara.check.ts",
     "check:buscar-casos": "npx tsx src/modules/expedientes/__checks__/buscarCasos.check.ts",
+    "check:datos-del-caso": "npx tsx src/modules/expedientes/__checks__/datosDelCaso.check.ts",
     "check:avisos-cara": "npx tsx src/modules/push/__checks__/avisosCara.check.ts",
     "check:audiencias-cara": "npx tsx src/modules/transcription/__checks__/audienciasCara.check.ts",
     "check:entrevistas-cara": "npx tsx src/modules/clients/__checks__/entrevistasCara.check.ts",
@@ -43,6 +44,8 @@
     "check:rama-candidata": "npx esbuild src/modules/workspace/__checks__/ramaDeLaCandidata.check.ts --bundle --platform=node --format=cjs --outfile=node_modules/.cache/ramaDeLaCandidata.check.cjs --log-level=error && node node_modules/.cache/ramaDeLaCandidata.check.cjs",
     "check:recuperacion": "npx tsx src/modules/auth/__checks__/recuperacion.check.ts",
     "check:manual-soporte-cara": "npx tsx src/modules/help/__checks__/manualSoporteCara.check.ts",
+    "check:manual-vigente": "npx tsx src/modules/help/__checks__/manualVigente.check.ts",
+    "check:novedades": "npx tsx src/modules/help/__checks__/novedades.check.ts",
     "check:cerrar-sesion": "npx tsx src/modules/tenant/__checks__/cerrarSesion.check.ts",
     "check:herramientas-cara": "npx tsx src/modules/tools/__checks__/herramientasCara.check.ts",
     "check:ajustes-plan-cara": "npx tsx src/modules/settings/__checks__/ajustesPlanCara.check.ts",
@@ -52,7 +55,8 @@
     "check:consola-cara": "npx tsx src/modules/admin/__checks__/consolaCara.check.ts",
     "check:buscador-catalogo-cara": "npx tsx src/modules/search/__checks__/buscadorCatalogoCara.check.ts",
     "check:estilo": "npx tsx src/modules/estilo/__checks__/estilo.check.ts",
-    "check:jerga": "npx tsx src/modules/estilo/__checks__/jerga.check.ts"
+    "check:jerga": "npx tsx src/modules/estilo/__checks__/jerga.check.ts",
+    "check:privacidad-seguridad-auditoria-cara": "npx tsx src/modules/audit/__checks__/privacidadSeguridadAuditoriaCara.check.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",

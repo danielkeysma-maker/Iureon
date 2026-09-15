@@ -1,89 +1,44 @@
 import React from 'react';
-import { Loader2 } from 'lucide-react';
-import { auditApi, type AuditLogEntry } from '../services/audit.api';
-import { ACCIONES } from './AuditView';
+import { Loader2, Search } from 'lucide-react';
+import { POR_PAGINA, useRegistroDeAuditoria } from '../hooks/useRegistroDeAuditoria';
+import { PERIODOS, VISTAS, claveDelDia, hora, nombreCorto, nombreDeAccion, rotuloDelDia } from '../registro';
+import type { AuditLogEntry } from '../services/audit.api';
 
 /**
- * Auditoría en móvil. Artboard 4e, y su nota es la instrucción entera:
+ * Auditoría en el teléfono. DERIVADA: ningún `public/handoff/app-*.html` dibuja
+ * la auditoría a 375 px. Toma la escala de la cara nueva del artboard de
+ * escritorio (`app-administrar-y-saldo.html`:303) y conserva la instrucción de
+ * la maqueta móvil anterior (4e):
  *
  *   «La tabla densa de auditoría no cabe en 390px y NO SE INTENTA: se convierte
  *    en lista de eventos agrupada por día.»
  *
- * ─── POR QUÉ NO SE INTENTA, MEDIDO ──────────────────────────────────────────
+ * AGRUPAR POR DÍA ES LO QUE HACE ÚTIL EL REGISTRO. A esta pantalla se viene con
+ * una pregunta con fecha —«¿quién descargó eso el martes?»—; el rótulo del día
+ * convierte una lista larga en una consulta. El día es el LOCAL de quien mira:
+ * agrupar por fecha UTC ponía un evento de las 11 p. m. en el día siguiente.
  *
- * Las columnas de escritorio suman 464px —fecha 104, usuario 110, acción 150,
- * origen 100— antes del recurso, que es la que más texto lleva. En 375 no hay
- * forma de encogerlas sin que cada celda quede en dos palabras. La maqueta no
- * propone una tabla estrecha: propone otra cosa.
+ * Lee el MISMO registro que escritorio (`useRegistroDeAuditoria`): mismas
+ * páginas, mismo periodo, mismo «no se pudo leer». Antes el teléfono no podía
+ * pedir más que la primera lectura.
  *
- * ─── AGRUPAR POR DÍA ES LO QUE HACE ÚTIL EL REGISTRO ────────────────────────
- *
- * A esta pantalla se viene con una pregunta con fecha —«¿quién descargó eso el
- * martes?»—, no a leer mil cuatrocientos eventos seguidos. El rótulo del día es
- * lo que convierte una lista larga en una consulta.
- *
- * ─── LO QUE 4e DIBUJA Y NO SE PINTA, con la razón (ya declarada) ────────────
- *
- * · El sello «OK» por evento. Solo se registran las acciones que OCURRIERON:
- *   una columna que siempre dice OK es ruido, y está razonado desde antes en la
- *   pantalla de escritorio. El día que se registren fallos, el sello tendrá algo
- *   que distinguir.
- * · La hoja de detalle con «Antes / Después» y el `sha256`. Exigiría guardar el
- *   estado previo de cada cambio, que la tabla no guarda. Es construible —una
- *   columna con el valor anterior— y queda anotado como tal.
+ * LO QUE 4e DIBUJA Y NO SE PINTA: el sello «OK» por evento (solo se registran
+ * acciones que ocurrieron) y la hoja «Antes / Después» (exigiría guardar el
+ * estado previo de cada cambio, que la tabla no guarda).
  */
-
-const fechaDe = (iso: string): string => new Date(iso).toISOString().slice(0, 10);
-
-const rotuloDelDia = (iso: string): string => {
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  const dia = new Date(iso);
-  dia.setHours(0, 0, 0, 0);
-  const dias = Math.round((hoy.getTime() - dia.getTime()) / 86400000);
-
-  const largo = dia.toLocaleDateString('es-CO', { day: 'numeric', month: 'long' });
-  if (dias === 0) return `Hoy · ${largo}`;
-  if (dias === 1) return `Ayer · ${largo}`;
-  return dia.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' });
-};
-
-const hora = (iso: string): string =>
-  new Date(iso).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-
 export const AuditMobileView: React.FC = () => {
-  const [eventos, setEventos] = React.useState<AuditLogEntry[]>([]);
-  const [cargando, setCargando] = React.useState(true);
-  const [error, setError] = React.useState('');
-
-  React.useEffect(() => {
-    let vigente = true;
-    auditApi
-      .listLogs()
-      .then((filas) => {
-        if (vigente) setEventos(filas);
-      })
-      .catch((e: unknown) => {
-        if (vigente) setError(e instanceof Error ? e.message : 'No se pudo leer la auditoría.');
-      })
-      .finally(() => {
-        if (vigente) setCargando(false);
-      });
-    return () => {
-      vigente = false;
-    };
-  }, []);
+  const r = useRegistroDeAuditoria();
+  const periodo = PERIODOS.find((p) => p.id === r.periodo)?.etiqueta ?? '';
 
   /*
-   * Agrupado por dia CONSERVANDO EL ORDEN que trae el servidor —lo mas reciente
-   * primero—. Reordenar aqui pondria a esta pantalla a discrepar del registro
-   * que audita, que es exactamente lo que no puede pasar.
+   * Agrupado por día CONSERVANDO EL ORDEN del servidor —lo más reciente
+   * primero—. Reordenar aquí pondría a esta pantalla a discrepar del registro.
    */
   const porDia = React.useMemo(() => {
     const orden: string[] = [];
     const mapa = new Map<string, AuditLogEntry[]>();
-    for (const e of eventos) {
-      const dia = fechaDe(e.timestamp);
+    for (const e of r.visibles) {
+      const dia = claveDelDia(e.timestamp);
       if (!mapa.has(dia)) {
         mapa.set(dia, []);
         orden.push(dia);
@@ -91,96 +46,147 @@ export const AuditMobileView: React.FC = () => {
       mapa.get(dia)!.push(e);
     }
     return orden.map((dia) => ({ dia, eventos: mapa.get(dia)! }));
-  }, [eventos]);
+  }, [r.visibles]);
 
   return (
-    /*
-      `min-w-0` porque esta columna es un ítem flex y nace con `min-width: auto`:
-      se niega a bajar del ancho mínimo de su contenido, y ese mínimo lo fija el
-      correo del renglón de abajo —una sola palabra sin espacios de 370px—. La
-      pantalla medía 433px en un teléfono de 375 y la raíz recortaba el resto.
-    */
-    <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col bg-canvas">
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
-        {cargando && (
-          <div className="flex items-center justify-center gap-2 py-16 text-[12.5px] text-ink-500">
-            <Loader2 className="h-4 w-4 animate-spin" />
+    <div data-visita="vista-audit" className="cara-nueva cn-aud2 cn-aud2--movil">
+      <div className="cn-aud2-movil-scroll">
+        <h1 className="cn-aud2-titulo">Auditoría</h1>
+        <p className="cn-aud2-entrada">El registro de lo que hizo su firma. Se consulta cuando algo ya pasó.</p>
+
+        <label className="cn-aud2-buscar">
+          <Search className="cn-aud2-buscar-icono" aria-hidden="true" />
+          <input
+            value={r.busqueda}
+            onChange={(e) => r.setBusqueda(e.target.value)}
+            placeholder="Por documento, actuación o usuario"
+            aria-label="Buscar entre los eventos leídos"
+            className="cn-aud2-campo"
+          />
+        </label>
+
+        <div className="cn-aud2-movil-filtros">
+          <select
+            value={r.periodo}
+            onChange={(e) => r.setPeriodo(e.target.value as typeof r.periodo)}
+            className="cn-aud2-selector"
+            aria-label="Periodo"
+          >
+            {PERIODOS.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.etiqueta}
+              </option>
+            ))}
+          </select>
+          <select value={r.usuario} onChange={(e) => r.setUsuario(e.target.value)} className="cn-aud2-selector" aria-label="Usuario">
+            <option value="TODOS">Usuario: todos</option>
+            {r.usuarios.map((u) => (
+              <option key={u} value={u}>
+                {nombreCorto(u)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="cn-aud2-vistas" role="group" aria-label="Vistas frecuentes">
+          {VISTAS.map((v) => (
+            <button
+              key={v.etiqueta}
+              type="button"
+              aria-pressed={r.vista === v.etiqueta}
+              onClick={() => r.setVista(r.vista === v.etiqueta ? null : v.etiqueta)}
+              className={`cn-aud2-chip${r.vista === v.etiqueta ? ' cn-aud2-chip--activo' : ''}`}
+            >
+              {v.etiqueta}
+            </button>
+          ))}
+        </div>
+
+        {r.estado === 'CARGANDO' && (
+          <p className="cn-aud2-estado" role="status">
+            <Loader2 className="cn-aud2-icono cn-aud2-icono--girando" aria-hidden="true" />
             Leyendo la auditoría…
+          </p>
+        )}
+
+        {r.estado === 'NO_SE_PUDO_LEER' && (
+          <div className="cn-aud2-aviso cn-aud2-aviso--peligro" role="alert">
+            <p className="cn-aud2-aviso-titulo">No se pudo leer la auditoría</p>
+            <p className="cn-aud2-aviso-texto">{r.error} Esto no significa que no haya eventos.</p>
+            <button type="button" onClick={r.recargar} className="cn-aud2-boton cn-aud2-boton--suave">
+              Intentar de nuevo
+            </button>
           </div>
         )}
 
-        {error && (
-          <p className="rounded-[8px] border border-[rgb(var(--danger)/0.35)] bg-[rgb(var(--danger)/0.06)] px-3.5 py-3 text-[12.5px] leading-snug text-danger text-justify">
-            {error}
+        {r.estado === 'VACIO' && <p className="cn-aud2-estado">No hay eventos registrados en {periodo.toLowerCase()}.</p>}
+
+        {(r.estado === 'LISTA' || r.estado === 'INCOMPLETA') && r.visibles.length === 0 && (
+          <p className="cn-aud2-estado">Ningún evento leído coincide con el filtro.</p>
+        )}
+
+        {porDia.map(({ dia, eventos }) => (
+          <section key={dia} className="cn-aud2-dia-grupo">
+            <p className="cn-aud2-dia">{rotuloDelDia(eventos[0].timestamp)}</p>
+            <ul className="cn-aud2-tarjetas">
+              {eventos.map((e) => (
+                <li key={e.id} className="cn-aud2-tarjeta">
+                  <div className="cn-aud2-tarjeta-arriba">
+                    <span className="cn-aud2-accion">{nombreDeAccion(e.action)}</span>
+                    <span className="cn-aud2-hora">{hora(e.timestamp)}</span>
+                  </div>
+                  {e.resource && <p className="cn-aud2-recurso">{e.resource}</p>}
+                  <p className="cn-aud2-tarjeta-quien">
+                    <span className="cn-aud2-detalle-valor">{e.userEmail}</span>
+                    {e.ipAddress && <span className="cn-aud2-ip">{e.ipAddress}</span>}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+
+        {(r.estado === 'LISTA' || r.estado === 'INCOMPLETA') && (
+          <div className="cn-aud2-pie">
+            <p className="cn-aud2-conteo">
+              {r.total !== null ? `Leídos ${r.eventos.length} de ${r.total} eventos` : `Leídos ${r.eventos.length} eventos`} · {periodo}
+            </p>
+            {r.hayMas && r.estado === 'LISTA' && (
+              <button type="button" onClick={r.cargarMas} disabled={r.cargando} className="cn-aud2-boton cn-aud2-boton--suave">
+                {r.cargando ? 'Leyendo…' : `Leer ${Math.min(POR_PAGINA, r.quedan ?? POR_PAGINA)} más`}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => void r.exportar()}
+              disabled={r.visibles.length === 0}
+              className="cn-aud2-boton cn-aud2-boton--fantasma"
+            >
+              Descargar CSV · {r.visibles.length} {r.visibles.length === 1 ? 'fila' : 'filas'}
+            </button>
+          </div>
+        )}
+
+        {r.estado === 'INCOMPLETA' && (
+          <div className="cn-aud2-aviso cn-aud2-aviso--peligro" role="alert">
+            <p className="cn-aud2-aviso-titulo">No se pudo leer el resto del registro</p>
+            <p className="cn-aud2-aviso-texto">{r.error} Lo que ve arriba está incompleto.</p>
+            <button type="button" onClick={r.cargarMas} className="cn-aud2-boton cn-aud2-boton--suave">
+              Intentar de nuevo
+            </button>
+          </div>
+        )}
+
+        {r.hashCsv && (
+          <p className="cn-aud2-aviso cn-aud2-aviso--ok">
+            CSV descargado · SHA-256 <span className="cn-aud2-hash">{r.hashCsv.slice(0, 16)}…</span>
           </p>
         )}
 
-        {!cargando && !error && eventos.length === 0 && (
-          <p className="py-16 text-center text-[12.5px] text-ink-500">
-            Todavía no hay eventos registrados.
-          </p>
-        )}
-
-        <div className="flex flex-col gap-2">
-          {porDia.map(({ dia, eventos: delDia }) => (
-            <section key={dia}>
-              <p className="pb-1 pt-1 font-mono text-[9.5px] font-semibold uppercase tracking-[0.1em] text-ink-400">
-                {rotuloDelDia(delDia[0].timestamp)}
-              </p>
-
-              <ul className="flex flex-col gap-2">
-                {delDia.map((e) => (
-                  <li
-                    key={e.id}
-                    className="rounded-[8px] border border-line-200 bg-surface px-3 py-[11px]"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="min-w-0 flex-1 truncate text-[13px] font-semibold text-ink-900">
-                        {ACCIONES[e.action] ?? e.action}
-                      </span>
-                      <span className="shrink-0 font-mono text-[11.5px] text-ink-500">
-                        {hora(e.timestamp)}
-                      </span>
-                    </div>
-
-                    {e.resource && (
-                      /*
-                        EL RECURSO TAMBIEN PUEDE SER UNA SOLA PALABRA LARGA: un
-                        radicado de 23 digitos, una URL, o el nombre de un
-                        archivo escrito sin espacios. Sin `overflow-wrap:
-                        anywhere` el navegador no encuentra donde partirlo y el
-                        renglon se pinta hasta 742px en una pantalla de 320 —el
-                        corte a la derecha que se reporto en Seguridad—. La caja
-                        medi­a bien; lo que se salia era el texto, que es por
-                        que medir solo `getBoundingClientRect()` no lo veia.
-                      */
-                      <p className="mt-1 text-justify text-[12.5px] leading-[1.55] text-ink-700 [overflow-wrap:anywhere] [text-wrap:pretty]">
-                        {e.resource}
-                      </p>
-                    )}
-
-                    {/*
-                      QUIEN Y DESDE DONDE, en una linea de mono. La IP se recorta
-                      igual que en escritorio: identifica la sesion sin publicar
-                      la direccion completa de nadie.
-                    */}
-                    {/*
-                      UN CORREO ES UNA SOLA PALABRA DE 370px. No tiene espacios,
-                      así que el navegador no encuentra dónde partirlo y se sale
-                      de la tarjeta por la derecha. `break-words` no sirve aquí
-                      —está medido: el ancho mínimo se queda en 370—; hace falta
-                      `overflow-wrap: anywhere`, que sí permite cortar dentro de
-                      la palabra, y solo cuando no cabe de otro modo.
-                    */}
-                    <p className="mt-1.5 font-mono text-[11px] text-ink-400 [overflow-wrap:anywhere]">
-                      {[e.userEmail, e.ipAddress].filter(Boolean).join(' · ')}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
-        </div>
+        <p className="cn-aud2-nota">
+          El registro no se puede editar ni borrar, tampoco al eliminar la firma: conserva el correo de cada usuario, la IP
+          y una descripción breve de cada acción.
+        </p>
       </div>
     </div>
   );

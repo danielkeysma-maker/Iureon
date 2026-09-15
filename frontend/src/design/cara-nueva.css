@@ -9287,6 +9287,21 @@
   line-height: 21px;
   color: var(--ink-4);
 }
+/* Editar datos del caso: el nombre vacío es error; el radicado incompleto, solo aviso. */
+.cara-nueva .cn-exp-ayuda--error {
+  font-weight: 500;
+  color: var(--warn);
+}
+.cara-nueva .cn-exp-ayuda--aviso {
+  color: var(--warn);
+}
+.cara-nueva .cn-exp-entrada--area {
+  height: auto;
+  min-height: 112px;
+  padding: 12px 16px;
+  line-height: 24px;
+  resize: vertical;
+}
 .cara-nueva .cn-exp-entrada {
   display: block;
   width: 100%;
@@ -9450,6 +9465,25 @@
 }
 .cara-nueva .cn-exp-fecha .cn-red-lista {
   width: 240px;
+}
+/*
+ * La rama va aparte de las fechas porque no es una fecha. Más ancha que año y
+ * mes: los nombres del catálogo son largos («Superintendencias (SIC, …)»).
+ */
+.cara-nueva .cn-exp-ramas {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+  align-items: flex-end;
+}
+.cara-nueva .cn-exp-ramas .cn-exp-fecha {
+  width: 280px;
+  max-width: 100%;
+  flex: 0 1 280px;
+}
+.cara-nueva .cn-exp-ramas .cn-red-lista {
+  width: 360px;
+  max-width: calc(100vw - 32px);
 }
 .cara-nueva .cn-exp-fecha-apagada,
 .cara-nueva .cn-exp-fecha-apagada:hover {
@@ -9766,6 +9800,81 @@
   flex: none;
   align-items: center;
   gap: 8px;
+}
+/* El estado en la ficha del caso: la lista de la casa, sin rótulo visible (lo lleva el botón). */
+.cara-nueva .cn-exp-estado {
+  flex: none;
+  width: 176px;
+}
+.cara-nueva .cn-exp-estado .cn-red-rotulo {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+/* Los subformularios de «Personas»: cliente y quién es quién, con la misma cara que los diálogos. */
+.cara-nueva .cn-exp-subform {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--wash);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.cara-nueva .cn-exp-subform-cuerpo {
+  display: grid;
+  gap: 16px;
+}
+.cara-nueva .cn-exp-con-icono {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+}
+/* Los rótulos del selector compartido, con el mismo peso que los de los campos del módulo. */
+.cara-nueva .cn-exp-subform .cn-red-rotulo,
+.cara-nueva .cn-exp-dlg .cn-red-rotulo {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ink);
+}
+.cara-nueva .cn-exp-editar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+}
+/* «Sin rama registrada · Agregar»: la falta, y al lado cómo llenarla. */
+.cara-nueva .cn-exp-datos dd.cn-exp-dato-falta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 6px;
+}
+.cara-nueva .cn-exp-agregar {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  margin: -11px 0;
+  padding: 0 6px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brand);
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-agregar:hover {
+  background: var(--field);
+  text-decoration: underline;
+}
+.cara-nueva .cn-exp-agregar:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
 }
 .cara-nueva .cn-exp-termino {
   display: flex;
@@ -10534,6 +10643,10 @@
   .cara-nueva .cn-exp-nuevo {
     display: none;
   }
+  /* En el teléfono «Editar» vive en «Más opciones»: la ficha le deja el renglón a la carátula. */
+  .cara-nueva .cn-exp-editar {
+    display: none;
+  }
   .cara-nueva .cn-exp-caso-trabajo > .cn-exp-pestanas {
     gap: 0 20px;
     margin: 16px 16px 0;
@@ -10562,6 +10675,14 @@
   }
   .cara-nueva .cn-exp-fechas .cn-exp-fecha {
     width: auto;
+  }
+  /* La rama, en su renglón a todo el ancho: su nombre no cabe en media columna. */
+  .cara-nueva .cn-exp-ramas {
+    width: 100%;
+  }
+  .cara-nueva .cn-exp-ramas .cn-exp-fecha {
+    width: 100%;
+    flex: 1 1 100%;
   }
   .cara-nueva .cn-exp-cuerpo {
     padding: 16px 16px 24px;
@@ -24510,23 +24631,84 @@
 .cara-nueva .cn-cat-pie-fijo .cn-cat-boton {
   flex: 1;
 }
+/*
+ * LA HOJA MIDE LO QUE SE VE. `--hoja-alto` y `--hoja-arriba` los pone
+ * `HojaSobreElTeclado` desde `visualViewport`: con `92dvh` el teclado del
+ * teléfono tapaba el pie y los campos. Sin la API, `100dvh`.
+ */
 .cara-nueva .cn-cat-hoja-capa {
   position: fixed;
-  inset: 0;
+  top: var(--hoja-arriba, 0px);
+  right: 0;
+  left: 0;
   z-index: 50;
   display: flex;
+  height: var(--hoja-alto, 100dvh);
   flex-direction: column;
   justify-content: flex-end;
 }
 .cara-nueva .cn-cat-hoja {
   position: relative;
   display: flex;
-  height: 92dvh;
+  height: 92%;
+  min-height: 0;
+  max-width: 100%;
   flex-direction: column;
   overflow: hidden;
   padding-bottom: env(safe-area-inset-bottom);
   border-radius: 20px 20px 0 0;
   background: var(--canvas);
+}
+/*
+ * EL FORMULARIO ENTERO SE DESPLAZA; CABECERA Y PIE SE PEGAN. Antes solo se
+ * desplazaba el cuerpo, y cabecera, resumen y un pie apilado de 136 px dejaban
+ * 274 px de cuerpo en un teléfono de 664: con el teclado abierto, cero.
+ */
+.cara-nueva .cn-cat-hoja > .cn-cat-form {
+  height: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.cara-nueva .cn-cat-hoja .cn-cat-form-cabeza {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--canvas);
+}
+.cara-nueva .cn-cat-hoja .cn-cat-form-cuerpo {
+  flex: none;
+  overflow: visible;
+}
+.cara-nueva .cn-cat-hoja .cn-cat-form-pie {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: stretch;
+  margin-top: auto;
+  padding: 12px 16px;
+}
+.cara-nueva .cn-cat-hoja .cn-cat-form-pie .cn-cat-separa {
+  display: none;
+}
+.cara-nueva .cn-cat-hoja .cn-cat-form-pie .cn-cat-boton {
+  min-width: 0;
+  flex: 1 1 0;
+  padding: 0 12px;
+}
+.cara-nueva .cn-cat-hoja .cn-cat-form-pie .cn-cat-boton--primario {
+  flex-grow: 2;
+}
+.cara-nueva .cn-cat-hoja .cn-cat-form-pie .cn-cat-boton--fantasma {
+  flex-basis: 100%;
+}
+.cara-nueva .cn-cat-hoja input,
+.cara-nueva .cn-cat-hoja textarea {
+  scroll-margin-block: 96px;
 }
 
 /* ── El marco compartido (`ConfirmarDialog`), vestido desde fuera ─────── */
@@ -24643,3 +24825,1665 @@
   }
 }
 /* ─── fin Buscador y Catálogo ─── */
+/* ─── Privacidad, Seguridad y Auditoría ─── */
+/*
+ * Auditoría (`modules/audit`), Privacidad y Seguridad (`modules/privacy`,
+ * `modules/support/components/SeguridadDeLaFirma.tsx`).
+ *
+ * FORMA de `public/handoff/app-administrar-y-saldo.html` (:303, Auditoría) y de
+ * `app-ajustes-y-plan.html` (:78, Privacidad y seguridad; :136, Lo que nunca
+ * ocurre). La auditoría en el teléfono y el bloque de Seguridad son DERIVADOS:
+ * ningún artboard los dibuja.
+ *
+ * Reglas del bloque:
+ *   · las tablas solo tienen columnas fijas desde 1024 px (Auditoría) o 900 px
+ *     (Privacidad); por debajo cada fila es una tarjeta con sus rótulos;
+ *   · el mono solo para lo citable: hora, IP, identificador y hash
+ *     (selectores `-hora`, `-ip`, `-id`, `-hash`); los conteos van en la letra
+ *     de interfaz;
+ *   · nada por debajo de 14 px, todo control a 44 px, sin discontinuo (nada
+ *     aquí está «sin verificar») y sin oro (es del módulo activo del panel);
+ *   · la cabecera de Privacidad va en la tinta del panel: es la pantalla que se
+ *     muestra ante un cliente y se lee como documento, no como ajuste.
+ * Prefijos `cn-aud2-` (el `cn-aud-` ya es de Audiencias), `cn-pri-`, `cn-seg-`.
+ */
+.cara-nueva.cn-aud2,
+.cara-nueva.cn-pri {
+  --aud2-sombra: 0 1px 3px rgb(16 24 34 / 0.1);
+  --pri-sombra: 0 1px 3px rgb(16 24 34 / 0.1);
+  --pri-sobre: #fff;
+  --pri-sobre-2: #a9bccc;
+  --pri-sobre-3: #c3cdd8;
+  --pri-sello: rgb(255 255 255 / 0.12);
+  --pri-sello-peligro: rgb(235 165 156 / 0.28);
+  --pri-blanco: #fff;
+  --pri-blanco-tinta: #0f2233;
+  --pri-punto: #4fb483;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva.cn-aud2,
+  :root:not([data-theme='light']) .cara-nueva.cn-pri {
+    --aud2-sombra: inset 0 0 0 1px #24303d;
+    --pri-sombra: inset 0 0 0 1px #24303d;
+    --pri-sobre: #e8edf2;
+    --pri-sobre-2: #8fa0b2;
+    --pri-sobre-3: #c3cdd8;
+    --pri-sello: rgb(255 255 255 / 0.08);
+    --pri-sello-peligro: rgb(235 165 156 / 0.18);
+    --pri-blanco: #e8edf2;
+    --pri-blanco-tinta: #131b24;
+    --pri-punto: #4fb483;
+  }
+}
+:root[data-theme='dark'] .cara-nueva.cn-aud2,
+:root[data-theme='dark'] .cara-nueva.cn-pri {
+  --aud2-sombra: inset 0 0 0 1px #24303d;
+  --pri-sombra: inset 0 0 0 1px #24303d;
+  --pri-sobre: #e8edf2;
+  --pri-sobre-2: #8fa0b2;
+  --pri-sobre-3: #c3cdd8;
+  --pri-sello: rgb(255 255 255 / 0.08);
+  --pri-sello-peligro: rgb(235 165 156 / 0.18);
+  --pri-blanco: #e8edf2;
+  --pri-blanco-tinta: #131b24;
+  --pri-punto: #4fb483;
+}
+
+/* ── Auditoría ─────────────────────────────────────────────────────────── */
+.cara-nueva.cn-aud2 {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  background: var(--canvas);
+  color: var(--ink);
+}
+.cara-nueva .cn-aud2-cabecera {
+  flex: none;
+  padding: 28px max(36px, calc((100% - 1100px) / 2)) 0;
+}
+.cara-nueva .cn-aud2-titulo {
+  margin: 0 0 6px;
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.cara-nueva .cn-aud2-entrada {
+  margin: 0 0 20px;
+  font-size: 18px;
+  line-height: 26px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aud2-herramientas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.cara-nueva .cn-aud2-buscar {
+  position: relative;
+  display: block;
+  min-width: 260px;
+  flex: 1;
+}
+.cara-nueva .cn-aud2-buscar-icono {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  color: var(--ink-5);
+  pointer-events: none;
+}
+.cara-nueva .cn-aud2-campo {
+  display: block;
+  width: 100%;
+  height: 44px;
+  box-sizing: border-box;
+  padding: 0 14px 0 40px;
+  border: none;
+  border-radius: 12px;
+  background: var(--field);
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  outline: none;
+}
+.cara-nueva .cn-aud2-campo::placeholder {
+  color: var(--ink-5);
+}
+.cara-nueva .cn-aud2-campo:focus-visible,
+.cara-nueva .cn-aud2-selector:focus-visible,
+.cara-nueva .cn-aud2-boton:focus-visible,
+.cara-nueva .cn-aud2-chip:focus-visible,
+.cara-nueva .cn-aud2-fila-boton:focus-visible {
+  box-shadow: 0 0 0 2px var(--brand);
+  outline: none;
+}
+.cara-nueva .cn-aud2-selector {
+  display: inline-block;
+  height: 44px;
+  max-width: 220px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 12px;
+  background: var(--neutral);
+  font-family: inherit;
+  font-size: 14.5px;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.cara-nueva .cn-aud2-boton {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.16s;
+}
+.cara-nueva .cn-aud2-boton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.cara-nueva .cn-aud2-boton--fantasma {
+  background: transparent;
+  color: var(--brand);
+}
+.cara-nueva .cn-aud2-boton--fantasma:hover:not(:disabled) {
+  background: var(--brand-soft);
+}
+.cara-nueva .cn-aud2-boton--suave {
+  background: var(--neutral);
+  color: var(--ink-2);
+}
+.cara-nueva .cn-aud2-boton--suave:hover:not(:disabled) {
+  background: var(--line-2);
+  color: var(--ink);
+}
+.cara-nueva .cn-aud2-boton--icono {
+  width: 44px;
+  padding: 0;
+  background: var(--neutral);
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aud2-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.cara-nueva .cn-aud2-icono--girando {
+  animation: spin 1s linear infinite;
+}
+.cara-nueva .cn-aud2-vistas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.cara-nueva .cn-aud2-chip {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 0 14px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-4);
+  cursor: pointer;
+}
+.cara-nueva .cn-aud2-chip:hover {
+  background: var(--neutral);
+  color: var(--ink);
+}
+.cara-nueva .cn-aud2-chip--activo,
+.cara-nueva .cn-aud2-chip--activo:hover {
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 600;
+}
+.cara-nueva .cn-aud2-cuerpo {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px max(36px, calc((100% - 1100px) / 2)) 32px;
+}
+.cara-nueva .cn-aud2-encabezado {
+  display: none;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aud2-renglon {
+  border-bottom: 1px solid var(--line);
+}
+.cara-nueva .cn-aud2-fila-boton {
+  display: grid;
+  width: 100%;
+  min-height: 44px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+  padding: 13px 14px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.14s;
+}
+.cara-nueva .cn-aud2-fila-boton:hover {
+  background: var(--wash);
+}
+.cara-nueva .cn-aud2-renglon--abierto .cn-aud2-fila-boton {
+  background: var(--brand-soft);
+}
+.cara-nueva .cn-aud2-hora {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 14.5px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aud2-usuario {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-aud2-que {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+.cara-nueva .cn-aud2-accion {
+  font-size: 15px;
+  line-height: 23px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-aud2-recurso {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-aud2-ip {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 23px;
+  color: var(--ink-5);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-aud2-id {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-aud2-hash {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-aud2-detalle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px 24px;
+  margin: 0;
+  padding: 4px 14px 16px;
+  background: var(--brand-soft);
+}
+.cara-nueva .cn-aud2-detalle-par {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+.cara-nueva .cn-aud2-detalle-par--ancho {
+  grid-column: 1 / -1;
+}
+.cara-nueva .cn-aud2-detalle-rotulo {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aud2-detalle dd {
+  margin: 0;
+}
+.cara-nueva .cn-aud2-detalle-valor {
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-aud2-estado {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 32px 14px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aud2-aviso {
+  margin: 16px 0;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-aud2-aviso--peligro {
+  background: var(--danger-bg);
+}
+.cara-nueva .cn-aud2-aviso--ok {
+  background: var(--ok-bg);
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ok);
+}
+.cara-nueva .cn-aud2-aviso-titulo {
+  margin: 0 0 4px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--danger);
+}
+.cara-nueva .cn-aud2-aviso-texto {
+  margin: 0 0 12px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-aud2-pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 16px;
+}
+.cara-nueva .cn-aud2-conteo {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aud2-nota {
+  max-width: 80ch;
+  margin: 20px 0 0;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-5);
+}
+@media (min-width: 1024px) {
+  .cara-nueva .cn-aud2-encabezado {
+    display: grid;
+    grid-template-columns: 150px 170px minmax(0, 1fr) 150px;
+    gap: 16px;
+  }
+  .cara-nueva .cn-aud2-fila-boton {
+    grid-template-columns: 150px 170px minmax(0, 1fr) 150px;
+    align-items: start;
+    gap: 16px;
+  }
+  .cara-nueva .cn-aud2-detalle {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ── Auditoría en el teléfono: tarjetas agrupadas por día ──────────────── */
+.cara-nueva .cn-aud2-movil-scroll {
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 16px 32px;
+}
+.cara-nueva.cn-aud2--movil .cn-aud2-titulo {
+  font-size: 28px;
+  line-height: 34px;
+}
+.cara-nueva.cn-aud2--movil .cn-aud2-entrada {
+  margin-bottom: 16px;
+  font-size: 16px;
+  line-height: 24px;
+}
+.cara-nueva.cn-aud2--movil .cn-aud2-buscar {
+  min-width: 0;
+  margin-bottom: 8px;
+}
+.cara-nueva .cn-aud2-movil-filtros {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.cara-nueva.cn-aud2--movil .cn-aud2-selector {
+  width: 100%;
+  max-width: none;
+}
+.cara-nueva.cn-aud2--movil .cn-aud2-vistas {
+  margin-bottom: 4px;
+  padding-bottom: 12px;
+}
+.cara-nueva .cn-aud2-dia-grupo {
+  margin-top: 14px;
+}
+.cara-nueva .cn-aud2-dia {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-aud2-dia::first-letter {
+  text-transform: uppercase;
+}
+.cara-nueva .cn-aud2-tarjetas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-aud2-tarjeta {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--aud2-sombra);
+}
+.cara-nueva .cn-aud2-tarjeta-arriba {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.cara-nueva .cn-aud2-tarjeta-arriba .cn-aud2-accion {
+  min-width: 0;
+  flex: 1;
+}
+.cara-nueva .cn-aud2-tarjeta .cn-aud2-recurso {
+  margin-top: 4px;
+}
+.cara-nueva .cn-aud2-tarjeta-quien {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  margin: 6px 0 0;
+}
+.cara-nueva .cn-aud2-tarjeta-quien .cn-aud2-detalle-valor {
+  font-size: 14px;
+  color: var(--ink-4);
+}
+.cara-nueva.cn-aud2--movil .cn-aud2-pie {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* ── Privacidad y seguridad ────────────────────────────────────────────── */
+.cara-nueva.cn-pri {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  background: var(--canvas);
+  color: var(--ink);
+}
+.cara-nueva .cn-pri-scroll {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+}
+.cara-nueva .cn-pri-ancho {
+  width: 100%;
+  max-width: 1064px;
+  box-sizing: border-box;
+  margin-inline: auto;
+  padding-inline: 32px;
+}
+.cara-nueva .cn-pri-cabecera {
+  padding-block: 28px;
+  background: var(--panel);
+}
+.cara-nueva .cn-pri-titulo {
+  margin: 0 0 10px;
+  font-size: 30px;
+  line-height: 38px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--pri-sobre);
+}
+.cara-nueva .cn-pri-entrada {
+  max-width: 76ch;
+  margin: 0 0 18px;
+  font-size: 16px;
+  line-height: 25px;
+  color: var(--pri-sobre-2);
+}
+.cara-nueva .cn-pri-entrada b {
+  font-weight: 600;
+  color: var(--pri-sobre);
+}
+.cara-nueva .cn-pri-sellos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.cara-nueva .cn-pri-sello {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 13px;
+  border-radius: 10px;
+  background: var(--pri-sello);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--pri-sobre);
+}
+.cara-nueva .cn-pri-sello--suave {
+  font-weight: 400;
+  color: var(--pri-sobre-3);
+}
+.cara-nueva .cn-pri-sello--peligro {
+  background: var(--pri-sello-peligro);
+}
+.cara-nueva .cn-pri-punto {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--pri-punto);
+}
+.cara-nueva .cn-pri-boton {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.16s;
+}
+.cara-nueva .cn-pri-boton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.cara-nueva .cn-pri-boton:focus-visible,
+.cara-nueva .cn-pri-enlace:focus-visible,
+.cara-nueva .cn-seg-boton:focus-visible {
+  box-shadow: 0 0 0 2px var(--brand);
+  outline: none;
+}
+.cara-nueva .cn-pri-boton--blanco {
+  margin-left: auto;
+  background: var(--pri-blanco);
+  color: var(--pri-blanco-tinta);
+}
+.cara-nueva .cn-pri-boton--suave {
+  background: var(--neutral);
+  color: var(--ink-2);
+}
+.cara-nueva .cn-pri-boton--suave:hover:not(:disabled) {
+  background: var(--line-2);
+  color: var(--ink);
+}
+.cara-nueva .cn-pri-icono {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.cara-nueva .cn-pri-icono--girando {
+  animation: spin 1s linear infinite;
+}
+.cara-nueva .cn-pri-cuerpo {
+  padding-block: 24px 32px;
+}
+.cara-nueva .cn-pri-estado {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 16px 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-pri-aviso {
+  margin: 0 0 24px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--danger-bg);
+}
+.cara-nueva .cn-pri-aviso-titulo {
+  margin: 0 0 4px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--danger);
+}
+.cara-nueva .cn-pri-seccion {
+  margin-bottom: 28px;
+}
+.cara-nueva .cn-pri-h2 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.cara-nueva .cn-pri-parrafo {
+  margin: 0 0 14px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.cara-nueva .cn-pri-tabla {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cara-nueva .cn-pri-encabezado {
+  display: none;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-pri-fila {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--pri-sombra);
+}
+.cara-nueva .cn-pri-quien,
+.cara-nueva .cn-pri-celda {
+  min-width: 0;
+}
+.cara-nueva .cn-pri-nombre {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 23px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-pri-sub {
+  margin: 2px 0 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-pri-enlace {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brand);
+  text-decoration: none;
+}
+.cara-nueva .cn-pri-enlace:hover,
+.cara-nueva .cn-pri-enlace-nombre:hover {
+  text-decoration: underline;
+}
+.cara-nueva .cn-pri-enlace-icono {
+  width: 14px;
+  height: 14px;
+}
+.cara-nueva .cn-pri-enlace-nombre {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  text-decoration: none;
+}
+.cara-nueva .cn-pri-rotulo {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-pri-texto {
+  margin: 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-pri-datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 0;
+}
+.cara-nueva .cn-pri-dato {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 9px;
+  background: var(--neutral);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+.cara-nueva .cn-pri-dato--sensible {
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 600;
+}
+.cara-nueva .cn-pri-filas-simples {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cara-nueva .cn-pri-fila-simple {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+  padding: 10px 14px;
+  border-radius: 10px;
+}
+.cara-nueva .cn-pri-fila-simple:hover {
+  background: var(--wash);
+}
+.cara-nueva .cn-pri-posicion {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  padding: 20px 22px;
+  border-radius: 14px;
+  background: var(--wash);
+}
+.cara-nueva .cn-pri-posicion-titulo {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-pri-posicion .cn-pri-parrafo,
+.cara-nueva .cn-pri-caja .cn-pri-parrafo {
+  margin: 0;
+}
+.cara-nueva .cn-pri-caja {
+  margin: 0 0 28px;
+  padding: 20px 22px;
+  border-radius: 14px;
+  background: var(--field);
+}
+.cara-nueva .cn-pri-tarjetas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+.cara-nueva .cn-pri-tarjeta {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--ok-bg);
+}
+.cara-nueva .cn-pri-tarjeta--neutra {
+  background: var(--field);
+}
+.cara-nueva .cn-pri-tarjeta-icono {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin-top: 4px;
+  color: var(--ok);
+}
+.cara-nueva .cn-pri-tarjeta-texto {
+  min-width: 0;
+}
+.cara-nueva .cn-pri-tarjeta-titulo {
+  margin: 0;
+  font-size: 16.5px;
+  line-height: 25px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-pri-tarjeta-detalle {
+  margin: 2px 0 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ok);
+}
+.cara-nueva .cn-pri-tarjeta--neutra .cn-pri-tarjeta-detalle {
+  color: var(--ink-4);
+}
+.cara-nueva .cn-pri-final {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 20px;
+}
+@media (min-width: 768px) {
+  .cara-nueva .cn-pri-posicion {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 900px) {
+  .cara-nueva .cn-pri-tabla {
+    gap: 0;
+  }
+  .cara-nueva .cn-pri-encabezado {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr) 150px 190px;
+    gap: 16px;
+  }
+  .cara-nueva .cn-pri-fila {
+    grid-template-columns: 180px minmax(0, 1fr) 150px 190px;
+    align-items: start;
+    gap: 16px;
+    padding: 14px;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .cara-nueva .cn-pri-rotulo {
+    display: none;
+  }
+  .cara-nueva .cn-pri-fila-simple {
+    grid-template-columns: 180px minmax(0, 1fr) 150px;
+    align-items: start;
+    gap: 16px;
+  }
+  .cara-nueva .cn-pri-tarjetas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 767px) {
+  .cara-nueva .cn-pri-ancho {
+    padding-inline: 16px;
+  }
+  .cara-nueva .cn-pri-cabecera {
+    padding-block: 22px;
+  }
+  .cara-nueva .cn-pri-titulo {
+    font-size: 26px;
+    line-height: 32px;
+  }
+  .cara-nueva .cn-pri-boton--blanco {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+/* ── Seguridad (dentro de Privacidad) ──────────────────────────────────── */
+.cara-nueva .cn-seg {
+  margin-bottom: 8px;
+}
+.cara-nueva .cn-seg-tarjeta {
+  margin-bottom: 12px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--canvas);
+  box-shadow: var(--pri-sombra);
+}
+.cara-nueva .cn-seg-tarjeta-titulo {
+  margin: 0 0 8px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-seg-texto {
+  margin: 0 0 8px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-seg-texto--fuerte {
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-seg-icono {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  vertical-align: -3px;
+}
+.cara-nueva .cn-seg-icono--girando {
+  animation: spin 1s linear infinite;
+}
+.cara-nueva .cn-seg-aviso {
+  margin-bottom: 8px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--danger-bg);
+}
+.cara-nueva .cn-seg-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0 12px;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-seg-lista-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.cara-nueva .cn-seg-lista-item .cn-seg-texto {
+  margin: 0;
+}
+.cara-nueva .cn-seg-hora {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-seg-puntos {
+  margin: 0;
+  padding-left: 20px;
+}
+.cara-nueva .cn-seg-puntos .cn-seg-texto {
+  margin-bottom: 6px;
+}
+.cara-nueva .cn-seg-boton {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--neutral);
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: background-color 0.16s;
+}
+.cara-nueva .cn-seg-boton:hover:not(:disabled) {
+  background: var(--line-2);
+  color: var(--ink);
+}
+.cara-nueva .cn-seg-boton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.cara-nueva .cn-seg-boton--peligro,
+.cara-nueva .cn-seg-boton--peligro:hover:not(:disabled) {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cara-nueva .cn-aud2-icono--girando,
+  .cara-nueva .cn-pri-icono--girando,
+  .cara-nueva .cn-seg-icono--girando {
+    animation: none;
+  }
+  .cara-nueva .cn-aud2-boton,
+  .cara-nueva .cn-aud2-fila-boton,
+  .cara-nueva .cn-pri-boton,
+  .cara-nueva .cn-seg-boton {
+    transition: none;
+  }
+}
+/* ─── fin Privacidad, Seguridad y Auditoría ─── */
+
+/* ─── Novedades ─── */
+/*
+ * `public/handoff/app-novedades.html`: cabecera :80, filas :131, detalle :191,
+ * vacío :281, teléfono de 375 px :291. Reglas que se ven aquí:
+ *   · el punto AZUL es «no lo ha visto» y el GRIS «ya lo vio», como en la
+ *     maqueta; el ámbar es solo del filtro «Le afecta» y de las correcciones;
+ *   · nada de oro: es del módulo activo en la barra;
+ *   · la descripción de la fila se corta a dos renglones y se lee entera en
+ *     el detalle; la prosa del detalle va justificada;
+ *   · en el teléfono los chips de módulo ceden su sitio a un selector y
+ *     «Marcar todo como visto» baja al pie, pegado al borde (maqueta :330);
+ *   · la fila de Inicio (`cn-nov-inicio-*`) va aquí y no en el bloque de
+ *     Inicio: es la misma señal «Nuevo» que la lista.
+ */
+.cara-nueva.cn-nov {
+  --nov-punto-visto: #d7dde4;
+  --nov-fila-hover: #f6f7f9;
+  --nov-caja: #fafbfc;
+  --nov-chip-activo: #101822;
+  --nov-chip-activo-tinta: #fff;
+  --nov-pie: #fff;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--canvas);
+}
+.cara-nueva .cn-nov-inicio-fila {
+  --nov-punto-nuevo: #17456b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cara-nueva.cn-nov {
+    --nov-punto-visto: #3a4a5c;
+    --nov-fila-hover: #1a2430;
+    --nov-caja: #0b1219;
+    --nov-chip-activo: #e8edf2;
+    --nov-chip-activo-tinta: #0b1219;
+    --nov-pie: #131b24;
+  }
+  :root:not([data-theme='light']) .cara-nueva .cn-nov-inicio-fila {
+    --nov-punto-nuevo: #7fb0d8;
+  }
+}
+:root[data-theme='dark'] .cara-nueva.cn-nov {
+  --nov-punto-visto: #3a4a5c;
+  --nov-fila-hover: #1a2430;
+  --nov-caja: #0b1219;
+  --nov-chip-activo: #e8edf2;
+  --nov-chip-activo-tinta: #0b1219;
+  --nov-pie: #131b24;
+}
+:root[data-theme='dark'] .cara-nueva .cn-nov-inicio-fila {
+  --nov-punto-nuevo: #7fb0d8;
+}
+
+/* ── Página ─────────────────────────────────────────────────────────────── */
+.cara-nueva .cn-nov-pagina {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 28px 36px 40px;
+  box-sizing: border-box;
+}
+.cara-nueva .cn-nov-icono {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.cara-nueva .cn-nov-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.cara-nueva .cn-nov-cabeza {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  margin-bottom: 22px;
+}
+.cara-nueva .cn-nov-cabeza-textos {
+  min-width: 0;
+}
+.cara-nueva .cn-nov-titulo {
+  margin: 0 0 6px;
+  font-size: 34px;
+  line-height: 40px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.cara-nueva .cn-nov-entradilla {
+  margin: 0;
+  font-size: 18px;
+  line-height: 26px;
+  color: var(--ink-4);
+  text-wrap: pretty;
+}
+
+/* ── Botones ───────────────────────────────────────────────────────────── */
+.cara-nueva .cn-nov-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  background: var(--brand-fill);
+  color: #fff;
+  font-family: inherit;
+  font-size: 15.5px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-btn);
+  transition: background 0.16s;
+}
+.cara-nueva .cn-nov-boton:hover {
+  background: var(--brand-fill-hover);
+}
+.cara-nueva .cn-nov-boton--suave {
+  background: var(--neutral);
+  color: var(--ink-2);
+  box-shadow: none;
+}
+.cara-nueva .cn-nov-boton--suave:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-nov-boton--ancho {
+  width: 100%;
+  min-height: 48px;
+}
+.cara-nueva .cn-nov-marcar {
+  flex: none;
+}
+.cara-nueva .cn-nov-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  margin: 0 0 12px -6px;
+  padding: 0 10px 0 6px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-4);
+  font-family: inherit;
+  font-size: 14.5px;
+  cursor: pointer;
+}
+.cara-nueva .cn-nov-volver:hover {
+  background: var(--field);
+  color: var(--ink);
+}
+
+/* ── Filtros ───────────────────────────────────────────────────────────── */
+.cara-nueva .cn-nov-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.cara-nueva .cn-nov-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--neutral);
+  color: var(--ink-2);
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.16s;
+}
+.cara-nueva .cn-nov-chip:hover {
+  background: var(--line-2);
+}
+.cara-nueva .cn-nov-chip[aria-pressed='true'] {
+  background: var(--nov-chip-activo);
+  color: var(--nov-chip-activo-tinta);
+}
+.cara-nueva .cn-nov-chip--afecta[aria-pressed='true'] {
+  background: var(--warn-bg);
+  color: var(--warn);
+  box-shadow: inset 0 0 0 1px var(--warn);
+}
+.cara-nueva .cn-nov-select-rotulo {
+  display: none;
+  flex: 1 1 100%;
+}
+.cara-nueva .cn-nov-select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 10px;
+  background: var(--field);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 15.5px;
+}
+.cara-nueva .cn-nov-resumen {
+  margin: 0 0 8px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+
+/* ── Lista ─────────────────────────────────────────────────────────────── */
+.cara-nueva .cn-nov-mes {
+  margin-top: 22px;
+}
+.cara-nueva .cn-nov-mes-titulo {
+  margin: 0 0 6px;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.cara-nueva .cn-nov-lista {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-nov-fila {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  width: 100%;
+  min-height: 44px;
+  padding: 18px 14px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.14s;
+}
+.cara-nueva .cn-nov-fila:hover {
+  background: var(--nov-fila-hover);
+}
+.cara-nueva .cn-nov-punto {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin-top: 9px;
+  border-radius: 50%;
+  background: var(--nov-punto-visto);
+}
+.cara-nueva .cn-nov-punto--nueva {
+  background: var(--brand);
+}
+.cara-nueva .cn-nov-punto--afecta {
+  margin-top: 0;
+  background: var(--warn);
+}
+.cara-nueva .cn-nov-fila-cuerpo {
+  display: block;
+  flex: 1;
+  min-width: 0;
+}
+.cara-nueva .cn-nov-fila-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-bottom: 3px;
+}
+.cara-nueva .cn-nov-fila-titulo {
+  font-size: 17px;
+  line-height: 26px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-nov-fila-meta {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+}
+.cara-nueva .cn-nov-fila-texto {
+  display: -webkit-box;
+  max-width: 74ch;
+  overflow: hidden;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.cara-nueva .cn-nov-fecha {
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 26px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-nov-fila-fecha {
+  flex: none;
+}
+.cara-nueva .cn-nov-tipo--correccion {
+  color: var(--warn);
+  font-weight: 600;
+}
+.cara-nueva .cn-nov-tipo--nuevo {
+  color: var(--brand);
+  font-weight: 600;
+}
+.cara-nueva .cn-nov-insignia {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.cara-nueva .cn-nov-insignia--nueva {
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.cara-nueva .cn-nov-insignia--incluido {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.cara-nueva .cn-nov-insignia--fuera {
+  background: var(--neutral);
+  color: var(--ink-4);
+}
+
+/* ── Vacío y nota ──────────────────────────────────────────────────────── */
+.cara-nueva .cn-nov-vacio {
+  max-width: 48ch;
+  margin: 40px auto;
+  text-align: center;
+}
+.cara-nueva .cn-nov-vacio-icono {
+  display: inline-grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 20px;
+  border-radius: 16px;
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.cara-nueva .cn-nov-vacio-titulo {
+  margin: 0 0 8px;
+  font-size: 26px;
+  line-height: 34px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+.cara-nueva .cn-nov-vacio-texto {
+  margin: 0 0 22px;
+  font-size: 16.5px;
+  line-height: 26px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-nov-nota {
+  margin: 28px 0 0;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--field);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+  text-wrap: pretty;
+}
+.cara-nueva .cn-nov-pie-movil {
+  display: none;
+}
+
+/* ── Detalle ───────────────────────────────────────────────────────────── */
+.cara-nueva .cn-nov-detalle {
+  max-width: 800px;
+}
+.cara-nueva .cn-nov-detalle-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.cara-nueva .cn-nov-tipo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 11px;
+  border-radius: 9px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 14px;
+  font-weight: 600;
+}
+.cara-nueva .cn-nov-tipo-chip--mejora {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+.cara-nueva .cn-nov-tipo-chip--correccion {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.cara-nueva .cn-nov-tipo-punto {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.cara-nueva .cn-nov-detalle-titulo {
+  max-width: 40ch;
+  margin: 0 0 10px;
+  font-size: 30px;
+  line-height: 38px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.cara-nueva .cn-nov-detalle-texto {
+  max-width: 72ch;
+  margin: 0 0 26px;
+  font-size: 17px;
+  line-height: 27px;
+  color: var(--ink-3);
+  text-align: justify;
+  text-wrap: pretty;
+}
+.cara-nueva .cn-nov-caja {
+  margin-bottom: 24px;
+  padding: 20px 22px;
+  border-radius: 14px;
+  background: var(--nov-caja);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.cara-nueva .cn-nov-caja-titulo {
+  margin: 0 0 8px;
+  font-size: 17px;
+  line-height: 26px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.cara-nueva .cn-nov-caja-texto {
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-nov-modulos {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cara-nueva .cn-nov-modulo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+.cara-nueva .cn-nov-modulo-nombre {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-nov-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+/* ── En Inicio ─────────────────────────────────────────────────────────── */
+.cara-nueva .cn-nov-inicio-fila {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 8px;
+  margin: 0 -8px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-3);
+  font-family: inherit;
+  font-size: 14.5px;
+  line-height: 21px;
+  text-align: left;
+  cursor: pointer;
+}
+.cara-nueva .cn-nov-inicio-fila:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-nov-inicio-titulo {
+  flex: 1;
+  min-width: 0;
+}
+.cara-nueva .cn-nov-inicio-nuevo {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--nov-punto-nuevo);
+}
+.cara-nueva .cn-nov-inicio-punto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ── Teléfono ──────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .cara-nueva .cn-nov-pagina {
+    padding: 16px 16px 24px;
+  }
+  .cara-nueva .cn-nov-cabeza {
+    margin-bottom: 14px;
+  }
+  .cara-nueva .cn-nov-titulo {
+    margin-bottom: 4px;
+    font-size: 28px;
+    line-height: 34px;
+  }
+  .cara-nueva .cn-nov-entradilla {
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .cara-nueva .cn-nov-marcar,
+  .cara-nueva .cn-nov-chip--modulo {
+    display: none;
+  }
+  .cara-nueva .cn-nov-select-rotulo {
+    display: block;
+  }
+  .cara-nueva .cn-nov-fila {
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    margin: 0 -12px;
+    width: calc(100% + 24px);
+    padding: 16px 12px;
+  }
+  .cara-nueva .cn-nov-fila-cuerpo {
+    flex: 1 1 calc(100% - 40px);
+  }
+  .cara-nueva .cn-nov-fila-titulo {
+    font-size: 16.5px;
+    line-height: 25px;
+  }
+  .cara-nueva .cn-nov-punto {
+    order: -2;
+    margin-top: 7px;
+  }
+  .cara-nueva .cn-nov-fila-fecha {
+    order: -1;
+    flex: 1 1 auto;
+    font-size: 13.5px;
+    line-height: 20px;
+  }
+  .cara-nueva .cn-nov-detalle-titulo {
+    font-size: 24px;
+    line-height: 32px;
+  }
+  .cara-nueva .cn-nov-detalle-texto {
+    font-size: 16px;
+    line-height: 26px;
+  }
+  .cara-nueva .cn-nov-acciones .cn-nov-boton {
+    width: 100%;
+  }
+  .cara-nueva .cn-nov-pie-movil {
+    position: sticky;
+    bottom: 0;
+    display: block;
+    padding: 12px 16px 16px;
+    border-top: 1px solid var(--line);
+    background: var(--nov-pie);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cara-nueva .cn-nov-boton,
+  .cara-nueva .cn-nov-chip,
+  .cara-nueva .cn-nov-fila {
+    transition: none;
+  }
+}
+/* ─── fin Novedades ─── */

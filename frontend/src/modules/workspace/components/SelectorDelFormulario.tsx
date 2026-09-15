@@ -96,7 +96,12 @@ export const SelectorDelFormulario: React.FC<SelectorDelFormularioProps> = ({
   const conVacio = !opciones.some((o) => o.valor === valor);
   const fila = (o: OpcionEnCascada) => (
     <option key={o.valor} value={o.valor}>
-      {o.busqueda ? `${o.etiqueta} · ${o.busqueda}` : o.etiqueta}
+      {/*
+        `busqueda` es texto oculto para filtrar (p. ej. la cédula escrita de tres
+        formas): pintarlo en la lista nativa del teléfono repetía el número tres
+        veces. Aquí va lo que se lee; el detalle, si lo hay, una sola vez.
+      */}
+      {o.detalleTexto ? `${o.etiqueta} · ${o.detalleTexto}` : o.etiqueta}
     </option>
   );
 

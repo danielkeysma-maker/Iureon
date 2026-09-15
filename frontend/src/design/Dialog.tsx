@@ -238,7 +238,7 @@ export const Dialog: React.FC<DialogProps> = ({
           <button
             onClick={onCerrar}
             aria-label="Cerrar"
-            className="-mr-1 -mt-0.5 flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-control text-ink-400 hover:bg-canvas hover:text-ink-900"
+            className="-mr-3 -mt-2.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-control text-ink-400 hover:bg-canvas hover:text-ink-900"
           >
             <X className="h-4 w-4" />
           </button>

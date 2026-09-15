@@ -1,3 +1,5 @@
+import { BRANCH_LABELS } from '../../catalog/branchLabels';
+import { compararEnEspanol } from '../../workspace/services/fichaEnLaLista';
 import { NOMBRE_DE_PAPEL, type ExpedienteEnLista, type PersonaEnLista } from '../types';
 
 /**
@@ -49,7 +51,43 @@ import { NOMBRE_DE_PAPEL, type ExpedienteEnLista, type PersonaEnLista } from '..
  * aplicación no enmascara documentos en ninguna otra pantalla (la ficha del
  * cliente los muestra enteros), y enmascararlos solo aquí haría dudar de que
  * sea la persona buscada.
+ *
+ * ─── RAMA: POR SU CÓDIGO Y POR EL NOMBRE QUE SE LEE ────────────────────────
+ *
+ * El mismo día el dueño pidió buscar y filtrar por rama. La caja compara el
+ * código guardado («LABORAL», «PROPIEDAD_INTELECTUAL» leído como palabras) y el
+ * nombre del catálogo («Laboral & Seguridad Social»), porque el abogado escribe
+ * lo que ve. Una rama escrita a mano es su propio nombre. Entra como un campo
+ * más en la regla de «todas las palabras».
+ *
+ * NO TRAE «POR QUÉ»: la rama siempre está a la vista cuando está registrada —es
+ * la cabecera del grupo en «Activos» y «Cerrados», y va en la línea de cliente
+ * de las tarjetas de «Esta semana»—, y un caso sin rama no coincide por rama.
+ * Tampoco se busca «Sin rama registrada»: es la falta de un dato, y para eso
+ * está la opción del filtro.
  */
+
+export const SIN_RAMA = 'Sin rama registrada';
+/** El valor del filtro para los casos sin rama. Ninguna rama guardada empieza con guion bajo doble. */
+export const CLAVE_SIN_RAMA = '__sin-rama__';
+
+export const ramaLimpia = (rama: string | null | undefined): string | null => {
+  const r = rama?.trim();
+  return r ? r : null;
+};
+
+/**
+ * El nombre de la rama tal como la reconoce el catálogo, o el texto guardado.
+ *
+ * `Object.hasOwn` y no `BRANCH_LABELS[r]` a secas: una rama escrita a mano que
+ * se llame como una propiedad de todo objeto —«constructor»— devolvería una
+ * función en vez de caer al texto guardado.
+ */
+export const etiquetaDeRama = (rama: string | null | undefined): string => {
+  const r = ramaLimpia(rama);
+  if (r === null) return SIN_RAMA;
+  return Object.hasOwn(BRANCH_LABELS, r) ? BRANCH_LABELS[r] : r;
+};
 
 export const normalizar = (texto: string): string =>
   texto.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
@@ -97,6 +135,8 @@ export interface CasoIndexado {
   documentos: CampoDeDocumento[];
   radicado: RadicadoIndexado | null;
   registro: RegistroDelCaso | null;
+  /** La rama guardada, sin espacios alrededor, o `CLAVE_SIN_RAMA`: la misma llave con que se agrupa. */
+  claveDeRama: string;
 }
 
 export interface ResultadoDeBusqueda {
@@ -162,6 +202,12 @@ export const indexarCaso = (caso: ExpedienteEnLista): CasoIndexado => {
   visible(caso.caratula);
   visible(caso.clienteNombre);
   visible(caso.despacho);
+  const rama = ramaLimpia(caso.rama);
+  if (rama !== null) {
+    /* Código con los guiones bajos como espacios, y el nombre del catálogo: los dos se ven como uno solo. */
+    const etiqueta = etiquetaDeRama(rama);
+    visible(etiqueta === rama ? rama : `${rama.replace(/_/g, ' ')} ${etiqueta}`);
+  }
   if (caso.contraparte?.trim()) {
     textos.push({
       norm: normalizar(caso.contraparte),
@@ -194,7 +240,14 @@ export const indexarCaso = (caso: ExpedienteEnLista): CasoIndexado => {
     }
   }
 
-  return { caso, textos, documentos, radicado: indexarRadicado(caso.radicado), registro: registroEnBogota(caso.createdAt) };
+  return {
+    caso,
+    textos,
+    documentos,
+    radicado: indexarRadicado(caso.radicado),
+    registro: registroEnBogota(caso.createdAt),
+    claveDeRama: rama ?? CLAVE_SIN_RAMA
+  };
 };
 
 /* ─── LA CONSULTA ─────────────────────────────────────────────────────────── */
@@ -336,13 +389,47 @@ export const aniosDeRegistro = (indices: readonly CasoIndexado[]): number[] =>
 export const mesesDeRegistro = (indices: readonly CasoIndexado[], anio: number): number[] =>
   [...new Set(indices.filter((x) => x.registro?.anio === anio).map((x) => x.registro!.mes))].sort((a, b) => a - b);
 
-/** «búsqueda «x» · año 2025 · diciembre», para decir qué está puesto cuando nada coincide. */
-export const filtrosEnPalabras = (f: FiltroDeRegistro & { busqueda: string }): string[] => {
+/* ─── RAMA ────────────────────────────────────────────────────────────────── */
+
+export interface OpcionDeRama {
+  valor: string;
+  etiqueta: string;
+}
+
+const etiquetaDeClave = (clave: string): string => (clave === CLAVE_SIN_RAMA ? SIN_RAMA : etiquetaDeRama(clave));
+
+/** `null` es «Todas». */
+export const filtrarPorRama = <T extends CasoIndexado>(indices: readonly T[], clave: string | null): T[] =>
+  clave === null ? [...indices] : indices.filter((x) => x.claveDeRama === clave);
+
+/**
+ * Las ramas de ESTOS casos —la pestaña—, por nombre con la colación española y
+ * «Sin rama registrada» al final, igual que en el agrupado.
+ *
+ * A diferencia de los años, que salen de todos los casos, las ramas salen de la
+ * pestaña: así lo pidió el dueño, y una rama que la pestaña no tiene es un
+ * callejón sin salida. La elegida se conserva aunque la nueva pestaña no la
+ * tenga: el filtro sobrevive al cambio de pestaña, y un control que no muestra
+ * lo que está filtrando haría leer la lista vacía como «no hay casos».
+ */
+export const opcionesDeRama = (indices: readonly CasoIndexado[], elegida: string | null): OpcionDeRama[] => {
+  const claves = new Set(indices.map((x) => x.claveDeRama));
+  if (elegida !== null) claves.add(elegida);
+  const sinRama = claves.delete(CLAVE_SIN_RAMA);
+  const opciones = [...claves]
+    .map((valor) => ({ valor, etiqueta: etiquetaDeClave(valor) }))
+    .sort((a, b) => compararEnEspanol(a.etiqueta, b.etiqueta) || (a.valor < b.valor ? -1 : a.valor > b.valor ? 1 : 0));
+  return sinRama ? [...opciones, { valor: CLAVE_SIN_RAMA, etiqueta: SIN_RAMA }] : opciones;
+};
+
+/** «búsqueda «x» · año 2025 · diciembre · rama Laboral», para decir qué está puesto cuando nada coincide. */
+export const filtrosEnPalabras = (f: FiltroDeRegistro & { busqueda: string; rama?: string | null }): string[] => {
   const partes: string[] = [];
   if (f.busqueda.trim()) partes.push(`búsqueda «${f.busqueda.trim()}»`);
   if (f.anio !== null) {
     partes.push(`año ${f.anio}`);
     if (f.mes !== null) partes.push(MESES[f.mes - 1]);
   }
+  if (f.rama != null) partes.push(f.rama === CLAVE_SIN_RAMA ? SIN_RAMA.toLowerCase() : `rama ${etiquetaDeRama(f.rama)}`);
   return partes;
 };

@@ -516,5 +516,34 @@ for (const sel of ['.cara-nueva .cn-exp-cliente-cabeza', '.cara-nueva .cn-exp-ta
 check('la tarjeta enseña el foco', /outline/.test(regla('.cara-nueva .cn-exp-tarjeta:focus-visible')));
 check('la carátula de la tarjeta va en un renglón', /text-overflow:\s*ellipsis/.test(regla('.cara-nueva .cn-exp-tarjeta-nombre')));
 
+/* ─── 17. NI LISTAS DEL SISTEMA EN ESCRITORIO NI RÓTULOS DE LA CARA VIEJA ── */
+/*
+ * El 14 de septiembre el dueño abrió «De quién es el asunto» → «Cambiar» y vio
+ * el rótulo «CLIENTE» en mono y mayúsculas y la lista azul del sistema
+ * operativo. En escritorio los selectores del módulo son `SelectorEnCascada`
+ * (directo o por `SelectorDelFormulario`); la lista nativa solo vive en el
+ * teléfono, donde es mejor que cualquier lista pintada, y lleva una clase que
+ * lo declara. `SelectorDeExpediente` queda fuera: su cara vieja es opt-in de
+ * pantallas de OTROS módulos (agenda, orientación, audiencias) que se
+ * rediseñan por su lado.
+ */
+const SELECTS_DEL_TELEFONO = ['cn-exp-fecha-select', 'cn-exp-select-movil'];
+const BARRIDO: Record<string, string> = {
+  ...MODULO,
+  'EditarDatosDelCaso.tsx': leer(`${COMP}EditarDatosDelCaso.tsx`),
+  'FiltrosDeLaLista.tsx': leer(`${COMP}FiltrosDeLaLista.tsx`)
+};
+for (const [nombre, codigo] of Object.entries(BARRIDO)) {
+  const nativos = [...codigo.matchAll(/<select\b/g)].map((m) => codigo.slice(m.index, (m.index ?? 0) + 400));
+  const deEscritorio = nativos.filter((s) => !SELECTS_DEL_TELEFONO.some((c) => s.includes(c)));
+  check(`${nombre}: ninguna lista nativa fuera del teléfono`, deEscritorio.length === 0, `${deEscritorio.length} sin clase de teléfono`);
+  check(
+    `${nombre}: si trae lista nativa, decide por el ancho de la ventana`,
+    nativos.length === 0 || codigo.includes('useVentanaAncha(')
+  );
+  const viejo = codigo.match(/\bfield-label\b|\buppercase\b|\bfont-mono\b|text-\[(?:\d|1[0-3])(?:\.\d+)?px\]/);
+  check(`${nombre}: sin rótulos en mono y mayúsculas ni texto por debajo de 14 px`, !viejo, viejo?.[0] ?? '');
+}
+
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

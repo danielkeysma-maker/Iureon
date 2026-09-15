@@ -343,6 +343,46 @@ for (const clase of ['cn-bus-hoja', 'cn-cat-ficha-panel', 'cn-cat-hoja']) {
 }
 check('el marco compartido se viste desde fuera y está vigilado', ESQUINAS.includes("'cn-cat-dialogos'"));
 
+/* ─── 6. LA HOJA DE VERIFICACIÓN SOBRE EL TECLADO DEL TELÉFONO ──────────────
+ *
+ * Reportado en producción el 14 de septiembre de 2026: en el teléfono la hoja
+ * «Verificar el término» quedaba tapada. Medía `92dvh`, que es la ventana de
+ * diseño; el teclado solo encoge la ventana visual y cubría el pie con
+ * «Guardar verificación» y el cuerpo, que ya era de 274 px en un teléfono de
+ * 664 porque cabecera, resumen y pie no se desplazaban. El emulador del
+ * escritorio no abre teclado: esto se vigila en el código.
+ */
+const sinComentariosTs = (s: string): string => s.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ');
+const reglaCss = (css: string, selector: string): string => {
+  const escapado = selector.replace(/[.*+?^${}()|[\]\\>]/g, '\\$&').replace(/\s+/g, '\\s+');
+  return new RegExp(`(?:^|[}\\s])${escapado}\\s*\\{([^}]*)\\}`).exec(css)?.[1] ?? '';
+};
+const faltasDeLaHoja = (hojaTsx: string, vistaTsx: string, css: string): string[] => {
+  const hoja = sinComentariosTs(hojaTsx);
+  const vista = sinComentariosTs(vistaTsx);
+  const faltas: string[] = [];
+  if (!/<HojaSobreElTeclado\b/.test(vista) || /className="cn-cat-hoja-capa"/.test(vista))
+    faltas.push('la vista del teléfono no abre la verificación en HojaSobreElTeclado');
+  if (!/createPortal\(/.test(hoja) || !/document\.body/.test(hoja)) faltas.push('la hoja no se monta en document.body');
+  if (!/className="cara-nueva\b/.test(hoja)) faltas.push('el portal no trae su raíz .cara-nueva (tokens y oscuro)');
+  if (!/visualViewport/.test(hoja) || !/--hoja-alto/.test(hoja)) faltas.push('la hoja no sigue a visualViewport');
+  if (!/scrollIntoView\(\{\s*block:\s*'center'/.test(hoja)) faltas.push('el campo enfocado no se centra sobre el teclado');
+  const capa = reglaCss(css, '.cara-nueva .cn-cat-hoja-capa');
+  if (!/height:\s*var\(--hoja-alto/.test(capa) || !/top:\s*var\(--hoja-arriba/.test(capa))
+    faltas.push('la capa no mide la ventana visual');
+  if (/\d+(d|s|l)?vh/.test(reglaCss(css, '.cara-nueva .cn-cat-hoja').replace(/var\([^)]*\)/g, '')))
+    faltas.push('la hoja vuelve a medirse en vh');
+  if (!/overflow-y:\s*auto/.test(reglaCss(css, '.cara-nueva .cn-cat-hoja > .cn-cat-form')))
+    faltas.push('el formulario de la hoja no se desplaza entero');
+  if (!/position:\s*sticky/.test(reglaCss(css, '.cara-nueva .cn-cat-hoja .cn-cat-form-pie')))
+    faltas.push('el pie con «Guardar» no se pega abajo');
+  return faltas;
+};
+const HOJA_TSX = readFileSync(join(SRC, 'modules', 'catalog', 'components', 'HojaSobreElTeclado.tsx'), 'utf8');
+const VISTA_CAT_MOVIL = readFileSync(join(SRC, 'modules', 'catalog', 'components', 'CatalogMobileView.tsx'), 'utf8');
+const faltasHoja = faltasDeLaHoja(HOJA_TSX, VISTA_CAT_MOVIL, bloqueLimpio);
+check('la hoja de verificación queda sobre el teclado del teléfono', faltasHoja.length === 0, faltasHoja.join(' · '));
+
 /* ─── 5. QUE MUERDA ──────────────────────────────────────────────────────── */
 const muerde = (nombre: string, dejaPasar: boolean): void => check(`muerde: ${nombre}`, !dejaPasar);
 muerde('un selector suelto', revisarBloque('.cn-bus-x { color: red; }').sueltos.length === 0);
@@ -361,6 +401,17 @@ muerde(
 muerde('un porcentaje de similitud', !/similarity\s*\*\s*100/.test('{(item.similarity * 100).toFixed(0)}%'));
 muerde('una cifra del catálogo a mano', !INVENTADAS[7][1].test('883 actuaciones de 28 ramas'));
 muerde('un curador de muestra', !INVENTADAS[0][1].test('Curada por C. Restrepo'));
+muerde(
+  'la hoja de verificación medida en 92dvh',
+  faltasDeLaHoja(
+    HOJA_TSX,
+    VISTA_CAT_MOVIL,
+    bloqueLimpio
+      .replace(/height:\s*var\(--hoja-alto, 100dvh\);/, 'bottom: 0;')
+      .replace(/(\.cn-cat-hoja\s*\{[^}]*?)height:\s*92%;/, '$1height: 92dvh;')
+  ).length === 0
+);
+muerde('la hoja sin portal', faltasDeLaHoja(HOJA_TSX.replace(/createPortal\(/g, 'sinPortal('), VISTA_CAT_MOVIL, bloqueLimpio).length === 0);
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

@@ -74,6 +74,8 @@ export const PANTALLAS = {
   herramienta: 'herramienta',
   /** Id of the manual article being read. */
   manual: 'manual',
+  /** Id of the Novedades entry whose detail is open. */
+  novedad: 'novedad',
   /** Section Ajustes must open on (e.g. `estilo`), set by whoever navigates there; Ajustes forgets it once read. */
   ajustes: 'ajustes'
 } as const;

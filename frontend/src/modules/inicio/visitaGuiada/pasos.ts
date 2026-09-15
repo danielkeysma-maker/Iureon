@@ -137,13 +137,19 @@ export const PASOS_DE_VISITA: readonly PasoDeVisita[] = [
     'ayuda',
     'manual',
     'Manual de uso',
-    'El manual, organizado por tarea: qué hace la aplicación, su primer escrito, los tres estados de una afirmación, y cada módulo paso a paso. Al inicio del índice, «Novedades» dice qué cambió y cuándo. Desde aquí puede repetir esta visita.'
+    'El manual, organizado por tarea: qué hace la aplicación, su primer escrito, los tres estados de una afirmación, y cada módulo paso a paso. Desde aquí puede repetir esta visita.'
   ),
   modulo(
     'ayuda',
     'soporte',
     'Soporte',
     'Un chat dentro de la aplicación, guardado en su cuenta y atendido por el operador de la plataforma en horario laboral. Si la firma tiene un número de WhatsApp de soporte configurado, aparece aquí como enlace.'
+  ),
+  modulo(
+    'ayuda',
+    'novedades',
+    'Novedades',
+    'Qué cambió en la aplicación y cuándo, de lo más reciente a lo más antiguo. «Nuevo» marca lo que no ha visto en este navegador, «Le afecta» deja solo lo que toca módulos de su plan, y cada cambio lleva al módulo y al artículo del manual que lo explica.'
   ),
   {
     id: 'marca',

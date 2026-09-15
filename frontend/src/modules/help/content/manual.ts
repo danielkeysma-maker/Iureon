@@ -22,51 +22,32 @@ import type { ManualArticle, ManualBlock, ManualEntry, ManualGroup } from '../ty
  * · Then one `consejo` (a habit that shortens the task) and, where a mistake
  *   costs a deadline or money, one `aviso`.
  *
- * ─── WHAT THE 9a ARTBOARD ASKED FOR AND IS NOT HERE ─────────────────────────
+ * ─── REWRITTEN ON 2026-09-14 AGAINST THE CURRENT SCREENS ────────────────────
  *
- * · "¿Le resolvió la duda?" (Sí / No) at the foot of each article. Two buttons
- *   that record nothing are a survey nobody reads.
+ * Every module was re-read label by label after the redesign shipped. The
+ * passages that had gone stale, so nobody reintroduces them:
+ * · Membrete never had «Razón social», «Pie de página», «Firma escaneada», SVG
+ *   logos or a «Guardar y aplicar» button. The button is «Guardar el membrete».
+ * · Recharging is not an administrator's act: the server lets any user of the
+ *   firm recharge. The dialog button is «Ir a pagar», with three amounts.
+ * · The phone bar has five doors (Inicio included), the active module is gold,
+ *   and «Avisos» is a switch, not «Activar»/«Desactivar» buttons.
+ * · The term agenda shows one month at a time; there is no year calendar.
+ * · Late-payment interest is computed by rate periods with the certified rates
+ *   loaded in the tool; the rate is not typed by hand.
+ * · The Buscador toggle is «Solo lo que alguien leyó» and its two blocks are
+ *   «Lo que una persona leyó» and «Encontrado automáticamente».
+ * · Expedientes became «casos» with tabs, search by cédula/NIT, stored files
+ *   and a row menu; «Otra voz» became «Es de otra persona» in Audiencias.
+ * · The free Orientación allowance is 10 a day per firm (`TOPE_DIARIO`).
+ * · A finished 7-day trial loses access entirely; it is not read-only.
  *
- * · Article 07, "Reformular con la jerga de su firma". There is no rewrite
- *   feature. What DOES exist is the firm's format travelling into the drafting
- *   prompt, and that is the article on Membrete. The slot is used for something
- *   real and daily instead: saving a draft and watching its deadline.
+ * The three-states block in `PaginaDelManual.tsx` still says «Verificarlo toma
+ * unos dos minutos», an unmeasured figure. That file belongs to another change
+ * in flight and is left for it.
  *
- * ─── THINGS THE OLD TEXT CLAIMED AND THE PRODUCT DOES NOT DO ────────────────
- *
- * Removed on 2026-09-04 after grepping the components:
- * · "el contador de afirmaciones sin verificar" in the draft's status bar.
- *   No such counter exists (`DocumentCanvasRight`, `DraftProvenanceBar`): the
- *   pipeline does not classify claims one by one. What exists is a chip
- *   «Término sin verificar» / «Sin catalogar», the «Secciones exigidas N/M»
- *   counter and the provenance bar above the paper.
- * · The phone's bottom bar being "Redactar, Audiencias, Entrevistas y Más".
- *   It is «Redactar», «Orientar», «Grabar» and «Más» (`MobileTabBar`).
- * · «Pagar · 1 mes» / «Pagar · 12 meses». The plan modal has a Mensual/Anual
- *   switch and a button that reads «Contratar <plan> mensual» or «Renovar …».
- * · "cada herramienta exporta" Excel. Six do; the glossary does not.
- *
- * Corrected on 2026-09-09, after the two review modes shipped:
- * · "En «Redacción», elija arriba la actuación en «Tipo de documento»" as step
- *   ONE of asking for a review. False twice over: the dialog now opens from
- *   «Revisiones» with its own branch/actuación block, and in «Un documento que
- *   recibí» that block does not exist at all and the button lights with only
- *   the file. The article's route said «Redacción» for a screen that has two
- *   other doors.
- * · "«Redactar esta» que lo trae aquí con la actuación ya elegida" in
- *   Orientación. It no longer jumps: it opens «Qué pedirle al motor» under the
- *   card, and «Llevar a Redacción» is what jumps.
- * · The actuación dropdown had two exits described; it has three since
- *   «No sé cómo se llama: describir qué debe lograr…» shipped.
- *
- * Two articles were added rather than stretching old ones: reading a document
- * somebody sent you is not reviewing your own draft, and Orientación had no
- * article at all while owning two screens a lawyer uses daily.
- *
- * Where a path half-works, the article says where it stops instead of
- * describing the happy half: a candidate from another branch does not move the
- * branch selector in Redacción, and the taller's «Guía» tab was never adapted
- * to a received document. Both are `todavia-no` blocks.
+ * `manualVigente.check.ts` holds a curated list of labels this file names and
+ * asserts each one still exists in the component that renders it.
  *
  * Reading time is computed from the words actually written below, so it cannot
  * drift away from the text the way a hand-typed "3 min" does.
@@ -74,33 +55,41 @@ import type { ManualArticle, ManualBlock, ManualEntry, ManualGroup } from '../ty
 
 const A_INICIO: ManualArticle = {
   id: 'inicio',
-  titulo: 'La pantalla de Inicio',
+  titulo: 'La pantalla de Inicio y la visita guiada',
   entradilla:
-    'Dónde se entra, qué hay en ella y cómo se vuelve a ella desde cualquier módulo.',
+    'Dónde se entra, qué hay en ella, cómo se recorre la aplicación la primera vez y cómo se vuelve a Inicio desde cualquier módulo.',
   bloques: [
-    { kind: 'ruta', camino: ['Inicio', 'El logo de Iureon', '«Iniciar la visita guiada»'] },
+    { kind: 'ruta', camino: ['Inicio', '«Por dónde empiezo»', '«Empezar la visita»'] },
     {
       kind: 'parrafo',
       texto:
-        'Inicio es la primera pantalla al entrar y la que abre el logo de Iureon, en la barra lateral y en la cabecera del teléfono. Reúne lo que conviene tener a la vista antes de empezar, en ese orden: lo que vence, lo que dejó abierto, el estado del plan y el saldo de la firma, las puertas para empezar y qué cambió en la aplicación.'
+        'Inicio es la primera pantalla al entrar y la que abre el logo de Iureon. Reúne, en este orden, lo que vence, lo que dejó abierto, el plan y el saldo de la firma, las puertas para empezar y lo que cambió en la aplicación.'
     },
     {
       kind: 'pasos',
       pasos: [
-        'Arriba está el saludo con su nombre, la firma y la fecha, con «Redactar» y «Revisar un escrito». Debajo, «Lo que vence»: los tres términos pendientes más próximos de la agenda de la firma —los vencidos primero, que no se esconden—, cada uno con cuánto falta y su fecha límite. Si el término no salió de una ficha verificada, su recuadro lleva el borde discontinuo y dice «Término sin verificar». «Empezar el borrador» abre Redacción con esa actuación y los datos del término; «Ver en Expedientes» abre el módulo donde está el caso al que se ató; «Ver la agenda completa» abre la agenda en Herramientas. Si no hay nada pendiente lo dice en una línea, y si la agenda no se pudo leer lo dice también, en vez de dar a entender que no vence nada.',
-        '«Continuar donde iba» junta sus borradores y sus revisiones más recientes, los cinco últimos por fecha, con el cliente y hace cuánto. Un borrador se abre en Redacción, tal como desde «Borradores»; una revisión se abre en su taller, tal como desde «Revisiones».',
-        '«Su plan» muestra el plan de la firma con su estado —activo con los días para que venza, por vencer, vencido, o en prueba con los días que quedan— y cuántos usuarios admite; «Saldo» trae el saldo disponible en pesos y, cuando el servidor lo calcula, para cuántos escritos alcanza según lo que cuestan en promedio. «Ver plan» abre la pantalla de planes; «Recargar saldo» abre la recarga, la misma del pie de la barra lateral.',
-        'Al final, «Por dónde empiezo»: cinco puertas nombradas por lo que usted tiene delante, no por el nombre del módulo. «Me llegó un documento» abre Revisiones; «Tengo los hechos y no el nombre» abre Orientación; «Ya sé qué voy a presentar» abre Redacción; «Tengo un caso con muchos papeles» abre Expedientes; «Grabé una audiencia» abre Audiencias. Si su plan no incluye un módulo, su tarjeta aparece atenuada con «No incluido en su plan» en vez de desaparecer.',
-        'Están nombradas así a propósito. «Orientación» y «Expedientes» son nombres correctos y no dicen nada a quien entra por primera vez: quien tiene unos hechos sin calificar tendría que saber ya que eso se llama «Orientación» para llegar a la pantalla que existe justamente porque no lo sabe.',
-        '«Novedades» trae los tres cambios más recientes de la aplicación; «Ver todas» abre la lista completa en el manual.',
-        'Recargar la página no le mueve la pantalla: la pestaña vuelve al mismo módulo y a lo que tuviera abierto dentro de él —el borrador, el taller de la revisión, el transcrito, la herramienta o el artículo del manual—. Una pestaña nueva, en cambio, empieza en Inicio, porque abrir la aplicación es empezar.',
-        '«¿Primera vez aquí?» tiene «Iniciar la visita guiada», que recorre cada módulo de trabajo diario —Expedientes incluido— señalándolo en pantalla con una tarjeta que dice para qué sirve —«Anterior», «Siguiente» y «Salir», o las flechas del teclado y Esc—, y «Abrir el manual». La primera vez que entra desde un navegador, Inicio le ofrece la visita en una franja; «Ahora no» la guarda para cuando quiera, desde esta pantalla o desde el índice del manual.'
+        'Arriba está el saludo con «Redactar» y «Revisar un escrito». Debajo, «Lo que vence»: los términos pendientes más próximos de la agenda de la firma, los vencidos primero, cada uno con cuánto falta. Si un término no está verificado, su recuadro dice «Término sin verificar». Desde cada uno puede pulsar «Empezar el borrador», «Ver en Expedientes» o «Ver en la agenda», y al pie «Ver la agenda completa». Si no hay nada pendiente, la pantalla lo dice en una línea.',
+        '«Continuar donde iba» junta sus borradores y revisiones más recientes; «Seguir» o «Ver» los abre donde los dejó.',
+        '«Su plan» muestra el plan de la firma y su estado, con «Ver plan». El saldo aparece en pesos disponibles, con «Recargar saldo».',
+        '«Por dónde empiezo» ofrece cinco puertas nombradas por lo que usted tiene delante: «Me llegó un documento», «Tengo los hechos y no el nombre», «Ya sé qué voy a presentar», «Tengo un caso con muchos papeles» y «Grabé una audiencia». Si su plan no incluye el módulo, la tarjeta dice «No incluido en su plan»; si la operación no lo habilitó para su firma, «No disponible para su firma».',
+        '«Novedades» trae los cambios más recientes de la aplicación, y «Ver todas» abre la lista completa.',
+        'Recargar la página no le cambia de pantalla: la pestaña vuelve al módulo y a lo que tenía abierto. Una pestaña nueva empieza en Inicio.'
+      ]
+    },
+    { kind: 'subtitulo', texto: 'La visita guiada' },
+    {
+      kind: 'pasos',
+      pasos: [
+        'La primera vez que entra desde un navegador, Inicio le pregunta si quiere una visita guiada: «Empezar» la abre y «Ahora no» la deja para después. También se abre desde «¿Primera vez aquí?» en Inicio y desde el índice del manual.',
+        'La visita empieza con una pantalla de entrada, «Le muestro dónde está cada cosa», que anuncia cuánto dura. Esa duración se calcula con el texto que la visita va a mostrar. Está dividida en cinco capítulos con nombre: «Empezar y producir escritos», «Registrar lo que pasó», «Consultar la norma», «Su cuenta y el saldo» y «Dónde pedir ayuda». Pulse «Empezar la visita» o, si prefiere leer, «Prefiero leer el manual».',
+        'En cada parada, la pantalla ilumina el lugar del que se habla y muestra en qué capítulo y en qué parada va. Avance con «Siguiente», retroceda con «Anterior» o use las flechas del teclado; «Salir» o Esc la cierran. En el teléfono, la explicación sube como una hoja desde abajo.',
+        'Al final, «Eso es lo que hay que saber para empezar» le ofrece tres puertas bajo «Por dónde empezar», solo a módulos que su plan incluye, además de «Ir a Inicio» y «Volver a verla». La visita no se ofrece sola una segunda vez en el mismo navegador.'
       ]
     },
     {
       kind: 'consejo',
       texto:
-        'Pulse el logo cuando se haya perdido: vuelve a Inicio y cierra lo que estuviera abierto en los demás módulos, sin descartar el escrito que tenga en pantalla en Redacción. Iniciar sesión también abre Inicio, aunque otra cuenta hubiera dejado abierto otro módulo en ese navegador.'
+        'Pulse el logo cuando se pierda: lo lleva a Inicio sin descartar el escrito que tenga abierto en Redacción.'
     }
   ]
 };
@@ -111,29 +100,29 @@ const A_QUE_HACE: ManualArticle = {
   entradilla:
     'Lo primero que conviene tener claro, porque decide cuándo puede confiar en la pantalla y cuándo tiene que abrir la norma.',
   bloques: [
-    { kind: 'ruta', camino: ['Barra lateral', 'Producir · Registrar · Consultar · Aprender'] },
+    { kind: 'ruta', camino: ['Barra lateral', 'Producir · Registrar · Consultar · Aprender · Administrar'] },
     {
       kind: 'parrafo',
       texto:
-        'Iureon redacta el primer borrador de un escrito, transcribe grabaciones de audiencia y entrevista, y guarda el catálogo de actuaciones con sus términos y sus fuentes. El trabajo que le ahorra es el de armar la estructura y de recordar el plazo; el que no le quita es el de decidir.'
+        'Iureon redacta el primer borrador de un escrito, revisa escritos y documentos recibidos, organiza los casos, transcribe audiencias y entrevistas, y guarda el catálogo de actuaciones con sus términos y sus fuentes. Le ahorra armar la estructura y recordar el plazo. La decisión sigue siendo suya.'
     },
     {
       kind: 'parrafo',
       texto:
-        'La aplicación guarda el conocimiento procesal para que usted no tenga que volver a comprobar cada documento. Esa promesa solo se sostiene si lo que está guardado fue comprobado alguna vez por alguien: por eso cada término aparece con su estado a la vista, y por eso hay una pantalla entera dedicada a curarlos.'
+        'La aplicación guarda el conocimiento procesal para que usted no tenga que comprobar cada documento. Eso solo funciona si alguien comprobó alguna vez lo guardado. Por eso cada término muestra su estado y hay una pantalla dedicada a curarlos.'
     },
     { kind: 'subtitulo', texto: 'Cómo está organizada la barra lateral' },
     {
       kind: 'pasos',
       pasos: [
-        '«Inicio», arriba de todo: la pantalla de entrada, con lo que vence, lo que dejó abierto, el plan y el saldo, y los accesos para empezar.',
-        'Producir: «Redacción» (el taller donde se genera un escrito), «Borradores» (los escritos guardados con su término), «Revisiones» (los escritos ya redactados que un revisor corrigió con usted, y los documentos que le llegaron y hay que entender) y «Orientación» (de los hechos a la actuación).',
+        '«Inicio», arriba: la pantalla de entrada.',
+        'Producir: «Orientación» (de los hechos a la actuación), «Redacción» (donde se genera un escrito), «Expedientes» (los casos y sus documentos), «Borradores» (los escritos guardados con su término) y «Revisiones» (escritos suyos revisados y documentos recibidos).',
         'Registrar: «Audiencias» y «Entrevistas», las dos pantallas que transcriben una grabación.',
-        'Consultar: «Buscador» de jurisprudencia, «Catálogo» de actuaciones y «Herramientas» de cálculo.',
-        'Aprender: este «Manual de uso» y «Soporte». Al inicio del índice del manual, «Novedades» lista qué cambió en la aplicación y cuándo.',
-        'Administrar (plegado por defecto): «Seguridad», con la auditoría de la firma; «Privacidad», con los proveedores que tocan sus datos; y «Ajustes».',
-        'La barra es un índice numerado: cada módulo lleva su número y el que está abierto se marca en azul. Arriba, el logo de Iureon lleva a Inicio. Abajo del todo, «Colapsar» deja la barra en una franja de iconos —el módulo abierto sigue en azul— y la vuelve a desplegar; su navegador recuerda cómo la dejó.',
-        'En el pie está la tarjeta del saldo: la cifra disponible con «Recargar», que compra saldo de consumo, y debajo, en su propia fila, el plan de la firma con su vencimiento, que abre la pantalla de planes. Son dos dineros distintos: el saldo se gasta escribiendo, el plan es el derecho a entrar. Al lado están «Membrete» y «Avisos», que son ajustes del aparato y de la firma, no módulos. En «Ajustes», dentro de Administrar, están además «Atajos de teclado», con los que la aplicación escucha; «Avisos», para activar las notificaciones de este dispositivo e instalar la app; «Su cuenta», con su nombre —que usted fija y se ve en la barra, en el saludo y en la lista de usuarios—, su correo, su rol y su firma, el cierre de sesión y la eliminación de su usuario o de la firma; y «Plan y facturación», con el plan vigente y el acceso a la pantalla de planes.'
+        'Consultar: «Buscador» de jurisprudencia, «Catálogo» de actuaciones y «Herramientas».',
+        'Aprender: este «Manual de uso» y «Soporte».',
+        'Administrar: «Seguridad», que abre la pantalla «Auditoría» de la firma; «Privacidad», con los proveedores que tocan sus datos; y «Ajustes».',
+        'El módulo abierto se marca en dorado. «Colapsar», al pie, reduce la barra a iconos y su navegador recuerda cómo la dejó.',
+        'En el pie están el saldo con «Recargar», la fila del plan de la firma, «Membrete», «Avisos» y el sello de versión, que abre las novedades. El saldo se gasta al usar la inteligencia artificial; el plan es el derecho a usar la aplicación. Son dos pagos distintos.'
       ]
     },
     { kind: 'subtitulo', texto: 'Lo que sí hace' },
@@ -141,22 +130,21 @@ const A_QUE_HACE: ManualArticle = {
       kind: 'lista',
       items: [
         'Redacta un escrito completo a partir de los hechos que usted describa, con la estructura de la actuación que elija del catálogo.',
-        'Resuelve el nombre de la actuación contra el catálogo verificado y le dice qué término rige, con el artículo que lo fija.',
-        'Lee un auto, una sentencia, un oficio o una notificación que usted recibió, y le dice qué decide, qué le exige y para cuándo con las palabras del propio documento, qué queda pendiente y por dónde se ataca.',
-        'Transcribe una grabación separando quién habla, y le deja corregir el texto, dividir una intervención y reasignar una voz.',
-        'Busca jurisprudencia en el corpus curado y, cuando ese corpus calla, consulta las relatorías oficiales de la Corte Constitucional, la Corte Suprema, el Consejo de Estado y la Comisión Nacional de Disciplina Judicial. Si el asunto es de un tribunal o un juzgado, no vive en ninguna de ellas y el escrito lo dice.',
-        'Exporta a Word y a PDF con el membrete, la tipografía y la numeración que su firma haya configurado.'
+        'Resuelve el nombre de la actuación contra el catálogo y le dice qué término rige, con el artículo que lo fija y su estado.',
+        'Lee un auto, una sentencia, un oficio o una notificación que usted recibió, y le dice qué decide, qué le exige y para cuándo, citando el propio documento.',
+        'Transcribe una grabación separando quién habla, y le permite corregir el texto, dividir una intervención y pasarla a otra persona.',
+        'Busca jurisprudencia, separa lo que una persona leyó de lo que se encontró automáticamente y le muestra la diferencia.',
+        'Exporta a Word y a PDF con el membrete y el formato de su firma.'
       ]
     },
     { kind: 'subtitulo', texto: 'Lo que no hace' },
     {
       kind: 'lista',
       items: [
-        'No radica nada. Ningún escrito sale de Iureon hacia un juzgado.',
+        'No radica nada. Ningún escrito sale de Iureon hacia un juzgado, y «Marcar como listo» no radica ni firma.',
         'No decide la estrategia del caso ni escoge las pretensiones por usted.',
-        'No garantiza que un dato que nadie verificó sea correcto. Cuando no lo está, lo dice en la propia línea del escrito.',
-        'No lee un adjunto que no pueda decodificar: un PDF escaneado sin capa de texto, un Word protegido o una foto borrosa quedan marcados como «no leído» en la consola de ejecución, con el motivo, y el escrito sale con lo demás. Lo que sí lee está descrito en «Redactar un escrito».',
-        'No conserva el audio de sus grabaciones. Se borra del almacenamiento en la misma petición que devuelve el transcrito.'
+        'No garantiza un dato que nadie verificó. Cuando el término no está comprobado, lo advierte.',
+        'No conserva el audio de sus grabaciones. Se borra del almacenamiento apenas termina la transcripción.'
       ]
     },
     {
@@ -177,52 +165,39 @@ const A_PRIMER_ESCRITO: ManualArticle = {
     {
       kind: 'parrafo',
       texto:
-        'Redacción abre como una sola columna, «Redactar un escrito», con pasos numerados: qué va a presentar, los hechos y las pruebas y, si su firma configuró Membrete, cómo escribe su firma. El papel aparece cuando el escrito existe, con lo que lo respalda a la derecha. Si prefiere ver antes cada módulo en su sitio, en «Inicio» está «Iniciar la visita guiada»: dos minutos, una parada por módulo.'
+        'Redacción abre como una sola columna, «Redactar un escrito», con pasos numerados: «Qué va a presentar», «Los hechos y las pruebas» y, cuando su firma configuró Membrete o enseñó un formato, «Cómo escribe su firma». El papel aparece cuando el escrito existe.'
     },
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Redacción» en la barra lateral. Si todavía no sabe qué actuación necesita, entre primero por «Orientación», describa los hechos —o adjunte el documento que le llegó— y pulse «Orientar»: el catálogo le propone actuaciones y en cada una hay un botón «Redactar esta» que abre, bajo la tarjeta, el panel «Qué pedirle al motor»; desde ahí, «Llevar a Redacción» lo trae aquí con la actuación, la rama y el encargo ya escritos. Está explicado en «De los hechos a la actuación».',
-        'En el paso 1, «Qué va a presentar», escoja primero «De qué caso» si su firma tiene expedientes y el escrito es de uno: si el caso tiene rama registrada y todavía no hay actuación elegida, esa rama se pone sola; si la rama elegida no coincide con la del caso, un aviso lo dice y ofrece volver a la del caso, sin impedir que redacte en otra. Luego escoja «Quién firma» —«Firma / Litigante», «Juez / Despacho» o «Secretaría»—, la «Rama» y la «Actuación». Esa lista se arma desde el catálogo de la rama que escogió, así que cambiar de rama cambia la lista. Al elegir la actuación, los selectores se pliegan en una tarjeta con la rama, el nombre, su estado —por ejemplo «art. 96 · término verificado»— y el término completo; «Cambiar» los vuelve a abrir.',
-        'Al final de esa lista pueden aparecer actuaciones marcadas «por remisión del CGP · plazo sin verificar en esta rama». Existen en su rama porque el Código General del Proceso la gobierna, pero su plazo está comprobado en lo civil y no para la rama que usted escogió. Se pueden elegir, y el escrito advertirá en vez de afirmar un plazo. Quien cura el catálogo de la firma puede comprobarlas para su rama en «Catálogo».',
-        'Si no sabe cuál actuación corresponde, abra el selector «Actuación» y, en el bloque de arriba «Si no está en la lista», elija «No sé cuál es: que la guía la proponga». Se abre un cuadro con los hechos que ya escribió —puede completarlos ahí— y, al pulsar «Pedir la orientación», la guía propone actuaciones de esa rama con la razón de cada una y su término, artículo y autoridad a la vista. Nada se aplica solo: usted pulsa «Elegir esta» en la que decida.',
-        'Si sospecha que la rama no es la que puso, marque dentro de ese cuadro «No sé la rama: buscar en todo el catálogo»: la consulta corre sobre las veintiocho ramas, cada candidata dice de cuál viene, y la propia pantalla le advierte antes que tarda más —entre diez y quince segundos, contra un par—. Cuando el catálogo no reconoce nada dentro de la rama elegida, aparece además «Puede que la rama no sea esa: buscar en todo el catálogo», que repite la consulta en el acto sin volver a escribir los hechos.',
-        'Si ninguna sirve, ese bloque tiene dos salidas más. «No está en la lista: la escribo yo» sirve cuando usted sí sabe cómo se llama: escríbalo como lo nombraría en el escrito, con una nota opcional para su firma, y quedará elegida y disponible en esa rama para todos sus abogados, marcada «de su firma, sin norma verificada».',
-        'Y si tampoco sabe cómo se llama, «Redactar sin actuación» le deja redactar de todos modos: escriba entre quince y ciento siete caracteres diciendo qué debe conseguir el escrito, vea en «Quedará en la lista como» exactamente lo que se va a guardar, y pulse «Guardar y redactar». Queda como actuación de la firma con el nombre «Sin nombre — …» y se elige sola en el selector. La guía tiene prohibido bautizarla, y el escrito lo declara.',
-        'En el paso 2, «Los hechos y las pruebas», cuente en el cuadro «Qué debe hacer este escrito» los hechos y la pretensión en lenguaje corriente, y adjunte lo que tenga. No hace falta redactar: hace falta contar.',
-        'Pulse «Generar escrito» al final de la columna (dice «Proyectar providencia» si escribe un juez y «Generar acto» si escribe la secretaría), o use ⌘↵ en Mac y Ctrl+↵ en Windows. Junto al botón está el precio: desde $2.000 de su saldo, y un escrito largo cuesta lo que mida. Mientras se genera, la consola «Ejecución» aparece debajo del botón; cuando el escrito llega, la pantalla pasa al papel, con los títulos de sección en negrita. Sin actuación elegida el botón está apagado y a su lado se lee «Elija la actuación arriba: es la que trae el artículo y el término verificados».',
-        'Si el motor no llega a entregar el escrito, la aplicación no fabrica uno de repuesto: lo dice. El aviso sale en rojo en la consola «Ejecución», debajo del botón de generar, la espera se cierra y la reserva del saldo vuelve a la cuenta. Mírela cuando el escrito no aparezca.',
-        'Lea el escrito. Bajo la barra del borrador, si el término de la actuación no está comprobado o la actuación no está catalogada, aparece una franja ámbar a todo lo ancho; si la firma ya la curó, una marca verde discreta; si no hay nada que advertir, nada. A la derecha del papel, «Lo que respalda este escrito» muestra la ficha: la norma, la autoridad, el término completo, «Ver la norma» y las secciones que pide, cada una «encontrada» —con «Ir al párrafo»— o «no se encontró el rótulo».',
-        'El escrito queda guardado como borrador de la firma al generarse. Si lo corrige en el papel, pulse «Guardar» en «Trabajar el escrito», junto al papel; para radicar, «Word» o «PDF» en la barra del borrador. La flecha de la izquierda de esa barra vuelve al asistente sin borrar nada, y el asistente ofrece «Volver al borrador».'
+        'Si todavía no sabe qué actuación necesita, empiece en «Orientación». Está explicado en «De los hechos a la actuación».',
+        'En «Qué va a presentar», escoja primero «De qué caso» si el escrito pertenece a un expediente. Si la rama que elige no coincide con la del caso, un aviso lo dice y ofrece usar la del caso. Luego escoja «Quién firma» («Firma / Litigante», «Juez / Despacho» o «Secretaría»), la «Rama» y la «Actuación». La lista de actuaciones sale del catálogo de esa rama. Al elegir una, los selectores se pliegan en una tarjeta con su estado y su término; «Cambiar» los vuelve a abrir.',
+        'Si la actuación no aparece, abra «¿No está en la lista?». Tiene tres opciones: «No sé cuál es: que la guía la proponga», «No está en la lista: la escribo yo» y «Redactar sin actuación».',
+        '«No sé cuál es: que la guía la proponga» abre un cuadro con los hechos. Pulse «Pedir la orientación» y la guía propondrá actuaciones de esa rama con su término, su artículo y su autoridad. Si duda de la rama, marque «No sé la rama: buscar en todo el catálogo». Nada se aplica solo: usted pulsa «Elegir esta».',
+        '«No está en la lista: la escribo yo» sirve cuando usted sabe cómo se llama la actuación. Escríbala en «Cómo la llama» y pulse «Guardar y elegirla». Quedará en la lista de la rama para toda su firma, sin norma verificada.',
+        '«Redactar sin actuación» sirve cuando tampoco sabe el nombre. Escriba en «¿Qué debe lograr este escrito?» entre 15 y 107 caracteres, revise «Quedará en la lista como» y pulse «Guardar y redactar». Queda como «Sin nombre — …», y el escrito declara que su término no está verificado.',
+        'En «Los hechos y las pruebas», cuente en «Qué debe hacer este escrito» los hechos y la pretensión en lenguaje corriente. Con «Adjuntar sentencias, pruebas o fotos» puede sumar hasta 8 archivos y 20 MB.',
+        'Si aparece «Cómo escribe su firma», revise el interruptor «Usar el formato y la jerga que su firma enseñó». Apagarlo afecta solo ese borrador.',
+        'Pulse «Generar escrito» o use ⌘↵ en Mac y Ctrl+↵ en Windows. El botón dice «Proyectar providencia» si firma un juez y «Generar acto» si firma la secretaría. Junto a él se lee «Desde $2.000 de su saldo; un escrito largo cuesta lo que mida.». Mientras se genera, la consola «Ejecución» muestra el avance. Si el motor falla, el aviso sale ahí mismo y la reserva de saldo vuelve a la cuenta.',
+        'Lea el escrito. Arriba del papel está la barra del borrador con «Word», «PDF» y «Copiar». A la derecha, «Lo que respalda este escrito» muestra la norma, la autoridad, el término, «Ver la norma» y las secciones que pide la ficha, cada una «encontrada» o «no se encontró el rótulo», con «Ir al párrafo».',
+        'El escrito se guarda como borrador de la firma al generarse. Si lo corrige en el papel, pulse «Guardar» en «Trabajar el escrito».'
       ]
     },
     {
       kind: 'consejo',
       texto:
-        'Antes de generar, mire el estado que la tarjeta de la actuación muestra en el paso 1. Si dice «sin verificar», puede abrir «Catálogo», verificarlo en dos minutos y volver: el escrito saldrá ya con el término comprobado, en vez de tener que regenerarlo después.'
+        'Antes de generar, mire el estado de la tarjeta de la actuación. Si el término no está verificado, un socio administrador puede verificarlo en «Catálogo» antes: así el escrito sale con el término comprobado y no hay que regenerarlo.'
     },
     {
       kind: 'aviso',
       texto:
-        'Elegir la actuación del catálogo no es un formalismo. El nombre catalogado es lo que conecta el escrito con un artículo y un término comprobados; cualquier otro texto produce una estructura genérica sin norma detrás.'
-    },
-    {
-      kind: 'nota',
-      titulo: 'Cuando la actuación la escribe usted',
-      texto:
-        'Una actuación escrita por su firma no trae artículo, término ni secciones comprobados, y el escrito lo dirá con todas sus letras: la guía tiene prohibido inventarlos. Para que el escrito deje de advertirlo, abra «Catálogo», búsquela, y escriba su término junto con la dirección donde lo leyó. Eso vale para el escrito, no para el informe de revisión: si después manda esa misma actuación a revisar, el informe sigue saliendo «Sin ficha verificada», porque la curaduría de la firma todavía no llega al motor que revisa. Sin la fuente no se guarda, igual que en cualquier otra ficha. Desde ahí también puede retirarla de la lista de la firma.'
-    },
-    {
-      kind: 'nota',
-      titulo: 'Cuando el escrito va sin nombre de actuación',
-      texto:
-        'Un título de trabajo —lo que crea «Redactar sin actuación»— vive en la lista de su rama con el nombre «Sin nombre — …» y el detalle «título de trabajo · no es el nombre de una figura». La marca no se asoma al documento: el motor recibe lo que la firma quiere lograr, con prohibición expresa de llamarlo recurso, tutela, incidente o nulidad, y el escrito declara que su término no está verificado y debe comprobarse antes de radicar. Sobre el papel, la franja de procedencia dice «Este escrito se redactó sin nombre de actuación». En «Catálogo» puede escribirle el término y su fuente, y eso sí llega al motor a partir de entonces; lo que no se puede es rebautizarlo, así que el título de trabajo se sigue llamando «Sin nombre — …» en el desplegable, en el borrador y en el catálogo.'
+        'Elegir la actuación del catálogo importa. El nombre catalogado conecta el escrito con un artículo y un término; cualquier otro texto produce una estructura sin norma verificada detrás.'
     },
     {
       kind: 'nota',
       titulo: 'Si la rama no está catalogada',
       texto:
-        'Algunas ramas todavía no tienen actuaciones catalogadas y ofrecen una lista antigua de tipos de documento. La pantalla lo advierte con «Esta rama aún no tiene catálogo verificado»: en esos casos ninguna norma verificada respalda la estructura, y el término lo tiene que comprobar usted.'
+        'Algunas ramas todavía no tienen actuaciones catalogadas. La pantalla lo advierte con «Esta rama aún no tiene catálogo verificado»: en esos casos ninguna norma verificada respalda la estructura, y el término lo tiene que comprobar usted.'
     }
   ]
 };
@@ -231,35 +206,35 @@ const A_TRES_ESTADOS: ManualArticle = {
   id: 'tres-estados',
   titulo: 'Los tres estados de una afirmación',
   entradilla:
-    'Todo término, artículo y autoridad que aparece en un escrito está en uno de tres estados. Distinguirlos de un vistazo es lo único imprescindible para usar Iureon con seguridad.',
+    'Todo término del catálogo está en uno de tres estados. Distinguirlos de un vistazo es lo único imprescindible para usar Iureon con seguridad.',
   bloques: [
     { kind: 'ruta', camino: ['Redacción', 'Lo que respalda este escrito', 'Catálogo', 'Ficha de la actuación'] },
     { kind: 'estados' },
-    { kind: 'subtitulo', texto: 'Cómo se ve en el escrito' },
+    { kind: 'subtitulo', texto: 'Cómo se ve' },
     { kind: 'ejemplo' },
     { kind: 'subtitulo', texto: 'Dónde mirar el estado antes de radicar' },
     {
       kind: 'pasos',
       pasos: [
-        'En Redacción, con el escrito generado, mire la franja de procedencia, bajo la barra del borrador y a todo lo ancho: dice contra qué ficha se redactó, su artículo, su fuente y si alguien de su firma la curó. Es ámbar cuando el término no está comprobado o la actuación no está en el catálogo, y no aparece cuando no hay nada que decir.',
-        'A la derecha del papel, «Lo que respalda este escrito» muestra el estado de la ficha —por ejemplo «art. 96 · término verificado» o «sin verificar»—, su término completo y las secciones que pide: cada una «encontrada», con «Ir al párrafo», o «no se encontró el rótulo». Encontrar el rótulo no dice que la sección esté bien escrita; solo que su nombre aparece en el texto.',
-        'Para ver el detalle completo, abra «Catálogo», busque la actuación y lea los tres bloques de la ficha —término, norma y autoridad—, cada uno con su propio estado.'
+        'En Redacción, con el escrito generado, mire la franja de procedencia bajo la barra del borrador. Dice contra qué ficha se redactó y si alguien de su firma la curó. Es ámbar cuando el término no está comprobado o la actuación no está en el catálogo, y no aparece cuando no hay nada que advertir.',
+        'A la derecha del papel, «Lo que respalda este escrito» muestra el estado de la ficha y las secciones que pide. Que un rótulo esté «encontrada» significa que su nombre aparece en el texto, no que la sección esté bien escrita.',
+        'Para el detalle, abra «Catálogo», busque la actuación y lea sus tres bloques: término, norma y autoridad, cada uno con su estado.'
       ]
     },
     {
       kind: 'consejo',
       texto:
-        'Cuando la ficha diga «sin verificar», no lo resuelva corrigiendo el escrito a mano: verifique la ficha en Catálogo. El arreglo a mano sirve para ese documento; la verificación sirve para todos los que vengan.'
+        'Cuando la ficha diga «sin verificar», no lo resuelva solo en el escrito: verifique la ficha en Catálogo. El arreglo a mano sirve para ese documento; la verificación sirve para todos los siguientes.'
     },
     {
       kind: 'parrafo',
       texto:
-        'La diferencia entre «no caduca» y «sin verificar» es la que más se confunde y la que más cuesta. La primera es un hecho comprobado sin cifra: la norma no fija término, como ocurre con la acción de tutela. La segunda es la ausencia de comprobación. Las dos se ven distintas a propósito, y ninguna de las dos es un dato faltante que la aplicación se haya olvidado de traer.'
+        '«No caduca» y «sin verificar» se confunden con frecuencia, y el error es caro. «No caduca» es un hecho comprobado: la norma no fija término, como en la acción de tutela. «Sin verificar» significa que nadie lo ha comprobado. Por eso se ven distintos.'
     },
     {
       kind: 'todavia-no',
       texto:
-        'No existe un contador de afirmaciones sin verificar dentro del texto del escrito. Nadie analiza el borrador frase por frase, y una cifra inventada en la pantalla donde se decide firmar sería la peor falsa alarma. Lo que se marca es lo que sí se sabe: el estado de la ficha contra la que se redactó.'
+        'El papel no marca las afirmaciones una por una ni cuenta cuántas quedan sin verificar: nadie analiza el borrador frase por frase. Lo que se marca es el estado de la ficha contra la que se redactó.'
     }
   ]
 };
@@ -268,41 +243,41 @@ const A_VERIFICAR: ManualArticle = {
   id: 'verificar',
   titulo: 'Verificar contra la norma',
   entradilla:
-    'Qué significa exactamente verificar una ficha, y por qué se hace una sola vez para toda la firma.',
+    'Qué significa exactamente verificar una ficha, quién puede hacerlo y por qué se hace una sola vez para toda la firma.',
   bloques: [
     { kind: 'ruta', camino: ['Catálogo', 'Ficha de la actuación', '«Guardar verificación»'] },
     {
       kind: 'parrafo',
       texto:
-        'Verificar es abrir el texto oficial de la norma, comprobar que el término y la autoridad que la ficha publica son los que ese artículo fija, y firmar esa comprobación con su nombre y la fecha. Queda guardado para la firma entera: el siguiente escrito de cualquier compañero ya sale con el término verificado.'
+        'Verificar es abrir el texto oficial de la norma, comprobar que el término y la autoridad de la ficha son los que fija el artículo, y firmar esa comprobación con su nombre. Vale para toda la firma: los siguientes escritos de cualquier compañero ya salen con el término verificado. El servidor solo permite guardar la verificación a un socio administrador.'
     },
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Catálogo» y escriba el nombre de la actuación o de la norma en «Buscar actuación o norma». Puede acotar con el selector de rama, que arranca en «Todas las ramas».',
-        'Pulse la actuación. A la derecha se abre la ficha con sus tres bloques —término, norma, autoridad— y debajo el formulario de «Curaduría de su firma».',
-        'Abra la fuente oficial que la ficha cita y localice el artículo. Compruebe por separado el término, el artículo que lo fija y la autoridad ante la que se surte.',
-        'En el formulario elija una de tres opciones: «Tiene término» si la norma fija un plazo y lo leyó en su texto, «No caduca» si la norma no fija ninguno, o «Sin verificar» si no pudo comprobarlo.',
-        'Si tiene término, escríbalo en «Término, como lo dice la norma», pegue la dirección oficial en «Fuente donde lo verificaste», cite el artículo en «Fundamento normativo» y ponga su nombre en «Quién verifica». «Nota interna» es opcional.',
-        'Pulse «Guardar verificación». Desde ese momento la ficha aparece como verificada por su firma en todos los escritos. Si se equivocó, «Revertir» descarta la verificación de la firma y vuelve al catálogo base.'
+        'Abra «Catálogo» y escriba en «Buscar una actuación» el nombre o la norma. Puede acotar por rama; arranca en «Todas».',
+        'Pulse la actuación. Se abre la ficha con sus tres bloques y, debajo, «Curaduría de su firma». Si nadie la ha comprobado, «Verificar el término» abre el formulario.',
+        'Abra la fuente oficial con «Ver el texto oficial de la norma» y localice el artículo. Compruebe por separado el término, el artículo que lo fija y la autoridad.',
+        'En «Estado del término» elija «Tiene término», «No caduca» o «Sin verificar».',
+        'Si tiene término, escríbalo en «Término, como lo dice la norma», pegue la dirección en «Fuente donde lo verificó» (obligatoria), cite el artículo en «Fundamento normativo» y ponga su nombre en «Quién verifica». La «Nota interna» es opcional.',
+        'Pulse «Guardar verificación». Si se equivocó, «Revertir al catálogo base» descarta la verificación de la firma.'
       ]
     },
     {
       kind: 'consejo',
       texto:
-        'Verifique primero las actuaciones que su firma redacta cada semana y déjelas listas: son las que más escritos limpian de un solo golpe. La lista de «Sin verificar» del catálogo es larga; la de las que usted usa, corta.'
+        'Verifique primero las actuaciones que su firma redacta cada semana: son las que dejan listos más escritos de una vez.'
     },
     {
       kind: 'aviso',
       texto:
-        'Pregúntese siempre de quién es el reloj. El error más frecuente y más caro de este oficio no es un plazo mal copiado: es publicar el plazo de la contraparte o del juzgado y callar el que extingue el derecho de su cliente. La ficha se ve exacta y la cita es real.'
+        'Pregúntese siempre de quién es el reloj. El error más caro no es copiar mal un plazo: es publicar el plazo de la contraparte o del juzgado y omitir el que extingue el derecho de su cliente. La ficha se ve exacta y la cita es real.'
     },
     {
       kind: 'lista',
       items: [
-        'Que una norma esté vigente no significa que esté resuelta: un decreto de emergencia obliga hoy y puede caer con efectos hacia atrás.',
-        'Una fuente oficial también puede estar desactualizada. Confirme que el artículo que está leyendo trae la reforma que espera, en vez de confiar en el dominio.',
-        'Un resultado de buscador no es fuente de derecho. Mezcla proyectos de ley, normas extranjeras y derecho vigente en una sola lista.'
+        'Que una norma esté vigente no significa que su validez esté resuelta: un decreto de emergencia obliga hoy y puede caer con efectos hacia atrás.',
+        'Una fuente oficial también puede estar desactualizada. Confirme que el artículo que lee trae la reforma que espera.',
+        'Un resultado de buscador no es fuente de derecho: puede mezclar proyectos de ley, normas extranjeras y derecho vigente.'
       ]
     }
   ]
@@ -318,42 +293,38 @@ const A_ORIENTACION: ManualArticle = {
     {
       kind: 'parrafo',
       texto:
-        'Orientación es la puerta de quien tiene hechos y no tiene nombre. Se cuenta el caso, se pulsa «Orientar» y el catálogo devuelve actuaciones posibles con su término, su artículo y su autoridad. En el teléfono la pestaña de abajo se llama «Orientar».'
+        'Orientación es para quien tiene los hechos y no sabe cómo se llama la actuación. Se cuenta el caso, se pulsa «Orientar» y el catálogo devuelve candidatas con su término, su norma y su autoridad. En el teléfono, la pestaña de abajo se llama «Orientar». Orientación está en los planes Premium y Firma.'
     },
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Orientación» y cuente el caso en «Los hechos, como se los contaría a un colega». No hace falta redactar: hace falta contar.',
-        'Si el caso le llegó por escrito, adjúntelo en vez de resumirlo. En el computador, bajo el cuadro hay una zona punteada que dice «Arrastre aquí el oficio, la demanda o la notificación» y «o escoja el archivo · PDF · Word · texto». En el teléfono no se arrastra: hay un solo renglón, «Adjuntar el oficio o la demanda (PDF, Word o texto)», que abre el selector de archivos.',
-        'El texto del archivo se lee en su propio navegador —no se sube nada y no cuesta nada— y cae AÑADIDO al final de lo que ya había escrito, separado por un renglón en blanco. Nunca lo sustituye. El cuadro sigue siendo editable, así que usted ve exactamente lo que va a viajar y puede recortarlo.',
-        'Si el documento que adjuntó anuncia un plazo, la pantalla lo dice antes de orientar, en ámbar, y cita la frase que lo anuncia: «Este documento anuncia un término: “dentro de los cinco (5) días siguientes”». Orientación NO lee plazos —devuelve el término de la norma, no el de ese papel—, así que ofrece el botón «Leerlo primero: qué le exige y para cuándo», que lleva el documento a Revisiones ya leído, sin volver a adjuntarlo. El aviso no cierra el paso: «Orientar» sigue encendido.',
-        'Pulse «Orientar» y lea las fichas propuestas, cada una con su término, su artículo y su autoridad.',
-        'En la ficha que decida, pulse «Redactar esta». Debajo de esa misma tarjeta se abre «Qué pedirle al motor»: hasta tres instrucciones ya escritas —«Con las secciones y la autoridad», «Con la norma y el término» y «Solo el encargo»—, un cuadro editable y los botones «Llevar a Redacción» y «Cancelar». Cada línea jurídica de esas instrucciones es cita literal de un campo de la ficha; el término solo aparece cuando está verificado.',
-        'Pulse «Llevar a Redacción». Llegan la actuación, su rama y el cuadro «Qué debe hacer este escrito» escrito en dos mitades rotuladas: la instrucción arriba y «HECHOS» debajo, con su relato. Puede llevarlo sin ninguna instrucción: el botón no se bloquea por dejar el cuadro vacío.'
+        'Abra «Orientación» y cuente el caso en «Los hechos, como se los contaría a un colega». Si el asunto ya es un expediente, puede elegirlo para que la orientación quede contada dentro del caso.',
+        'Si el caso le llegó por escrito, adjúntelo. En el computador, arrástrelo a «Arrastre aquí el oficio, la demanda o la notificación» o use «o escoja el archivo». En el teléfono, toque «Adjuntar el oficio o la demanda (PDF, Word o texto)». El archivo se lee en su navegador y su texto se añade al final del cuadro, que puede editar. «Quitar» deshace el adjunto.',
+        'Si el documento anuncia un plazo, la pantalla lo avisa antes de orientar: «Este documento anuncia un término». Orientación no lee ese plazo, así que ofrece «Leerlo primero: qué le exige y para cuándo», que lo lleva a Revisiones. El aviso no le impide orientar.',
+        'Pulse «Orientar». Las candidatas salen ordenadas por término más corto, con «Lo que el catálogo leyó» de sus hechos. Si falta precisión, la pantalla puede sugerir «Completar los hechos».',
+        'En la candidata que elija, pulse «Redactar esta». Debajo se abre «Qué pedirle al motor», con propuestas de instrucción armadas con la ficha y sus hechos. Escoja una, edítela o siga sin ninguna.',
+        'Pulse «Llevar a Redacción». Llegan la actuación, su rama y el cuadro de instrucción ya escrito.'
       ]
     },
-    { kind: 'subtitulo', texto: 'Qué se puede adjuntar y qué pasa si no se deja leer' },
+    { kind: 'subtitulo', texto: 'Cupo, precio y lo que el catálogo no tiene' },
     {
       kind: 'lista',
       items: [
-        'Se leen PDF —hasta 40 páginas, respetando los saltos de renglón—, Word .docx y texto plano .txt o .md. De cada documento entran al cuadro hasta 60.000 caracteres; si es más largo, la pantalla avisa: «El documento es largo: se leyó el comienzo del documento.»',
-        'La cifra de caracteres que muestra la ficha del adjunto es la del documento entero. Cuando aparece ese aviso de recorte, al cuadro entró menos que esa cifra.',
-        'Si el archivo no se deja leer, el cuadro de hechos queda intacto —no se pierde lo escrito— y la pantalla explica el motivo en tono de advertencia: una imagen no trae texto, y de un formato sin lector (un .doc antiguo) hay que guardar una copia en PDF, Word o texto, o pegarlo.',
-        'Un documento del que se lean menos de doscientos caracteres se rechaza con el aviso del PDF escaneado, aunque sea un texto corto y perfectamente legible. La salida es la misma: pegue el texto en el cuadro.',
-        'El aviso de plazo solo sale cuando el documento anuncia un término de verdad: reconoce «dentro de los…», «en el término de…», «so pena de…» y sus variantes. No salta con los hechos que se le parecen —«lleva tres (3) meses sin pagar», «trabajó durante cinco (5) años», «dentro de los seis meses anteriores»— porque un aviso que sale siempre deja de leerse. Tampoco salta en una reconvención ni cuando la cifra queda lejos de la fórmula.',
-        '«Quitar» deshace el adjunto y devuelve el cuadro a como estaba antes de él. Si soltó dos archivos seguidos, «Quitar» retira la ficha y el texto del segundo, pero el del primero se queda dentro del cuadro: léalo antes de orientar.',
-        'En las tarjetas cuyo término está sin verificar no se redacta desde ahí: en el computador el botón cambia a «Verificar y catalogar», que lleva al «Catálogo»; en el teléfono esa tarjeta no ofrece botón ninguno, y la verificación se hace entrando por «Catálogo». En los dos casos no se abre el panel de instrucción: primero se comprueba el término, después se redacta.'
+        'Cada firma tiene 10 orientaciones gratis al día. Después, cada una descuenta $150 del saldo. Cuando quedan pocas, la pantalla dice cuántas le quedan hoy, y cuando se acaban muestra «Cupo gratuito de hoy agotado».',
+        'Si una candidata tiene el término sin verificar, en el computador el botón es «Verificar y catalogar», que lleva al Catálogo; primero se comprueba el término y después se redacta.',
+        'Si el catálogo no reconoce ninguna actuación, lo dice: «El catálogo no reconoce una actuación para estos hechos». Puede completar los hechos, buscar en jurisprudencia o «Redactar sin catálogo», con la advertencia de que nada del escrito quedará verificado.',
+        'Cada orientación queda guardada para toda la firma. Desde el historial puede buscarla por los hechos y «Reutilizar» para otro cliente. Las consultas que terminaron «Sin actuación en catálogo» se agrupan y cuentan: muestran lo que a la firma le falta curar.'
       ]
     },
     {
       kind: 'consejo',
       texto:
-        'Adjunte el oficio en vez de resumirlo. El resumen escrito de memoria pierde justo el dato que define la vía —la fecha de notificación, la palabra con la que el juzgado nombra la carga—, y el catálogo propone sobre lo que lee.'
+        'Adjunte el oficio en vez de resumirlo. Un resumen de memoria pierde justo el dato que define la vía, como la fecha de notificación.'
     },
     {
       kind: 'aviso',
       texto:
-        'Los topes de 40 páginas y 60.000 caracteres son de lectura, no de carga: un PDF muy pesado se abre entero en la memoria del navegador antes de que esos topes lleguen a aplicarse. Con un documento de cientos de megas, y sobre todo en el teléfono, conviene partirlo o pegar el tramo que importa.'
+        'Orientar no decide. La calificación jurídica del caso es suya, y la pantalla lo recuerda debajo de las candidatas.'
     }
   ]
 };
@@ -367,16 +338,16 @@ const A_INSTRUCCION: ManualArticle = {
     {
       kind: 'parrafo',
       texto:
-        'El cuadro «Qué debe hacer este escrito» espera hechos, no redacción. Escriba lo que pasó, en qué orden, quién es quién, qué pide y contra quién. La estructura del escrito no sale de ahí: sale de la actuación que usted escogió en el paso 1, «Qué va a presentar».'
+        'El cuadro «Qué debe hacer este escrito» espera hechos, no redacción: qué pasó, en qué orden, quién es quién, qué pide y contra quién. La estructura del escrito sale de la actuación que usted escogió en «Qué va a presentar».'
     },
     {
       kind: 'pasos',
       pasos: [
-        'Empiece por las fechas concretas. Son las que sostienen el cómputo del término y las que el escrito va a citar.',
+        'Empiece por las fechas concretas. Sostienen el cómputo del término y el escrito las va a citar.',
         'Siga con las partes: nombres, calidades y, si el proceso ya existe, el radicado y el despacho.',
-        'Diga la pretensión como pretensión: qué quiere que el juez ordene.',
-        'Incluya los hechos que le incomodan. Un borrador que no los conoce los omite, y esa omisión la descubre la contraparte.',
-        'Genere con «Generar escrito» o con ⌘↵ / Ctrl+↵. Si el resultado necesita ajustes, vuelva al cuadro, añada lo que faltó y genere de nuevo, o corrija el texto a mano con «Editar» sobre el papel.'
+        'Diga qué quiere que el juez ordene.',
+        'Incluya también los hechos que le incomodan. Si el borrador no los conoce, los omite, y la contraparte sí los va a conocer.',
+        'Genere con «Generar escrito» o con ⌘↵ / Ctrl+↵. Si hace falta ajustar, vuelva al cuadro y genere de nuevo, o corrija a mano con «Editar» sobre el papel.'
       ]
     },
     { kind: 'subtitulo', texto: 'Lo que no hace falta' },
@@ -384,71 +355,80 @@ const A_INSTRUCCION: ManualArticle = {
       kind: 'lista',
       items: [
         'Fórmulas de encabezado, invocaciones y despedidas: las pone el escrito.',
-        'Pedir un tono o un formato. La tipografía, el membrete y la numeración vienen de «Membrete», la configuración de su firma.',
-        'Citar la norma de memoria. Si el catálogo la tiene verificada, entra por sí sola; si no la tiene, citarla de memoria es exactamente lo que hay que evitar.'
+        'Pedir un formato. La letra, el membrete y la numeración vienen de «Membrete», y la forma de escribir de la firma, de lo que su firma enseñó en «Estilo de la firma».',
+        'Citar la norma de memoria. Si el catálogo la tiene, entra sola; si no la tiene, citarla de memoria es justo lo que hay que evitar.'
       ]
     },
     {
       kind: 'consejo',
       texto:
-        'No vuelva a teclear lo que ya está transcrito: en una audiencia, el botón «Usar en redacción» copia el transcrito a este cuadro; en una entrevista, «Tomar el caso y redactar» lo trae aquí con los hechos del cliente. Lo dicho en la sala es el material del siguiente escrito.'
+        'No vuelva a teclear lo que ya está transcrito. En una audiencia, «Usar en redacción» lleva lo dicho a este cuadro; en una entrevista, «Tomar el caso» abre la redacción con lo que narró la persona.'
     },
     {
       kind: 'nota',
       titulo: 'Los adjuntos se leen',
       texto:
-        'Con «Adjuntar sentencias, pruebas o fotos» puede subir PDF, Word (.doc y .docx), texto e imágenes JPG, PNG o WEBP: la foto de un comparendo, un oficio, una cédula. Al generar, cada archivo se lee antes de redactar y sus datos —números, placas, radicados, fechas, lugares, nombres, valores— entran al escrito tal cual; lo que el adjunto no trae sigue saliendo como [•]. Si un dato del adjunto contradice lo que usted escribió, prevalece lo suyo y la discrepancia queda anotada entre corchetes. Límites: hasta 8 archivos y 20 MB por escrito; 15 MB por documento; las fotos se reducen en su navegador a 2000 px antes de enviarse (máximo 6 MB reducidas); de cada archivo se leen hasta 40.000 caracteres y 120.000 entre todos. La consola de ejecución dice qué se leyó de cada uno y qué no, con el motivo. Los archivos no se guardan: los que pasan por el almacenamiento se borran en la misma petición.'
+        'Con «Adjuntar sentencias, pruebas o fotos» puede subir PDF, Word, texto e imágenes, hasta 8 archivos y 20 MB. Al generar, se lee cada archivo y sus datos entran al escrito; lo que el adjunto no trae sale como [•]. La consola «Ejecución» dice qué se leyó de cada archivo y qué no. Un PDF escaneado sin texto no se puede leer. Los archivos no se guardan.'
     },
     {
       kind: 'nota',
       titulo: 'Cuando el cuadro llega ya escrito',
       texto:
-        'Si entró por «Orientación» o por el pie «¿Y con qué lo ataco?» de un documento recibido, el cuadro no llega vacío: llega en dos mitades rotuladas, la instrucción arriba y «HECHOS» debajo con el relato o con los flancos y sus citas. Esas dos mitades son texto corriente y se editan como cualquier otra cosa que usted escriba ahí; puede recortar, añadir o borrarlo todo antes de generar. La instrucción sugerida no inventa derecho: cada línea jurídica es cita literal de un campo de la ficha del catálogo, y donde no hay ficha, no hay instrucción sugerida.'
+        'Si entró por «Orientación» o por «¿Y con qué lo ataco?» de un documento recibido, el cuadro llega con la instrucción arriba y los hechos debajo. Es texto normal: puede recortarlo, completarlo o borrarlo antes de generar.'
     },
     {
       kind: 'nota',
       titulo: 'Continuar un borrador',
       texto:
-        'Si abre un borrador guardado desde «Borradores» o desde «Mis borradores», el cuadro deja de pedir hechos y pasa a pedir qué corregir, continuar o ampliar. La pantalla se lo dice arriba del cuadro, con el tamaño del borrador que está continuando.'
+        'Si abre un borrador guardado, el cuadro pasa a pedir qué corregir, continuar o ampliar, y el botón dice «Continuar el borrador».'
     }
   ]
 };
 
 const A_EXPORTAR: ManualArticle = {
   id: 'exportar',
-  titulo: 'Revisar y exportar a Word o PDF',
-  entradilla: 'Qué mirar antes de exportar, y qué diferencia hay entre los dos formatos.',
+  titulo: 'Trabajar, revisar y exportar el escrito',
+  entradilla: 'La barra del borrador, lo que respalda el escrito, cómo se enseña el formato de la firma y cómo se exporta.',
   bloques: [
-    { kind: 'ruta', camino: ['Redacción', 'Barra del borrador', '«Word» · «PDF»'] },
+    { kind: 'ruta', camino: ['Redacción', 'Barra del borrador', '«Word» · «PDF» · «Copiar»'] },
     {
       kind: 'parrafo',
       texto:
-        'Los botones de exportar viven en la barra del borrador, arriba del papel: «Word», «PDF», «Copiar» y una flecha con las opciones de exportación. En el teléfono están en el menú de la cabecera, con «Marcar como listo» primero cuando el borrador todavía no está listo ni radicado.'
+        'Con el escrito generado, la barra de arriba del papel tiene «Word», «PDF», «Copiar», las opciones de exportación, el modo concentración y «Marcar como listo». A la derecha, «Trabajar el escrito» reúne «Taller», «Mis borradores», «Guardar», «Enseñar este formato» y «Sugerir jerga».'
     },
     {
       kind: 'pasos',
       pasos: [
-        'Lea el escrito completo. Es un borrador, y la lectura es corta precisamente porque el estado de la ficha está marcado arriba del papel.',
-        'Mire la franja bajo la barra del borrador y la columna «Lo que respalda este escrito»: si el término no está comprobado o la actuación no está catalogada, decida antes de exportar si verifica la ficha en Catálogo, cambia el dato a mano o lo asume.',
-        'Compruebe los datos que solo usted conoce: nombres, radicado, cuantía, direcciones de notificación. Para corregirlos, pulse «Editar» en la esquina del papel y luego «Ver» para volver al formato.',
-        'Abra la flecha junto a «Copiar» si quiere cambiar cómo sale: bajo «Al exportar» está la casilla «Membrete de la firma» y, solo cuando el escrito trae fuentes, la casilla para anexarlas.',
-        'Pulse «Word» para seguir editando en su procesador, o «PDF» para radicar o archivar como quedó.'
+        'Lea el escrito completo. Mire la franja de procedencia y «Lo que respalda este escrito» para confirmar si el término está comprobado.',
+        'Compruebe los datos que solo usted conoce: nombres, radicado, cuantía y direcciones. Para corregirlos, pulse «Editar» sobre el papel y luego «Ver» para volver al formato. Si cambió algo, pulse «Guardar».',
+        'Abra las opciones de exportación para decidir si sale con «Membrete de la firma» y, cuando el escrito trae fuentes, si anexa la hoja de fuentes citadas.',
+        'Pulse «Word» para seguir editando en su procesador o «PDF» para radicar o archivar.',
+        'Cuando el texto esté terminado, «Marcar como listo» cambia el estado del borrador a Listo. No lo radica ni lo firma.'
+      ]
+    },
+    { kind: 'subtitulo', texto: 'Enseñar el formato y la jerga de la firma' },
+    {
+      kind: 'lista',
+      items: [
+        '«Enseñar este formato» toma el escrito como modelo de cómo escribe su firma para ese rol de firmante. Solo un socio administrador puede hacerlo. «Leer el formato · $100» descuenta $100 del saldo y muestra «Esto es lo que se guardaría», con «Qué se guarda» y «Qué no se guarda». Nada queda guardado hasta que pulse «Guardar el formato»; «Cancelar» descarta la lectura. Desde entonces se usa en los próximos borradores.',
+        'Lo enseñado se ve y se quita en «Ajustes», «Estilo de la firma».',
+        '«Sugerir jerga» busca en el borrador las palabras que su firma prefiere decir de otra forma y propone el reemplazo. Es gratis y no usa el modelo. No toca normas, sentencias, texto entre comillas ni marcadores entre corchetes. Puede reemplazar una aparición o todas.'
       ]
     },
     {
       kind: 'parrafo',
       texto:
-        'Los dos formatos salen con el membrete, la tipografía, el interlineado y la numeración de hechos y de títulos que su firma tenga configurados, y el PDF numera las páginas con el total real. El membrete imprime solo lo que su firma escribió en Membrete: sin NIT no aparece la palabra NIT, sin correo no hay correo. Si no ha configurado nada, el escrito lleva únicamente el nombre de la firma y su NIT si lo tiene. El documento no lleva ninguna marca de Iureon: lo que se radica es de su firma.'
+        'Word y PDF salen con el membrete y el formato de su firma. El membrete imprime solo los datos que su firma escribió. El documento no lleva ninguna marca de Iureon.'
     },
     {
       kind: 'consejo',
       texto:
-        'Exporte a Word cuando alguien más de la firma vaya a seguir corrigiendo, y a PDF solo la versión que se radica. Así el PDF que queda en el expediente es siempre el texto final y no una versión intermedia.'
+        'Exporte a Word mientras alguien de la firma siga corrigiendo, y a PDF solo la versión que se radica.'
     },
     {
       kind: 'aviso',
       texto:
-        'El archivo se fabrica dentro de la pestaña que usted tiene abierta, con el código que esa pestaña cargó. Si lleva días sin recargar, compare el sello de versión del pie de la barra lateral con el que espera antes de dar por bueno un export raro.'
+        'El archivo se genera en la pestaña abierta, con el código que esa pestaña cargó. Si lleva días sin recargarla y el archivo sale raro, compare el sello de versión del pie de la barra lateral.'
     }
   ]
 };
@@ -457,41 +437,41 @@ const A_BORRADORES: ManualArticle = {
   id: 'borradores',
   titulo: 'Guardar un borrador y vigilar su término',
   entradilla:
-    'Un borrador jurídico no es un archivo que espera: es un plazo que corre. Por eso tiene puerta propia.',
+    'Un borrador jurídico no es un archivo que espera: es un plazo que corre. Por eso tiene su propia pantalla.',
   bloques: [
     { kind: 'ruta', camino: ['Redacción', '«Guardar»', 'Borradores'] },
     {
       kind: 'parrafo',
       texto:
-        'Desde el taller puede guardar el escrito en curso. «Borradores», en la barra lateral, los reúne todos con el término de la actuación a la que pertenecen, para que saber qué vence esta semana no obligue a entrar a redactar.'
+        '«Borradores» reúne los escritos de la firma con el término de su actuación, para ver qué vence sin entrar a redactar. Un escrito se guarda solo al generarse.'
     },
     {
       kind: 'pasos',
       pasos: [
-        'El escrito se guarda solo al generarse. Si lo corrige en el papel, pulse «Guardar» en «Trabajar el escrito», junto al papel. Queda a nombre de quien lo creó, que sale de su sesión y no de un campo que se pueda escribir.',
-        'Abra «Borradores» en la barra lateral. La tabla «Borradores guardados» muestra escrito, término, versión, estado y última edición; puede filtrar con «Buscar por cliente, radicado o actuación» y por rama.',
-        'Abra el menú de acciones de una fila: «Abrir» lo lleva de vuelta al taller para continuarlo; «Duplicar» crea una copia; «Marcar radicado» lo saca de los que vencen; «Eliminar» lo borra. Ningún borrador se borra solo.',
-        'Complete los datos del proceso en la ficha del borrador —«Cliente o parte», «Despacho», «Radicado», «Vence el»— y su estado: Borrador, Revisar, Listo o Radicado. Son los datos por los que después lo va a encontrar.',
-        'Cuando lo abra, Redacción muestra el papel. Para pedirle al motor que lo corrija o lo amplíe, vuelva al asistente con la flecha de la barra del borrador: el cuadro de instrucción pasa a pedir qué corregir o ampliar. «Mis borradores», en «Trabajar el escrito», abre la misma lista sin salir de Redacción.'
+        'Abra «Borradores». La tabla muestra escrito, término, versión, estado y última edición. Por defecto aparecen los que están sin radicar; puede cambiar el estado, filtrar por rama, buscar y usar «Limpiar».',
+        'Abra el menú de una fila: «Abrir» lo lleva al papel; «Datos del proceso» guarda cliente, despacho, radicado y fecha de vencimiento; «Poner en la agenda» abre la agenda con el caso y la actuación ya elegidos; «Duplicar» crea una copia; «Marcar radicado» lo saca de los pendientes; «Eliminar» pide confirmación.',
+        'Un borrador tiene cuatro estados: Borrador, Revisar, Listo y Radicado. «Marcar como listo» en Redacción lo deja en Listo.',
+        'Para pedirle al motor que corrija o amplíe un borrador, ábralo y vuelva al asistente: el botón dice «Continuar el borrador». «Mis borradores», en «Trabajar el escrito», abre la misma lista sin salir de Redacción.',
+        '«Exportar lista» descarga la tabla y «Redactar escrito» abre Redacción.'
       ]
     },
     {
       kind: 'consejo',
       texto:
-        'Marque «Radicado» el mismo día que radica. Un borrador radicado ya no se continúa —solo se consulta y se duplica— y deja de aparecer entre los que vencen, que es lo que hace útil la lista.'
+        'Marque «Radicado» el mismo día que radica. Un borrador radicado solo se consulta y se duplica, nunca se continúa, y deja de aparecer entre los pendientes.'
     },
     {
       kind: 'lista',
       items: [
-        'El término que se muestra es el de la actuación catalogada. Si esa ficha no está verificada, el borrador lo hereda y lo dice.',
-        'Cuando otro abogado de su firma crea o edita un borrador, usted recibe un aviso si activó los avisos en su aparato (véase «Iureon en el teléfono»).'
+        'El término que se muestra es el de la actuación catalogada. Si la ficha no está verificada, el borrador lo advierte.',
+        'Si activó los avisos, le llega uno cuando otro abogado de su firma crea o edita un borrador (véase «Iureon en el teléfono»).'
       ]
     },
     {
       kind: 'nota',
       titulo: 'El escrito guarda el estado del momento',
       texto:
-        'Un escrito generado antes de que alguien verificara la ficha conserva el estado que tenía ese día. Si después se verifica el término y usted quiere verlo verificado en el documento, hay que volver a generarlo.'
+        'Un escrito generado antes de que alguien verificara la ficha conserva el estado de ese día. Para verlo con el término verificado, hay que generarlo de nuevo.'
     }
   ]
 };
@@ -500,47 +480,41 @@ const A_ENTREVISTA: ManualArticle = {
   id: 'entrevista',
   titulo: 'Entrevistar a un cliente',
   entradilla:
-    'Cómo queda registrada una entrevista, qué se le pregunta antes de grabar y qué se hace con lo grabado.',
+    'Cómo se registra una entrevista, qué debe preguntar antes de grabar y cómo termina en una decisión.',
   bloques: [
-    { kind: 'ruta', camino: ['Entrevistas', '«Cliente de la entrevista»', '«Grabar la entrevista»', '«Cerrar la entrevista»'] },
+    { kind: 'ruta', camino: ['Entrevistas', '«Nueva entrevista»', '«Empezar a grabar»', '«¿Toma el caso?»'] },
     {
       kind: 'parrafo',
       texto:
-        'Una entrevista es una transcripción atada a un cliente. El cliente se identifica por su cédula, que es única dentro de su firma y no se puede cambiar después: es la llave por la que la firma vuelve a encontrar a esa persona.'
+        'Una entrevista es una transcripción asociada a quien consulta. Grabar y transcribir no consumen saldo. La grabación no se guarda: se borra del almacenamiento apenas termina de transcribirse, y el texto queda guardado en su firma. Entrevistas está en los planes Premium y Firma.'
     },
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Entrevistas». En el panel «Cliente de la entrevista» busque al cliente por su cédula o pulse «Nuevo cliente» y escriba nombre completo y cédula; correo y celular son opcionales.',
-        'Tenga a la vista «Lo que no puede quedarse sin preguntar»: cuatro preguntas cuya respuesta define un término o cierra una prueba —la fecha exacta del hecho, cuándo lo notificaron, si hubo recurso o reclamación antes, y qué documentos tiene hoy—. Debajo de cada una dice qué se pierde si no se pregunta.',
-        'Marque la casilla «Le informé que la entrevista se graba y lo autorizó». Es un paso bloqueante y está ahí a propósito: la voz es un dato biométrico y la hora del clic queda registrada.',
-        'Pulse «Grabar la entrevista». Puede «Pausar» y «Reanudar», y la onda del micrófono se ve mientras graba. Al terminar, pulse el botón de detener y transcribir. Si ya tiene el audio, use «O sube una grabación que ya tengas».',
-        'Espere las dos etapas, que se ven por separado: «Enviando la grabación…» y «Transcribiendo…». El audio va del navegador al almacenamiento sin pasar por nuestros servidores, y se borra apenas se devuelve el transcrito.',
-        'Corrija el transcrito con las mismas herramientas de una audiencia: haga clic en el texto para editarlo, «Dividir» donde hablan dos personas, «Otra voz» para entregar una intervención completa a quien la dijo, y ponga nombre y rol a cada voz en «Interlocutores».',
-        'Al terminar de transcribir, las cuatro preguntas se tachan solas con lo que quedó dicho. Es una ayuda de memoria, no una comprobación: que una quede tachada no garantiza que la respuesta sirva, y que quede sin tachar no significa que no se habló del tema.',
-        'Pulse «Cerrar la entrevista» y decida: «Tomar el caso y redactar» lo lleva a Redacción con los hechos; «Declinar el caso» exige elegir un motivo. Confirme.'
+        'Abra «Entrevistas» y pulse «Nueva entrevista». En «Quién consulta» elija el cliente o créelo con «Nuevo cliente» (nombre completo y cédula; correo y celular son opcionales).',
+        'Marque «Le informé que la entrevista se graba y lo autorizó». Sin esa casilla, la grabación no se envía a transcribir: la voz es un dato biométrico, y la hora queda registrada.',
+        'Pulse «Empezar a grabar». Puede «Pausar» y «Reanudar». Al terminar, escuche la grabación y pulse «Transcribir esta entrevista», o «Descartar» para repetirla. Si ya tiene el audio, use «Subir un archivo».',
+        'Tenga delante «Lo que no puede quedar sin preguntar». Al transcribirse, las preguntas respondidas se tachan solas. Es una ayuda de memoria, no una comprobación.',
+        'Corrija el transcrito con las mismas herramientas de una audiencia (véase «Subir el audio de una audiencia»).',
+        'Responda «¿Toma el caso?». «Tomar el caso» registra quién lo tomó y abre la redacción con lo que narró la persona. «Declinar con motivo» exige escribir el motivo. «Decidir después» la deja esperando decisión, con los días de espera en la lista. «Reabrir la decisión» la vuelve a abrir.',
+        'Exporte el acta en Word desde el detalle, o «Exportar la constancia» si necesita la constancia de la reunión.'
       ]
-    },
-    {
-      kind: 'consejo',
-      texto:
-        'Registre al cliente antes de que llegue a la oficina. Con la ficha creada, la entrevista empieza en la casilla de autorización y no en un formulario, y la segunda entrevista del mismo cliente ya encuentra su historial.'
     },
     {
       kind: 'nota',
       titulo: 'La segunda entrevista con el mismo cliente',
       texto:
-        'Si el cliente ya tuvo una entrevista, el guion marca aparte —en azul y con la fecha— lo que quedó respondido en ella: «ya se habló de esto en la entrevista del 5 de agosto». Es distinto del tachado de hoy a propósito: una respuesta de hace tres semanas se relee, no se da por hecha. Lo que el cliente vuelva a decir hoy se tacha como de hoy.'
+        'Si el cliente ya tuvo entrevistas, el guion marca aparte, con la fecha, las preguntas que se respondieron en ellas. Una respuesta de hace semanas conviene releerla.'
     },
     {
       kind: 'parrafo',
       texto:
-        'A partir de lo que dijo el cliente —no de la entrevista entera, que es en su mayoría el abogado— la pantalla sugiere «Jurisprudencia relacionada» del corpus. Si el corpus no cubre el tema, calla y lo explica en vez de ofrecer providencias apenas parecidas. No hay doctrina: son providencias, y la pantalla también lo dice.'
+        '«Jurisprudencia relacionada» busca en el corpus a partir de lo que dijo el cliente, no de sus preguntas. Si nada se parece lo suficiente, lo dice. Son sugerencias por cercanía de lenguaje, no dictámenes de aplicabilidad.'
     },
     {
       kind: 'aviso',
       texto:
-        'Si declina el caso antes de transcribir, «Constancia» exporta el acta de la reunión sin transcrito: dice quién estuvo, cuándo y que autorizó la grabación, y declara que no hay transcrito. Un acta que prometa un transcrito que no existe sería peor que ninguna.'
+        'En el teléfono, la grabación vive en la aplicación abierta. Si la cierra antes de transcribir, se pierde. Dividir intervenciones y corregir el texto se hace en la pantalla grande.'
     }
   ]
 };
@@ -548,62 +522,58 @@ const A_ENTREVISTA: ManualArticle = {
 const A_AUDIENCIA: ManualArticle = {
   id: 'audiencia',
   titulo: 'Subir el audio de una audiencia',
-  entradilla: 'Las cuatro herramientas de corrección, y cuál usar según qué salió mal.',
+  entradilla: 'Cómo se transcribe, qué herramienta usar según el error y cuándo el acta está lista.',
   bloques: [
-    { kind: 'ruta', camino: ['Audiencias', '«Subir audio»', '«Transcribir»', '«Interlocutores»'] },
+    { kind: 'ruta', camino: ['Audiencias', '«Subir una grabación»', '«Transcribir y separar las voces»', '«Marcar acta lista»'] },
     {
       kind: 'parrafo',
       texto:
-        'La transcripción separa a los interlocutores y le propone un rol para cada voz cuando encuentra en el propio audio la frase que lo justifica —quien reparte la palabra es el juez, el juramento marca al testigo—, siempre citando el minuto y la frase. Nunca asigna sola: si no hay señal clara, la voz queda como desconocida.'
+        'La transcripción separa las voces y puede proponer el rol de cada una. Transcribir no consume saldo. La grabación no se guarda: se borra del almacenamiento apenas termina, y el texto queda en su firma. Audiencias está en los planes Premium y Firma.'
     },
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Audiencias» y pulse «Subir audio». En el diálogo «Subir audio de audiencia» arrastre el archivo o haga clic para buscarlo, y escriba en «Proceso al que pertenece» el juzgado, las partes y el radicado: ese contexto se le entrega al motor antes de oír.',
-        'Pulse «Transcribir». Mientras el archivo viaja al almacenamiento el botón muestra el porcentaje enviado, y después dice «Transcribiendo…»: son dos esperas distintas y las dos se ven.',
-        'Abra el transcrito desde «Audiencias de la firma». En «Roles sugeridos» revise cada propuesta con su frase y su minuto; en «Interlocutores» ponga nombre y rol a cada voz una sola vez, y el nombre se aplica a todas sus intervenciones.',
-        'Corrija con la herramienta que corresponda al error (abajo se explica cuál). Cada corrección se guarda en el servidor al instante.',
-        'Marque «Marcar revisada» en las intervenciones que ya leyó y «Marcar hecho clave» en las que deciden el caso: esas son las que entran al acta.',
-        'Cuando la haya leído completa, en la lista de audiencias elija «Marcar acta lista». Hasta entonces queda «Por revisar»; esa marca es de una persona, no del motor.',
-        'Exporte el acta con «Word» (el que se edita) o «PDF» (el que se anexa al expediente), o pulse «Usar en redacción» para llevar lo dicho como hechos al taller.'
+        'Abra «Audiencias» y pulse «Subir una grabación». Suelte el audio o el video, o use «Elegir la grabación». En «Proceso al que pertenece» (opcional) escriba partes, juzgado y radicado, para que los nombres se transcriban mejor. Si elige el caso, la audiencia queda contada en él.',
+        'Pulse «Transcribir y separar las voces». La pantalla muestra el envío de la grabación y luego la transcripción.',
+        'En «Quién habla», ponga nombre y rol a cada voz una sola vez: se aplica a todo el transcrito.',
+        'Las intervenciones con poca certeza se ven subrayadas con onda y llevan su porcentaje. «Ir a la primera» lo lleva a ellas. Vuélvalas a escuchar antes de citarlas.',
+        'Corrija con la herramienta que corresponda (abajo). Cada corrección se guarda para toda la firma.',
+        'Use «Marcar revisada» en lo que ya leyó y «Marcar hecho clave» en lo que decide el caso.',
+        'Cuando la haya leído completa, pulse «Marcar acta lista» en la lista. Una transcripción no es un acta: esa marca solo la pone una persona. La lista separa «Pendientes de revisar» y «Acta lista».',
+        '«Exportar acta» ofrece el acta con minutos o solo los hechos clave. «Usar en redacción» lleva lo dicho al taller.'
       ]
     },
     { kind: 'subtitulo', texto: 'Qué herramienta usar' },
     {
       kind: 'lista',
       items: [
-        'Editar — una palabra mal transcrita. Haga clic en el texto, corríjalo y pulse Enter; Esc descarta.',
-        '«Dividir» — dos personas quedaron en un mismo renglón. Parte la intervención donde tiene el cursor y le pregunta de quién es la mitad cortada.',
-        '«Otra voz» — la intervención completa está atribuida a quien no es. Se la entrega a otra voz, y el rol viaja con el destino.',
-        'Asignar rol en «Interlocutores» — la voz está bien separada pero mal identificada. Nombra al interlocutor en todas sus intervenciones.'
+        '«Corregir el texto»: una palabra mal transcrita.',
+        '«Dividir»: dos personas quedaron en una misma intervención. Haga clic donde empieza a hablar la otra y elija de quién es lo que sigue.',
+        '«Es de otra persona»: la intervención completa está atribuida a quien no es. Solo cambia esa intervención, y el rol lo toma la voz de destino.',
+        'Nombre y rol en «Quién habla»: la voz está bien separada pero mal identificada.'
       ]
     },
     {
       kind: 'consejo',
       texto:
-        'Corrija con la grabación sonando: «Escuchar la grabación» reproduce la copia que quedó en su navegador mientras dure la pestaña. Los fragmentos que el motor oyó con poca seguridad quedan marcados en el propio texto, solo en el tramo afectado: empiece por esos.'
+        'Corrija con la grabación sonando: «Escuchar la grabación» la reproduce desde la copia de su navegador mientras no cierre la pestaña.'
     },
     {
       kind: 'aviso',
       texto:
-        'Cuando dos personas hablan encima, la separación de voces no las distingue y ambas caen en un mismo bloque. No es una configuración: hay que cortar primero con «Dividir» y después asignar. Si la aplicación le avisa que bajo una misma voz aparecen dos nombres, es exactamente este caso.'
-    },
-    {
-      kind: 'parrafo',
-      texto:
-        'El transcrito se guarda apenas responde el proveedor, así que cerrar la pestaña no pierde nada ni obliga a repetir el gasto. El audio no se guarda: puede escucharlo mientras corrige desde la copia que quedó en su navegador, y esa copia dura lo que dure la pestaña.'
-    },
-    {
-      kind: 'nota',
-      titulo: 'Vocabulario jurídico',
-      texto:
-        'El modelo va preparado para oír términos del oficio, y aun así se equivoca. Los errores peligrosos son los que suenan bien: «desembarco» por desembargo, «con recámaras» por Confecámaras. Por eso el transcrito se edita y la grabación se puede volver a oír.'
+        'Cuando dos personas hablan a la vez, la separación de voces puede juntarlas en una misma intervención. No se arregla con configuración: hay que usar «Dividir» y después asignar. Si la pantalla avisa que bajo una misma voz aparecen dos nombres, es este caso.'
     },
     { kind: 'subtitulo', texto: 'El resumen y los hechos relevantes' },
     {
       kind: 'parrafo',
       texto:
-        'Sobre una audiencia o una entrevista transcrita, el recuadro «Resumen y hechos relevantes» tiene un botón «Generar»: unas frases sobre qué se trató y una lista de hechos dichos, cada uno con el minuto y quién lo dijo. Extrae lo que se dijo, no conclusiones jurídicas, y si el transcrito no trae hechos relevantes lo dice en vez de inventarlos. Se genera una vez y queda guardado; reabrirla mañana no lo vuelve a generar. Cuesta $50 del saldo cada vez que se pulsa «Generar» o «Regenerar»; transcribir no cuesta.'
+        'En «Resumen y hechos relevantes», «Generar el resumen» produce unas frases sobre lo tratado y los hechos dichos, con el minuto. Resume lo que se dijo y no toma decisiones. Queda guardado. Cada vez que pulsa «Generar el resumen» o «Regenerar» se descuentan $50 del saldo.'
+    },
+    {
+      kind: 'nota',
+      titulo: 'Vocabulario jurídico',
+      texto:
+        'El motor está preparado para términos del oficio y aun así se equivoca. Los errores peligrosos son los que suenan bien, como «desembarco» por desembargo. Por eso el transcrito se corrige y la grabación se puede volver a oír.'
     }
   ]
 };
@@ -617,256 +587,204 @@ const A_CURADURIA: ManualArticle = {
     {
       kind: 'parrafo',
       texto:
-        'El catálogo llega con las actuaciones y los términos que trae el producto. Encima de eso, cada firma guarda su propia curaduría: cuando un abogado verifica un término, esa verificación vale para su firma y para todos los escritos que vengan después. Se hace dentro del producto, no editando código: esa es la diferencia entre validar cada documento —el trabajo que la aplicación existe para eliminar— y validar el conocimiento una sola vez.'
+        'El catálogo llega con las actuaciones y los términos del producto. Encima, cada firma guarda su propia curaduría: cuando un socio administrador verifica un término, vale para la firma y para todos los escritos siguientes. Se valida el conocimiento una vez, no cada documento.'
     },
     {
       kind: 'pasos',
       pasos: [
-        'Decida en la firma quién cura. Verificar es firmar con nombre y fecha; conviene que lo hagan quienes van a responder por ese término.',
-        'En «Catálogo», filtre por la rama que la firma litiga y recorra las actuaciones marcadas «Sin verificar». El chip de cada fila dice su estado sin abrirla.',
-        'Abra cada ficha y lea sus tres bloques. Una ficha puede estar verificada en el término y coja en la autoridad; el bloque de autoridad es el que manda al abogado a radicar ante quien no es.',
-        'Complete «Curaduría de su firma» como se explica en «Verificar contra la norma» y pulse «Guardar verificación».',
-        'Revise en «Seguridad» la auditoría: cada verificación queda como «Verificó actuación», con quién y cuándo.'
+        'Decidan quién cura. Verificar deja constancia de quién lo hizo; el servidor lo permite a los socios administradores.',
+        'En «Catálogo», filtre por las ramas de la firma y recorra las actuaciones sin término verificado. La columna «Estado» lo dice sin abrirlas.',
+        'Abra cada ficha y lea sus tres bloques. Puede tener verificado el término y no la autoridad, y la autoridad decide ante quién se radica.',
+        'Revise «Secciones obligatorias del escrito»: son las que el motor le exige al escrito. Una sección «sin artículo confirmado» se sigue exigiendo; lo que falta es la cita que la respalda.',
+        'Complete la verificación como se explica en «Verificar contra la norma».',
+        'En «Seguridad» (pantalla «Auditoría») queda cada verificación con quién y cuándo.'
       ]
     },
     {
       kind: 'consejo',
       texto:
-        'Cuando una actuación exista con el mismo nombre en dos ramas —los recursos de reposición, apelación, queja y súplica tienen plazos distintos en el CGP y en el CPACA—, cure las dos fichas: la aplicación siempre busca con la rama y rechaza una etiqueta ambigua en vez de adivinar.'
+        'Cuando una actuación exista con el mismo nombre en dos ramas (reposición, apelación, queja y súplica tienen plazos distintos en el CGP y en el CPACA), cure las dos fichas. La aplicación busca siempre con la rama.'
     },
     {
       kind: 'lista',
       items: [
-        'Hay actuaciones transversales, como el derecho de petición, que aparecen en todas las ramas siendo una sola ficha. Corregirla la corrige en todas partes.',
-        'Otras aparecen en su rama marcadas «por remisión del CGP · plazo sin verificar en esta rama». Son fichas del Código General del Proceso —reposición, apelación, queja, súplica, nulidad procesal, desistimiento, aclaración, corrección, adición, amparo de pobreza, acumulación y poder— que llegan a familia, societario, insolvencia, propiedad intelectual, contratos y constitucional porque ese código gobierna esos asuntos. No son una copia: es la misma ficha, y por eso llega con el término sin afirmar. Su plazo está comprobado en lo civil, y nadie lo ha comprobado para la rama de usted.',
-        'Curar una ficha por remisión la verifica SOLO para esa rama. Ábrala desde el filtro de su rama, léala contra la norma y guarde el término: la ficha civil no cambia, y si mañana el plazo resulta distinto en su rama, las dos cifras conviven sin pisarse. Es lo contrario de lo transversal: allí una corrección vale para todos, aquí cada rama responde por su reloj.',
-        'Verificar exige la fuente. Un término sin fuente no se puede registrar como verificado.',
-        '«Revertir» descarta la curación de la firma y deja la ficha como venía de fábrica.'
+        'Las actuaciones transversales, como el derecho de petición, son una sola ficha visible en todas las ramas. Corregirla la corrige en todas.',
+        'Algunas fichas llegan a su rama por remisión del CGP con el plazo sin verificar en esa rama. Verificarlas en su rama no cambia la ficha de la rama de origen.',
+        'Las actuaciones que su firma añadió aparecen como «Añadida por su firma». Un socio puede verificarles el término o usar «Retirar de la lista de la firma».',
+        'Verificar exige la fuente. Sin fuente no se registra.',
+        '«Revertir al catálogo base» descarta la curación de la firma.'
       ]
     },
     {
       kind: 'todavia-no',
       texto:
-        'La historia de curaduría por actuación —quién verificó qué y cuándo, en una línea de tiempo— todavía no existe. Hoy se ve el estado actual y quién firmó la última verificación, no el recorrido completo.'
+        'No hay historial de curaduría. El catálogo guarda una fila por actuación y firma, así que cada curación reemplaza la anterior. Tampoco se pueden confirmar secciones una por una: la curaduría se registra por actuación.'
     }
   ]
 };
 
 const A_PLANES: ManualArticle = {
   id: 'planes-y-pago',
-  titulo: 'Planes y pago de la suscripción',
-  entradilla: 'Qué incluye cada plan, cuánto cuesta, cómo se paga y qué pasa cuando vence.',
+  titulo: 'Planes, prueba y pago de la suscripción',
+  entradilla: 'Qué incluye cada plan, cuánto cuesta, cómo funciona la prueba, cómo se paga y qué pasa cuando vence.',
   bloques: [
-    { kind: 'ruta', camino: ['Barra lateral', '«Plan»', '«Plan de la firma»', '«Contratar»'] },
+    { kind: 'ruta', camino: ['Ajustes', '«Plan y saldo»', '«Renovar o cambiar de plan»'] },
     { kind: 'subtitulo', texto: 'Tres planes' },
     {
       kind: 'lista',
       items: [
-        'Esencial: $85.000 al mes o $850.000 al año. Un usuario. Incluye Redacción, Borradores, Revisiones, Buscador, Catálogo, Herramientas, Manual, Soporte y Membrete. No incluye Audiencias, Entrevistas ni Orientación.',
-        'Premium: $120.000 al mes o $1.200.000 al año. Hasta cinco usuarios. Incluye todos los módulos.',
-        'Firma: $250.000 al mes o $2.500.000 al año. Hasta quince usuarios. Incluye todos los módulos.'
+        'Esencial: $85.000 al mes o $850.000 al año. Un usuario. Incluye Redacción, Expedientes, Borradores, Revisiones, Buscador, Catálogo, Herramientas, Manual, Soporte y Membrete. No incluye Audiencias, Entrevistas ni Orientación.',
+        'Premium: $120.000 al mes o $1.200.000 al año. Hasta cinco usuarios. Suma Audiencias, Entrevistas y Orientación.',
+        'Firma: $250.000 al mes o $2.500.000 al año. Hasta quince usuarios. Todos los módulos.'
       ]
     },
     {
       kind: 'parrafo',
       texto:
-        'Los precios incluyen IVA. El plan anual son doce meses por el precio de diez. El consumo de inteligencia artificial —escritos, revisiones, resúmenes, orientaciones pasado el cupo gratuito— no está incluido en el plan: se descuenta del saldo de recargas, como se explica en «Roles y saldo». Son dos cosas distintas: el plan es el derecho a usar la aplicación; el saldo, lo que cada operación consume.'
-    },
-    { kind: 'subtitulo', texto: 'Contratar desde la página pública' },
-    {
-      kind: 'pasos',
-      pasos: [
-        'En la página principal, bajo «Planes», pulse «Contratar Esencial», «Contratar Premium» o «Contratar Firma». Si su firma ya tiene cuenta, use «Iniciar sesión»: la cuenta se crea una sola vez.',
-        'Escriba el nombre de la firma, su nombre, su correo y una contraseña de al menos diez caracteres, acepte el tratamiento de datos y pulse «Crear cuenta y pagar» con el nombre del plan. La cuenta queda creada en ese momento y usted es su administrador.',
-        'La aplicación abre en solo lectura, con la franja roja y la pantalla «Plan de la firma» ya abierta y su plan destacado como «Su elección». Elija «Mensual» o «Anual» y pulse «Contratar»: se abre Wompi con el valor fijado.',
-        'Al confirmarse el pago, el plan queda activo hasta la fecha de vencimiento que muestra la pantalla y todos los módulos del plan se habilitan en el acto. No hay renovación automática: antes de vencer, la franja le avisa y vuelve a pagar desde «Plan».'
-      ]
-    },
-    {
-      kind: 'nota',
-      titulo: 'Suspensión por operación',
-      texto:
-        'Operación puede suspender el acceso de una firma con motivo escrito; la aplicación pasa a solo lectura en el acto, con la franja «Renovar plan», y el hecho queda en la auditoría de la firma como «Operación suspendió el acceso». Pagar desde «Plan» reactiva la firma; también puede hacerlo operación al fijar de nuevo el plan.'
+        'En el plan anual, el año cuesta lo mismo que diez meses. El plan no incluye el consumo de inteligencia artificial: escritos, revisiones, resúmenes y orientaciones fuera del cupo gratuito se descuentan del saldo (véase «Saldo, recarga y usuarios de la firma»).'
     },
     { kind: 'subtitulo', texto: 'Cómo se paga' },
     {
       kind: 'pasos',
       pasos: [
-        'En la barra lateral, al pie de la tarjeta del saldo, pulse la fila del plan: dice el plan de la firma y hasta cuándo va, o «Ver el plan» si todavía no hay ninguno. En el teléfono, abra «Más» y, bajo «Cuenta», toque «Plan de la firma».',
-        'Arriba, «Plan actual» muestra el plan vigente y hasta cuándo. Debajo, en «Elija el plan», cambie el interruptor entre «Mensual» y «Anual»; el anual lleva la etiqueta «2 meses gratis».',
-        'En la tarjeta del plan pulse el botón, que dice «Contratar Esencial mensual», «Renovar Premium anual» o la combinación que haya elegido. Dice «Renovar» cuando es el plan que ya tiene.',
-        'La aplicación abre la pasarela de Wompi con el valor ya fijado; pague con PSE, tarjeta o los medios que ofrezca.',
-        'Cuando la pasarela confirma, el plan se extiende solo y el pago aparece en la tabla «Pagos del plan», con fecha, plan, periodo cubierto, valor y quién pagó.'
+        'Abra el plan desde la fila del plan en el pie de la barra lateral («Ver el plan»), desde «Ver plan» en Inicio o desde «Ajustes» → «Plan y saldo». En el teléfono, «Más» → «Plan de la firma».',
+        'El diálogo se titula «Renovar o cambiar de plan», o «Elegir un plan» si la firma todavía no tiene uno. Arriba dice qué plan tiene hoy. Cambie entre mensual y anual.',
+        'Pulse el botón de la tarjeta: «Renovar», «Pasar a» o «Contratar», con el nombre del plan y el periodo. Se abre Wompi con el valor fijado.',
+        'Cuando el pago se confirma, el plan queda activo y el pago aparece en «Pagos del plan», con «Cuenta de cobro» para descargar el soporte en PDF.'
       ]
     },
     {
-      kind: 'consejo',
-      texto:
-        'Pague antes de la fecha de vencimiento, no después: renovar el plan que ya tiene suma el periodo a la fecha vigente, así que pagar el 10 un plan que vence el 20 lo deja hasta el 20 del mes siguiente. No se pierde ni un día. Cambiar a otro plan sigue otra regla, explicada más abajo.'
-    },
-    {
       kind: 'nota',
-      titulo: 'Solo un administrador paga',
+      titulo: 'Solo un socio administrador paga el plan',
       texto:
-        'Si su cuenta no es de administrador, la tarjeta dice «Solo un administrador de la firma puede pagar el plan» en lugar del botón. No se guarda tarjeta ni se cobra automáticamente: cada periodo se paga con un checkout nuevo.'
+        'El servidor solo acepta el pago del plan de un socio administrador. A los demás, la tarjeta les dice «Solo un socio administrador puede pagar el plan.». No se guarda la tarjeta ni hay cobro automático: cada periodo se paga de nuevo.'
     },
-    { kind: 'subtitulo', texto: 'Cambiar de plan: dos vías' },
-    {
-      kind: 'parrafo',
-      texto:
-        'Renovar el plan que ya tiene suma el periodo a la fecha vigente, incluso si pasa de mensual a anual: es el mismo plan comprado por más tiempo y no pierde ni un día. Cambiar a OTRO plan es distinto y se puede hacer de dos maneras, con consecuencias distintas; elija antes de pagar.'
-    },
+    { kind: 'subtitulo', texto: 'Renovar no es lo mismo que cambiar' },
     {
       kind: 'lista',
       items: [
-        'Desde la aplicación: en «Plan de la firma» pulse «Contratar» en la tarjeta del plan que quiere. El plan nuevo se paga completo y su ciclo empieza el día del pago, así que el vencimiento se cuenta desde hoy y los días que le quedaban del plan anterior no se acreditan ni se devuelven. La tarjeta se lo advierte debajo del botón, con los días que va a entregar, antes de que abra la pasarela. No hay prorrateo.',
-        'Por Soporte, conservando su fecha: escríbanos antes de pagar. Le decimos la diferencia entre los dos planes, usted la envía por fuera de la pasarela y nosotros le subimos el plan dejando intacta la fecha de vencimiento que ya tenía. El cambio queda en la auditoría de su firma como «Operación actualizó el plan», con el motivo escrito.'
+        'Renovar el plan vigente suma el periodo nuevo a la fecha de vencimiento. No pierde ningún día pagado.',
+        'Pasar a otro plan empieza el día del pago. Los días que quedaban del plan anterior no se acreditan ni se devuelven, y la tarjeta lo advierte antes de abrir la pasarela.',
+        'Si quiere cambiar de plan conservando su fecha de vencimiento, escríbanos por Soporte antes de pagar.'
+      ]
+    },
+    { kind: 'subtitulo', texto: 'Estados del plan' },
+    {
+      kind: 'lista',
+      items: [
+        'Activo, y «por vencer» durante los siete días anteriores al vencimiento, con una franja de aviso.',
+        'Vencido: la aplicación queda en solo lectura. Se pueden abrir, leer y exportar borradores e informes, y usar el Manual, Soporte, Ajustes y la pantalla del plan, pero no crear ni modificar trabajo. El saldo no se pierde. Al pagar, todo vuelve de inmediato.',
+        'Cortesía: un plan que asigna la operación de Iureon.',
+        'Prueba: siete días de Esencial.'
       ]
     },
     {
       kind: 'nota',
-      titulo: 'Por qué no hay prorrateo',
+      titulo: 'La prueba gratuita de Esencial',
       texto:
-        'Devolverle la diferencia por la pasarela obliga a un cobro más, y la comisión fija de la pasarela se come buena parte de un importe pequeño. En vez de disfrazar ese costo, la aplicación se lo dice: pagar desde aquí es cómodo e inmediato pero empieza de cero, y si lo que le importa es no perder los días que le quedan, esa vía existe y se pide por Soporte.'
-    },
-    { kind: 'subtitulo', texto: 'Qué pasa al vencer' },
-    {
-      kind: 'parrafo',
-      texto:
-        'Siete días antes, los administradores ven una franja arriba de la aplicación con la fecha. Al vencer, todos los roles ven una franja roja de «solo lectura» y la aplicación deja de crear o modificar trabajo: Redacción, Orientación, Buscador, Catálogo, Herramientas, Audiencias y Entrevistas quedan cubiertos con un aviso, y en Borradores y Revisiones desaparecen los botones de redactar y revisar. El servidor rechaza cualquier guardado, edición o eliminación con el mismo mensaje. Sigue abierto todo lo que ya tiene: entrar, abrir y leer borradores e informes, exportarlos a Word y PDF, el Manual, Soporte, Ajustes y la pantalla del plan para pagar. El saldo de recargas no se pierde. Al pagar, todo vuelve en el acto.'
-    },
-    {
-      kind: 'aviso',
-      texto:
-        'En el plan Esencial, Audiencias, Entrevistas y Orientación no aparecen en la barra, y crear una segunda cuenta responde que el plan admite una sola. Pasar a Premium habilita las tres pantallas y hasta cinco cuentas desde el momento del pago; Firma, las mismas pantallas y hasta quince cuentas.'
+        'Una firma puede abrir una prueba de Esencial de siete días: «Un usuario, sin tarjeta y sin cobro al terminar.». Hay una sola prueba por correo. La prueba es solo de Esencial, y el saldo de inteligencia artificial empieza en cero. Al terminar la prueba, la firma pierde el acceso; no queda en solo lectura. La pantalla «Los 7 días de prueba se acabaron» ofrece «Ver planes y contratar» y «Salir». Contratar la reactiva.'
     },
     {
       kind: 'nota',
-      titulo: 'Módulos o funciones no habilitados para su firma',
+      titulo: 'La cuenta de cobro no es factura',
       texto:
-        'Además de lo que trae cada plan, la operación de Iureon puede dejar sin habilitar un módulo o una función concreta para una firma —por ejemplo, «Preguntas para la audiencia» dentro de Expedientes—, normalmente mientras se acuerda algo con ella. En ese caso el módulo no aparece en la barra y su tarjeta de Inicio dice «No disponible para su firma»; si es una función, su botón o su pestaña no está. El mensaje es otro que el del plan: «no está habilitada para su firma» y le pide escribir por Soporte, sin ofrecerle cambiar de plan, porque el plan no es lo que falta. Escriba por Soporte y se habilita en el acto.'
+        'La «Cuenta de cobro» de cada pago es un soporte en PDF, no una factura electrónica de la DIAN, y el documento lo dice.'
     },
     {
       kind: 'nota',
-      titulo: 'Prueba gratuita de Esencial',
+      titulo: 'Módulos no habilitados para su firma',
       texto:
-        'Desde la página pública o desde el enlace bajo el formulario de entrada, una firma puede abrir por su cuenta una prueba de Esencial de siete días: un usuario, sin tarjeta y sin cobro al terminar. La prueba es una sola por persona: si el correo o la conexión ya la usaron, la aplicación responde «Ya usó su prueba gratuita» y ofrece contratar o iniciar sesión. Entra directo a la aplicación con todos los módulos de Esencial. El saldo de inteligencia artificial es aparte y empieza en cero: para probar la redacción hay que recargar desde «Saldo»; el Catálogo, el Buscador, las Herramientas y el Manual no consumen saldo. La pantalla del plan la muestra como «Prueba» con la fecha de vencimiento y la franja de aviso cuenta los días. Al cumplirse los siete días la aplicación pasa a solo lectura, igual que un plan vencido, y «Contratar» en la pantalla del plan la reactiva en el acto con Esencial o con otro plan. Una prueba por correo; el servidor limita las altas desde una misma conexión. La prueba también se puede pedir desde «Plan de la firma», con el botón «Probar Esencial gratis 7 días» de la tarjeta Esencial, cuando la firma nunca ha pagado ni probado y tiene un solo usuario.'
-    },
-    {
-      kind: 'nota',
-      titulo: 'Cuenta de cobro y correo de confirmación',
-      texto:
-        'Cada pago del plan queda en «Pagos del plan», dentro de la misma pantalla, con el botón «Cuenta de cobro» que descarga el soporte en PDF: emisor, firma, concepto, periodo cubierto, valor y referencia de Wompi, sin discriminar IVA. No es factura electrónica de la DIAN, y el documento lo dice. Si la plataforma tiene el correo configurado, quien pagó recibe además un correo de confirmación con la cuenta de cobro adjunta; las recargas de saldo también se confirman por correo.'
+        'Además del plan, la operación de Iureon puede dejar sin habilitar un módulo o una función para una firma. En ese caso, el módulo no aparece en la barra y su tarjeta de Inicio dice «No disponible para su firma». Escriba por Soporte.'
     }
   ]
 };
 
 const A_ROLES_SALDO: ManualArticle = {
   id: 'roles-saldo',
-  titulo: 'Roles y saldo',
-  entradilla: 'Quién puede hacer qué dentro de la firma, y cómo se consume y se recarga el saldo.',
+  titulo: 'Saldo, recarga y usuarios de la firma',
+  entradilla: 'Quién puede hacer qué dentro de la firma, qué consume saldo, cómo se recarga y cómo se recupera la cuenta.',
   bloques: [
-    { kind: 'ruta', camino: ['Barra lateral', '«Saldo»', '«Recargar»', '«Pagar»'] },
+    { kind: 'ruta', camino: ['Barra lateral', '«Recargar»', '«Recargar saldo»', '«Ir a pagar»'] },
     { kind: 'subtitulo', texto: 'Roles' },
     {
       kind: 'parrafo',
       texto:
-        'Un rol no es una etiqueta: se impone en el servidor, en cada petición. La administración de la firma —dar de alta compañeros, cambiar roles, recargar, pagar el plan, autorizar el guardado del taller— corresponde al administrador; redactar, transcribir y consultar, a todos.'
+        'Hay dos roles, «Socio administrador» y «Abogado», y el servidor los aplica en cada petición. Solo un socio administrador puede agregar usuarios y cambiar roles, pagar el plan, verificar términos del catálogo, enseñar el formato de la firma, autorizar que se conserven los escritos revisados, decidir el acceso de soporte y eliminar la firma. Todos pueden redactar, revisar, transcribir, consultar y recargar saldo.'
     },
-    { kind: 'subtitulo', texto: 'Su nombre' },
+    { kind: 'subtitulo', texto: 'Su firma: agregar abogados' },
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Ajustes», dentro de Administrar, y entre en «Su cuenta». Arriba están su nombre, su correo, su rol y su firma.',
-        'Escriba su nombre en el campo «Su nombre» y pulse «Guardar». Si todavía no tiene ninguno, el campo aparece vacío y en gris se ve lo que la aplicación deduce de su correo: eso es solo una sugerencia, no queda guardado hasta que usted escriba el suyo.',
-        'Desde ese momento su nombre aparece bajo la palabra «Iureon» en la barra lateral, en el saludo de «Inicio» y junto a su correo en la lista de «Usuarios y roles» de la firma. El correo no se sustituye en ninguna parte: sigue siendo con lo que entra.',
-        'Puede cambiarlo cuando quiera, y también con el plan vencido. Un socio administrador puede escribirlo al dar de alta a un compañero, pero es opcional: cada quien puede ponerlo después.'
-      ]
-    },
-    { kind: 'subtitulo', texto: 'Si olvidó su contraseña' },
-    {
-      kind: 'pasos',
-      pasos: [
-        'En la pantalla «Entrar», junto a «Contraseña», pulse «¿Olvidó su contraseña?».',
-        'Escriba el correo con el que entra y pulse «Enviarme el enlace». La pantalla dice «Si ese correo tiene cuenta, ya salió el enlace», exista o no la cuenta: así nadie puede usarla para averiguar qué correos están en Iureon.',
-        'Abra el correo de Iureon y pulse «Poner una contraseña nueva». El enlace vence en 30 minutos y solo sirve una vez; si no lo encuentra, revise el correo no deseado. Se pueden pedir hasta tres enlaces cada media hora, y cada enlace nuevo anula el anterior.',
-        'Escriba la contraseña nueva dos veces —al menos diez caracteres— y pulse «Guardar la contraseña». Se cierran todas las sesiones abiertas con su correo, en cualquier dispositivo, y se entra de nuevo desde «Entrar».'
-      ]
-    },
-    {
-      kind: 'nota',
-      titulo: 'Si el correo no llega',
-      texto:
-        'Un socio administrador de su firma puede pedirle a operación de Iureon que le ponga una contraseña nueva. Si su usuario está desactivado, el enlace no llega: lo reactiva un socio de su firma. La solicitud y el cambio quedan en la auditoría de la firma.'
-    },
-    { kind: 'subtitulo', texto: 'Eliminar su usuario o su firma' },
-    {
-      kind: 'pasos',
-      pasos: [
-        'Abra «Ajustes», dentro de Administrar, y entre en «Su cuenta». Al final está la «Zona de riesgo». Funciona también con el plan vencido.',
-        'Para irse solo usted, pulse «Eliminar mi usuario», escriba su contraseña y confirme. Su acceso desaparece; sus escritos, revisiones y transcritos son trabajo de la firma y se quedan en ella con su correo como autor. Si es el único usuario, la aplicación le pedirá usar la otra puerta; si es el único administrador y hay más usuarios, nombre otro antes.',
-        'Para borrar la firma entera, el socio administrador pulsa «Eliminar la firma y todos sus datos», escribe su contraseña y el nombre exacto de la firma tal como aparece, y confirma. Se borran escritos, revisiones, transcripciones, clientes, pagos, usuarios y saldo, y ninguna cuenta de la firma vuelve a entrar.',
-        'Ninguna de las dos se deshace. Antes de borrar, exporte a Word o PDF lo que quiera conservar: después no habrá de dónde sacarlo. Lo único que se conserva es el registro de que su correo ya usó la prueba gratuita.'
+        'Abra «Ajustes» → «Usuarios». La pantalla se titula «Su firma».',
+        'Pulse «Agregar un abogado», complete los datos y pulse «Crear el usuario». El plan limita cuántos usuarios puede tener la firma.',
+        'En cada usuario, «Hacer socio» o «Pasar a abogado» cambian su rol.'
       ]
     },
     { kind: 'subtitulo', texto: 'Qué consume saldo' },
     {
       kind: 'lista',
       items: [
-        'Los escritos generados y las revisiones —tanto la de un escrito suyo como la lectura de un documento que recibió—, con un precio que se muestra en el propio botón.',
-        'Cada mensaje a la guía del taller ($300) y cada «Volver a revisar» ($2.000).',
-        'El resumen de una audiencia o entrevista ($50 cada vez que se genera o regenera).',
-        'Las orientaciones que pasen del cupo diario gratuito de la firma.',
-        'Transcribir no consume saldo.'
+        'Cada escrito generado: desde $2.000; un escrito largo cuesta lo que mida.',
+        'Cada revisión, de un escrito suyo o de un documento recibido, y cada «Volver a revisar»: desde $2.000.',
+        'Cada mensaje a la guía del taller: $300.',
+        'Cada resumen de audiencia o entrevista: $50.',
+        'Cada orientación después de las 10 gratis del día: $150.',
+        'Leer un formato para enseñarlo: $100.',
+        'No consumen saldo: transcribir, buscar jurisprudencia, las herramientas, «Sugerir jerga», crear casos y escribir a soporte.'
       ]
     },
     {
       kind: 'parrafo',
       texto:
-        'El saldo se reserva antes de llamar al modelo, no se cobra después: si no alcanza, se lo dicen antes de empezar, y si el trabajo falla, la reserva se devuelve. El saldo también fija cuánto puede extenderse un escrito, para que nunca reciba uno cortado por una regla que no conocía.'
+        'El saldo se reserva antes de llamar al modelo. Si no alcanza, se lo dicen antes de empezar, y si el trabajo falla, la reserva vuelve. El saldo no vence y lo comparten todos los usuarios de la firma.'
     },
     { kind: 'subtitulo', texto: 'Cómo se recarga' },
     {
       kind: 'pasos',
       pasos: [
-        'Pulse «Saldo» en el pie de la barra lateral. En el teléfono, «Más» y luego «Saldo y recarga».',
-        'Arriba está el disponible, el consumo del mes —escritos, transcripciones y orientaciones— y, con el consumo real de su firma, aproximadamente cuántos escritos alcanza.',
-        'En «Recargar» escriba el monto (el mínimo aparece en el propio campo) y pulse «Pagar». Se abre la pasarela de Wompi, donde paga con PSE, tarjeta o los medios que ofrezca.',
-        'Cuando la pasarela confirma, el saldo se acredita y el movimiento aparece en «Movimientos», con fecha, concepto, usuario, valor y saldo resultante.',
-        'Para conciliar con contabilidad, baje a «Extracto», elija el mes y pulse «Imprimir comprobante»: se abre la impresión del navegador; en el teléfono, elija «Guardar como PDF».'
+        'Pulse «Recargar» en el pie de la barra lateral o «Recargar saldo» en Inicio. En el teléfono, «Más» → «Saldo y recarga». Cualquier usuario de la firma puede recargar.',
+        'En «Recargar saldo», elija $100.000, $200.000 o $500.000, o escriba otro monto. El mínimo es $100.000.',
+        'Pulse «Ir a pagar». Se abre Wompi para pagar con PSE, tarjeta u otro medio disponible.',
+        'Cuando el pago se confirma, el saldo se acredita y aparece en «Movimientos».',
+        'El panel del saldo muestra «Disponible ahora», para cuántos escritos alcanza aproximadamente, lo cobrado este mes y el costo medio por escrito. Un socio ve además quién consumió.',
+        'Para conciliar, abra «Extracto», elija el mes y pulse «Imprimir comprobante». El comprobante es informativo, no una factura.'
       ]
     },
     {
       kind: 'consejo',
       texto:
-        'Recargue una vez al mes un monto grande en vez de varios pequeños: la pasarela cobra una parte fija por transacción, así que la misma plata rinde más en una recarga que en cinco. La cifra de «≈ N escritos» le dice cuánto le va a durar.'
-    },
-    {
-      kind: 'parrafo',
-      texto:
-        'El extracto muestra el saldo inicial, las entradas, las salidas por concepto —escritos, resúmenes, orientaciones— y el saldo final, sumados por el servidor sobre el mismo libro que la tabla de movimientos. El comprobante lleva el nombre y el NIT de la firma, el período y el detalle línea por línea. Cada consumo aparece con el título del escrito o de la grabación que lo causó y con el correo de quien lo pidió.'
+        'Recargue un monto grande de una vez en lugar de varios pequeños: la pasarela cobra una parte fija por transacción.'
     },
     {
       kind: 'nota',
-      titulo: 'El comprobante no es una factura',
+      titulo: 'Saldo que no pasa por la pasarela',
       texto:
-        'En Colombia la factura de venta es un documento que la DIAN valida antes de entregarse. El comprobante del extracto es informativo y lo dice en su pie: sirve para saber en qué se fue el saldo y para conciliar con contabilidad, pero no sustituye la factura electrónica de la recarga, que se emite por separado.'
+        'Si Iureon le acredita saldo directamente, por ejemplo como compensación, lo hace la operación con un motivo escrito que queda en la auditoría de su firma.'
     },
+    { kind: 'subtitulo', texto: 'Su cuenta y su contraseña' },
     {
-      kind: 'nota',
-      titulo: 'Recargas que no pasan por la pasarela',
-      texto:
-        'Si Iureon le acredita saldo directamente —una compensación por un borrador fallido, por ejemplo—, esa recarga la hace el operador desde su consola, con un motivo escrito que queda en la auditoría de su firma («Acreditó saldo», en «Seguridad») con el correo de quien la hizo. Es la única forma en que el saldo se mueve sin que su firma pague.'
+      kind: 'pasos',
+      pasos: [
+        'En «Ajustes» → «Su cuenta» puede escribir «Su nombre» y pulsar «Guardar». El correo no se puede cambiar.',
+        'La contraseña no se cambia desde Ajustes. En la pantalla de entrada, pulse «¿Olvidó su contraseña?», escriba su correo y pulse «Enviarme el enlace». La pantalla responde «Si ese correo tiene cuenta, ya salió el enlace», exista o no la cuenta.',
+        'En el correo, pulse «Elegir una contraseña nueva». El enlace vale 30 minutos y sirve una sola vez. Escriba la contraseña nueva, de al menos diez caracteres, y pulse «Guardar la contraseña». Se cierran todas las sesiones abiertas con esa cuenta.',
+        'Si el correo no llega, revise el correo no deseado. Se pueden pedir hasta tres enlaces cada media hora.'
+      ]
+    },
+    { kind: 'subtitulo', texto: 'Borrar su acceso o la firma' },
+    {
+      kind: 'pasos',
+      pasos: [
+        'En «Ajustes» → «Su cuenta», al final, está la zona de riesgo. Solo aparece en el computador.',
+        '«Borrar mi acceso» elimina solo su usuario. Sus escritos son trabajo de la firma y se quedan en ella.',
+        '«Eliminar la firma y todos sus datos» solo lo ve un socio administrador. Pide confirmación y borra escritos, revisiones, transcripciones, clientes, pagos, usuarios y saldo.',
+        'Ninguna de las dos acciones se puede deshacer. Antes, exporte lo que quiera conservar.'
+      ]
     },
     {
       kind: 'todavia-no',
       texto:
-        'La factura electrónica de cada recarga no se emite todavía desde la aplicación. Cuando se emita, saldrá por un proveedor tecnológico autorizado por la DIAN y llegará al correo de facturación de la firma; hasta entonces, el comprobante del extracto es el único documento que la aplicación produce, y no es factura.'
-    },
-    {
-      kind: 'todavia-no',
-      texto:
-        'Los topes de gasto por usuario no existen todavía. Un tope que la interfaz muestre pero el servidor no imponga no es un tope, así que hasta que se imponga en cada petición, el control es el saldo de la firma.'
+        'No existen topes de gasto por usuario ni factura electrónica de las recargas. El control del gasto es el saldo de la firma.'
     }
   ]
 };
@@ -875,93 +793,62 @@ const A_REVISAR: ManualArticle = {
   id: 'revisar-escrito',
   titulo: 'Revisar un escrito ya redactado',
   entradilla:
-    'Suba la tutela, la demanda o el recurso que ya escribió y pregunte qué está bien, qué está mal y qué corregir. Después, corríjalo en el taller con el revisor al lado.',
+    'Suba la tutela, la demanda o el recurso que ya escribió, reciba un informe y corríjalo en el taller con la guía al lado.',
   bloques: [
-    { kind: 'ruta', camino: ['Revisiones', '«Revisar un documento»', '«Qué trae»', '«Abrir en el taller»'] },
+    { kind: 'ruta', camino: ['Revisiones', '«Revisar un documento»', '«Un escrito mío, que voy a presentar»', '«Abrir en el taller»'] },
     {
       kind: 'parrafo',
       texto:
-        'La revisión es un informe, no un borrador: juicio global, secciones que la norma exige y faltan, fortalezas, debilidades, errores de aplicación con su corrección, citas textuales del escrito con la frase que las reemplazaría y recomendaciones. Separa dos planos y lo dice en cada punto: lo que exige la norma, que sale de la ficha del catálogo y se cita con artículo, y lo que es criterio profesional del revisor, que usted pesa. No cita sentencias: cuando un punto necesite precedente, lo señala para que usted lo verifique.'
-    },
-    {
-      kind: 'parrafo',
-      texto:
-        'El diálogo empieza preguntando «Qué trae», con dos botones: «Un escrito mío, que voy a presentar» y «Un documento que recibí». Este artículo trata el primero. El segundo —un auto, una sentencia, un oficio— se lee de otra manera y tiene su propio artículo, «Leer un documento que recibió».'
+        'La revisión es un informe, no un borrador. Separa dos cosas: «Lo que exige la norma», que sale de la ficha verificada de la actuación, y «Criterio del revisor», que es valoración profesional y usted decide. No cita sentencias: cuando un punto necesite precedente, lo señala.'
     },
     { kind: 'subtitulo', texto: 'Pedir el informe' },
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Revisiones» en la barra lateral y pulse «Revisar un documento», en la cabecera. También se llega desde «Redacción», con «Revisar un documento: suyo o recibido» debajo de los adjuntos: es el mismo diálogo, pero abierto desde ahí la rama y la actuación son las que tenga puestas en el paso 1 de Redacción, y el bloque para elegirlas no aparece dentro del diálogo. Con el plan vencido no se ofrece ninguno de los dos caminos.',
-        'Escoja «Un escrito mío, que voy a presentar» en «Qué trae». Es lo que viene marcado.',
-        'Use «Subir PDF, Word o texto (hasta 15 MB, con anexos)» o pegue el texto en el cuadro. Indique el cliente o proceso en el campo de referencia.',
-        'En «Qué actuación es» elija la «Rama» y después la «Actuación»: la revisión objetiva se hace contra la ficha verificada de esa actuación. Mientras falte, el botón sigue apagado y el diálogo dice «Falta elegir la actuación» señalando dónde está.',
-        'Si no sabe cómo se llama —lo normal cuando el escrito viene de otro—, pulse «Que la guía diga qué actuación es». Lee el archivo en su propio navegador, no lo sube y no cuesta nada, y propone candidatas del catálogo con su término, su artículo y su autoridad para que escoja usted. Hace falta haber elegido la rama antes: sin ella el botón está apagado y la pantalla lo dice. Y escoja una candidata de la rama que puso: si viene de otra, lea el aviso que sigue a estos pasos antes de pulsar «Revisar».',
-        'Escriba en «Qué quiere saber» lo que le preocupa. Está marcado «· opcional» porque solo dirige el énfasis: si lo deja vacío, el escrito se revisa completo igual.',
-        'Pulse «Revisar», que muestra el precio. Cuesta lo mismo que un borrador y se descuenta del saldo de la firma; si el revisor no responde, no se cobra. La primera vez que un socio administrador revisa, antes de generar el informe la aplicación pregunta «¿Conservar el escrito y su trabajo?»: con «Sí, conservar» la firma guarda el texto, la conversación con la guía, los comentarios y las versiones; con «Solo el informe» el trabajo del taller desaparece al cerrar la pestaña. Se decide una vez para toda la firma y se puede cambiar en «Revisiones».',
-        'Lea el informe. Puede descargarlo en «Word» o «PDF» con la letra de la firma, o «Copiar informe» como texto; los mismos dos botones están en la cabecera de la pestaña «Informe» del taller, para cuando vuelva días después por la lista de «Revisiones». Queda en la lista del módulo «Revisiones» y en «Revisiones anteriores de la firma», dentro del mismo diálogo, con el cliente, la actuación, el archivo, la fecha y quién lo pidió.'
+        'Abra «Revisiones» y pulse «Revisar un documento». También está en Redacción, como «Revisar un documento: suyo o recibido».',
+        'En «Qué trae», elija «Un escrito mío, que voy a presentar».',
+        'Use «Subir PDF, Word o texto» (hasta 15 MB, con anexos) o pegue el texto. En «Cliente o proceso» indique de qué asunto se trata.',
+        'En «Qué actuación es», elija la rama y la actuación. Si no sabe cuál es, pulse «Que la guía diga qué actuación es»: lee el archivo en su navegador, no cuesta nada y propone candidatas. Primero debe elegir la rama.',
+        '«Qué quiere saber» es opcional y solo orienta el énfasis.',
+        'Pulse el botón de revisar, que muestra «Desde $2.000 de su saldo». Si el revisor no responde, no se cobra.',
+        'La primera vez, la aplicación pregunta «¿Conservar el escrito y su trabajo?». «Sí, conservar» guarda el archivo como lo subió, la conversación, los comentarios y las versiones. «Solo el informe» guarda solo el informe. Se decide una vez para toda la firma, lo decide un socio administrador y se puede cambiar en «Revisiones» con «Retirar autorización».'
       ]
     },
+    { kind: 'subtitulo', texto: 'Leer el informe' },
     {
-      kind: 'todavia-no',
-      texto:
-        'Escoger en la guía una candidata de OTRA rama todavía no cambia la «Rama» de este diálogo. Dentro de la guía la casilla «No sé la rama: buscar en todo el catálogo» está siempre a la mano, pero si la candidata que escoge vive en otra rama, su nombre no está en la lista de la rama que sigue puesta y el selector «Actuación» se queda pintado en gris con «Elegir actuación…». El botón «Revisar» sí se enciende, y aquí eso cuesta dinero: la petición viaja con la rama vieja, el servidor no encuentra la ficha y el informe sale rotulado «Sin ficha verificada», ya cobrado. Antes de pulsar «Revisar», cambie la «Rama» por la que la candidata indica, vuelva a elegir la actuación en la lista y compruebe que el selector quedó con el nombre puesto.'
-    },
-    {
-      kind: 'nota',
-      titulo: 'Una actuación de su firma no tiene ficha contra la cual revisar',
-      texto:
-        'En el desplegable «Actuación» aparecen también las actuaciones que su firma añadió —las marcadas «de su firma · sin norma verificada» y los títulos de trabajo «Sin nombre — …»—. Se pueden escoger, pero el informe sale rotulado «Sin ficha verificada» aunque su firma ya le haya escrito el término y la fuente en «Catálogo»: hoy la curaduría de la firma llega al motor que redacta, no al que revisa. Lo objetivo del informe va entonces con menos respaldo, y la pantalla lo dice en esa misma etiqueta.'
+      kind: 'lista',
+      items: [
+        'Secciones: «Resumen», «Lo que exige la norma», «Errores de aplicación», «Correcciones textuales» (con «Dice el escrito», «El problema» y «Reemplazo propuesto») y «Criterio del revisor».',
+        'Una banda de comprobación automática contrasta artículos y citas con las fuentes oficiales y, cuando algo requiere atención, «Ir al punto» lo lleva al pasaje.',
+        'En el taller, la barra del informe tiene «Leer en grande», que lo abre a pantalla completa, y las descargas en «Word» y «PDF».',
+        'Si la actuación es una de las que añadió su firma, el informe advierte que no hay ficha verificada detrás.'
+      ]
     },
     { kind: 'subtitulo', texto: 'Corregir en el taller' },
     {
       kind: 'pasos',
       pasos: [
-        'Con el informe en pantalla pulse «Abrir en el taller». El escrito aparece con los pasajes citados tachados; también se llega desde el módulo «Revisiones» de la barra lateral, y desde Redacción el botón «Taller» sobre cualquier escrito generado abre el mismo taller con la guía, sin informe previo.',
-        'Toque un pasaje tachado: verá «Por qué» falla y el «Reemplazo propuesto», con un botón «Aplicar» que lo sustituye en el texto. En «Editar» corrige a mano; «Con marcas» vuelve a la vista marcada.',
-        'A la derecha, en la pestaña «Guía», pregunte o pida redacciones —«reescribe la pretensión tercera como subsidiaria», «¿cómo va después de mis cambios?»—. Cada mensaje lleva el texto tal como está en ese momento, cuesta $300 y, si propone cambiar un pasaje, trae su propio «Aplicar».',
-        'Seleccione texto para marcarlo: aparecen Amarillo, Verde, Azul, Rosa y Tachar, y el botón «Comentar» para dejar una nota sobre el pasaje. Las marcas se anclan a las palabras y sobreviven a las ediciones; doble clic las quita, y «Limpiar» quita todas las suyas sin tocar los comentarios.',
-        'Pulse «Guardar versión» cuando quiera un punto de retorno. La pestaña «Versiones» compara cualquiera con el texto actual —lo quitado en rojo, lo añadido en verde— y la restaura si la de antes era mejor. Se conservan todas, sin borrar ninguna; también se guarda una sola antes de cada revisión nueva y de cada consulta si el texto cambió.',
-        'No hay botón de guardar el taller: con la autorización de la firma, el texto, la conversación, los comentarios, las marcas y las versiones se guardan solos dos segundos después de cada cambio y también al cerrar u ocultar la pestaña. La cinta de arriba dice «Guardando…», «Guardado hace un momento» o, si algo falló, «No se pudo guardar el último cambio». Al volver a abrir la revisión, desde «Revisiones» o tras recargar, todo está como lo dejó.',
-        'Cuando el texto esté corregido, «Volver a revisar» emite un informe nuevo ($2.000) sobre el texto tal como está. Descargue el resultado con «Word» o «PDF»: sale con el membrete de la firma.',
-        'Para seguir trabajándolo como escrito de la firma, pulse «Llevar a Redacción», junto a «Word» y «PDF». El texto tal como está en el taller se guarda como un borrador nuevo —con la actuación y la rama de la revisión, y con el nombre del archivo como título— y Redacción se abre con él cargado, igual que al abrirlo desde «Borradores». Es una copia: la revisión, su informe y su conversación quedan intactos en «Revisiones». Si la actuación no está en el catálogo, el borrador nace igual y la franja sobre el papel lo advierte. Con el plan vencido el botón queda gris y dice por qué.'
+        'Pulse «Abrir en el taller», o abra la fila en «Revisiones».',
+        'El papel tiene tres vistas: «Con marcas», «Editar» y «Original», que muestra el archivo tal como se subió, con su diagramación y sus tablas.',
+        'Toque un pasaje señalado: verá «Por qué», el «Reemplazo propuesto» y «Aplicar reemplazo».',
+        'Seleccione texto para resaltarlo, tacharlo o «Comentar». Sus marcas y comentarios viajan con cada mensaje a la guía. «Limpiar» quita sus marcas.',
+        'Los paneles de la derecha son «Guía», «Comentarios», «Informe» y «Versiones». En «Guía», cada mensaje cuesta $300.',
+        '«Guardar versión» deja un punto de retorno. En «Versiones» puede compararla con el texto actual y usar «Restaurar esta versión». Ninguna versión se sobrescribe: restaurar también crea una versión.',
+        'Con la autorización de la firma, el taller se guarda solo y la cinta de arriba dice «Guardando…» o «Guardado hace un momento». Sin autorización, se pierde al cerrar la pestaña, y el informe sí queda.',
+        '«Volver a revisar» emite un informe nuevo sobre el texto actual, desde $2.000. «Llevar a Redacción» guarda el texto como un borrador nuevo de la firma, sin tocar la revisión.',
+        '«Ocultar guía» deja el papel a todo lo ancho y «Pantalla completa» quita el resto de la aplicación.'
       ]
-    },
-    {
-      kind: 'consejo',
-      texto:
-        'Sus marcas y sus comentarios viajan a la guía con cada mensaje. Resalte en amarillo lo que duda y escríbale «revisa lo que resalté en amarillo», o deje un comentario y pídale «mira mi comentario sobre la jurisprudencia»: responde a esa nota, y si el comentario la corrige, lo tiene en cuenta o explica por qué no.'
-    },
-    {
-      kind: 'lista',
-      items: [
-        'Cuando la guía responde, los pasajes de los que habla se subrayan en azul.',
-        '«Ocultar guía» deja el papel a todo lo ancho y «Pantalla completa» quita el resto de la aplicación; Esc sale.',
-        'El control «A − +» del taller, del borrador de Redacción y de los transcritos agranda o reduce la letra en pantalla, del 85 % al 200 %; tocar el porcentaje vuelve al tamaño normal. Es solo para leer: no cambia el tamaño del documento, que sigue siendo el de Membrete en el PDF y el Word, y cada pantalla recuerda el suyo en ese navegador.'
-    ]
-    },
-    {
-      kind: 'nota',
-      titulo: 'Resaltar y comentar desde el teléfono',
-      texto:
-        'Mantenga pulsado sobre el escrito y arrastre para escoger el pasaje. El teléfono abrirá su propio menú —copiar, buscar, compartir—: no le haga caso. La barra de Iureon aparece abajo del todo, sobre la barra de navegación, y le muestra entre comillas las primeras palabras de lo que va a marcar; ahí elige el color, tacha, o toca «Comentar». Si el teléfono borra el subrayado azul de la selección mientras usted decide, no pasa nada: la barra recuerda el pasaje y la marca cae donde debe. La equis descarta. Para releer o corregir un comentario, toque el pasaje subrayado con puntos y la nota se abre como una hoja desde abajo, con sitio para el teclado. En el computador todo sigue igual, con la barra flotando sobre lo que seleccionó.'
-    },
-    {
-      kind: 'nota',
-      titulo: 'Si la guía niega una sentencia que sí existe',
-      texto:
-        'Cada vez que usted nombra una sentencia de la Corte Constitucional en el chat o en un comentario —por su tipo, número y año, como la escribe siempre—, la aplicación la consulta en el índice oficial de la Corte antes de que la guía responda, y le entrega el resultado con la fuente y un extracto del texto oficial. Ese resultado manda sobre la memoria del modelo: si la guía había dicho que no existía, debe reconocerlo y corregir con base en el extracto. Si el índice no la tiene, la guía se lo dice así, con la fuente, y le sugiere revisar número y año; si el índice no respondió, lo dice y no la da ni por existente ni por inexistente. Las providencias de la Corte Suprema, del Consejo de Estado y de tribunales no se verifican por esta vía: la guía debe pedirle la fuente o el radicado en vez de afirmar o negar que existan.'
     },
     {
       kind: 'aviso',
       texto:
-        'Retomar otro día requiere autorización de la firma. El texto de trabajo, la conversación, los comentarios y las versiones se conservan en el servidor solo si un socio administrador lo autorizó, una vez, para toda la firma; queda en la auditoría con su correo. La pregunta aparece sola la primera vez que un administrador revisa un escrito, y también se responde desde la cinta del taller o desde la cabecera de «Revisiones», donde siempre se ve si está dada, quién la dio y cuándo, y donde «Retirar autorización» la revoca. Sin esa autorización el taller funciona igual, pero al cerrar la pestaña se pierden el texto, la conversación y las marcas —el informe sí queda—; la cinta de arriba lo advierte y, si usted no es administrador, el diálogo de revisión se lo dice al terminar para que pida activarlo. A un abogado nunca se le impide revisar por esto.'
+        'Si la guía propone una candidata de otra rama, cambie la rama en el diálogo y vuelva a elegir la actuación antes de revisar. Si no, el informe puede salir sin ficha verificada y quedar cobrado igual.'
     },
     {
       kind: 'nota',
-      titulo: 'Qué queda guardado y qué no',
+      titulo: 'Qué queda guardado',
       texto:
-        'El informe queda guardado para su firma. El escrito revisado se conserva únicamente si la firma autorizó el taller; si no, se lee, se revisa y se descarta en la misma petición. En la auditoría de la firma queda que se revisó un escrito de tal actuación, nunca su contenido. Un PDF escaneado es una imagen y no trae texto: la aplicación se lo dirá y tendrá que pegar el texto. Se lee el documento completo hasta 300.000 caracteres, unas 75 páginas; solo si el escrito es más largo el informe declara que fue recortado.'
+        'El informe queda guardado para su firma. El escrito y su trabajo en el taller se conservan solo si la firma lo autorizó. En la auditoría queda que se revisó un escrito, nunca su contenido.'
     }
   ]
 };
@@ -970,88 +857,53 @@ const A_DOCUMENTO_RECIBIDO: ManualArticle = {
   id: 'documento-recibido',
   titulo: 'Leer un documento que recibió',
   entradilla:
-    'Un auto, una sentencia, un oficio, una notificación: qué dice, qué le exige, para cuándo y por dónde se ataca. Sin tener que decir antes qué actuación es.',
+    'Un auto, una sentencia, un oficio o una notificación: qué dice, qué le exige, para cuándo y por dónde se ataca, sin decir antes qué actuación es.',
   bloques: [
     { kind: 'ruta', camino: ['Revisiones', '«Revisar un documento»', '«Un documento que recibí»', '«¿Y con qué lo ataco?»'] },
     {
       kind: 'parrafo',
       texto:
-        'Es el otro modo del mismo diálogo de revisión, y es el contrario del anterior: aquí el papel no es suyo y no se corrige, se entiende. La lectura sale entera del texto del documento y va citada; ninguna ficha del catálogo respalda esas líneas, y la pantalla lo dice al pie. Por eso no hay que elegir actuación: quien acaba de recibir un auto no sabe —ni tiene por qué saber— cómo se llama en el catálogo.'
+        'En este modo el documento no es suyo: no se corrige, se entiende. El informe solo afirma lo que está escrito en el documento y lo cita. No agrega artículos, plazos ni autoridades de memoria, y ninguna ficha del catálogo respalda esas líneas.'
     },
     { kind: 'subtitulo', texto: 'Pedir la lectura' },
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Revisiones» y pulse «Revisar un documento». También sirve «Revisar un documento: suyo o recibido» en Redacción: es el mismo diálogo con los dos modos.',
-        'En «Qué trae», pulse «Un documento que recibí». El bloque «Qué actuación es» desaparece entero, y el rótulo del adjunto pasa a decir «El documento que recibió».',
-        'Suba el archivo o pegue el texto completo del documento. El cuadro de pegar espera el documento entero, no la pregunta: «No la pregunta: ésa va más abajo».',
-        'En «A quién representa en este proceso», escoja a su cliente: «Represento al demandante», «Represento al demandado», la víctima o la persona procesada en su etapa. No es obligatorio y arranca en «Prefiero no decirlo por ahora»; lo que cambia es que el informe pueda separar las cargas suyas de las de la otra parte.',
-        'Si quiere, escriba en «Qué quiere saber» lo que le interesa; está marcado «· opcional» y, vacío, el informe sale igual.',
-        'Pulse «Revisar», que muestra el precio. Se enciende con solo el documento: no falta nada más.',
-        'Lea el informe ahí mismo y descárguelo con «Word» o «PDF», al pie del diálogo. Salen con todo, «Por dónde se ataca» incluida.'
+        'Abra «Revisiones» y pulse «Revisar un documento». En «Qué trae», elija «Un documento que recibí». No tiene que elegir actuación.',
+        'Suba el archivo o pegue el texto completo en «El documento que recibió».',
+        'En «A quién representa en este proceso», indique su posición. Si el caso ya tiene cliente registrado, se completa solo. Con esa información, el informe separa las cargas suyas de las de la otra parte.',
+        '«Qué quiere saber» es opcional. Pulse revisar: se descuenta desde $2.000 del saldo.'
       ]
     },
     { kind: 'subtitulo', texto: 'Qué trae el informe' },
     {
       kind: 'lista',
       items: [
-        'Qué es el documento, en una frase.',
-        '«Según el propio documento»: quién lo profirió, el radicado y la fecha, y solo si el texto los trae. Lo que el documento no diga, no aparece.',
+        '«Según el propio documento»: quién lo profirió, el radicado y la fecha, solo si el texto los trae.',
         '«Qué decide u ordena».',
-        '«Qué le exige y para cuándo»: cada carga con su plazo y, debajo, las palabras exactas del documento entre comillas, bajo el rótulo «Dice el documento». Si del texto no se desprende ninguna carga, lo dice.',
-        'De quién es cada carga, cuando se puede saber. Si declaró a quién representa y el documento nombra a una sola parte, la carga ajena sale marcada «Esta carga no es suya» con el destinatario que el documento nombra, y no se le pide ir a contar días por ella. Si no declaró posición, el rótulo pasa a «Qué exige el documento y para cuándo» y las cargas salen sin atribuir: la aplicación no supone de qué lado está usted.',
-        '«Qué queda pendiente, según el documento» y «Lo que el documento no dice».',
-        '«Por dónde se ataca»: hasta tres flancos. Cada uno lleva la cita del documento; la norma solo se nombra cuando el propio documento la transcribe, y con su texto al lado; y el criterio va aparte, rotulado «Lectura del revisor». Un flanco sin cita no llega a la pantalla, y si no hay ninguno anclado en el texto, la sección no se dibuja.'
+        '«Qué le exige y para cuándo», o «Qué exige el documento y para cuándo» si no indicó su posición. Cada carga lleva la cita en «Dice el documento». Una carga ajena sale marcada «Esta carga no es suya.».',
+        '«Qué queda pendiente, según el documento».',
+        '«Por dónde se ataca»: los flancos, cada uno con su cita y con la «Lectura del revisor» aparte.'
       ]
     },
     {
       kind: 'aviso',
       texto:
-        'Cuando el documento no anuncia plazo para una carga, el informe no le pone uno: la casilla queda vacía y en su lugar aparece una franja ámbar que dice que el documento no lo anuncia y que no se le pone uno de memoria. En el Word, en el PDF y en «Copiar informe» sale la línea equivalente. Ese hueco no es un dato que la aplicación se haya olvidado de traer: es la respuesta. El término con su artículo y su autoridad verificados está en el catálogo, y ahí es donde hay que buscarlo.'
+        'Si el documento no anuncia plazo para una carga, el informe no inventa uno: dice que el documento no lo anuncia. El término verificado con su artículo está en el catálogo.'
     },
     { kind: 'subtitulo', texto: 'De los flancos a Redacción' },
     {
-      kind: 'parrafo',
-      texto:
-        'Al pie de la lectura está «¿Y con qué lo ataco?» —«¿Y qué puedo hacer?» si el informe no halló flancos—. Es el puente entre entender el documento y contestarlo, y está en los tres sitios donde se lee la lectura: el diálogo abierto desde «Redacción», el mismo diálogo abierto desde «Revisiones», y la pestaña «Informe» del taller.'
-    },
-    {
       kind: 'pasos',
       pasos: [
-        'Elija la «Rama» en ese pie —o marque ahí mismo, en la casilla que está bajo el selector, «No sé la rama: buscar en todo el catálogo»— y después pulse «Llevar los flancos a la guía de actuaciones». Sin una de las dos cosas el botón está apagado. Viajan los flancos hallados —cada uno con la cita literal del documento, la norma que el documento invoca transcrita y la lectura del revisor— y, debajo, el texto del documento.',
-        'Escoja una candidata en la guía. Si marcó «No sé la rama», la guía abre ya con la casilla puesta —dentro también se puede marcar y desmarcar—: la consulta corre sobre todas las ramas, tarda más y cada candidata dice de cuál viene. Aquí la rama que manda es la de la candidata: la que ella indique es la que viaja a Redacción, no la que quedó en el pie.',
-        'Con la candidata escogida aparece «Redactar esta actuación». Ábralo y verá «Qué pedirle al motor»: instrucciones ya escritas, escogibles y editables. La primera de la lista es «Con los flancos que se atacan, citados», que junta el encargo de la ficha del catálogo con los flancos y sus citas.',
-        'Pulse «Llevar a Redacción». Nunca se bloquea: puede ir sin ninguna instrucción. Redacción se abre con la actuación puesta en el selector y el cuadro «Qué debe hacer este escrito» escrito en dos mitades rotuladas, la instrucción arriba y «HECHOS» debajo.'
+        'Al pie está «¿Y con qué lo ataco?», o «¿Y qué puedo hacer?» si no hubo flancos. Elija la rama o marque «No sé la rama: buscar en todo el catálogo.» y pulse «Llevar los flancos a la guía de actuaciones».',
+        'Escoja una candidata y pulse «Redactar esta actuación». Se abre «Qué pedirle al motor» con instrucciones que puede editar.',
+        'Pulse «Llevar a Redacción». Si prefiere escribir usted el nombre, use «Escribir el nombre de la actuación».'
       ]
-    },
-    {
-      kind: 'aviso',
-      texto:
-        'Antes de generar, mire la barra de arriba de Redacción y compruebe que la rama y la actuación son las que quería. Cuando la actuación la escogió la guía, su rama viaja con ella; cuando usted la escribe a mano con «Escribir el nombre de la actuación», la rama que viaja es la que estuviera puesta en el pie, y si había marcado «No sé la rama» no viaja ninguna y Redacción se queda con la que ya tenía. La rama decide qué ficha se busca y, con ella, qué término se afirma.'
     },
     {
       kind: 'consejo',
       texto:
-        'Entre por «Revisiones» y no por el diálogo cuando vuelva días después: pulsar la fila abre el taller directamente, y ahí la pestaña «Informe» tiene la lectura completa con su puente al final. Eso vale siempre que la firma tuviera autorizado conservar los escritos; si no lo tenía, la fila no abre nada y avisa de que el texto de ese documento no se conservó, y entonces la lectura hay que abrirla desde «Revisiones anteriores de la firma», dentro del diálogo «Revisar un documento». El Word y el PDF se descargan desde la propia pestaña «Informe» del taller, con los botones «Word» y «PDF» de su cabecera; también siguen estando en el diálogo.'
-    },
-    {
-      kind: 'lista',
-      items: [
-        'La instrucción sugerida con los flancos existe solo cuando el catálogo devuelve la ficha de la actuación. Si es una actuación propia de la firma, sin catalogar, los flancos llegan a Redacción dentro de los HECHOS y el cuadro va sin encargo.',
-        '«Volver a revisar» no se ofrece sobre un documento recibido, ni desde el taller ni por ninguna otra vía: el informe bueno no se sobrescribe con otro de distinta forma.',
-        'En la lista de «Revisiones», la fila queda rotulada «Documento recibido». Es la etiqueta del producto, no una actuación del catálogo: nadie clasificó el auto. Por eso «Poner en la agenda» abre el formulario sin actuación ni rama prellenadas.'
-      ]
-    },
-    {
-      kind: 'nota',
-      titulo: 'Si el texto del documento no viaja',
-      texto:
-        'El puente lleva a la guía los flancos y el texto del documento. Al reabrir una lectura antigua desde «Revisiones anteriores de la firma», el texto solo está si la firma había autorizado conservar los escritos; si no, viajan los flancos con sus citas y nada más. En una lectura recién hecha esto no ocurre.'
-    },
-    {
-      kind: 'todavia-no',
-      texto:
-        'El taller de un documento recibido abre también la pestaña «Guía», y sobre el papel sigue estando «Llevar a Redacción». Los dos están hechos para un escrito suyo: la guía conversa como si acompañara a quien corrige su propio texto y ofrece «Aplicar» sobre él, y «Llevar a Redacción» copia el papel ajeno como borrador de la firma, con el auto del juzgado por cuerpo y «Documento recibido» —la etiqueta del producto— por actuación. Sobre el auto de un juez nada de eso tiene sentido, y la guía además cuesta saldo. Todavía no están adaptados a este modo: lo que sí lo está es la lectura y su puente, y el botón que casi siempre se busca es «Redactar esta actuación», en el pie «¿Y con qué lo ataco?».'
+        'En la lista de «Revisiones», estas filas se rotulan «Documento recibido». Desde la fila, «Poner en la agenda de términos» abre la agenda para que elija usted la actuación.'
     }
   ]
 };
@@ -1060,61 +912,38 @@ const A_BUSCADOR: ManualArticle = {
   id: 'buscador',
   titulo: 'Buscar jurisprudencia',
   entradilla:
-    'Providencias del corpus curado y, cuando el corpus no alcanza, del registro oficial en vivo — con la diferencia entre las dos dicha en pantalla.',
+    'Providencias que una persona leyó y providencias encontradas automáticamente, separadas en pantalla.',
   bloques: [
-    { kind: 'ruta', camino: ['Buscador', 'Escriba lo que busca', '«Buscar»'] },
+    { kind: 'ruta', camino: ['Buscador', '«Escriba el problema jurídico o nombre una sentencia»'] },
     {
       kind: 'parrafo',
       texto:
-        'El Buscador responde con providencias reales, no con un resumen redactado por un modelo: cada resultado trae su número, su corporación, su magistrado ponente cuando consta, el fragmento de donde salió y el enlace «Leer la providencia en la fuente oficial». Lo que usted cita lo cita del documento, no de esta pantalla.'
-    },
-    {
-      kind: 'parrafo',
-      texto:
-        'Busca por significado, igual que la búsqueda dentro de un expediente: no hace falta acertar la palabra de la providencia. El cuadro propone ejemplos —«estabilidad laboral reforzada», «mínimo vital», «contrato realidad»— porque así es como se busca aquí: por la figura, no por una cita literal.'
+        'El Buscador responde con providencias reales, no con un resumen escrito por un modelo. Busca por significado: describa el problema jurídico o nombre una sentencia. Buscar no consume saldo.'
     },
     { kind: 'subtitulo', texto: 'Acotar la consulta' },
     {
       kind: 'lista',
       items: [
-        '«Corporación» filtra entre «Todas las corporaciones», «Corte Constitucional», «Corte Suprema» y «Disciplina Judicial».',
-        '«Año» solo aparece cuando los resultados traen más de un año, y se arma con los años que de verdad volvieron: no ofrece años vacíos.',
-        '«Solo curadas» esconde lo traído automáticamente y deja únicamente lo que alguien leyó.',
-        'Junto a los filtros se muestran el número de resultados y el tiempo REAL que tardó la consulta.'
+        '«Corporación» filtra entre Corte Constitucional, Corte Suprema de Justicia, Consejo de Estado y Comisión Nacional de Disciplina Judicial.',
+        '«Año» acota por año.',
+        '«Solo lo que alguien leyó» oculta lo encontrado automáticamente.'
       ]
     },
-    { kind: 'subtitulo', texto: 'Lo curado y lo automático no son lo mismo' },
+    { kind: 'subtitulo', texto: 'Lo leído y lo automático no son lo mismo' },
     {
       kind: 'parrafo',
       texto:
-        'Los resultados llegan en dos bloques rotulados y la pantalla no los mezcla. Arriba, «Corpus curado · N — una persona la leyó y extrajo sus hechos y su ratio». Debajo, «Descubrimiento automático · N — relevancia del modelo, sin lectura humana», que es lo que la búsqueda alcanzó en vivo; cada tarjeta de ese bloque lleva además el chip «Automático» y su cita va con filete punteado.'
+        'Los resultados llegan en dos bloques: «Lo que una persona leyó» y «Encontrado automáticamente». Cada tarjeta dice si se leyó antes de indexarse o está «Sin leer», y trae «Leer en la fuente oficial». «Copiar la cita» solo aparece en las que alguien leyó.'
     },
     {
       kind: 'aviso',
       texto:
-        'Esa distinción es la razón de ser de la pantalla, no un adorno. Un resultado automático es igual de real y NO está comprobado: nadie de esta casa lo ha abierto. Antes de llevar uno a un escrito, ábralo por «Leer la providencia en la fuente oficial» y compruebe que dice lo que la aplicación cree que dice.'
+        'El orden de los resultados es por parecido con su consulta, no por autoridad. Que una providencia salga primero no la hace más importante. Antes de citar un resultado automático, ábralo en la fuente oficial y compruebe que dice lo que usted necesita.'
     },
-    { kind: 'subtitulo', texto: 'Cuando no devuelve nada' },
     {
       kind: 'parrafo',
       texto:
-        '«Sin resultados» no siempre significa lo mismo, y la segunda línea lo precisa: que no hubo coincidencias para lo que usted escribió, o que el corpus todavía no tiene providencias indexadas, o que falta el proveedor que convierte la consulta en vector, o que la búsqueda no pudo completarse. Las tres últimas no dicen nada sobre su consulta: dicen que la pantalla no pudo buscar.'
-    },
-    {
-      kind: 'consejo',
-      texto:
-        'Buscar no descuenta saldo de la firma. Puede probar la misma idea con tres redacciones distintas sin pensar en el costo — y conviene, porque la búsqueda por significado responde mejor a la figura jurídica que a la frase suelta.'
-    },
-    {
-      kind: 'nota',
-      titulo: 'Antes de escribir nada',
-      texto:
-        'Sin consulta todavía, la pantalla no finge resultados: dice «Escriba una consulta para buscar en el corpus indexado.» Y cuando responde, a la derecha de los filtros aparecen cuántos resultados son y cuántos segundos tardó de verdad, medidos y sin adornar.'
-    },
-    {
-      kind: 'todavia-no',
-      texto:
-        'El Consejo de Estado no está entre las corporaciones. Su API oficial existe pero exige una llave que no es de autoservicio, y ofrecer una opción que nunca devuelve nada enseñaría que el buscador no sirve — sobre la única pantalla cuyo valor es que lo que muestra está comprobado. Vuelve el día que haya llave.'
+        'Si no hay resultados, la pantalla distingue si nada se parece lo suficiente o si el corpus no pudo responder. En el segundo caso, el problema no es su consulta.'
     }
   ]
 };
@@ -1123,108 +952,73 @@ const A_EXPEDIENTE: ManualArticle = {
   id: 'expediente',
   titulo: 'Reunir el expediente de un caso',
   entradilla:
-    'Un asunto por carpeta: quiénes son las partes, qué documentos hay —aunque sean trescientas páginas— y cómo encontrar un párrafo dentro de ellos sin recordar en qué archivo estaba.',
+    'Un caso por carpeta: quién es quién, qué documentos hay y cómo encontrar un párrafo sin recordar en qué archivo estaba.',
   bloques: [
-    { kind: 'ruta', camino: ['Expedientes', '«Nuevo expediente»'] },
+    { kind: 'ruta', camino: ['Expedientes', '«Nuevo caso»', '«Agregar un documento»'] },
     {
       kind: 'parrafo',
       texto:
-        'Un expediente es el asunto, no el cliente ni el documento: un mismo cliente puede tener varios, y cada uno reúne lo suyo. Sirve para dos cosas que antes no se podían hacer: guardar los papeles del caso de modo que se puedan CONSULTAR —no solo archivar— y registrar quién es quién, que es de donde salen después las preguntas del interrogatorio con nombre propio.'
+        'Un caso es el asunto, no el cliente ni el documento: un cliente puede tener varios. Se crea con el nombre que usted le da y se completa con el tiempo. Crear un caso no consume saldo.'
     },
-    {
-      kind: 'parrafo',
-      texto:
-        'Está pensado para el caso que se llena con el tiempo, no solo para el que llega completo. Se crea con el nombre con el que usted lo llama y se le va añadiendo lo que aparezca: el radicado cuando lo haya, el cliente cuando esté registrado, los documentos a medida que lleguen.'
-    },
-    { kind: 'subtitulo', texto: 'Crearlo y darle nombre' },
+    { kind: 'subtitulo', texto: 'La lista de casos' },
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Expedientes» y pulse «Nuevo expediente». Pide cuatro cosas y solo la primera es obligatoria: «Nombre del asunto», y debajo «Radicado», «Despacho» y «Contraparte», los tres marcados «(opcional)».',
-        'En el nombre escriba cómo llama usted al asunto, no cómo lo llama el juzgado: la pantalla lo dice —«Con lo que usted lo busca después. El radicado puede venir más tarde.»— y el ejemplo del cuadro es «Mosquera vs. ACME — restitución de inmueble».',
-        'Dentro del expediente, «Estado» es un desplegable con «Activo», «Suspendido», «Terminado» y «Archivado». Se guarda al escogerlo, sin botón de guardar. En la lista, el estado solo aparece como chip cuando NO es «Activo»: lo normal no se rotula.',
-        'En «De quién es el asunto», «Atar un cliente» lo enlaza con un cliente ya registrado; si es nuevo, «El cliente es nuevo: registrarlo aquí» lo crea con su nombre y su documento sin salir de la pantalla. Sin cliente atado, el aviso dice qué se pierde: «Sin cliente. Átelo y el expediente alcanza sus entrevistas.»'
+        'Abra «Expedientes». Hay tres pestañas: «Esta semana» (lo que tiene términos próximos o vencidos en la agenda), «Activos» y «Cerrados» (terminados o archivados). Si hay algo esta semana, la lista abre ahí.',
+        'En «Activos» y «Cerrados», los casos se agrupan por cliente y, dentro de cada cliente, por rama.',
+        'En «Nombre, cédula o radicado» puede buscar por nombre del cliente, del caso, del despacho, de la contraparte o de una persona registrada; por cédula o NIT, desde el primer dígito; o por radicado. Enter abre el caso si queda uno solo.',
+        'Los filtros «Año», «Mes» y «Rama» se combinan con la búsqueda. Para filtrar por mes, elija primero el año. «Limpiar filtros» los quita.',
+        'Pulse «Nuevo caso». Solo «Nombre del asunto» es obligatorio: use el nombre con el que lo va a buscar. El radicado puede venir después.'
       ]
     },
-    { kind: 'subtitulo', texto: 'Traer lo que ya tiene' },
-    {
-      kind: 'parrafo',
-      texto:
-        'Lo que la firma ya produjo no hay que volver a subirlo. «Traer al expediente» → «Ver lo que hay» lista las entrevistas, audiencias, revisiones, borradores, términos y orientaciones existentes, con un buscador por nombre; «Traer» ata la pieza y «Soltar» la desata. Si una pieza ya pertenece a otro expediente, la fila lo advierte —«Ya está en otro expediente. Traerla aquí la mueve.»— antes de que usted decida, porque atarla aquí se la quita al otro.'
-    },
-    { kind: 'subtitulo', texto: 'Los documentos, y por qué se «indexan»' },
-    {
-      kind: 'parrafo',
-      texto:
-        'La revisión lee un escrito de principio a fin y corta a los 300.000 caracteres. Para veinte páginas sobra; para un expediente de trescientas, no alcanza, y ningún motor lee trescientas páginas de un tirón. Indexar es la otra forma de leer: el documento se parte en fragmentos una sola vez y, a partir de ahí, la aplicación recupera los pedazos que vienen al caso. Es lo mismo que sostiene el corpus de jurisprudencia.'
-    },
+    { kind: 'subtitulo', texto: 'La ficha del caso' },
     {
       kind: 'pasos',
       pasos: [
-        'En «Documentos del expediente», pulse «Indexar un documento». Acepta PDF, Word y texto; la pantalla lo dice así: «PDF, Word o texto. Se lee aquí en su equipo: el archivo no se envía, solo su texto.»',
-        'Al escoger el archivo, y antes de indexar nada, la pantalla informa cuánto leyó: «Se leyeron N caracteres (~N páginas).» Si el documento era más largo que el techo del lector, añade «El documento es más largo y se recortó.» Ese aviso aparece ANTES de mandarlo, para que usted decida.',
-        'Póngale el nombre con el que lo va a reconocer —viene propuesto el del archivo— y pulse «Indexar en este expediente». Tarda: el botón dice «Indexando… puede tardar un minuto».',
-        'Al terminar dice en cuántos fragmentos quedó y que ya se puede buscar. Cada documento aparece después en la lista con su número de «fragmentos buscables» y la fecha, y una equis para quitarlo.'
+        'Arriba están los datos del caso: radicado, rama, despacho, su cliente y contraparte, con «Editar». Si el caso tiene un término en la agenda, la franja «Término del caso» lo muestra con «Abrir la agenda».',
+        '«Estado del caso» cambia entre Activo, Suspendido, Terminado y Archivado. Se guarda al elegirlo.',
+        'El menú «Más opciones» tiene «Editar datos del caso», «Traer algo de otro módulo», «Agregar un documento» y la opción de borrar el caso. En «Editar datos del caso», cambie solo lo necesario y pulse «Guardar los cambios». Editar no consume saldo.',
+        'El caso tiene dos pestañas, «Documentos» y «Personas». Al lado, «Lo que hay en el caso» resume su contenido.',
+        '«Traer algo de otro módulo» asocia al caso entrevistas, audiencias, revisiones, borradores, términos u orientaciones que ya existen. Si una pieza ya está en otro caso, la fila avisa: «Ya está en otro expediente. Traerla aquí la mueve.».'
+      ]
+    },
+    { kind: 'subtitulo', texto: 'Documentos y carpetas' },
+    {
+      kind: 'pasos',
+      pasos: [
+        'Pulse «Agregar documento», escoja el archivo y ponga el nombre con el que lo va a reconocer. Se guarda el archivo y se lee su texto para buscar dentro de él. Al terminar, la pantalla dice en cuántos fragmentos quedó y que ya se puede buscar.',
+        '«Nueva carpeta» crea una carpeta donde está. «Filtrar por nombre» acota la vista.',
+        'Cada carpeta y cada documento tiene un menú en su fila, que también se abre con clic derecho. Una carpeta: «Abrir», «Renombrar», «Mover» y «Eliminar carpeta». Un documento: «Abrir», «Renombrar», «Mover a otra carpeta» y «Quitar del caso».',
+        'Al abrir un documento puede leerlo, usar «Descargar», «Mover» o «Quitar del caso».',
+        'Ordenar en carpetas no oculta nada: la búsqueda y el interrogatorio leen todo el caso.'
       ]
     },
     {
       kind: 'aviso',
       texto:
-        'Si el motor de búsqueda no está disponible, el documento se lee pero NO queda buscable, y la pantalla lo dice con esas palabras: «Se leyó el documento (N fragmentos) pero NO quedó buscable: el motor de búsqueda no está disponible. Vuelva a intentarlo más tarde.» No es un detalle de servidor: un documento que usted crea indexado y no lo esté saldrá ausente de todas las búsquedas sin que nada falle. Vuelva a indexarlo cuando salga ese mensaje.'
+        'Un PDF escaneado o una foto no traen texto. Ese archivo no se agrega ni queda buscable, y no se cobra nada. Pida el PDF original con texto o use «Reemplazar el archivo».'
     },
     {
       kind: 'aviso',
       texto:
-        'Un PDF escaneado no trae texto: son imágenes. El lector lo dice con todas sus letras —«El archivo no trae texto que se pueda leer. Si es un PDF escaneado o una foto, son imágenes: copie y pegue el texto en su lugar.»— en vez de indexar un documento vacío. La salida es pegar el texto.'
+        'Eliminar una carpeta borra también sus subcarpetas y documentos, y antes de hacerlo la pantalla muestra lo que contiene. Borrar un caso borra sus carpetas, las personas registradas y sus documentos. Las entrevistas, revisiones, borradores y términos siguen existiendo, sin caso. Ninguna de las dos acciones se puede deshacer.'
     },
     { kind: 'subtitulo', texto: 'Buscar dentro del caso' },
     {
       kind: 'parrafo',
       texto:
-        'Un expediente de trescientas páginas no se navega: se pregunta. «Buscar en el expediente» busca POR SIGNIFICADO y no por palabra exacta —la propia pantalla lo explica: «no entregó el inmueble» encuentra un pasaje que dice «se abstuvo de restituir el bien»—, y devuelve los pasajes con el documento del que salieron encima. No consume saldo, y la pantalla también lo dice, porque el botón de al lado sí cobra.'
+        '«Buscar dentro del caso» busca por significado, no por palabra exacta: «no entregó el inmueble» encuentra un pasaje que dice «se abstuvo de restituir el bien». No consume saldo. Si un documento no está agregado, la búsqueda no lo ve.'
     },
-    {
-      kind: 'nota',
-      titulo: 'Si no aparece lo que usted sabe que está',
-      texto:
-        'La búsqueda solo ve lo indexado. Cuando no hay coincidencias, el aviso lo recuerda: «Nada en este expediente habla de eso. Si el documento no está indexado, la búsqueda no lo ve: revise arriba qué hay dentro.» Es el primer sitio donde mirar antes de concluir que el expediente no dice nada del asunto.'
-    },
-    { kind: 'subtitulo', texto: 'Carpetas: para ordenar, no para acotar' },
-    {
-      kind: 'lista',
-      items: [
-        'Las carpetas se anidan y un documento está en UNA sola. «Nueva carpeta» la crea donde usted esté; la miga de pan de arriba devuelve a la raíz, que lleva el nombre del expediente. Dos carpetas hermanas no pueden llamarse igual.',
-        'Tres modos de ver, con sus botones: «Lista» para recorrer con la vista, «Detalle» para ver cuántos fragmentos tiene cada documento y cuándo se indexó, y «Tarjetas» para reconocer por forma. El modo se recuerda por navegador, no por expediente.',
-        'Un documento se mueve con el selector de su fila, que incluye «Raíz del expediente» como destino.',
-        'ORDENAR NO ESCONDE NADA. El interrogatorio y la búsqueda leen TODO el expediente, esté cada cosa en la carpeta que esté; la pantalla lo dice para que la duda razonable —«si lo meto aquí, ¿deja de verlo?»— no impida organizar.',
-        'Vacío, se dice cuál de los dos vacíos es: «Todo está en la raíz. Cree carpetas para agrupar por prueba, por etapa o como prefiera.» en la raíz, y «Esta carpeta está vacía.» dentro de una.'
-      ]
-    },
-    {
-      kind: 'aviso',
-      texto:
-        'Borrar una carpeta SE LLEVA lo que hay dentro, subcarpetas y documentos. Se pregunta antes y con números: «Se borrará la carpeta con 2 subcarpeta(s) y 5 documento(s) indexado(s). Los documentos dejarán de estar en el expediente y de aparecer en las búsquedas; para volver a tenerlos habría que indexarlos de nuevo. Esto no se deshace.» Si la carpeta está vacía, lo dice también. Y si el conteo previo falla, pregunta igual pero sin prometer un número: decir «vacía» sin haberlo comprobado sería la peor forma de equivocarse aquí.'
-    },
-    { kind: 'subtitulo', texto: 'Quién es quién, y para qué sirve' },
+    { kind: 'subtitulo', texto: 'Quién es quién' },
     {
       kind: 'parrafo',
       texto:
-        'En «Quién es quién» se registran las partes, los testigos y el perito. Cada persona lleva su nombre, «Qué es en el proceso» —un desplegable agrupado en Partes, Prueba, Penal y Estrado—, «De qué lado» —«De mi lado», «De la contraparte» o «De ninguno»— y «Sobre qué declara», que está marcado «(opcional, pero es el que más sirve)».'
-    },
-    {
-      kind: 'parrafo',
-      texto:
-        'El lado no es una etiqueta: decide la técnica. La pantalla lo explica debajo del campo —«al propio se le interroga, al de enfrente se le contrainterroga»— y es lo que la aplicación usa después para armar preguntas abiertas o cerradas. Un chip «se le pregunta» marca a quién se le puede preparar interrogatorio; al juez, al secretario, a los apoderados y al intérprete no, y no cuentan para eso. Cómo se pide el interrogatorio está en «Preparar el interrogatorio de la audiencia».'
+        'En la pestaña «Personas», «Quién es quién» registra partes, testigos y peritos: nombre, «Qué es en el proceso», «De qué lado» («De mi lado», «De la contraparte» o «De ninguno») y «Sobre qué declara». El lado define cómo se pregunta: al propio se le interroga y al de enfrente se le contrainterroga.'
     },
     {
       kind: 'consejo',
       texto:
-        'Registre el lado con cuidado al crear cada persona: el campo nace en «De mi lado» y nadie lo corrige después. Una contraparte registrada como propia recibe preguntas abiertas para que cuente su versión, que es exactamente lo contrario de lo que se quiere en una audiencia.'
-    },
-    {
-      kind: 'aviso',
-      texto:
-        'Borrar un expediente NO borra el trabajo que tenía atado. La pantalla lo dice antes: «Se borra la carpeta y las personas que registró en ella. Lo demás —entrevistas, revisiones, borradores y términos— sigue en su sitio, sin expediente.» Los documentos INDEXADOS aquí son otra cosa: esos viven en el expediente y se van con él.'
+        'Registre el lado con cuidado. Si registra a una contraparte como propia, recibirá preguntas abiertas para contar su versión, justo lo contrario de lo que conviene en audiencia.'
     }
   ]
 };
@@ -1233,80 +1027,66 @@ const A_PREGUNTAS_AUDIENCIA: ManualArticle = {
   id: 'preguntas-audiencia',
   titulo: 'Preparar el interrogatorio de la audiencia',
   entradilla:
-    'Desde el expediente, escoja a quién va a interrogar y pida una lista de preguntas POR PERSONA: con su nombre, con la técnica que le corresponde y con lo que cada pregunta busca establecer.',
+    'Desde el caso, escoja a quién va a interrogar y reciba una lista de preguntas por persona, con la técnica que le corresponde.',
   bloques: [
-    { kind: 'ruta', camino: ['Expedientes', 'Abra el expediente', '«Preparar el interrogatorio»'] },
+    { kind: 'ruta', camino: ['Expedientes', 'Abra el caso', '«Personas»', '«Preparar el interrogatorio»'] },
     {
       kind: 'parrafo',
       texto:
-        'Un interrogatorio se prepara contra una persona, no contra una categoría. Por eso las preguntas salen del expediente y no de un escrito: la aplicación ya sabe quién es cada quien en el asunto —qué papel tiene, de qué lado está y sobre qué declara— porque usted lo registró en «Quién es quién en el asunto», y con eso arma una lista distinta para cada nombre.'
-    },
-    {
-      kind: 'parrafo',
-      texto:
-        'La técnica la decide la aplicación a partir de ese registro, y se la muestra encima de cada lista. Al testigo o a la parte de su lado se le interroga con preguntas abiertas y no sugestivas, ordenadas como un relato. A la parte contraria se le hacen preguntas cuya respuesta, sea cual sea, favorezca a su cliente; a su testigo, contrainterrogatorio de preguntas cerradas que se contestan sí o no. Al perito no se le pregunta qué vio —no vio nada, dictaminó— sino por su calificación, su método, los datos de los que partió y lo que no examinó; y si el perito lo nombró el despacho, no se le contrainterroga: se le piden esclarecimientos.'
+        'El interrogatorio se prepara para una persona concreta. La técnica sale de lo que usted registró en «Quién es quién»: preguntas abiertas para su propio testigo, cerradas para contrainterrogar al de la contraparte, y para el perito, preguntas sobre su calificación, su método y los datos que usó.'
     },
     {
       kind: 'pasos',
       pasos: [
-        'Abra el expediente en «Expedientes» y compruebe que las personas están registradas arriba, con su papel, su lado y sobre qué declaran. Si el bloque del interrogatorio dice que no hay a quién preguntar, es que faltan: al juez, al secretario, a los apoderados y al intérprete no se les pregunta y no cuentan para esto.',
-        'Marque a quién va a interrogar. Caben cuatro personas por tanda; con más, la última lista saldría cortada, así que pida otra tanda para los demás.',
-        'Si quiere, escriba qué quiere probar en la audiencia y de qué audiencia se trata. Sin eso, la aplicación lo deduce del expediente.',
-        'Pulse «Preparar para N persona(s)». Consume saldo de la firma una vez por tanda, y el aviso está encima del botón; si la guía no devuelve preguntas legibles, no se descuenta nada.',
-        'Lea el enfoque —lo que este asunto exige probar y en qué audiencia— y luego cada lista, con el nombre de la persona y su técnica arriba. Cada pregunta trae «Para» —lo que busca establecer o desvirtuar— y, cuando nace de un pasaje del material, la cita literal.',
-        'Llévese el interrogatorio: «Copiar» lo pasa como texto, «Word» lo descarga para seguir trabajándolo y «PDF» para imprimirlo. Los dos archivos salen con la letra de su membrete y sin bloque de firma: es material de trabajo, no se radica.'
+        'Registre a las personas en «Quién es quién». Al juez, al secretario, a los apoderados y al intérprete no se les pregunta.',
+        'En «Preparar el interrogatorio», marque «A quién» va a interrogar.',
+        'Si quiere, complete «Qué quiere probar» y «Tipo de audiencia».',
+        'Pulse preparar. Se descuenta saldo de la firma una vez por tanda.',
+        'Lea cada lista con la técnica indicada arriba. Cada pregunta dice qué busca establecer y, cuando corresponde, cita el material del caso.',
+        'Llévese el interrogatorio con «Word» para seguir trabajándolo.'
       ]
     },
     {
-      kind: 'consejo',
-      texto:
-        'Corrija primero el registro de las personas y pida el interrogatorio después. El lado de cada quien es lo que decide la técnica, así que un testigo marcado del lado equivocado recibe preguntas cerradas cuando le correspondían abiertas — y eso se ve en la audiencia, no antes.'
-    },
-    {
       kind: 'nota',
-      titulo: 'Son sugerencias, y salen de lo que usted registró',
+      titulo: 'Son sugerencias',
       texto:
-        'La aplicación conoce el expediente que usted llenó: la carátula, el radicado, las personas y lo que anotó de cada una. No afirma hechos que ese material no traiga ni cita normas o sentencias, y por eso una lista puede quedar corta cuando de esa persona se sabe poco. Las preguntas son material de trabajo que usted pesa, ordena y descarta con su conocimiento del caso; formularlas es decisión suya. En la auditoría de la firma consta que se preparó interrogatorio para tal asunto y para cuántas personas, nunca su contenido.'
-    },
-    {
-      kind: 'nota',
-      titulo: 'Antes vivía en el taller de revisión',
-      texto:
-        'Hasta ahora esto era una pestaña «Audiencia» dentro del taller de una revisión, y daba tres listas fijas —a la contraparte, a mis testigos, a los testigos de la contraparte— porque solo conocía el escrito y no sabía quién había en el caso. Esa pestaña ya no existe: el taller quedaba muy cargado y las listas por categoría no preparaban a nadie en concreto. Si su firma tenía habilitada la función, la sigue teniendo aquí.'
+        'Las preguntas salen de lo que usted registró en el caso. No afirman hechos que ese material no traiga ni citan normas o sentencias. Formularlas es decisión suya.'
     }
   ]
 };
 
 const A_DATOS_CLIENTE: ManualArticle = {
   id: 'datos-cliente',
-  titulo: 'Qué responder si su cliente pregunta por sus datos',
-  entradilla: 'La posición jurídica de cada quien, dicha en el orden en que se pregunta.',
+  titulo: 'Privacidad, auditoría y qué responder a su cliente',
+  entradilla: 'Quién es responsable de los datos, quién los procesa y cómo demostrar quién hizo qué.',
   bloques: [
-    { kind: 'ruta', camino: ['Barra lateral', 'Administrar', '«Privacidad»'] },
+    { kind: 'ruta', camino: ['Barra lateral', 'Administrar', '«Privacidad»', '«Seguridad»'] },
     {
       kind: 'parrafo',
       texto:
-        'Su firma es la responsable del tratamiento de los datos de su cliente. Iureon es su encargado. Los proveedores que Iureon usa para prestar el servicio son, por eso, subencargados de su firma, y usted tiene derecho a saber cuáles son y qué recibe cada uno.'
+        'Su firma es la responsable del tratamiento de los datos de su cliente e Iureon es su encargado. Los proveedores que Iureon usa son subencargados de su firma, y usted tiene derecho a saber cuáles son.'
     },
     {
       kind: 'pasos',
       pasos: [
-        'Despliegue «Administrar» en la barra lateral y abra «Privacidad». La pantalla se titula «Privacidad y seguridad» y arranca por quién es responsable y quién encargado.',
-        'Lea la tabla de subencargados: por cada proveedor dice qué recibe, dónde se procesa y cuánto lo conserva, y debajo la base de transferencia con la que el dato sale del país. Nadie la mantiene a mano: se deriva de la configuración que está corriendo.',
-        'Si el cliente pregunta por su grabación, responda con «Lo que nunca ocurre», al pie: el audio no se conserva —se borra del almacenamiento en la misma petición que devuelve el transcrito—, el transcrito sí se guarda dentro de su firma y solo su firma lo ve.',
-        'Si pregunta quién más puede leer el caso: la consola de operación de Iureon gestiona firmas, planes y saldos, y no puede abrir un transcrito, un borrador ni un expediente. Si soporte necesita ver algo, lo pide por el acceso de soporte, que un socio autoriza o niega con botones del mismo peso, y «No autorizar» no afecta el servicio.',
-        'Para demostrar quién hizo qué, abra «Seguridad»: ahí está la auditoría de la firma, con cada escrito generado, cada transcripción, cada verificación y cada acceso.'
+        'Abra «Privacidad». La pantalla «Privacidad y seguridad» lista los subencargados activos: qué recibe cada uno, dónde se procesa y cuánto tiempo lo conserva. «Descargar la lista (CSV)» le da la lista para entregar.',
+        'Lea «Quién toca el contenido de sus casos» y «Quién no toca el contenido». La operación de Iureon gestiona firmas, planes y saldos, pero no abre transcritos, borradores ni expedientes.',
+        'Si el cliente pregunta por su grabación, responda con «Lo que nunca ocurre» y «Lo que sí se conserva»: el audio se borra al transcribirse y el texto queda en su firma.',
+        'Para demostrar quién hizo qué, abra «Seguridad» en la barra lateral. La pantalla se llama «Auditoría». Busque en «Por documento, actuación o usuario», filtre por usuario y periodo o use las vistas frecuentes.',
+        'La tabla muestra fecha y hora, usuario, acción y origen. Carga por partes: dice cuántos registros leyó del total y ofrece leer más.',
+        '«Descargar CSV» exporta las filas con un resumen SHA-256, para comprobar después que el archivo no se modificó.'
       ]
     },
     {
-      kind: 'consejo',
+      kind: 'nota',
+      titulo: 'El acceso de soporte',
       texto:
-        'Responda a su cliente desde la pantalla, no de memoria: la lista de proveedores puede cambiar con la configuración, y lo que la pantalla muestra hoy es lo que está corriendo hoy.'
+        'Si soporte necesita ver material de su firma, lo pide por la aplicación: «Soporte pide ver material de su firma». Solo un socio administrador decide, por 1, 4 o 24 horas, con «Autorizar» o «No autorizar». No autorizar no afecta el servicio. Mientras dura, una franja lo recuerda y el acceso se puede retirar en cualquier momento.'
     },
     {
       kind: 'aviso',
       texto:
-        'WhatsApp queda fuera de ese acuerdo. No envíe por ahí datos de sus clientes ni documentos del caso, aunque escriba a soporte. La misma regla vale para el chat de soporte dentro de la aplicación: describa el problema, no pegue el caso.'
+        'WhatsApp está fuera del acuerdo de tratamiento de datos. No envíe por ahí datos de sus clientes ni documentos del caso. Tampoco los pegue en el chat de soporte: describa el problema, no el caso.'
     }
   ]
 };
@@ -1320,247 +1100,210 @@ const A_SOPORTE: ManualArticle = {
     {
       kind: 'parrafo',
       texto:
-        'Soporte es un chat que queda guardado en su cuenta y que responde el operador de la plataforma en horario laboral. No hay tiempo de respuesta garantizado ni cola de prioridad. Lo ven todos los abogados de su firma y cada mensaje queda en su auditoría, no en un canal externo.'
+        'Soporte es un chat guardado en su cuenta. Lo atiende el operador de la plataforma en horario laboral, sin tiempo de respuesta garantizado. Escribir a soporte no consume saldo. La pantalla muestra sus conversaciones y las de su firma.'
     },
     {
       kind: 'pasos',
       pasos: [
         'Abra «Soporte» en la barra lateral, bajo «Aprender». En el teléfono está en «Más».',
-        'En «Nueva conversación» escriba el «Asunto» en una línea —qué pasa y en qué pantalla— y el «Mensaje». Si tiene un término que vence hoy o mañana, dígalo en la primera línea.',
-        'Pulse «Abrir conversación». Aparece en «Sus conversaciones con soporte» como «Abierta»; cuando el operador la cierre, dirá «Cerrada».',
-        'Vuelva a la conversación para leer la respuesta y contestar: Enter envía, Shift+Enter salta de línea. Si activó los avisos en su aparato, la respuesta le llega como notificación.',
-        'Desde cualquier artículo de este manual, «Escribir a soporte» lo trae aquí.'
+        'Antes de escribir, revise los atajos de «Antes de escribir»: llevan a los artículos que resuelven las dudas más frecuentes.',
+        'Pulse «Nueva conversación». En «Qué pasó», elija el motivo y escriba el «Asunto» y el «Mensaje». Si tiene un término que vence hoy o mañana, dígalo en la primera línea.',
+        'Pulse «Abrir conversación». Aparece en «Sus conversaciones con soporte» como «Abierta». Cuando el operador la cierra, dice «Cerrada»; si usted vuelve a escribir, se reabre.',
+        'Cuando hay respuesta, la conversación dice «Soporte respondió» y cuántos mensajes tiene sin leer. Enter envía y Shift+Enter salta de línea.',
+        'Desde cualquier artículo del manual, «Escribir a soporte» lo trae aquí.'
       ]
     },
     {
       kind: 'consejo',
       texto:
-        'Diga en el asunto la pantalla y el botón exactos, y en el mensaje qué esperaba y qué ocurrió. El operador no ve su pantalla ni su material: cuanto más precisa la descripción, menos vueltas.'
+        'Diga la pantalla y el botón exactos, qué esperaba y qué ocurrió. El operador no ve su pantalla. Agregue el sello de versión del pie de la barra lateral.'
     },
     {
       kind: 'aviso',
       texto:
-        'No pegue en el chat datos de sus clientes ni documentos del caso. Soporte no ve su material por escribirle; si hace falta verlo, se pide por el acceso de soporte, que autoriza un socio, es de solo lectura, dura un tiempo fijo, deja rastro de cada pantalla abierta y se puede revocar.'
+        'El chat no admite adjuntos. No pegue datos de sus clientes ni documentos del caso. Si soporte necesita ver algo, lo pide por el acceso de soporte, que decide un socio administrador.'
     },
     {
       kind: 'nota',
       titulo: 'WhatsApp',
       texto:
-        'Si la firma tiene un número de WhatsApp de soporte configurado, aparece en la misma pantalla como enlace, con el nombre de su firma y el correo de su cuenta ya escritos en el mensaje. Si no hay número configurado, la pantalla lo dice en vez de mostrar un botón que no hace nada. Desde WhatsApp nadie puede entrar a su cuenta: cualquier acceso se autoriza dentro de la aplicación.'
+        'Si hay un número de WhatsApp configurado, aparece al pie de la pantalla. Lo que se responda por WhatsApp no queda registrado en la aplicación. Si no hay número configurado, la pantalla lo dice.'
     }
   ]
 };
 
 const A_FORMATO: ManualArticle = {
   id: 'formato',
-  titulo: 'Formato, membrete y tipografía',
-  entradilla: 'Cómo se configura la marca de la firma y hasta dónde llega su efecto.',
+  titulo: 'Membrete, formato y estilo de la firma',
+  entradilla: 'Cómo se configuran los datos y el formato de la firma, y hasta dónde llega su efecto.',
   bloques: [
-    { kind: 'ruta', camino: ['Barra lateral', '«Membrete»', '«Guardar y aplicar»'] },
+    { kind: 'ruta', camino: ['Barra lateral', '«Membrete»', '«Guardar el membrete»'] },
     {
       kind: 'parrafo',
       texto:
-        'La marca de la firma es una sola y vale para todos los documentos: no se elige letra escrito por escrito, porque la letra es de la firma, no del documento. Lo que se guarde en Membrete se ve en el escrito en pantalla y sale igual en el Word y el PDF.'
+        'El membrete y el formato son de la firma y valen para todos sus documentos. Lo que guarde en Membrete se ve en el escrito en pantalla y sale igual en Word y PDF.'
     },
     {
       kind: 'pasos',
       pasos: [
-        'Pulse «Membrete» en el pie de la barra lateral. Se abre la configuración de la marca con una vista previa del escrito a la derecha, que reacciona a cada cambio.',
-        'Suba el logo con «Subir logo» (PNG o SVG con fondo transparente) y complete «Razón social», «NIT», «Pie de página» —la dirección que va al pie del membrete—, «Teléfono», «T.P. del abogado que firma» y «Correo de notificaciones judiciales». Si quiere que la firma escaneada salga en el documento, súbala en «Firma escaneada».',
-        'Elija la «Tipografía» entre diez: las clásicas de juzgado —Times New Roman, Arial, Calibri, Tahoma, Inter— y las libres —Plus Jakarta Sans, Manrope, Public Sans, Satoshi y Work Sans—. Debajo de la lista, la pantalla le dice cómo se comporta cada una en Word y en PDF.',
-        'Fije «Tamaño», «Interlineado» (1,0 · 1,5 · 2,0), «Numeración de hechos» («1. 2. 3.» o «PRIMERO.») y «Títulos de sección» («I. Romanos», «1. Arábigos» o «Sin numerar»).',
-        'Pulse «Guardar y aplicar». Desde ese momento el formato viaja al motor de redacción como instrucción: el escrito nace ya con la numeración y los títulos que su firma usa, en vez de quedar maquillado al final.'
+        'Abra «Membrete» desde el pie de la barra lateral o desde «Ajustes».',
+        'En «Datos de la firma», complete el nombre de la firma, el NIT, la dirección, el teléfono y el correo de notificaciones judiciales. El logotipo es opcional y puede ser PNG o JPG; use «Elegir» o «Reemplazar».',
+        'En «Formato del escrito», elija la letra entre diez, el tamaño (de 10 a 14), el interlineado (1,0, 1,5 o 2,0), la numeración de hechos («1. 2. 3.» o «PRIMERO.») y los títulos de sección («I. Romanos», «1. Arábigos» o «Sin numerar»).',
+        'En «Bloque de firma», escriba la «T.P. del abogado que firma».',
+        'Pulse «Guardar el membrete». Desde entonces, el formato se aplica a los escritos generados.'
       ]
     },
     {
       kind: 'consejo',
       texto:
-        'Si sus escritos van a un despacho que los recibe en Word, prefiera una clásica: está en todo equipo con Office y se ve igual en el suyo y en el del juzgado. Las libres van incrustadas en el PDF y se ven igual en todas partes, pero en Word dependen de que quien abra el archivo las tenga instaladas.'
+        'Si los escritos van a un despacho que los recibe en Word, elija una letra clásica (Times New Roman, Arial o Calibri): se ve igual en su equipo y en el del juzgado.'
     },
+    { kind: 'subtitulo', texto: 'Estilo de la firma' },
     {
       kind: 'lista',
       items: [
-        'Times New Roman sale en el PDF con Times, su equivalente estándar; Arial, Calibri, Tahoma e Inter salen con Helvetica, porque no se pueden incrustar sin licencia.',
-        'El membrete con el logo, la tipografía elegida, la fecha y la paginación real salen en el PDF del escrito.',
-        'El acta de audiencia usa su propio formato de acta y también sale en Word y en PDF.',
-        'Ni el Word ni el PDF llevan marca de Iureon.'
+        'En «Ajustes» → «Estilo de la firma» se ve lo que su firma enseñó para cada rol de firmante. Un socio administrador puede «Quitar» un formato enseñado.',
+        'Un formato se enseña desde Redacción, con «Enseñar este formato» sobre un escrito (véase «Trabajar, revisar y exportar el escrito»).',
+        'En Redacción, «Cómo escribe su firma» deja apagar el formato y la jerga enseñados para un solo borrador.'
       ]
     },
     {
       kind: 'nota',
       titulo: 'Si el documento no sale con su membrete',
       texto:
-        'Compruebe primero que la marca esté guardada, después que la casilla «Membrete de la firma» esté marcada en las opciones de exportación de Redacción, y por último el sello de versión del pie de la barra lateral: una pestaña que lleva días abierta exporta con el código que cargó ese día.'
+        'Compruebe que guardó el membrete, que «Membrete de la firma» esté marcado en las opciones de exportación de Redacción y que su pestaña no tenga una versión vieja: compare el sello de versión del pie de la barra lateral.'
     }
   ]
 };
 
 const A_MOVIL: ManualArticle = {
   id: 'movil',
-  titulo: 'Iureon en el teléfono',
+  titulo: 'Iureon en el teléfono, avisos y cierre de sesión',
   entradilla:
-    'Cada módulo tiene su pantalla pensada para el teléfono. No es la de computador apretada: es otra, con lo que se hace de pie.',
+    'Cómo se usa en el teléfono, cómo instalarla como aplicación, qué avisos llegan y qué pasa al cerrar la sesión.',
   bloques: [
-    { kind: 'ruta', camino: ['Barra inferior', '«Redactar» · «Orientar» · «Grabar» · «Más»'] },
+    { kind: 'ruta', camino: ['Barra inferior', '«Inicio» · «Redactar» · «Orientar» · «Grabar» · «Más»'] },
     {
       kind: 'parrafo',
       texto:
-        'Abajo hay una barra con cuatro puertas: «Redactar», «Orientar», «Grabar» y «Más». Arriba, el nombre del módulo y sus acciones. Todo lo demás —Audiencias, Borradores, Revisiones, Buscador, Catálogo, Herramientas, Manual, Soporte, Ajustes— está en «Más», bajo «Todo lo demás», agrupado con los mismos verbos de la barra lateral del computador, para que no haya que aprender dos mapas del mismo producto. En «Más» están también «Saldo y recarga» y «Plan de la firma», bajo «Cuenta».'
+        'En el teléfono, la barra inferior tiene cinco botones: «Inicio», «Redactar», «Orientar», «Grabar» y «Más». «Más» abre «Todo lo demás»: bajo «Cuenta», «Saldo y recarga» y «Plan de la firma»; bajo «En este dispositivo», los avisos y la instalación; y el resto de módulos, agrupados como en la barra lateral del computador.'
     },
     {
       kind: 'lista',
       items: [
-        'Redactar: arriba, la barra de rama y actuación; debajo, el taller en dos pestañas —«Instrucción» y «Documento»— y el visor con la barra de revisión.',
-        'Orientar: describa los hechos y pulse «Orientar»; «Redactar esta» abre el mismo panel «Qué pedirle al motor» que en el computador, con una diferencia: en las tarjetas cuyo término está sin verificar el teléfono no muestra botón, ni «Redactar esta» ni «Verificar y catalogar», así que esas hay que verificarlas entrando por «Catálogo». Para adjuntar el documento no se arrastra —eso solo existe en el computador—: hay un renglón, «Adjuntar el oficio o la demanda (PDF, Word o texto)», que abre el selector de archivos.',
-        'Grabar: la grabadora ocupa la pantalla, con pausa y con la onda, y el mismo consentimiento; el cronómetro es lo más grande de la pantalla y la grabación sigue con la pantalla apagada. El guion de las cuatro preguntas aparece al terminar de transcribir, no mientras se graba.',
-        'Audiencias: se sube el archivo, se ve el porcentaje mientras viaja, y el transcrito se lee con cada intervención a ancho completo. Las herramientas de corrección son las mismas; de pie se revisa mejor de lo que se edita.',
-        'Catálogo: se busca por nombre y cada ficha se abre completa, con su término, su fuente y su estado.',
-        'Los diálogos suben desde abajo, como una hoja, y se cierran deslizando o con el velo.',
-        'Para actualizar, tire hacia abajo desde la parte de arriba de la pantalla: aparece el logo girando y, al soltar, la aplicación se recarga y vuelve a la misma pantalla en la que estaba.'
+        'Redactar: el asistente en dos pestañas, «Instrucción» y «Documento». El menú «Acciones» incluye «Marcar como listo», copiar el texto y exportar a Word o PDF.',
+        'Orientar: igual que en el computador, pero el documento se adjunta con un renglón y no arrastrándolo. Las candidatas con término sin verificar no muestran botón; verifíquelas desde «Catálogo».',
+        'Grabar: la grabadora ocupa la pantalla. Corregir el transcrito se hace en la pantalla grande.',
+        'Los diálogos suben desde abajo. Para actualizar, deslice hacia abajo desde arriba de la pantalla.'
       ]
     },
     {
       kind: 'aviso',
       texto:
-        'Grabar una entrevista con la pantalla apagada funciona, pero cerrar la aplicación no: la grabación vive en la pestaña. Si va a grabar más de unos minutos, deje el teléfono con la aplicación al frente.'
+        'La grabación vive en la aplicación abierta. Si la cierra antes de transcribir, se pierde.'
     },
     { kind: 'subtitulo', texto: 'Instalarla como aplicación' },
     {
-      kind: 'parrafo',
-      texto:
-        'Iureon se puede añadir a la pantalla de inicio y abrirse como una aplicación, sin barra de direcciones. No se descarga nada de una tienda: es la misma página, con icono propio. Es requisito para recibir avisos en iPhone y iPad.'
+      kind: 'pasos',
+      pasos: [
+        'Android con Chrome: en «Más», bajo «En este dispositivo», toque «Instalar Iureon en este dispositivo». También puede usar el menú de Chrome.',
+        'iPhone o iPad con Safari: toque «Compartir» y luego «Añadir a pantalla de inicio». Abra Iureon desde el icono nuevo.',
+        'Computador: en «Ajustes» → «Instalar la aplicación», o con el icono de instalar de la barra de direcciones.'
+      ]
     },
+    { kind: 'subtitulo', texto: 'Avisos' },
     {
       kind: 'pasos',
       pasos: [
-        'Android con Chrome: abra «Más» abajo a la derecha y, bajo «En este dispositivo», toque «Instalar Iureon en este dispositivo». Si el botón no aparece, use el menú de Chrome (⋮) → «Instalar aplicación» o «Añadir a pantalla de inicio».',
-        'iPhone o iPad con Safari: la misma sección le muestra los dos toques: «Compartir» (el cuadrado con la flecha) y luego «Añadir a pantalla de inicio». Abra Iureon desde el icono nuevo, no desde Safari.',
-        'Computador con Chrome o Edge: el icono de instalar aparece a la derecha de la barra de direcciones; también está en «Avisos», en el pie de la barra lateral.',
-        'Una vez instalada, la sección dice «Instalada. Ábrala desde su pantalla de inicio o su escritorio».'
+        'En el computador, pulse «Avisos» en el pie de la barra lateral o abra «Ajustes» → «Avisos». En el teléfono, abra «Más».',
+        'Encienda el interruptor «Avisos en este dispositivo» y conceda el permiso del navegador.',
+        'Pulse «Enviar una prueba» para confirmar que llegan.',
+        'Repita en cada dispositivo: los avisos se activan dispositivo por dispositivo.'
       ]
-    },
-    { kind: 'subtitulo', texto: 'Avisos en el teléfono y en el computador' },
-    {
-      kind: 'pasos',
-      pasos: [
-        'En el teléfono, abra «Más» y, bajo «En este dispositivo», toque «Activar avisos en este dispositivo». En el computador, pulse «Avisos» en el pie de la barra lateral.',
-        'El navegador le pedirá permiso una vez. Al concederlo, la pantalla dice «Activados en este dispositivo».',
-        'Pulse «Enviar una prueba»: si la notificación llega, el camino entero funciona. «Desactivar» lo cierra en ese aparato.',
-        'Repita en cada aparato donde quiera recibirlos: se activan aparato por aparato, y activarlos en el teléfono no los activa en el portátil.'
-      ]
-    },
-    {
-      kind: 'parrafo',
-      texto:
-        'Los avisos llegan como notificaciones del sistema aunque la pestaña esté cerrada. Hoy se avisa de tres cosas, y la propia pantalla lo dice:'
     },
     {
       kind: 'lista',
       items: [
-        'Cuando soporte responde a una conversación de su firma.',
-        'Cuando otro abogado de su firma crea un borrador.',
-        'Cuando otro abogado de su firma edita el texto de un borrador: como mucho un aviso cada diez minutos por escrito, para que una sesión de edición no sean treinta avisos.'
+        'Términos de la agenda: cinco días antes, dos días antes y el día del vencimiento.',
+        'Cuando soporte responde una conversación de su firma.',
+        'Cuando otro abogado de su firma crea un borrador, y cuando lo edita: como mucho un aviso cada diez minutos por escrito.',
+        'Lo que usted mismo hace no le llega a sus dispositivos.'
       ]
-    },
-    {
-      kind: 'consejo',
-      texto:
-        'Active los avisos en el teléfono y no solo en el computador: la respuesta de soporte y el borrador nuevo de un compañero son justo lo que llega cuando usted no está frente al escritorio.'
-    },
-    {
-      kind: 'nota',
-      titulo: 'Lo que usted hace no le avisa a usted',
-      texto:
-        'Su propio borrador y su propio mensaje a soporte no le llegan a sus dispositivos. Y nada más avisa por ahora: ni vencimientos, ni transcripciones terminadas, ni saldo. Cuando algo de eso se añada, aparecerá en esta lista.'
     },
     {
       kind: 'aviso',
       texto:
-        'En iPhone y iPad, los avisos solo funcionan si Iureon está añadida a la pantalla de inicio y se abre desde ahí. Desde una pestaña de Safari no llegan, y la pantalla de avisos lo dice.'
+        'En iPhone y iPad, los avisos solo llegan si Iureon está añadida a la pantalla de inicio y se abre desde ahí.'
+    },
+    { kind: 'subtitulo', texto: 'Cerrar la sesión' },
+    {
+      kind: 'parrafo',
+      texto:
+        '«Cerrar sesión» pregunta «¿Cerrar la sesión en este dispositivo?». Solo se cierra la sesión de ese navegador; en sus otros dispositivos sigue abierta. Su trabajo no se pierde: borradores, revisiones, casos y transcritos quedan guardados en la firma. «Seguir trabajando» cancela.'
     }
   ]
 };
 
 const A_HERRAMIENTAS: ManualArticle = {
   id: 'herramientas',
-  titulo: 'Herramientas de cálculo',
+  titulo: 'Herramientas de cálculo y agenda de términos',
   entradilla:
-    'Qué calcula cada herramienta, de dónde salen sus cifras y cuáles tiene que escribir usted porque ninguna fuente oficial las entrega de forma estable.',
+    'Qué calcula cada herramienta, de dónde salen sus cifras y cómo se vigila un vencimiento.',
   bloques: [
-    { kind: 'ruta', camino: ['Herramientas', 'La herramienta', '«Fuentes»', '«Exportar a Excel» o «Exportar a PDF»'] },
+    { kind: 'ruta', camino: ['Herramientas', '«Contador de términos»', '«Poner en la agenda»'] },
     {
       kind: 'parrafo',
       texto:
-        'Herramientas reúne siete utilidades que no generan un escrito: «Contador de términos», la «Agenda de términos» de su firma, «Liquidación de prestaciones», «Competencia por cuantía», «Intereses de mora», «Indexación por IPC» y el «Glosario jurídico». Todas obedecen la misma regla que el catálogo: ninguna constante entra al cálculo sin su norma, la dirección oficial donde se leyó y la fecha en que se leyó.'
+        'Herramientas reúne siete utilidades: «Contador de términos», «Intereses de mora», «Indexación por IPC», «Competencia por cuantía», «Liquidación de prestaciones», «Agenda de términos» y «Glosario jurídico». Cada una abre a pantalla completa con su regla a la vista. Ninguna consume saldo. Para encontrar una, escriba en «Por nombre o por lo que necesita calcular».'
     },
+    { kind: 'subtitulo', texto: 'Contador de términos' },
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Herramientas»: las siete utilidades están numeradas en una retícula de tarjetas, cada una con un dibujo que anticipa lo que calcula. Filtre con «Todas», «Términos», «Dinero» o «Referencia», o busque en «Por nombre o por lo que necesita calcular». Al pie de cada tarjeta está la fuente de ese cálculo —la norma de la que sale su cifra—, el estado «Fuente declarada» o «Sin verificar», y la insignia «Excel · PDF» solo donde la exportación existe. En el teléfono la primera tarjeta va completa y las demás quedan como filas con su miniatura.',
-        'Abra la herramienta y complete los campos. En el contador de términos escriba la fecha de partida, el número de «Días hábiles» y la jurisdicción —«Civil» o «Penal (atiende lunes a miércoles santos)»— y pulse «Calcular».',
-        'Lea el resultado y, debajo, el recuadro «Fuentes»: es la lista de cada norma, cada dirección oficial y cada fecha de lectura que sostiene la cifra.',
-        'Si necesita soporte para el expediente o para contabilidad, pulse «Exportar a Excel» o «Exportar a PDF». Los dos archivos salen del mismo cálculo, así que dicen lo mismo: las cifras, el detalle y las fuentes con su norma, su dirección y la fecha en que se consultaron. El Excel sirve para seguir trabajando la cifra; el PDF, para imprimirlo y anexarlo, y sale con la letra de su membrete. Los tienen las cinco calculadoras y el detalle de festivos del año; el glosario y la agenda no, porque no calculan nada.'
+        'Escriba «Desde qué fecha» y el número del término.',
+        'Elija la «Clase de término»: días hábiles, días calendario, meses o años, según el artículo 118 del CGP, que la herramienta cita.',
+        'Elija la «Jurisdicción». Arranca en Laboral, y ofrece también Civil, Constitucional y Penal. Si quiere, escriba «Qué se vence».',
+        'Pulse «Contar». El resultado explica qué días descontó y por qué, y cómo llegó a la fecha.',
+        'Para vigilar el vencimiento, pulse «Poner en la agenda». También puede copiar el resultado o exportarlo a Excel o PDF.'
       ]
     },
-    { kind: 'subtitulo', texto: 'La agenda de términos de su firma' },
-    {
-      kind: 'parrafo',
-      texto:
-        'La tarjeta «Agenda de términos» reúne lo que se le vence a la firma: el calendario del año con sus vencimientos encima, la lista de lo que viene con los días que faltan, y el formulario para añadir uno. La fecha límite no se escribe: la calcula el mismo motor del contador de términos a partir de la fecha de notificación y del plazo, y el cálculo se hace en el servidor, no en su navegador.'
-    },
+    { kind: 'subtitulo', texto: 'Agenda de términos' },
     {
       kind: 'pasos',
       pasos: [
-        'Abra «Agenda de términos» y pase a «Añadir». Escriba el asunto o el proceso —y, si quiere, el cliente y el radicado—, elija la rama y la actuación del catálogo, y ponga la fecha de notificación.',
-        'Si la ficha del catálogo fija su término sin ambigüedad, la aplicación lo dice en verde con su artículo y la frase de la que sale, y no hay nada más que escribir: debajo aparece la fecha de vencimiento y, desplegando, qué días se descontaron y por qué.',
-        'Si la ficha describe más de un plazo, no dice si los días son hábiles o de calendario, o nadie ha comprobado su término, la aplicación lo advierte en ámbar, le muestra el término TAL COMO lo escribe la ficha y le pide el número de días. La fecha se sigue calculando, y la entrada queda marcada «Plazo sin verificar» porque esa lectura la hizo usted.',
-        'Cuando el término no se cuenta en días —meses, años o «en cualquier tiempo»— o la actuación no está catalogada, escriba la fecha límite. Queda marcada «Fecha escrita a mano»: la aplicación la vigila, pero no la calculó.',
-        'Elija a quién se le avisa: a toda la firma, solo a usted, o a otra persona por su correo. Con un responsable, el aviso es solo suyo.',
-        'En «Lo que viene», cada entrada dice cuántos días faltan, contra qué actuación corre y a quién se avisa. «Cumplida» la retira de la lista y de los avisos; «Borrar» la elimina. En «El año» verá los doce meses con los días que no cuentan en gris y sus vencimientos en oro.',
-        'Desde «Borradores», en el menú de un escrito, «Poner en la agenda» abre el formulario con el caso y la actuación ya elegidas. Desde «Revisiones», el mismo icono de calendario al final de cada fila. Si esa fila es la lectura de un documento que recibió, el formulario se abre sin actuación ni rama: «Documento recibido» es la etiqueta del producto y no una actuación del catálogo, así que la escoge usted.'
+        'Abra «Agenda de términos». Tiene tres pestañas: «Lo que viene», «El calendario» y «Añadir».',
+        '«El calendario» muestra un mes a la vez, con sus vencimientos, y se recorre mes a mes. Los festivos y la vacancia del año están en «Festivos y vacancia del año», donde también está la casilla de Semana Santa.',
+        'En «Añadir», escriba el asunto, elija la rama y la actuación y ponga la fecha de notificación. Si la ficha fija su término sin ambigüedad, la fecha se calcula sola. Si no, la aplicación se lo advierte y le pide los días, o la fecha si el término no se cuenta en días. Elija en «A quién se le avisa».',
+        'En «Lo que viene», cada entrada dice cuántos días faltan. «Cumplida» la retira y «Borrar» la elimina después de confirmar.',
+        'Puede exportar la agenda a PDF y a un archivo .ics para su calendario, con la opción de incluir los cumplidos.',
+        'Desde «Borradores», «Poner en la agenda» abre la agenda con el caso y la actuación elegidos; desde «Revisiones», «Poner en la agenda de términos».'
       ]
     },
     {
       kind: 'aviso',
       texto:
-        'Los avisos llegan al teléfono y al computador cinco días antes, dos días antes y el día del vencimiento, y solo a los dispositivos donde haya activado los avisos en «Ajustes». No hay correo: si no activa los avisos en al menos un dispositivo, la agenda le sirve para consultar, no para que le recuerden. La aplicación jamás deduce un plazo que la ficha no fija: cuando no puede leerlo, se lo dice y se lo pregunta.'
+        'Los avisos de vencimiento llegan cinco días antes, dos días antes y el día, y solo a los dispositivos donde activó los avisos. No llegan por correo. La aplicación nunca deduce un plazo que la ficha no fija: si no puede leerlo, se lo pregunta.'
     },
-    { kind: 'subtitulo', texto: 'Lo que el servidor sabe' },
+    { kind: 'subtitulo', texto: 'Intereses de mora' },
     {
       kind: 'lista',
       items: [
-        'Los festivos se calculan de la Ley 51 de 1983 para cualquier año desde 1984 —fechas fijas, las que se trasladan al lunes y las que dependen de la Pascua— y desde 2026 incluyen el 9 de julio de la Ley 2578 de 2026. Cada fila del calendario dice qué regla la produjo.',
-        'La vacancia judicial del 20 de diciembre al 10 de enero y la Semana Santa se descuentan porque el Decreto 1660 de 1978 las declara vacancia y el artículo 118 del CGP ordena no contarlas. Los despachos penales atienden de lunes a miércoles santos: elija «Penal» en el contador, o apague la casilla de Semana Santa en el calendario.',
-        'El salario mínimo y el auxilio de transporte de 2020 a 2026 están cargados con el decreto de cada año. La competencia por cuantía solo ofrece esos años; para otro año la herramienta se niega en vez de suponer un valor.',
-        'La tasa de interés bancario corriente cambia cada mes. El servidor trae únicamente la última certificación verificada, con su mes y su resolución, y la prellena etiquetada.'
+        'Tres modos: «Mora comercial», a 1,5 veces el interés bancario corriente de cada periodo (art. 884 del Código de Comercio); «Interés legal civil», al 6 % anual (art. 1617 del Código Civil); y «Tasa pactada», que no puede superar la usura (art. 305 del Código Penal).',
+        'El día «Desde» no se cuenta y el día «Hasta» sí.',
+        'La herramienta trae cargadas las tasas certificadas por la Superintendencia Financiera, con su rango y el enlace «Ver certificaciones». No tiene que escribir la tasa.',
+        'Cuando el periodo cruza varios meses, la liquidación se hace por tramos, cada uno con su tasa, y se muestra en la tabla «Por tramos de tasa». Cada tramo convierte la tasa efectiva anual a los días que dura, sin capitalizar los intereses.'
       ]
     },
     { kind: 'subtitulo', texto: 'Lo que usted escribe' },
     {
       kind: 'parrafo',
       texto:
-        'El índice IPC no se carga solo: el DANE lo publica en un archivo cuya dirección cambia cada mes y que un servidor no puede leer con garantías. Tome el índice inicial y el final de la página oficial enlazada en la herramienta —el total nacional, base diciembre de 2018 igual a 100— y escríbalos; la fórmula que se aplica se muestra con sus números. Lo mismo ocurre con el interés bancario corriente de cualquier mes distinto del prellenado: tómelo de la certificación de la Superintendencia Financiera y consérvela como soporte.'
+        'El IPC no se carga solo. Tome el índice inicial y el final de la página del DANE enlazada en «Indexación por IPC» y escríbalos; la fórmula aparece con sus números. «Competencia por cuantía» trabaja con los salarios mínimos de 2020 a 2026; para otro año, la herramienta no calcula.'
     },
     {
       kind: 'consejo',
       texto:
-        'Guarde el archivo exportado junto al escrito que usa la cifra. La hoja «Fuentes» es la respuesta lista a la pregunta «¿de dónde sacó ese número?», con norma, dirección y fecha, sin tener que reconstruirla meses después.'
-    },
-    {
-      kind: 'nota',
-      titulo: 'Los intereses se liquidan de forma simple',
-      texto:
-        'Interés simple sobre los días calendario entre las dos fechas, año de 365 días, sin capitalizar. En el modo comercial la tasa es 1,5 veces el bancario corriente (art. 884 del Código de Comercio); en el civil, el 6 % anual del artículo 1617 del Código Civil; en el pactado, la que usted indique, contrastada con el tope de usura del artículo 305 del Código Penal. Si un periodo cruza varios meses, la herramienta advierte que una liquidación exacta aplica la tasa certificada de cada mes.'
-    },
-    {
-      kind: 'aviso',
-      texto:
-        'El salario mínimo de 2026 está fijado por el Decreto 1469 de 2025, suspendido provisionalmente por el Consejo de Estado, y por el Decreto 0159 de 2026, que fija el mismo valor de forma transitoria. La cifra es la misma bajo los dos; el resultado lo advierte para que verifique si hay decisión de fondo posterior.'
-    },
-    {
-      kind: 'todavia-no',
-      texto:
-        'El cómputo de ejecutoria con traslados no está construido: exige modelar cada recurso con su término y su forma de notificación. La competencia laboral por cuantía se calcula solo con la Ley 2452 de 2025, vigente desde el 2 de abril de 2026; para demandas anteriores la herramienta se niega porque el código anterior no está verificado en ella.'
+        'Guarde el Excel o el PDF exportado junto al escrito que usa la cifra. Las fuentes con su norma y su fecha responden a la pregunta «¿de dónde sacó ese número?».'
     }
   ]
 };
@@ -1576,10 +1319,9 @@ export const MANUAL: readonly ManualGroup[] = [
     articulos: [A_ORIENTACION, A_INSTRUCCION, A_REVISAR, A_DOCUMENTO_RECIBIDO, A_EXPORTAR, A_BORRADORES]
   },
   /*
-   * «Preparar el interrogatorio» SALE DE «Redactar» y se viene aquí. Su ruta
-   * empieza en «Expedientes» desde que el interrogatorio se mudó a ese módulo,
-   * y un manual que agrupa por tarea no puede dejarlo bajo el verbo de otra:
-   * nadie que quiera preparar una audiencia lo busca en «Redactar».
+   * «Preparar el interrogatorio» vive aquí y no en «Redactar»: su ruta empieza
+   * en «Expedientes», y nadie que prepare una audiencia lo busca bajo el verbo
+   * de otra tarea.
    */
   { titulo: 'Organizar el caso', articulos: [A_EXPEDIENTE, A_PREGUNTAS_AUDIENCIA] },
   { titulo: 'Consultar', articulos: [A_BUSCADOR] },

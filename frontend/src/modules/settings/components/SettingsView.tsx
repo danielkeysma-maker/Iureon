@@ -30,8 +30,6 @@ import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
  * lo afirme antes de que alguien toque algo.
  *
  * LO QUE EL ARTBOARD PIDE Y AQUÍ NO ESTÁ, con la razón:
- *  · «Privacidad y datos» y «Auditoría» — son otra unidad de trabajo, que el
- *    titular dejó para el final; no se pinta una entrada que no abre nada.
  *  · «Tarjeta profesional» en «Su cuenta» — no es un dato de la cuenta: la T.P.
  *    vive en el membrete de la firma, y un campo aquí no se guardaría en ninguna
  *    parte.
@@ -44,14 +42,26 @@ import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
  * «Enseñar este formato». Se llega también desde ese diálogo: quien navega deja
  * la sección en `PANTALLAS.ajustes` (o pide ir con el evento de `irAlEstilo`),
  * y Ajustes abre en ella y la olvida.
+ *
+ * «PRIVACIDAD Y DATOS» Y «AUDITORÍA» (:252-253) NO SON SECCIONES DE AJUSTES:
+ * llevan a sus pantallas propias del grupo «Administrar». Duplicarlas aquí
+ * serían dos copias de la misma lista de subencargados y del mismo registro,
+ * que envejecerían por separado. Solo se pintan si quien monta Ajustes sabe
+ * navegar (`onIr`): una entrada que no abre nada no se ofrece.
  */
 
 type Seccion = 'cuenta' | 'apariencia' | 'avisos' | 'instalar' | 'atajos' | 'plan' | 'estilo';
 
 interface Entrada {
-  id: Seccion | 'documento' | 'membrete' | 'usuarios';
+  id: Seccion | 'documento' | 'membrete' | 'usuarios' | 'privacidad' | 'audit';
   label: string;
 }
+
+/** Las entradas que salen de Ajustes hacia otra pantalla. */
+const HACIA_OTRA_PANTALLA: Entrada[] = [
+  { id: 'privacidad', label: 'Privacidad y datos' },
+  { id: 'audit', label: 'Auditoría' }
+];
 
 const SUYAS: Entrada[] = [
   { id: 'cuenta', label: 'Su cuenta' },
@@ -79,9 +89,11 @@ const fechaCorta = (iso: string): string =>
 interface SettingsViewProps {
   /** Cerrar la sesión de este dispositivo, desde «Su cuenta». */
   onLogout?: () => void;
+  /** Abre Privacidad o Auditoría, que viven fuera de Ajustes. */
+  onIr?: (vista: 'privacidad' | 'audit') => void;
 }
 
-export const SettingsView: React.FC<SettingsViewProps> = ({ onLogout }) => {
+export const SettingsView: React.FC<SettingsViewProps> = ({ onLogout, onIr }) => {
   /* En escritorio abre en «Su cuenta», como el artboard; en el teléfono manda `abiertaEnTelefono`. */
   const pedida = recordado(PANTALLAS.ajustes) === SECCION_ESTILO;
   const [seccion, setSeccion] = useState<Seccion>(pedida ? 'estilo' : 'cuenta');
@@ -104,6 +116,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onLogout }) => {
   const abrirEntrada = (id: Entrada['id']) => {
     if (id === 'documento' || id === 'membrete') setMarcaAbierta(true);
     else if (id === 'usuarios') setUsuariosAbierto(true);
+    else if (id === 'privacidad' || id === 'audit') onIr?.(id);
     else {
       setSeccion(id);
       setAbiertaEnTelefono(true);
@@ -177,7 +190,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ onLogout }) => {
         )}
 
         <Grupo titulo="Suyas" entradas={SUYAS} />
-        <Grupo titulo="De la firma" nota="Lo cambia un socio y aplica a todos." entradas={DE_LA_FIRMA} />
+        <Grupo
+          titulo="De la firma"
+          nota="Lo cambia un socio y aplica a todos."
+          entradas={onIr ? [...DE_LA_FIRMA, ...HACIA_OTRA_PANTALLA] : DE_LA_FIRMA}
+        />
 
         <p className="cn-aju-indice-nota">
           Lo de <b>De la firma</b> lo cambia un socio administrador y aplica a todos. Lo suyo no afecta a nadie más.

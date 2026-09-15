@@ -5,6 +5,7 @@ import { useCatalogCuration } from '../hooks/useCatalogCuration';
 import { VerificationForm } from './VerificationForm';
 import { ActuacionDetail } from './ActuacionDetail';
 import { InvitacionAVerificar } from './InvitacionAVerificar';
+import { HojaSobreElTeclado } from './HojaSobreElTeclado';
 import { branchLabel } from '../branchLabels';
 import { filaDelCatalogo } from '../estadoEnElCatalogo';
 import type { Actuacion } from '../types';
@@ -91,30 +92,27 @@ export const CatalogMobileView: React.FC = () => {
           EL FORMULARIO SE ABRE COMO HOJA, NO SE APILA DEBAJO. Apilado, su alto
           completo competía con la ficha y lo único que encogía era el centro:
           un botón «Guardar» visible sobre un formulario invisible. En la hoja,
-          cabecera y pie fijos y los campos con su propio desplazamiento. Alto en
-          `dvh`: en un teléfono `vh` no descuenta la barra de direcciones.
+          cabecera y pie fijos y los campos con su propio desplazamiento.
+
+          EL ALTO ES EL DE LO QUE SE VE, NO EL DE LA VENTANA. Con `92dvh` el
+          teclado del teléfono tapaba el pie y los campos (reportado en
+          producción); la razón completa está en `HojaSobreElTeclado`.
         */}
         {verificando && (
-          <div className="cn-cat-hoja-capa" role="dialog" aria-modal="true" aria-label="Verificar el término">
-            <div className="cn-cat-velo" onClick={() => setVerificando(false)} aria-hidden="true" />
-            <section className="cn-cat-hoja">
-              <span className="cn-cat-asidero" aria-hidden="true" />
-              <div className="min-h-0 min-w-0 flex-1">
-                <VerificationForm
-                  actuacion={actual}
-                  isSaving={curation.isSaving}
-                  error={curation.saveError}
-                  onSave={curation.save}
-                  onRevert={async (id, rama) => {
-                    const listo = await curation.revert(id, rama);
-                    if (listo) setVerificando(false);
-                    return listo;
-                  }}
-                  onClose={() => setVerificando(false)}
-                />
-              </div>
-            </section>
-          </div>
+          <HojaSobreElTeclado etiqueta="Verificar el término" onCerrar={() => setVerificando(false)}>
+            <VerificationForm
+              actuacion={actual}
+              isSaving={curation.isSaving}
+              error={curation.saveError}
+              onSave={curation.save}
+              onRevert={async (id, rama) => {
+                const listo = await curation.revert(id, rama);
+                if (listo) setVerificando(false);
+                return listo;
+              }}
+              onClose={() => setVerificando(false)}
+            />
+          </HojaSobreElTeclado>
         )}
       </div>
     );

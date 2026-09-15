@@ -1,7 +1,7 @@
 import React from 'react';
 import { SelectorEnCascada, type OpcionEnCascada } from '../../workspace/components/SelectorEnCascada';
 import { useVentanaAncha } from '../../workspace/components/SelectorDelFormulario';
-import { MESES, aniosDeRegistro, mesesDeRegistro, type CasoIndexado } from '../services/buscarCasos';
+import { MESES, aniosDeRegistro, mesesDeRegistro, opcionesDeRama, type CasoIndexado } from '../services/buscarCasos';
 
 /**
  * AÑO Y MES DE REGISTRO, junto a la búsqueda de la lista.
@@ -37,18 +37,34 @@ import { MESES, aniosDeRegistro, mesesDeRegistro, type CasoIndexado } from '../s
  * Sin `localStorage`: los filtros duran lo que dura la pantalla y sobreviven al
  * cambio de pestaña. Al recargar se vuelve a ver todo, que es lo que se espera
  * al entrar a la lista.
+ *
+ * ─── LA RAMA, APARTE DE LAS FECHAS ─────────────────────────────────────────
+ *
+ * Va al lado, fuera del grupo «Registrado en Iureon», porque no es una fecha.
+ * Sus opciones salen de LA PESTAÑA y no de todos los casos (así lo pidió el
+ * dueño): una rama que la pestaña no tiene sería otro callejón sin salida. Las
+ * reglas —orden, «Sin rama registrada», la elegida que se conserva— viven en
+ * `opcionesDeRama`. Mismo control que año y mes, por la misma razón.
  */
 
 export const FiltrosDeLaLista: React.FC<{
   indices: readonly CasoIndexado[];
+  /** Los casos de la pestaña abierta, antes de año, mes y texto: de ellos salen las ramas. */
+  indicesDeLaPestana: readonly CasoIndexado[];
   anio: number | null;
   mes: number | null;
+  /** La llave de la rama, o `null` para «Todas». */
+  rama: string | null;
   onCambiar: (anio: number | null, mes: number | null) => void;
-}> = ({ indices, anio, mes, onCambiar }) => {
+  onCambiarRama: (rama: string | null) => void;
+}> = ({ indices, indicesDeLaPestana, anio, mes, rama, onCambiar, onCambiarRama }) => {
   const ancha = useVentanaAncha();
   const base = React.useId();
   const anios = React.useMemo(() => aniosDeRegistro(indices), [indices]);
   const meses = React.useMemo(() => (anio === null ? [] : mesesDeRegistro(indices, anio)), [indices, anio]);
+  const ramas = React.useMemo(() => opcionesDeRama(indicesDeLaPestana, rama), [indicesDeLaPestana, rama]);
+  const opcionesDeRamaEnLista: OpcionEnCascada[] = [{ valor: '', etiqueta: 'Todas' }, ...ramas];
+  const elegirRama = (valor: string): void => onCambiarRama(valor === '' ? null : valor);
 
   const opcionesDeAnio: OpcionEnCascada[] = [
     { valor: '', etiqueta: 'Todos' },
@@ -68,75 +84,104 @@ export const FiltrosDeLaLista: React.FC<{
   const elegirMes = (valor: string): void => onCambiar(anio, valor === '' ? null : Number(valor));
 
   return (
-    <div className="cn-exp-fechas" role="group" aria-labelledby={`${base}-rotulo`}>
-      <span id={`${base}-rotulo`} className="cn-exp-fechas-rotulo">
-        Registrado en Iureon
-      </span>
-      {ancha ? (
-        <>
-          <SelectorEnCascada
-            etiqueta="Año"
-            valor={anio === null ? '' : String(anio)}
-            opciones={opcionesDeAnio}
-            onChange={elegirAnio}
-            conBusqueda={false}
-            anchoCampo="cn-exp-fecha"
-          />
-          {anio === null ? (
-            <div className="cn-red-campo cn-exp-fecha">
-              <span className="cn-red-rotulo">Mes</span>
-              <button type="button" className="cn-red-disparador cn-exp-fecha-apagada" disabled={anio === null}>
-                <span className="cn-red-disparador-texto">Elija primero el año</span>
-              </button>
-            </div>
-          ) : (
+    <>
+      <div className="cn-exp-fechas" role="group" aria-labelledby={`${base}-rotulo`}>
+        <span id={`${base}-rotulo`} className="cn-exp-fechas-rotulo">
+          Registrado en Iureon
+        </span>
+        {ancha ? (
+          <>
             <SelectorEnCascada
-              etiqueta="Mes"
-              valor={mes === null ? '' : String(mes)}
-              opciones={opcionesDeMes}
-              onChange={elegirMes}
+              etiqueta="Año"
+              valor={anio === null ? '' : String(anio)}
+              opciones={opcionesDeAnio}
+              onChange={elegirAnio}
               conBusqueda={false}
               anchoCampo="cn-exp-fecha"
             />
-          )}
-        </>
-      ) : (
-        <>
+            {anio === null ? (
+              <div className="cn-red-campo cn-exp-fecha">
+                <span className="cn-red-rotulo">Mes</span>
+                <button type="button" className="cn-red-disparador cn-exp-fecha-apagada" disabled={anio === null}>
+                  <span className="cn-red-disparador-texto">Elija primero el año</span>
+                </button>
+              </div>
+            ) : (
+              <SelectorEnCascada
+                etiqueta="Mes"
+                valor={mes === null ? '' : String(mes)}
+                opciones={opcionesDeMes}
+                onChange={elegirMes}
+                conBusqueda={false}
+                anchoCampo="cn-exp-fecha"
+              />
+            )}
+          </>
+        ) : (
+          <>
+            <label className="cn-exp-fecha cn-exp-fecha-movil">
+              <span className="cn-exp-fecha-rotulo">Año</span>
+              <select
+                className="cn-exp-select cn-exp-fecha-select"
+                value={anio === null ? '' : String(anio)}
+                onChange={(e) => elegirAnio(e.target.value)}
+              >
+                {opcionesDeAnio.map((o) => (
+                  <option key={o.valor} value={o.valor}>
+                    {o.etiqueta}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="cn-exp-fecha cn-exp-fecha-movil">
+              <span className="cn-exp-fecha-rotulo">Mes</span>
+              <select
+                className="cn-exp-select cn-exp-fecha-select"
+                value={mes === null ? '' : String(mes)}
+                onChange={(e) => elegirMes(e.target.value)}
+                disabled={anio === null}
+              >
+                {anio === null ? (
+                  <option value="">Elija primero el año</option>
+                ) : (
+                  opcionesDeMes.map((o) => (
+                    <option key={o.valor} value={o.valor}>
+                      {o.etiqueta}
+                    </option>
+                  ))
+                )}
+              </select>
+            </label>
+          </>
+        )}
+      </div>
+      <div className="cn-exp-ramas">
+        {ancha ? (
+          <SelectorEnCascada
+            etiqueta="Rama"
+            valor={rama ?? ''}
+            opciones={opcionesDeRamaEnLista}
+            onChange={elegirRama}
+            conBusqueda={false}
+            anchoCampo="cn-exp-fecha"
+          />
+        ) : (
           <label className="cn-exp-fecha cn-exp-fecha-movil">
-            <span className="cn-exp-fecha-rotulo">Año</span>
+            <span className="cn-exp-fecha-rotulo">Rama</span>
             <select
               className="cn-exp-select cn-exp-fecha-select"
-              value={anio === null ? '' : String(anio)}
-              onChange={(e) => elegirAnio(e.target.value)}
+              value={rama ?? ''}
+              onChange={(e) => elegirRama(e.target.value)}
             >
-              {opcionesDeAnio.map((o) => (
+              {opcionesDeRamaEnLista.map((o) => (
                 <option key={o.valor} value={o.valor}>
                   {o.etiqueta}
                 </option>
               ))}
             </select>
           </label>
-          <label className="cn-exp-fecha cn-exp-fecha-movil">
-            <span className="cn-exp-fecha-rotulo">Mes</span>
-            <select
-              className="cn-exp-select cn-exp-fecha-select"
-              value={mes === null ? '' : String(mes)}
-              onChange={(e) => elegirMes(e.target.value)}
-              disabled={anio === null}
-            >
-              {anio === null ? (
-                <option value="">Elija primero el año</option>
-              ) : (
-                opcionesDeMes.map((o) => (
-                  <option key={o.valor} value={o.valor}>
-                    {o.etiqueta}
-                  </option>
-                ))
-              )}
-            </select>
-          </label>
-        </>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };

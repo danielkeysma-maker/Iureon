@@ -22,16 +22,19 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  CLAVE_SIN_RAMA,
   MESES,
   aniosDeRegistro,
   buscarCasos,
+  filtrarPorRama,
   filtrarPorRegistro,
   filtrosEnPalabras,
   indexarCaso,
   mesesDeRegistro,
+  opcionesDeRama,
   registroEnBogota
 } from '../services/buscarCasos';
-import { filtrarCasos } from '../services/agruparCasos';
+import { agruparPorClienteYRama, filtrarCasos } from '../services/agruparCasos';
 import type { ExpedienteEnLista } from '../types';
 
 let fallos = 0;
@@ -160,6 +163,71 @@ check(
 );
 check('sin filtros no dice nada', filtrosEnPalabras({ busqueda: '', anio: null, mes: null }).length === 0);
 
+/* ─── 5b. LA RAMA: BÚSQUEDA Y FILTRO ────────────────────────────────────── */
+/*
+ * Lo que puede mentir: una rama que se busca por su código y no por el nombre
+ * que el abogado lee («seguridad social»); un filtro que ofrece ramas que la
+ * pestaña no tiene; y un cliente que queda como cabecera vacía al filtrar.
+ */
+const RAMAS = [
+  caso('lab', { rama: 'LABORAL', clienteId: 'r1', clienteNombre: 'Cliente A', createdAt: '2025-03-10T15:00:00Z' }),
+  caso('fam', { rama: 'FAMILIA', clienteId: 'r1', clienteNombre: 'Cliente A', createdAt: '2025-03-12T15:00:00Z' }),
+  caso('lab2', { rama: ' LABORAL ', clienteId: 'r2', clienteNombre: 'Cliente Beta', createdAt: '2024-07-01T15:00:00Z' }),
+  caso('libre', { rama: 'Restitución de tierras', clienteId: 'r3', clienteNombre: 'Cliente C', createdAt: '2025-03-01T15:00:00Z' }),
+  caso('sinrama', { rama: '  ', clienteId: 'r3', clienteNombre: 'Cliente C', createdAt: '2025-03-02T15:00:00Z' }),
+  caso('fam2', { rama: 'FAMILIA', clienteId: 'r4', clienteNombre: 'Cliente D', createdAt: '2025-03-05T15:00:00Z' })
+];
+const IR = RAMAS.map(indexarCaso);
+const idsR = (q: string, xs = IR) => soloIds(buscarCasos(xs, q));
+check('«laboral» encuentra los casos de la rama por su nombre', idsR('laboral') === 'lab,lab2', idsR('laboral'));
+check('el nombre completo de la rama también: «seguridad social»', idsR('seguridad social') === 'lab,lab2', idsR('seguridad social'));
+check('sin tildes ni mayúsculas, y la rama escrita a mano: «RESTITUCION»', idsR('RESTITUCION') === 'libre', idsR('RESTITUCION'));
+check('«familia» encuentra la rama Familia & Sucesiones', idsR('familia') === 'fam,fam2', idsR('familia'));
+check('el código guardado con guion bajo se busca como palabras', soloIds(buscarCasos([indexarCaso(caso('pi', { rama: 'PROPIEDAD_INTELECTUAL' }))], 'propiedad intelectual')) === 'pi');
+check('la rama cuenta como un campo más para «todas las palabras»', idsR('laboral beta') === 'lab2' && idsR('laboral inexistente') === '', idsR('laboral beta'));
+check('«sin rama» no encuentra los casos que no la tienen: la falta de un dato no es texto', idsR('sin rama registrada') === '', idsR('sin rama registrada'));
+check(
+  'la rama no trae «por qué»: se ve en la cabecera del grupo y en la línea de cliente de «Esta semana»',
+  buscarCasos(IR, 'laboral').every((r) => r.porQue === null)
+);
+
+const valores = (xs: { valor: string; etiqueta: string }[]) => xs.map((o) => o.etiqueta).join(' | ');
+const pestanaR = IR.filter((x) => ['lab', 'fam', 'lab2', 'libre', 'sinrama'].includes(x.caso.id));
+check(
+  'las opciones de rama salen solo de la pestaña, en orden español, sin repetir, y «Sin rama registrada» al final',
+  valores(opcionesDeRama(pestanaR, null)) === 'Familia & Sucesiones | Laboral & Seguridad Social | Restitución de tierras | Sin rama registrada',
+  valores(opcionesDeRama(pestanaR, null))
+);
+const soloConRama = IR.filter((x) => ['lab', 'fam'].includes(x.caso.id));
+check('sin casos sin rama, no se ofrece «Sin rama registrada»', valores(opcionesDeRama(soloConRama, null)) === 'Familia & Sucesiones | Laboral & Seguridad Social', valores(opcionesDeRama(soloConRama, null)));
+check(
+  'la rama elegida que no está en esta pestaña sigue en la lista: el control no esconde lo que filtra',
+  valores(opcionesDeRama(soloConRama, 'Restitución de tierras')) === 'Familia & Sucesiones | Laboral & Seguridad Social | Restitución de tierras',
+  valores(opcionesDeRama(soloConRama, 'Restitución de tierras'))
+);
+check('filtrar por rama, con la rama guardada con espacios', soloIds(filtrarPorRama(IR, 'LABORAL')) === 'lab,lab2', soloIds(filtrarPorRama(IR, 'LABORAL')));
+check('filtrar por «Sin rama registrada»', soloIds(filtrarPorRama(IR, CLAVE_SIN_RAMA)) === 'sinrama');
+check('«Todas» no filtra', filtrarPorRama(IR, null).length === IR.length);
+check(
+  'rama + año + mes + texto se combinan',
+  soloIds(buscarCasos(filtrarPorRama(filtrarPorRegistro(IR, { anio: 2025, mes: 3 }), 'LABORAL'), 'cliente')) === 'lab' &&
+    soloIds(buscarCasos(filtrarPorRama(filtrarPorRegistro(IR, { anio: 2025, mes: 3 }), 'FAMILIA'), 'cliente d')) === 'fam2',
+  soloIds(buscarCasos(filtrarPorRama(filtrarPorRegistro(IR, { anio: 2025, mes: 3 }), 'LABORAL'), 'cliente'))
+);
+const agrupadoLaboral = agruparPorClienteYRama(filtrarPorRama(IR, 'LABORAL').map((x) => x.caso), '');
+check(
+  'con la rama filtrada, cada cliente muestra solo ese grupo y no quedan clientes vacíos',
+  agrupadoLaboral.map((g) => `${g.etiqueta}:${g.ramas.map((r) => r.etiqueta).join('+')}:${g.casos}`).join(' | ') ===
+    'Cliente A:Laboral & Seguridad Social:1 | Cliente Beta:Laboral & Seguridad Social:1',
+  agrupadoLaboral.map((g) => `${g.etiqueta}:${g.ramas.map((r) => r.etiqueta).join('+')}:${g.casos}`).join(' | ')
+);
+check(
+  'la rama puesta en palabras',
+  filtrosEnPalabras({ busqueda: 'x', anio: 2025, mes: null, rama: 'LABORAL' }).join(' · ') === 'búsqueda «x» · año 2025 · rama Laboral & Seguridad Social' &&
+    filtrosEnPalabras({ busqueda: '', anio: null, mes: null, rama: CLAVE_SIN_RAMA }).join(' · ') === 'sin rama registrada',
+  filtrosEnPalabras({ busqueda: 'x', anio: 2025, mes: null, rama: 'LABORAL' }).join(' · ')
+);
+
 /* ─── 6. MIL CASOS SIGUEN SIENDO INMEDIATOS ─────────────────────────────── */
 const MIL = Array.from({ length: 3000 }, (_, i) =>
   indexarCaso(
@@ -200,6 +268,11 @@ check('«Limpiar filtros» aparece con cualquier filtro puesto', /hayFiltros\s*&
 check('«Ninguno coincide» nombra los filtros puestos', LISTAS.includes('Ninguno coincide') && LISTAS.includes('filtros.join('));
 check('la tarjeta dice por qué coincidió', LISTAS.includes('Coincide con:') && LISTAS.includes('cn-exp-mono'));
 check('el aviso de búsqueda incompleta se muestra', VISTA.includes('misCasos?.avisoBusqueda'));
+check('la rama filtra la pestaña junto con año, mes y texto', /buscarCasos\(filtrarPorRama\(filtrarPorRegistro\(indicesDeLaPestana, \{ anio, mes \}\), rama\), texto\)/.test(VISTA));
+check('las ramas del filtro salen de la pestaña, no de todos los casos', /indicesDeLaPestana=\{indicesDeLaPestana\}/.test(VISTA) && FILTROS.includes('opcionesDeRama(indicesDeLaPestana'));
+check('la rama cuenta para «Limpiar filtros» y para la cuenta', /hayFiltros = [^;]*rama !== null/.test(VISTA) && /limpiarFiltros = [\s\S]{0,200}setRama\(null\)/.test(VISTA));
+check('la rama usa el mismo control que año y mes', /<SelectorEnCascada[\s\S]{0,40}etiqueta="Rama"/.test(FILTROS) && />Rama</.test(FILTROS));
+check('«Ninguno coincide» dice que también se busca por rama', LISTAS.includes('por despacho y por rama'));
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

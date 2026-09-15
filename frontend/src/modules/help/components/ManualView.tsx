@@ -15,6 +15,8 @@ interface ManualViewProps {
   /** Article to open on mount — how Soporte hands a reader to the manual. */
   articuloInicial?: string;
   onSoporte: () => void;
+  /** Opens the Novedades module from the index. */
+  onNovedades: () => void;
   /** Launches the guided tour. Absent = no invitation. */
   onVisitaGuiada?: () => void;
 }

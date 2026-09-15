@@ -243,7 +243,7 @@ export const CuentaSection: React.FC<{ onLogout?: () => void }> = ({ onLogout })
 
         <div>
           <p className="cn-aju-subtitulo">Sesión y contraseña</p>
-          <p className="cn-aju-ayuda">Para cambiar la contraseña, pídalo por Soporte: todavía no se cambia desde aquí.</p>
+          <p className="cn-aju-ayuda">Para cambiar la contraseña, cierre la sesión y use «¿Olvidó su contraseña?» en la pantalla de entrar: le llega un enlace a su correo. Al cambiarla se cierran todas sus sesiones.</p>
           {onLogout && (
             <div className="cn-aju-acciones">
               <button type="button" onClick={() => setConfirmarSalida(true)} className="cn-aju-boton cn-aju-boton--suave">

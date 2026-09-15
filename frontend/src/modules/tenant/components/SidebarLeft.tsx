@@ -5,7 +5,7 @@ import type { MainView } from '../types';
 import { NAV_GROUPS, NAV_MODULES, NUMERAL_DE_MODULO, navModule } from '../navigation';
 import { IureonMark } from './IureonMark';
 import { useTenant } from '../TenantContext';
-import { solicitarAbrirNovedades, useNovedadesNuevas } from '../../help/useNovedades';
+import { useNovedadesNuevas } from '../../help/useNovedades';
 import { usePlan } from '../../subscriptions/PlanContext';
 import { NOMBRE_DE_PLAN } from '../../subscriptions/types';
 import type { PlanDeFirma } from '../../subscriptions/types';
@@ -162,9 +162,9 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
 }) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(leerColapsado);
   const [administrarAbierto, setAdministrarAbierto] = useState(false);
-  const novedadesNuevas = useNovedadesNuevas();
   const { currentUserEmail, currentUserName } = useTenant();
   const { plan } = usePlan();
+  const novedadesNuevas = useNovedadesNuevas(plan?.modulosPermitidos ?? null, isSuperUser);
 
   /*
    * QUIÉN ESTÁ TRABAJANDO. Antes aquí iba un chip con dos iniciales SACADAS DEL
@@ -528,10 +528,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
             punto dice que hay cambios que este navegador no ha visto. */}
         <button
           type="button"
-          onClick={() => {
-            solicitarAbrirNovedades();
-            setMainView('manual');
-          }}
+          onClick={() => setMainView('novedades')}
           title={`Versión ${__COMMIT__} · ver qué cambió`}
           aria-label={`Versión ${__COMMIT__}. Ver qué cambió`}
           className="cn-rail-version"

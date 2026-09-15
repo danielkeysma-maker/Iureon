@@ -12,14 +12,11 @@ import {
   separarRuta
 } from '../content/manual';
 import { ETIQUETA_DE_COSTO, FRECUENTES } from '../content/frecuentes';
-import { NOVEDADES_ID } from '../content/novedades';
 import { PANTALLAS, recordado, recordar } from '../../tenant/pantallaRecordada';
 import { PASOS_DE_VISITA } from '../../inicio/visitaGuiada/pasos';
 import { agruparEnCapitulos, textoDeLaVisitaCompleta } from '../../inicio/visitaGuiada/capitulos';
 import type { ManualBlock, ManualEntry } from '../types';
 import { useManualReads } from '../useManualReads';
-import { useAperturaNovedades, useNovedadesNuevas } from '../useNovedades';
-import { NovedadesPanel } from './NovedadesPanel';
 
 /**
  * El manual con la cara nueva: índice por lo que se necesita hacer, artículo
@@ -64,6 +61,11 @@ interface PaginaDelManualProps {
   /** Article to open on mount — how Soporte hands a reader to the manual. */
   articuloInicial?: string;
   onSoporte: () => void;
+  /**
+   * Novedades dejó de ser una página del manual y es el módulo 13: la entrada
+   * del índice lleva allá. Su contador vive en el panel lateral, junto al módulo.
+   */
+  onNovedades: () => void;
   /** Launches the guided tour. Absent = no invitation. */
   onVisitaGuiada?: () => void;
 }
@@ -89,7 +91,7 @@ const ESTADOS = [
     nombre: 'Sin verificar',
     icono: AlertTriangle,
     texto:
-      'El modelo lo propuso, pero nadie lo ha comprobado. Puede ser correcto y suele serlo; aun así no lo lleve a un juzgado sin abrir la norma. Verificarlo toma unos dos minutos y queda hecho para toda la firma.',
+      'El modelo lo propuso, pero nadie lo ha comprobado. Puede ser correcto y suele serlo; aun así no lo lleve a un juzgado sin abrir la norma. Cuando alguien de la firma lo verifica en el Catálogo, queda verificado para toda la firma.',
     seVeAsi: 'Se ve así: subrayado discontinuo ámbar, fondo con trama y un triángulo de aviso.'
   },
   {
@@ -280,10 +282,10 @@ export const PaginaDelManual: React.FC<PaginaDelManualProps> = ({
   movil,
   articuloInicial,
   onSoporte,
+  onNovedades,
   onVisitaGuiada
 }) => {
   const lectura = useManualReads();
-  const nuevas = useNovedadesNuevas();
   const raiz = React.useRef<HTMLDivElement>(null);
 
   /*
@@ -294,7 +296,7 @@ export const PaginaDelManual: React.FC<PaginaDelManualProps> = ({
   const [activo, setActivo] = React.useState<string | null>(() => {
     if (articuloInicial && entradaPorId(articuloInicial)) return articuloInicial;
     const guardado = recordado(PANTALLAS.manual);
-    if (guardado && (guardado === NOVEDADES_ID || entradaPorId(guardado))) return guardado;
+    if (guardado && entradaPorId(guardado)) return guardado;
     return null;
   });
   const [consulta, setConsulta] = React.useState('');
@@ -310,30 +312,7 @@ export const PaginaDelManual: React.FC<PaginaDelManualProps> = ({
     if (articuloInicial && entradaPorId(articuloInicial)) abrir(articuloInicial);
   }, [articuloInicial, abrir]);
 
-  /* El sello de versión de la barra lateral abre Manual → Novedades por aquí. */
-  const abrirNovedades = React.useCallback(() => abrir(NOVEDADES_ID), [abrir]);
-  useAperturaNovedades(abrirNovedades);
-
-  const entrada = activo && activo !== NOVEDADES_ID ? entradaPorId(activo) : undefined;
-
-  /* ─── Novedades ─────────────────────────────────────────────────────────── */
-  if (activo === NOVEDADES_ID) {
-    return (
-      <div ref={raiz} data-visita="vista-manual" className={`cara-nueva cn-man${movil ? ' cn-man--movil' : ''}`}>
-        <div className="cn-man-pagina cn-man-pagina--lectura">
-          <button type="button" className="cn-man-volver" onClick={() => abrir(null)}>
-            <IconoVolver className="cn-man-icono" aria-hidden="true" />
-            Manual
-          </button>
-          <h1 className="cn-man-titulo">Novedades</h1>
-          <p className="cn-man-entradilla">Qué cambió en la aplicación y cuándo.</p>
-          <div className="cn-man-novedades-lista">
-            <NovedadesPanel compacto={movil} />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const entrada = activo ? entradaPorId(activo) : undefined;
 
   /* ─── El artículo ───────────────────────────────────────────────────────── */
   if (entrada) {
@@ -495,22 +474,15 @@ export const PaginaDelManual: React.FC<PaginaDelManualProps> = ({
           <>
             {/*
               NOVEDADES ARRIBA, fuera de los grupos: no es un artículo que se lea
-              una vez sino una lista que crece. Se oculta al buscar.
+              una vez sino una lista que crece. Lleva al módulo 13, que es donde
+              vive desde el 14 de septiembre de 2026. Se oculta al buscar.
             */}
-            <button type="button" className="cn-man-novedades" onClick={() => abrir(NOVEDADES_ID)}>
+            <button type="button" className="cn-man-novedades" onClick={onNovedades}>
               <Sparkles className="cn-man-icono" aria-hidden="true" />
               <span className="cn-man-novedades-textos">
                 <span className="cn-man-novedades-titulo">Novedades</span>
                 <span className="cn-man-novedades-detalle">Qué cambió en la aplicación y cuándo</span>
               </span>
-              {nuevas > 0 && (
-                <span
-                  className="cn-man-contador"
-                  title={`${nuevas} ${nuevas === 1 ? 'cambio nuevo' : 'cambios nuevos'} desde su última visita`}
-                >
-                  {nuevas}
-                </span>
-              )}
             </button>
 
             <section className="cn-man-seccion" aria-labelledby="manual-frecuentes">

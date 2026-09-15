@@ -63,7 +63,8 @@ const SELECTORES_MODALES: ReadonlyArray<{ clase: string; componente: string }> =
   { clase: 'cn-bus-ficha-panel', componente: 'modules/search/components/SearchView.tsx' },
   { clase: 'cn-bus-hoja', componente: 'modules/search/components/SearchMobileView.tsx' },
   { clase: 'cn-cat-ficha-panel', componente: 'modules/catalog/components/CatalogCurationView.tsx' },
-  { clase: 'cn-cat-hoja', componente: 'modules/catalog/components/CatalogMobileView.tsx' }
+  /* Desde el 14 de septiembre de 2026 la hoja se monta en `document.body` desde su propio componente. */
+  { clase: 'cn-cat-hoja', componente: 'modules/catalog/components/HojaSobreElTeclado.tsx' }
 ];
 
 /**

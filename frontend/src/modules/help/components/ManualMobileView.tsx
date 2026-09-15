@@ -16,6 +16,8 @@ import { PaginaDelManual } from './PaginaDelManual';
 
 interface ManualMobileViewProps {
   onSoporte: () => void;
+  /** Abre el módulo Novedades desde el índice. */
+  onNovedades: () => void;
   /** Con id abre ese artículo: así Soporte entrega al lector en el teléfono. */
   articuloInicial?: string;
   onVisitaGuiada?: () => void;
