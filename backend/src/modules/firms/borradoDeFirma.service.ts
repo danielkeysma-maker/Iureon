@@ -85,7 +85,7 @@ export const firmIdDelOperador = async (): Promise<string | null> => {
  *     sin enumerar módulos. Lo que no se pudo borrar se reporta archivo por
  *     archivo, y también si el barrido no llegó al final (`barridoDeArchivos`).
  *  3. `borrar_firma_completa` removes every row in one transaction (see
- *     supabase/migration-borrar-firma-completa-v3.sql for the table list, the
+ *     supabase/migration-borrar-firma-completa-v4.sql for the table list, the
  *     order, and why trial_signups and audit_logs survive).
  *  4. The accounts are deleted LAST: had they gone first and step 3 failed,
  *     the firm would keep its data with nobody able to sign in.
@@ -136,7 +136,7 @@ export const borrarFirmaConTodo = async (input: {
     if (sinFuncion) {
       throw new AuthError(
         'MIGRATION_REQUIRED',
-        'Falta ejecutar supabase/migration-borrar-firma-completa-v3.sql en la base de datos antes de poder eliminar una firma.',
+        'Falta ejecutar supabase/migration-borrar-firma-completa-v4.sql en la base de datos antes de poder eliminar una firma.',
         503
       );
     }

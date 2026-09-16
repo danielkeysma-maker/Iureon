@@ -200,6 +200,7 @@ const NOMBRE_DE_TABLA: Record<string, string> = {
   legal_documents: 'Documentos cargados',
   expediente_carpetas: 'Carpetas de los expedientes',
   expediente_actores: 'Partes y actores de los expedientes',
+  expediente_interrogatorios: 'Interrogatorios preparados para las audiencias',
   saved_drafts: 'Borradores guardados',
   document_reviews: 'Revisiones de documentos',
   transcriptions: 'Transcripciones de audiencias y entrevistas',

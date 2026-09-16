@@ -24,6 +24,11 @@ import {
   obtenerExpedienteController
 } from './expedientes.controller';
 import { preguntasDelExpedienteController } from './preguntas.controller';
+import {
+  abrirInterrogatorioController,
+  borrarInterrogatorioController,
+  listarInterrogatoriosController
+} from './interrogatorios.controller';
 import { indexarEnExpedienteController } from './indexar.controller';
 
 /**
@@ -65,6 +70,20 @@ router.delete('/expedientes/:id/actores/:actorId', bloquearSiPlanVencido, borrar
  * como toda escritura, y además `exigirModulo` dentro del controlador.
  */
 router.post('/expedientes/:id/preguntas', bloquearSiPlanVencido, preguntasDelExpedienteController as any);
+
+/*
+ * Las tandas ya preparadas. NO llevan `bloquearSiPlanVencido` las dos lecturas:
+ * es material que la firma ya pagó, y quitarle lo comprado por un pago atrasado
+ * sería tomarle el trabajo de rehén — la misma regla que la búsqueda dentro del
+ * expediente. Eliminar sí escribe, así que va detrás del bloqueo como todas.
+ */
+router.get('/expedientes/:id/interrogatorios', listarInterrogatoriosController as any);
+router.get('/expedientes/:id/interrogatorios/:interrogatorioId', abrirInterrogatorioController as any);
+router.delete(
+  '/expedientes/:id/interrogatorios/:interrogatorioId',
+  bloquearSiPlanVencido,
+  borrarInterrogatorioController as any
+);
 
 /*
  * Indexar el expediente de 300 paginas. No cuesta saldo del motor de redaccion

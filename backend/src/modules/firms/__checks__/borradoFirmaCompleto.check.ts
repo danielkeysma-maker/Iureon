@@ -58,7 +58,8 @@ const check = (nombre: string, ok: boolean, detalle = ''): void => {
 const VERSIONES = [
   'migration-borrar-firma.sql',
   'migration-borrar-firma-estilo.sql',
-  'migration-borrar-firma-completa-v3.sql'
+  'migration-borrar-firma-completa-v3.sql',
+  'migration-borrar-firma-completa-v4.sql'
 ];
 
 /*

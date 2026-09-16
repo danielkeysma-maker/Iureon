@@ -13,6 +13,7 @@ import { ENGINE, callOpenRouterWithUsage } from '../agent/openrouter.client';
 import { conLimite, LIMITE_LLAMADA_MS } from '../agent/review/documentReview.controller';
 import { exigirFuncion, responderPlanError } from '../subscriptions/plan.service';
 import { ExpedienteError, obtenerExpediente } from './expedientes.service';
+import { guardarInterrogatorio } from './interrogatorios.service';
 import { buscarPasajesDelExpediente } from './materialDelExpediente';
 import {
   MAX_AUDIENCIA,
@@ -51,8 +52,25 @@ import {
 
 const OPERACION = 'CONSULTA_REVISION' as const;
 
-/** Por persona, medido sobre el tamaño de las listas del endpoint que ya existe. */
-const TOKENS_POR_PERSONA = 1_100;
+/**
+ * Por persona, medido sobre el tamaño de las listas del endpoint que ya existe.
+ *
+ * ─── POR QUÉ SUBIÓ DE 1.100 A 2.700 (16 de septiembre de 2026) ─────────────
+ *
+ * Cada pregunta pasó de tres campos a seis: además de la pregunta y su «para
+ * qué», ahora lleva la RESPUESTA PROBABLE, la REPREGUNTA con la que se sigue si
+ * la da, y el CON QUÉ —nombre del documento y cita literal— con que se la
+ * contradice. Medido sobre el propio formato: la pregunta y el «para qué» son
+ * unos 55 tokens; la respuesta probable ~40, la repregunta ~35 y el `conQue`
+ * ~70 con sus dos claves. Son unos 250 tokens por pregunta contra los ~90 de
+ * antes, y el tope de ${MAX_PREGUNTAS_POR_PERSONA} preguntas por persona lo
+ * multiplica.
+ *
+ * EL PRESUPUESTO SE CALCULA POR CABEZA, COMO ANTES, y por la misma razón: lo
+ * que se corta al quedarse corto es la ÚLTIMA persona, la que el colega puso de
+ * última porque le importaba menos — pero sin avisar.
+ */
+const TOKENS_POR_PERSONA = 2_700;
 /** El enfoque y la estructura del JSON, que no dependen de cuánta gente haya. */
 const TOKENS_DE_BASE = 600;
 
@@ -192,7 +210,14 @@ export const preguntasDelExpedienteController = async (req: Request, res: Respon
 
     await recordUsage({ firmId, userEmail, operation: OPERACION, operationId, usage: llamada.usage ?? null });
 
-    const preguntas = llamada.text ? leerPreguntas(llamada.text, aQuienes, userEmail) : null;
+    /*
+     * LOS MISMOS PASAJES QUE VIERON AL MOTOR SON CON LOS QUE SE LE COTEJA.
+     * `leerPreguntas` tira todo «con qué» cuya cita no esté literalmente en
+     * ellos, y toma el nombre del documento del pasaje en el que apareció, no
+     * del que el modelo dijo. Sin pasajes no hay ninguno, que es lo correcto:
+     * un expediente sin indexar no tiene con qué contradecir a nadie.
+     */
+    const preguntas = llamada.text ? leerPreguntas(llamada.text, aQuienes, userEmail, pasajes) : null;
     if (!preguntas) {
       /*
        * NADIE PAGA POR LO QUE NO RECIBIÓ. Se devuelve la reserva ANTES de
@@ -223,13 +248,41 @@ export const preguntasDelExpedienteController = async (req: Request, res: Respon
     });
 
     /*
+     * ─── SE GUARDA DESPUÉS DE COBRAR, Y ANTES DE RESPONDER ─────────────────
+     *
+     * DESPUÉS DE COBRAR, porque lo que se archiva es lo que la firma compró: un
+     * intento que no llegó a cobrarse no tiene por qué dejar rastro en el
+     * expediente. ANTES DE RESPONDER, porque una función serverless se congela
+     * al responder y un guardado «para después» sencillamente no ocurre — la
+     * misma cicatriz que dejó el borrado del audio de las audiencias.
+     *
+     * Y NO SE COMPRUEBA EL RESULTADO: `guardarInterrogatorio` devuelve `null`
+     * cuando no pudo, sin lanzar. El abogado ya pagó y las preguntas ya están
+     * listas; negárselas porque la base no aceptó la fila sería quitarle el
+     * trabajo que acaba de comprar por no haber podido archivarlo. El fallo se
+     * grita en la consola del servidor, que es donde alguien puede arreglarlo.
+     */
+    const guardado = await guardarInterrogatorio({
+      firmId,
+      expedienteId: expediente.id,
+      creadoPor: userEmail,
+      queSeQueriaProbar: quiereProbar,
+      audiencia,
+      preguntas,
+      modelo: ENGINE.OPUS,
+      cobradoCop: cobro.charged
+    });
+
+    /*
      * A LA AUDITORÍA VA EL ASUNTO Y CUÁNTA GENTE, no las preguntas. Qué se le
-     * va a preguntar a un testigo es estrategia del abogado y del cliente.
+     * va a preguntar a un testigo es estrategia del abogado y del cliente, y
+     * ahora con más razón: la respuesta probable y la cita con que se lo
+     * contradice son la estrategia entera.
      */
     await auditService.record({
       firmId,
       userEmail,
-      action: 'HEARING_QUESTIONS_GENERATED',
+      action: 'EXPEDIENTE_INTERROGATORIO',
       resource: `${expediente.caratula} · ${aQuienes.length} persona(s)`,
       ipAddress: (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim() ?? req.ip ?? ''
     });
@@ -237,6 +290,13 @@ export const preguntasDelExpedienteController = async (req: Request, res: Respon
     res.json({
       success: true,
       preguntas,
+      /*
+       * La ficha de lo guardado viaja en la misma respuesta, para que la lista
+       * de «Interrogatorios preparados» muestre la tanda recién hecha sin
+       * volver a preguntarle al servidor. `null` cuando no se pudo guardar: la
+       * pantalla lo dice en vez de enseñar una lista que no la tiene.
+       */
+      guardado,
       cobradoCop: cobro.charged,
       saldoCop: cobro.balance,
       precioCop: PRICE_COP[OPERACION]

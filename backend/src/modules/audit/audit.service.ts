@@ -29,7 +29,31 @@ export type AuditAction =
   | 'DOCUMENT_REVIEWED'
   | 'DOCUMENT_REREVIEWED'
   | 'REVIEW_CHAT'
+  /*
+   * Lo que escribían las preguntas colgadas de una revisión, el camino que ya
+   * se retiró. Se conserva en la unión porque las filas viejas siguen en
+   * `audit_logs` —que es inalterable por disparador— y sin su nombre en español
+   * un socio leería el código crudo en la pantalla que abre cuando algo salió
+   * mal. Nada lo escribe desde el 16 de septiembre de 2026.
+   */
   | 'HEARING_QUESTIONS_GENERATED'
+  /*
+   * Se preparó una tanda de interrogatorio en un expediente, y esta vez se
+   * guardó. Al rastro van la carátula y CUÁNTA GENTE se preparó; nunca las
+   * preguntas, ni las respuestas probables, ni las citas del expediente. Qué se
+   * le va a preguntar a un testigo es estrategia del abogado y de su cliente:
+   * vive en `expediente_interrogatorios`, que es material de la firma, y no en
+   * un registro pensado para que un socio vigile poderes.
+   */
+  | 'EXPEDIENTE_INTERROGATORIO'
+  /*
+   * Se eliminó una tanda de interrogatorio. Material privilegiado, PAGADO y sin
+   * papelera: quien vuelva a buscarlo y no lo encuentre tiene derecho a saber
+   * quién lo retiró y cuándo. Al rastro van la carátula, cuánta gente cubría y
+   * quién la había preparado; las preguntas, la respuesta probable y las citas
+   * no salen de `expediente_interrogatorios` ni al borrarse.
+   */
+  | 'EXPEDIENTE_INTERROGATORIO_DELETED'
   | 'EXPEDIENTE_CREATED'
   | 'EXPEDIENTE_DELETED'
   | 'EXPEDIENTE_INDEXED'

@@ -42,12 +42,43 @@ export const MAX_PERSONAS_POR_TANDA = 4;
 export const MAX_QUIERE_PROBAR = 1_000;
 export const MAX_AUDIENCIA = 120;
 
+/**
+ * CON QUÉ SE LE CONTRADICE, y las dos mitades son obligatorias.
+ *
+ * `documento` NO lo escribe el modelo: lo pone el código, tomándolo del pasaje
+ * en el que la cita apareció de verdad. Un modelo que acierta la cita y se
+ * equivoca de archivo produce una atribución falsa que se lee exactamente igual
+ * que una correcta — y en audiencia se descubre delante del juez.
+ */
+export interface ConQueSeAtaca {
+  /** El nombre del documento del expediente del que salió la cita. Lo pone el código. */
+  documento: string;
+  /** El fragmento, copiado literal del pasaje recuperado. */
+  cita: string;
+}
+
 export interface PreguntaParaAlguien {
   pregunta: string;
   /** Una línea con lo que la pregunta busca establecer o desvirtuar. */
   paraQue: string;
   /** El pasaje del material que la sostiene, copiado literal. Ausente si no nace de uno. */
   delMaterial?: string;
+  /**
+   * Qué va a contestar probablemente esa persona, dado su lado, su papel y lo
+   * que el expediente dice. Ausente si el modelo no la entregó.
+   */
+  respuestaProbable?: string;
+  /** Qué preguntar DESPUÉS si contesta eso. Ausente si el modelo no la entregó. */
+  repregunta?: string;
+  /**
+   * El pasaje del expediente que contradice o sostiene esa respuesta.
+   *
+   * AUSENTE SIGNIFICA «EL EXPEDIENTE NO TIENE CON QUÉ», y esa es la razón de
+   * que no haya un tercer estado: el campo se cae —lo tira el servidor— cuando
+   * la cita no está literalmente en los pasajes recuperados. Quien lo pinte
+   * dice esa frase, no una menos comprometida.
+   */
+  conQue?: ConQueSeAtaca;
 }
 
 export interface PreguntasParaUnaPersona {
@@ -64,6 +95,16 @@ export interface PreguntasDelExpediente {
   porPersona: PreguntasParaUnaPersona[];
   generadoEl: string;
   por: string;
+  /**
+   * Si esta tanda tuvo pasajes del expediente indexado con los que cotejar.
+   *
+   * SIN ESTO, «el expediente no tiene con qué contradecirlo» SE LEERÍA COMO UN
+   * HALLAZGO donde solo hubo un expediente sin indexar. Son dos cosas distintas
+   * —no hay documento que lo contradiga, y no había documentos— y decir la
+   * primera cuando ocurre la segunda es afirmar algo que nadie comprobó.
+   * Falta en tandas guardadas antes del campo: se lee tolerando `undefined`.
+   */
+  conMaterial?: boolean;
 }
 
 /**
@@ -142,11 +183,18 @@ REGLAS PARA TODAS:
 - NO cites normas, artículos, sentencias, autos ni radicados. NO afirmes hechos que el material no traiga. NO des consejos fuera de las preguntas.
 - Entre ${MIN_PREGUNTAS_POR_PERSONA} y ${MAX_PREGUNTAS_POR_PERSONA} preguntas por persona, de la más importante a la menos. Si el material da para menos con alguien, entrega las que tengan sustento y ninguna de relleno.
 
+PREPARAR ES ANTICIPAR LA RESPUESTA, NO SOLO ESCRIBIR LA PREGUNTA. Una lista de preguntas sin más deja al colega de pie en la audiencia cuando el testigo contesta lo que le conviene. Por eso cada pregunta trae, además:
+- "respuestaProbable": qué va a contestar ESA persona, en una o dos frases, dado su lado, su papel y lo que el expediente dice de ella. Escríbela como la diría quien declara, no como te gustaría que contestara.
+- "repregunta": qué preguntar A CONTINUACIÓN si contesta eso. Una sola pregunta, lista para leerse en voz alta, con la misma técnica que se le indicó para esa persona.
+- "conQue": el pasaje del material adjunto que CONTRADICE o SOSTIENE esa respuesta probable, con {"documento": el nombre del archivo tal como aparece entre corchetes al principio del pasaje, "cita": el fragmento COPIADO LITERAL de ese pasaje, de 5 a 50 palabras, sin corregirlo ni resumirlo}.
+
+LA REGLA DURA DE "conQue", Y EL SERVIDOR LA APLICA. La "cita" tiene que estar, palabra por palabra, dentro del material adjunto: el servidor la busca allí y TIRA el "conQue" entero si no la encuentra, así que una cita reconstruida de memoria no llega al colega, solo se pierde el trabajo. Cuando el material no tenga nada con qué contradecir esa respuesta, OMITE "conQue" por completo; no lo rellenes con un pasaje que hable de otra cosa. Sin material adjunto, no hay "conQue" en ninguna pregunta.
+
 RESPONDE ÚNICAMENTE CON UN OBJETO JSON, sin texto antes ni después, sin cercas de código. "enfoque" va PRIMERO: una o dos frases con lo que este asunto exige probar y la audiencia en la que se preguntará, sin citar normas. En "porPersona", devuelve el MISMO "actorId" que se te entregó, sin cambiarlo:
 {
   "enfoque": "…",
   "porPersona": [
-    {"actorId": "…", "preguntas": [{"pregunta": "…", "paraQue": "…", "delMaterial": "…"}]}
+    {"actorId": "…", "preguntas": [{"pregunta": "…", "paraQue": "…", "delMaterial": "…", "respuestaProbable": "…", "repregunta": "…", "conQue": {"documento": "…", "cita": "…"}}]}
   ]
 }`;
 
@@ -215,12 +263,94 @@ Entrega el JSON indicado.`;
 
 const cadena = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim();
 
-const aPregunta = (v: unknown): PreguntaParaAlguien | null => {
+/** Un pasaje recuperado del expediente, en lo mínimo que hace falta para cotejar. */
+export interface PasajeParaCotejar {
+  archivo: string | null;
+  texto: string;
+}
+
+/**
+ * Normaliza para comparar: sin tildes, sin mayúsculas y sin la puntuación que
+ * el modelo cambia al copiar.
+ *
+ * Es la misma regla —y la misma razón— que `apoyoEstaEnElTexto` en
+ * `agent/review/verificarGlosa.ts`, escrita aquí para que este archivo siga sin
+ * dependencias y su guarda corra sin montar nada. NO es laxitud: perdona que
+ * escriba «articulo» por «ARTÍCULO», que junte dos espacios o que se coma una
+ * coma, cosas que no cambian qué pasaje señaló. Lo único que no perdona —y es
+ * lo único que importa— es que el pasaje no esté.
+ */
+const paraComparar = (t: string): string =>
+  t
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+
+/**
+ * El piso de longitud de una cita, en caracteres ya normalizados.
+ *
+ * Una cita de tres palabras no prueba que el modelo leyera el expediente: «en
+ * el inmueble» aparece en cualquier demanda de restitución. El mismo piso que
+ * usa la comprobación de las glosas del informe.
+ */
+export const MINIMO_DE_CITA = 15;
+
+/**
+ * ¿De qué documento del expediente salió esta cita? `null` si de ninguno.
+ *
+ * ─── AQUÍ SE TIRA LO QUE NO SE PUDO COMPROBAR ──────────────────────────────
+ *
+ * El nombre del documento se toma del pasaje EN EL QUE LA CITA APARECIÓ, no del
+ * que el modelo dijo. Comprobar la cita y creerle el archivo dejaría entrar la
+ * atribución falsa por la puerta de atrás: un fragmento real de la contestación
+ * presentado como si estuviera en el dictamen es, en audiencia, peor que no
+ * tener nada — el colega lo lee en voz alta y el juez abre el otro documento.
+ */
+export const documentoDeLaCita = (
+  cita: string,
+  pasajes: readonly PasajeParaCotejar[]
+): string | null => {
+  const aguja = paraComparar(cita);
+  if (aguja.length < MINIMO_DE_CITA) return null;
+  for (const p of pasajes) {
+    if (paraComparar(p.texto).includes(aguja)) return p.archivo ?? 'documento del caso';
+  }
+  return null;
+};
+
+const aConQue = (v: unknown, pasajes: readonly PasajeParaCotejar[]): ConQueSeAtaca | null => {
+  const o = (v ?? {}) as Record<string, unknown>;
+  const cita = cadena(o.cita);
+  if (!cita) return null;
+  const documento = documentoDeLaCita(cita, pasajes);
+  if (!documento) return null;
+  return { documento, cita };
+};
+
+const aPregunta = (v: unknown, pasajes: readonly PasajeParaCotejar[]): PreguntaParaAlguien | null => {
   const o = (v ?? {}) as Record<string, unknown>;
   const pregunta = cadena(o.pregunta);
   if (!pregunta) return null;
+  /*
+   * CADA CAMPO NUEVO ENTRA POR SU CUENTA. Una respuesta a la que le falte
+   * `repregunta`, o que traiga `conQue` sin cita, degrada a la forma de
+   * siempre en vez de tumbar la tanda entera: el colega ya pagó, y una lista
+   * de preguntas sin la respuesta probable sigue sirviendo para la audiencia.
+   */
   const delMaterial = cadena(o.delMaterial);
-  return { pregunta, paraQue: cadena(o.paraQue), ...(delMaterial ? { delMaterial } : {}) };
+  const respuestaProbable = cadena(o.respuestaProbable);
+  const repregunta = cadena(o.repregunta);
+  const conQue = aConQue(o.conQue, pasajes);
+  return {
+    pregunta,
+    paraQue: cadena(o.paraQue),
+    ...(delMaterial ? { delMaterial } : {}),
+    ...(respuestaProbable ? { respuestaProbable } : {}),
+    ...(repregunta ? { repregunta } : {}),
+    ...(conQue ? { conQue } : {})
+  };
 };
 
 /**
@@ -238,7 +368,9 @@ const aPregunta = (v: unknown): PreguntaParaAlguien | null => {
 export const leerPreguntas = (
   crudo: string,
   aQuienes: ActorDelExpediente[],
-  por: string
+  por: string,
+  /** Los pasajes con los que se coteja cada `conQue`. Sin ellos, no hay ninguno. */
+  pasajes: readonly PasajeParaCotejar[] = []
 ): PreguntasDelExpediente | null => {
   const desde = crudo.indexOf('{');
   const hasta = crudo.lastIndexOf('}');
@@ -261,7 +393,7 @@ export const leerPreguntas = (
     if (!actor) continue;
     const preguntas = Array.isArray(o.preguntas)
       ? (o.preguntas as unknown[])
-          .map(aPregunta)
+          .map((q) => aPregunta(q, pasajes))
           .filter((p): p is PreguntaParaAlguien => p !== null)
           .slice(0, MAX_PREGUNTAS_POR_PERSONA)
       : [];
@@ -280,6 +412,7 @@ export const leerPreguntas = (
     enfoque: cadena(objeto.enfoque),
     porPersona,
     generadoEl: new Date().toISOString(),
-    por
+    por,
+    conMaterial: pasajes.length > 0
   };
 };
