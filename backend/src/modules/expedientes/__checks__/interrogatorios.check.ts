@@ -346,6 +346,35 @@ check(
     BILLING.includes('return Math.max(piso, medido);')
 );
 
+/* ─── 5 quater. EL RELOJ DE LA TANDA ────────────────────────────────────── */
+
+/*
+ * EL DEFECTO QUE ESTO VIGILA: la llamada usaba `LIMITE_LLAMADA_MS`, los 50 s
+ * medidos para una revisión. Un interrogatorio escribe hasta veinte preguntas
+ * por persona con su respuesta probable, su repregunta y su cita: medido, 39 s
+ * con una persona y 57 s con dos. La tanda de dos moría en el reloj de otra
+ * pantalla y salía como «No se pudo preparar el interrogatorio».
+ */
+const LIMITE = Number((/LIMITE_DEL_INTERROGATORIO_MS = ([\d_]+);/.exec(PREGUNTAS_CTRL)?.[1] ?? '0').replace(/_/g, ''));
+const MAX_DURACION_MS =
+  Number(/"maxDuration": (\d+)/.exec(readFileSync(join(process.cwd(), 'vercel.json'), 'utf8'))?.[1] ?? '0') * 1000;
+
+check('el interrogatorio no usa el reloj del taller', !PREGUNTAS_CTRL.includes('LIMITE_LLAMADA_MS'));
+check('tiene el suyo, con sitio para la tanda de dos personas medida en 57 s', LIMITE >= 120_000, `${LIMITE} ms`);
+check(
+  'y queda POR DEBAJO del reloj de la función, para que corte este código y devuelva la reserva',
+  MAX_DURACION_MS > 0 && LIMITE < MAX_DURACION_MS,
+  `${LIMITE} ms contra ${MAX_DURACION_MS} ms`
+);
+check(
+  'el cliente recibe su propio plazo: si no, aborta Opus a los 120 s y el de arriba no se usa nunca',
+  PREGUNTAS_CTRL.includes('{ timeoutMs: LIMITE_DEL_INTERROGATORIO_MS - 10_000 }')
+);
+check(
+  'un plazo agotado se dice aparte de los demás fallos, con la salida concreta',
+  PREGUNTAS_CTRL.includes("error: 'QUESTIONS_TIMEOUT'") && PREGUNTAS_CTRL.includes('con menos personas por tanda')
+);
+
 /* ─── 6. QUIÉN PUEDE BORRAR UNA TANDA ───────────────────────────────────── */
 
 const DE = 'autora@firma.co';

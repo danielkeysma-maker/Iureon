@@ -11,7 +11,7 @@ import {
   SUPLEMENTO_POR_PERSONA
 } from '../billing/billing.service';
 import { ENGINE, callOpenRouterWithUsage } from '../agent/openrouter.client';
-import { conLimite, LIMITE_LLAMADA_MS } from '../agent/review/documentReview.controller';
+import { conLimite, TiempoAgotado } from '../agent/review/documentReview.controller';
 import { exigirFuncion, responderPlanError } from '../subscriptions/plan.service';
 import { ExpedienteError, obtenerExpediente } from './expedientes.service';
 import { guardarInterrogatorio } from './interrogatorios.service';
@@ -60,6 +60,25 @@ import {
  */
 
 const OPERACION = 'INTERROGATORIO' as const;
+
+/**
+ * EL RELOJ DE ESTA LLAMADA, Y POR QUÉ NO ES EL DEL TALLER (16/09/2026).
+ *
+ * Usaba `LIMITE_LLAMADA_MS` —50 s—, que está medido para una revisión: un
+ * informe de unos 3.000 tokens sobre un escrito. Un interrogatorio escribe otra
+ * cosa: hasta veinte preguntas POR PERSONA, cada una con su respuesta probable,
+ * su repregunta y su cita. Medido contra el motor el mismo día que subió el
+ * tope: 39 s con una persona y 57 s con dos — o sea que la tanda de dos moría
+ * en el reloj del taller antes de llegar, y la de una pasaba rozando. Desde
+ * fuera eso se lee «No se pudo preparar el interrogatorio», con el saldo
+ * devuelto y sin lista.
+ *
+ * La función tiene 300 s (`vercel.json`), así que el techo de 50 no lo imponía
+ * la plataforma: lo imponía un número heredado de otra pantalla. Se le da el
+ * suyo, por debajo del de la función para que corte ESTE código —y devuelva la
+ * reserva diciendo por qué— y no la plataforma en seco.
+ */
+const LIMITE_DEL_INTERROGATORIO_MS = 240_000;
 
 /** El piso de ESTA tanda: el de la operación más lo que suman las personas de más. */
 const suplementoDe = (personas: number): number => SUPLEMENTO_POR_PERSONA * Math.max(0, personas - 1);
@@ -238,9 +257,12 @@ export const preguntasDelExpedienteController = async (req: Request, res: Respon
         ENGINE.OPUS,
         buildPreguntasSystemPrompt(),
         buildPreguntasUserPrompt({ expediente, aQuienes, quiereProbar, audiencia, material }),
-        TOKENS_DE_BASE + TOKENS_POR_PERSONA * aQuienes.length
+        TOKENS_DE_BASE + TOKENS_POR_PERSONA * aQuienes.length,
+        undefined,
+        /* El cliente aborta Opus a los 120 s por su cuenta: sin esto, el reloj de arriba no llegaría a usarse nunca. */
+        { timeoutMs: LIMITE_DEL_INTERROGATORIO_MS - 10_000 }
       ),
-      LIMITE_LLAMADA_MS
+      LIMITE_DEL_INTERROGATORIO_MS
     );
 
     await recordUsage({ firmId, userEmail, operation: OPERACION, operationId, usage: llamada.usage ?? null });
@@ -354,13 +376,32 @@ export const preguntasDelExpedienteController = async (req: Request, res: Respon
       precioCop: pisoDeLaTanda(aQuienes.length)
     });
   } catch (err) {
+    /*
+     * EL RELOJ SE DICE APARTE DEL RESTO DE FALLOS. «No se pudo preparar» sirve
+     * para todo y por eso no sirve para nada: el colega no sabe si reintentar,
+     * si quitar gente de la tanda o si el problema es suyo. Un plazo agotado
+     * tiene una salida concreta —menos personas— y se le dice.
+     */
+    const porElReloj = err instanceof TiempoAgotado;
     await refundReservation({
       firmId,
       userEmail,
       operation: OPERACION,
       suplementoCop: suplementoDe(aQuienes.length),
-      reason: 'la guía no pudo completarse'
+      reason: porElReloj ? 'el interrogatorio tardó más de lo que la plataforma permite' : 'la guía no pudo completarse'
     });
+    if (porElReloj) {
+      console.error(`[EXPEDIENTES/PREGUNTAS] Plazo agotado con ${aQuienes.length} persona(s).`);
+      res.status(504).json({
+        success: false,
+        error: 'QUESTIONS_TIMEOUT',
+        message:
+          aQuienes.length > 1
+            ? 'El interrogatorio tardó más de lo que la plataforma permite. No se descontó saldo. Prepárelo con menos personas por tanda.'
+            : 'El interrogatorio tardó más de lo que la plataforma permite. No se descontó saldo. Inténtelo de nuevo.'
+      });
+      return;
+    }
     fallar(res, err, 'No se pudo preparar el interrogatorio. No se descontó saldo.');
   }
 };
