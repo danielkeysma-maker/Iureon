@@ -337,6 +337,12 @@ export interface PreguntasDelExpediente {
    * documentos que nadie leyó. Falta en tandas guardadas antes del campo.
    */
   conMaterial?: boolean;
+  /**
+   * Si la respuesta del motor llegó cortada y se rescataron las preguntas
+   * completas. Una lista recortada se lee igual que una lista corta: quien la
+   * lleva a la audiencia tiene que saber cuál de las dos tiene en la mano.
+   */
+  recortado?: boolean;
 }
 
 /**

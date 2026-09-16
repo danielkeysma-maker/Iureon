@@ -147,6 +147,16 @@ check(
   PANEL_CODIGO.includes('conMaterial && (') && PANEL_CODIGO.includes('{SIN_CON_QUE}')
 );
 check('la cita va en mono, que es lo citable', PANEL_CODIGO.includes('cn-exp-mono'));
+/*
+ * UNA LISTA RECORTADA SE LEE IGUAL QUE UNA CORTA. Cuando el servidor rescata
+ * las preguntas de una respuesta cortada, la pantalla tiene que decirlo: lo
+ * contrario es dejar que el colega llegue a la audiencia creyendo que el caso
+ * no daba para más preguntas.
+ */
+check(
+  'si la tanda llegó recortada, la pantalla lo dice',
+  PANEL_CODIGO.includes('abierto.preguntas.recortado &&') && PANEL.includes('Esta lista quedó recortada')
+);
 check(
   'el documento solo se vuelve botón cuando se pudo identificar de verdad',
   PANEL_CODIGO.includes('documentosPorTitulo?.get(p.conQue.documento)') && PANEL_CODIGO.includes('documentId ? (')

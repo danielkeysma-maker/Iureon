@@ -4,6 +4,7 @@ import {
   MINIMO_DE_CITA,
   documentoDeLaCita,
   leerPreguntas,
+  objetoDeLaRespuesta,
   type PasajeParaCotejar
 } from '../preguntasDelExpediente';
 import { puedeBorrarInterrogatorio } from '../interrogatorios.service';
@@ -244,6 +245,60 @@ const ajeno = leerPreguntas(
 );
 check('una lista atribuida a un actor que no está en la tanda se descarta', ajeno === null);
 
+/* ─── 5 bis. LA RESPUESTA QUE LLEGA CORTADA ─────────────────────────────── */
+
+/*
+ * EL DEFECTO QUE ESTO VIGILA, MEDIDO: una persona con los seis pasajes del
+ * expediente consumía 3.102 tokens de salida de los 3.300 que había. Cuando se
+ * pasaba, el JSON quedaba abierto a mitad de pregunta, `JSON.parse` fallaba, y
+ * el colega recibía «la guía no devolvió preguntas legibles» —sin lista y sin
+ * saber por qué— aunque once preguntas hubieran llegado enteras.
+ */
+const COMPLETO = JSON.stringify({
+  enfoque: 'Quién pagó el inmueble.',
+  porPersona: [
+    {
+      actorId: TESTIGO.id,
+      preguntas: [1, 2, 3, 4, 5].map((n) => ({
+        pregunta: `Diga cómo le consta el hecho número ${n}.`,
+        paraQue: 'Fijar el hecho.',
+        respuestaProbable: 'Dirá que no le consta.',
+        repregunta: 'Explique entonces por qué lo afirmó.'
+      }))
+    }
+  ]
+});
+const CORTADO = COMPLETO.slice(0, Math.floor(COMPLETO.length * 0.72));
+
+const entero = objetoDeLaRespuesta(COMPLETO);
+check('una respuesta entera se lee y NO se marca recortada', entero !== null && entero.recortado === false);
+
+const rescatado = leerPreguntas(CORTADO, [TESTIGO], 'abogada@firma.co', PASAJES);
+check(
+  'una respuesta cortada a mitad de pregunta entrega las preguntas completas en vez de nada',
+  rescatado !== null && (rescatado.porPersona[0]?.preguntas.length ?? 0) > 0,
+  rescatado === null ? 'devolvió null' : `${rescatado.porPersona[0]?.preguntas.length} preguntas`
+);
+check('y las que entrega están enteras: ninguna a medias', (rescatado?.porPersona[0]?.preguntas ?? []).every((q) => q.pregunta.endsWith('.')));
+check('y no se calla que quedó recortada', rescatado?.recortado === true);
+check('lo que no alcanza a traer una pregunta completa sigue siendo ilegible', objetoDeLaRespuesta('{"enfoque": "a med') === null);
+
+/*
+ * EL PRESUPUESTO NO PUEDE VOLVER A BAJAR DE LO MEDIDO. El rescate de arriba es
+ * la red, no la corrección: una lista recortada sigue siendo una lista a la que
+ * le faltan preguntas pagadas.
+ */
+const PRESUPUESTO = sinComentarios(leer('modules/expedientes/preguntas.controller.ts'));
+const porPersona = /const TOKENS_POR_PERSONA = ([\d_]+);/.exec(PRESUPUESTO);
+const deBase = /const TOKENS_DE_BASE = ([\d_]+);/.exec(PRESUPUESTO);
+const tokens = (m: RegExpExecArray | null): number => Number((m?.[1] ?? '0').replace(/_/g, ''));
+check(
+  'el presupuesto por persona cubre con margen los 3.102 tokens medidos con material',
+  tokens(porPersona) >= 3_700,
+  `${tokens(porPersona)} por persona`
+);
+check('y la base deja sitio para lo que el motor razona antes de escribir', tokens(deBase) >= 1_000, `${tokens(deBase)} de base`);
+
 /* ─── 6. QUIÉN PUEDE BORRAR UNA TANDA ───────────────────────────────────── */
 
 const DE = 'autora@firma.co';
@@ -399,10 +454,12 @@ check(
   'y le avisa de que el servidor tira la cita que no encuentre',
   PROMPT.includes('TIRA el "conQue" entero si no la encuentra')
 );
-check(
-  'el presupuesto por cabeza subió con los campos nuevos',
-  /TOKENS_POR_PERSONA = 2_700/.test(CONTROLADOR)
-);
+/*
+ * ESTE CHECK PEDÍA LA CIFRA EXACTA (`= 2_700`) y por eso no sirvió de nada
+ * cuando la cifra resultó corta: certificaba que alguien la había subido una
+ * vez, no que alcanzara. El piso medido contra el motor se vigila arriba, en
+ * «5 bis», comparando números y no texto.
+ */
 
 /* ─── 11. LAS TRES RUTAS, Y CUÁL BLOQUEA EL PLAN VENCIDO ────────────────── */
 

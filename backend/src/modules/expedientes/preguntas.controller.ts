@@ -69,10 +69,27 @@ const OPERACION = 'CONSULTA_REVISION' as const;
  * EL PRESUPUESTO SE CALCULA POR CABEZA, COMO ANTES, y por la misma razón: lo
  * que se corta al quedarse corto es la ÚLTIMA persona, la que el colega puso de
  * última porque le importaba menos — pero sin avisar.
+ *
+ * ─── Y POR QUÉ 2.700 TAMPOCO ALCANZÓ (16 de septiembre de 2026) ────────────
+ *
+ * La cuenta de arriba salió del formato, no de una medición, y se quedó corta
+ * en el caso que importa. Medido contra el motor con este mismo prompt: una
+ * persona SIN material del expediente consume 2.093 tokens de salida; CON los
+ * seis pasajes que trae `buscarPasajesDelExpediente`, 3.102 — de los 3.300 que
+ * había. Ciento noventa y ocho tokens de margen, y las citas del `conQue` son
+ * justo lo que lo consume, así que el expediente mejor indexado era el más
+ * expuesto a quedarse sin lista.
+ *
+ * Lo que se veía desde afuera: «La guía no devolvió preguntas legibles», una y
+ * otra vez, sin pasar de ahí — porque un JSON cortado a mitad de pregunta no
+ * se puede leer y `leerPreguntas` devolvía `null`. Hoy son 3.800 por cabeza
+ * (23% sobre lo medido) y 1.200 de base, que es donde cabe el razonamiento del
+ * motor; y si aun así se corta, `objetoDeLaRespuesta` rescata las preguntas
+ * completas y la pantalla dice que la lista quedó recortada.
  */
-const TOKENS_POR_PERSONA = 2_700;
-/** El enfoque y la estructura del JSON, que no dependen de cuánta gente haya. */
-const TOKENS_DE_BASE = 600;
+const TOKENS_POR_PERSONA = 3_800;
+/** El enfoque, la estructura del JSON y lo que el motor razona antes de escribir. */
+const TOKENS_DE_BASE = 1_200;
 
 const fallar = (res: Response, err: unknown, mensaje: string): void => {
   if (responderPlanError(res, err)) return;
@@ -219,6 +236,18 @@ export const preguntasDelExpedienteController = async (req: Request, res: Respon
      */
     const preguntas = llamada.text ? leerPreguntas(llamada.text, aQuienes, userEmail, pasajes) : null;
     if (!preguntas) {
+      /*
+       * QUÉ SE REGISTRA Y POR QUÉ. Sin esto, el fallo llega como una frase en
+       * pantalla y no hay forma de saber si el motor se cortó, devolvió otra
+       * cosa o no devolvió nada: son tres causas distintas con tres arreglos
+       * distintos. Va el TAMAÑO y si el proveedor cortó por longitud, nunca el
+       * texto: son las preguntas del interrogatorio de un caso real.
+       */
+      console.error(
+        `[EXPEDIENTES/PREGUNTAS] Ilegible: ${llamada.text?.length ?? 0} caracteres, cortado por longitud: ${
+          llamada.truncated ? 'sí' : 'no'
+        }, personas: ${aQuienes.length}, pasajes: ${pasajes.length}.`
+      );
       /*
        * NADIE PAGA POR LO QUE NO RECIBIÓ. Se devuelve la reserva ANTES de
        * responder, porque una función serverless se congela al responder y un

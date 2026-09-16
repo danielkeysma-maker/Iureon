@@ -495,6 +495,21 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
           )}
 
           {/*
+            UNA LISTA RECORTADA SE LEE IGUAL QUE UNA LISTA CORTA. Si la
+            respuesta del motor llegó cortada, lo que hay sirve —son preguntas
+            completas— pero faltan las últimas, y nadie debería descubrirlo en
+            la audiencia. Se dice aquí, junto a las preguntas, no en una nota al
+            pie.
+          */}
+          {abierto.preguntas.recortado && (
+            <p className="notice text-meta [text-wrap:pretty]">
+              Esta lista quedó recortada: el interrogatorio salió más largo de lo que cabía en una
+              tanda y las últimas preguntas no llegaron. Las que ve están completas. Si necesita más,
+              prepare otra tanda con menos personas.
+            </p>
+          )}
+
+          {/*
             LLEVARSE EL INTERROGATORIO: Word para seguir trabajándolo, PDF para
             imprimirlo. Los dos salen con la letra del membrete de la firma y
             sin bloque de firma — es material de trabajo, no se radica.

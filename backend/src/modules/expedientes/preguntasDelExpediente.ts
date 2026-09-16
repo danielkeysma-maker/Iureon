@@ -105,6 +105,15 @@ export interface PreguntasDelExpediente {
    * Falta en tandas guardadas antes del campo: se lee tolerando `undefined`.
    */
   conMaterial?: boolean;
+  /**
+   * Si la respuesta del motor llegó CORTADA y se rescató lo que estaba completo.
+   *
+   * Un interrogatorio recortado no se distingue por dentro de uno corto: las
+   * preguntas que hay son válidas, y las que faltan no dejan hueco. Quien lo
+   * lea sin saberlo creerá que el caso no daba para más, cuando lo que pasó es
+   * que el presupuesto de salida se acabó a mitad de la lista. Se dice.
+   */
+  recortado?: boolean;
 }
 
 /**
@@ -365,6 +374,98 @@ const aPregunta = (v: unknown, pasajes: readonly PasajeParaCotejar[]): PreguntaP
  * lee igual de bien que una correcta. Lo que no case con un actor de la tanda
  * SE DESCARTA, en vez de entrar con el nombre que el modelo quiso.
  */
+/**
+ * RESCATAR UNA RESPUESTA CORTADA A MITAD, en vez de perderla entera.
+ *
+ * ─── EL DEFECTO QUE LA TRAJO (16 de septiembre de 2026) ────────────────────
+ *
+ * Un interrogatorio real devolvió «la guía no devolvió preguntas legibles» y
+ * no pasaba de ahí. No era el modelo: era el presupuesto de salida. Medido
+ * sobre este mismo prompt, una persona CON material del expediente consume
+ * ~3.100 tokens de los 3.300 que había; basta que el modelo razone un poco más
+ * o que una cita sea larga para que el JSON se corte en mitad de una pregunta.
+ * `JSON.parse` falla con la llave abierta, `leerPreguntas` devolvía `null`, y
+ * once preguntas buenas se tiraban a la basura por culpa de la doceava.
+ *
+ * Se sube el presupuesto —esa es la corrección de fondo, en el controlador— y
+ * ADEMÁS se rescata lo que llegó: el corte siempre cae dentro de una pregunta,
+ * así que retroceder hasta el último objeto que cerró bien y cerrar los
+ * corchetes que quedaron abiertos devuelve una lista corta pero íntegra.
+ *
+ * NO SE INVENTA NADA: solo se descarta la mitad de pregunta que no llegó. Y no
+ * se calla —`recortado` sube hasta la pantalla—, porque una lista recortada se
+ * lee igual que una lista corta y quien la lleva a la audiencia merece saber
+ * cuál de las dos tiene en la mano.
+ */
+export const objetoDeLaRespuesta = (
+  crudo: string
+): { objeto: Record<string, unknown>; recortado: boolean } | null => {
+  const desde = crudo.indexOf('{');
+  if (desde < 0) return null;
+
+  const hasta = crudo.lastIndexOf('}');
+  if (hasta > desde) {
+    try {
+      return { objeto: JSON.parse(crudo.slice(desde, hasta + 1)) as Record<string, unknown>, recortado: false };
+    } catch {
+      /* Cortado, o con basura detrás. Se intenta rescatar abajo. */
+    }
+  }
+
+  /*
+   * Se recorre una sola vez llevando la pila de corchetes abiertos y si se va
+   * por dentro de una cadena —una comilla dentro de una cita no abre nada, y
+   * `\"` no la cierra—. Cada vez que un objeto cierra bien y quedan al menos
+   * dos niveles abiertos, se recuerda ese punto: ahí termina una pregunta
+   * completa dentro de su lista.
+   */
+  let pila: string[] = [];
+  let enCadena = false;
+  let escapado = false;
+  let corte = -1;
+  let pilaEnElCorte: string[] = [];
+
+  for (let i = desde; i < crudo.length; i += 1) {
+    const c = crudo[i];
+    if (enCadena) {
+      if (escapado) escapado = false;
+      else if (c === '\\') escapado = true;
+      else if (c === '"') enCadena = false;
+      continue;
+    }
+    if (c === '"') {
+      enCadena = true;
+      continue;
+    }
+    if (c === '{' || c === '[') {
+      pila.push(c);
+      continue;
+    }
+    if (c === '}' || c === ']') {
+      pila.pop();
+      if (c === '}' && pila.length >= 2) {
+        corte = i;
+        pilaEnElCorte = [...pila];
+      }
+    }
+  }
+
+  if (corte < 0) return null;
+
+  const cierre = pilaEnElCorte
+    .reverse()
+    .map((a) => (a === '{' ? '}' : ']'))
+    .join('');
+  try {
+    return {
+      objeto: JSON.parse(`${crudo.slice(desde, corte + 1)}${cierre}`) as Record<string, unknown>,
+      recortado: true
+    };
+  } catch {
+    return null;
+  }
+};
+
 export const leerPreguntas = (
   crudo: string,
   aQuienes: ActorDelExpediente[],
@@ -372,16 +473,9 @@ export const leerPreguntas = (
   /** Los pasajes con los que se coteja cada `conQue`. Sin ellos, no hay ninguno. */
   pasajes: readonly PasajeParaCotejar[] = []
 ): PreguntasDelExpediente | null => {
-  const desde = crudo.indexOf('{');
-  const hasta = crudo.lastIndexOf('}');
-  if (desde < 0 || hasta <= desde) return null;
-
-  let objeto: Record<string, unknown>;
-  try {
-    objeto = JSON.parse(crudo.slice(desde, hasta + 1)) as Record<string, unknown>;
-  } catch {
-    return null;
-  }
+  const leido = objetoDeLaRespuesta(crudo);
+  if (!leido) return null;
+  const { objeto, recortado } = leido;
 
   const porId = new Map(aQuienes.map((a) => [a.id, a]));
   const listas = Array.isArray(objeto.porPersona) ? (objeto.porPersona as unknown[]) : [];
@@ -413,6 +507,7 @@ export const leerPreguntas = (
     porPersona,
     generadoEl: new Date().toISOString(),
     por,
-    conMaterial: pasajes.length > 0
+    conMaterial: pasajes.length > 0,
+    ...(recortado ? { recortado: true } : {})
   };
 };
