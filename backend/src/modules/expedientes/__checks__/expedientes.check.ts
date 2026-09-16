@@ -480,10 +480,19 @@ check(
   preguntasCtrl.indexOf('refundReservation') < preguntasCtrl.indexOf("error: 'QUESTIONS_FAILED'"),
   'serverless se congela al responder'
 );
+/*
+ * ESTE CHECK PEDÍA LO CONTRARIO HASTA EL 16/09/2026: que el interrogatorio se
+ * cobrara como `CONSULTA_REVISION` para no partir el histórico. El argumento se
+ * cayó con una medición — el piso de esa operación son $300 y una tanda cuesta
+ * entre $1.160 y $1.573, y el piso es lo que se RESERVA antes de llamar al
+ * motor—, así que la firma lanzaba una operación cinco veces mayor que lo
+ * reservado. Un renglón de histórico ordenado no vale un cobro que no se puede
+ * recaudar. El cobro por tanda lo vigila `npm run check:interrogatorios`.
+ */
 check(
-  'se cobra con la MISMA operación que las preguntas de una revisión: el histórico no se parte',
-  /const OPERACION = 'CONSULTA_REVISION'/.test(preguntasCtrl),
-  'mismo trabajo, mismo renglón en el movimiento de crédito'
+  'el interrogatorio se cobra con su propia operación, no con el piso de una consulta del taller',
+  /const OPERACION = 'INTERROGATORIO'/.test(preguntasCtrl),
+  'su piso es lo que se reserva antes de llamar al motor'
 );
 
 /* ─── 10. EL EXPEDIENTE DE 300 PAGINAS ───────────────────────────────────── */

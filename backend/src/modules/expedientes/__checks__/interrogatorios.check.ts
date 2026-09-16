@@ -299,6 +299,53 @@ check(
 );
 check('y la base deja sitio para lo que el motor razona antes de escribir', tokens(deBase) >= 1_000, `${tokens(deBase)} de base`);
 
+/* ─── 5 ter. EL COBRO DE LA TANDA ───────────────────────────────────────── */
+
+/*
+ * EL DEFECTO QUE ESTO VIGILA: se cobraba como `CONSULTA_REVISION`, piso $300, y
+ * el piso es lo que se RESERVA antes de llamar al motor. Medido el mismo día,
+ * una tanda con material cuesta $1.160 con una persona y $1.573 con dos: una
+ * firma con $300 de saldo lanzaba una operación de $1.500 y la diferencia la
+ * ponía la casa. Reservar menos de lo que la operación va a costar es prestar
+ * sin decirlo.
+ */
+const PREGUNTAS_CTRL = sinComentarios(leer('modules/expedientes/preguntas.controller.ts'));
+const BILLING = sinComentarios(leer('modules/billing/billing.service.ts'));
+
+check('el interrogatorio tiene operación propia', PREGUNTAS_CTRL.includes("const OPERACION = 'INTERROGATORIO' as const;"));
+check('con piso propio en la tabla de precios', /INTERROGATORIO: [1-9][\d_]*,/.test(BILLING));
+check('y un suplemento por cada persona de más', /SUPLEMENTO_POR_PERSONA = [1-9][\d_]*;/.test(BILLING));
+check(
+  'el suplemento solo cuenta a partir de la segunda persona',
+  PREGUNTAS_CTRL.includes('SUPLEMENTO_POR_PERSONA * Math.max(0, personas - 1)')
+);
+/*
+ * LAS TRES LLAMADAS LLEVAN EL MISMO SUPLEMENTO O EL DINERO NO CUADRA: reservar
+ * el piso y cobrar el total deja un descubierto; devolver el piso deja cobrado
+ * el resto de una tanda que nunca llegó.
+ */
+const conSuplemento = (fragmento: string): boolean => {
+  const i = PREGUNTAS_CTRL.indexOf(fragmento);
+  return i >= 0 && PREGUNTAS_CTRL.slice(i, i + 400).includes('suplementoCop: suplementoDe(aQuienes.length)');
+};
+check('la reserva lleva el suplemento', conSuplemento('reserveForOperation({'));
+check('el cobro final lleva el mismo suplemento', conSuplemento('settleOperation({'));
+const devoluciones = [...PREGUNTAS_CTRL.matchAll(/refundReservation\(\{[\s\S]{0,400}?\}\)/g)].map((m) => m[0]);
+check(
+  'y TODAS las devoluciones también',
+  devoluciones.length >= 2 && devoluciones.every((d) => d.includes('suplementoCop: suplementoDe(aQuienes.length)')),
+  `${devoluciones.length} devoluciones`
+);
+check(
+  'el piso que se le informa a la pantalla es el de ESTA tanda, no el de la operación',
+  PREGUNTAS_CTRL.includes('precioCop: pisoDeLaTanda(aQuienes.length)')
+);
+check(
+  'el suplemento sube el piso dentro de priceFor, sin dejar de comparar con lo medido',
+  BILLING.includes('const piso = base + Math.max(0, Math.round(suplementoCop));') &&
+    BILLING.includes('return Math.max(piso, medido);')
+);
+
 /* ─── 6. QUIÉN PUEDE BORRAR UNA TANDA ───────────────────────────────────── */
 
 const DE = 'autora@firma.co';

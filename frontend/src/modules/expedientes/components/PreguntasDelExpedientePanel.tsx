@@ -3,7 +3,9 @@ import { AlertCircle, Check, Copy, Download, FolderOpen, Gavel, Loader2, Trash2 
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { useFuncionHabilitada } from '../../subscriptions/PlanContext';
 import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
+import { pesos } from '../../billing/recargaEnPantalla';
 import { expedientesApi } from '../services/expedientes.api';
+import { PISO_INTERROGATORIO_COP, SUPLEMENTO_POR_PERSONA_COP, pisoDeLaTanda } from '../services/precioDelInterrogatorio';
 import {
   exportarPreguntasAPdf,
   exportarPreguntasAWord,
@@ -447,10 +449,20 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
         </div>
       </div>
 
-      {/* El aviso del cobro va ARRIBA del botón, no debajo. */}
+      {/*
+        EL AVISO DEL COBRO VA ARRIBA DEL BOTÓN, no debajo, Y CON LA CIFRA. Decir
+        «consume saldo» sin decir cuánto obliga a pulsar para averiguarlo, que
+        es justo lo que nadie hace con el saldo de la firma. Con personas
+        escogidas se dice lo que cuesta ESTA tanda; sin ninguna, la tarifa.
+      */}
       <p className="mt-3 text-meta text-ink-500">
-        Preparar el interrogatorio consume saldo de la firma, una vez por tanda. Queda guardado en el
-        expediente y se puede volver a abrir sin pagar.
+        {escogidos.length > 0
+          ? `Esta tanda cuesta desde ${pesos(pisoDeLaTanda(escogidos.length))} del saldo de la firma`
+          : `Preparar un interrogatorio cuesta desde ${pesos(PISO_INTERROGATORIO_COP)} del saldo de la firma, más ${pesos(
+              SUPLEMENTO_POR_PERSONA_COP
+            )} por cada persona adicional`}
+        . Se cobra una vez por tanda: queda guardada en el expediente y se puede volver a abrir sin
+        pagar. Si la tanda resulta más larga de lo que cubre ese piso, se cobra lo que costó.
       </p>
 
       {!habilitado && (
@@ -470,7 +482,9 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
           ? 'Preparando el interrogatorio…'
           : escogidos.length === 0
             ? 'Escoja al menos a una persona'
-            : `Preparar para ${escogidos.length} persona(s)`}
+            : `Preparar para ${escogidos.length} ${escogidos.length === 1 ? 'persona' : 'personas'} · desde ${pesos(
+                pisoDeLaTanda(escogidos.length)
+              )}`}
       </button>
 
       {error && (

@@ -32,6 +32,7 @@ export type Operation =
   | 'RESUMEN'
   | 'REVISION'
   | 'CONSULTA_REVISION'
+  | 'INTERROGATORIO'
   | 'ESTILO';
 
 export class BillingError extends Error {
@@ -158,8 +159,37 @@ export const PRICE_COP: Record<Operation, number> = {
    * cobra lo medido (`priceFor`), igual que un borrador. Todavía no lo usa
    * ninguna ruta: se declara aquí para que el precio exista antes que el botón.
    */
+  /*
+   * PREPARAR UN INTERROGATORIO. Decisión del dueño, 16/09/2026: piso de $2.000
+   * por tanda y $1.000 por cada persona adicional (`SUPLEMENTO_POR_PERSONA`).
+   *
+   * POR QUÉ DEJA DE COBRARSE COMO UNA CONSULTA DEL TALLER. Iba montado en
+   * `CONSULTA_REVISION`, cuyo piso son $300, y ese piso es lo que se RESERVA
+   * antes de llamar al motor. Medido contra el motor el mismo día: una persona
+   * con material del expediente cuesta US$0,126 —$1.160 al margen estándar— y
+   * dos, US$0,171, o sea $1.573. Una firma con $300 de saldo podía lanzar una
+   * tanda de $1.500, y ese hueco lo pagaba la casa, no ella: se reservaba un
+   * quinto de lo que la operación iba a costar.
+   *
+   * Y no es una consulta del taller ni por trabajo ni por producto: son de seis
+   * a veinte preguntas por persona, cada una con su respuesta probable, su
+   * repregunta y la cita del expediente con que se contradice.
+   */
+  INTERROGATORIO: 2000,
   ESTILO: 100
 };
+
+/**
+ * Lo que suma cada persona DESPUÉS de la primera en una tanda de interrogatorio.
+ *
+ * El costo crece por cabeza —cada persona es otra lista de hasta veinte
+ * preguntas— pero el prompt del expediente se paga una sola vez, así que la
+ * segunda persona cuesta menos que la primera. Medido: US$0,126 con una y
+ * US$0,171 con dos, o sea unos $410 de más al margen estándar. Se cobra $1.000
+ * por decisión del dueño: el piso manda mientras el costo medido no lo pase, y
+ * pasado ese punto manda lo medido (`priceFor`).
+ */
+export const SUPLEMENTO_POR_PERSONA = 1000;
 
 /**
  * Pesos per dollar, for turning an upstream cost into a Colombian price.
@@ -188,10 +218,16 @@ export const MARKUP = 2.3;
  * measurement — and by then the lawyer has a forty-page demanda in their hands,
  * which is the moment a higher price is easiest to justify.
  */
-export const priceFor = (operation: Operation, costUsd: number): number => {
-  const piso = PRICE_COP[operation];
-  if (piso <= 0) return 0;
+export const priceFor = (operation: Operation, costUsd: number, suplementoCop = 0): number => {
+  const base = PRICE_COP[operation];
+  if (base <= 0) return 0;
 
+  /*
+   * EL SUPLEMENTO SUBE EL PISO, NO EL COBRO. Sigue mandando el mayor entre el
+   * piso y lo medido: una tanda de cuatro personas que resulte barata paga su
+   * piso, y una que se dispare paga lo que costó, igual que un escrito largo.
+   */
+  const piso = base + Math.max(0, Math.round(suplementoCop));
   const medido = Math.round(costUsd * COP_PER_USD * MARKUP);
   return Math.max(piso, medido);
 };
@@ -306,11 +342,19 @@ export const reserveForOperation = async (input: {
   firmId: string;
   userEmail: string;
   operation: Operation;
+  /**
+   * Lo que esta tanda cuesta POR ENCIMA del piso de su operación, cuando el
+   * trabajo crece con lo que el colega escogió —hoy, las personas de un
+   * interrogatorio—. Se reserva junto con el piso: reservar menos de lo que la
+   * operación va a costar es prestarle el resto a la firma sin decirlo.
+   */
+  suplementoCop?: number;
 }): Promise<{ reserved: number; balance: number }> => {
   const db = requireDb();
-  const precio = PRICE_COP[input.operation];
+  const base = PRICE_COP[input.operation];
 
-  if (precio <= 0) return { reserved: 0, balance: await balanceOf(input.firmId) };
+  if (base <= 0) return { reserved: 0, balance: await balanceOf(input.firmId) };
+  const precio = base + Math.max(0, Math.round(input.suplementoCop ?? 0));
 
   /*
    * AN EXPIRED PLAN REFUSES EVERY PAID OPERATION, HERE AND NOWHERE ELSE.
@@ -365,11 +409,14 @@ export const refundReservation = async (input: {
   userEmail: string;
   operation: Operation;
   reason: string;
+  /** El mismo suplemento que se reservó: devolver el piso a secas dejaría el resto cobrado. */
+  suplementoCop?: number;
 }): Promise<void> => {
   if (!supabase) return;
 
-  const precio = PRICE_COP[input.operation];
-  if (precio <= 0) return;
+  const base = PRICE_COP[input.operation];
+  if (base <= 0) return;
+  const precio = base + Math.max(0, Math.round(input.suplementoCop ?? 0));
 
   const { data: firma } = await supabase
     .from('firms')
@@ -452,6 +499,8 @@ export const settleOperation = async (input: {
   description: string;
   /** What was already taken when the work started. */
   reserved: number;
+  /** El suplemento con el que se reservó, para que el piso de esta tanda sea el mismo aquí. */
+  suplementoCop?: number;
 }): Promise<{ charged: number; balance: number; costUsd: number }> => {
   const db = requireDb();
 
@@ -466,7 +515,8 @@ export const settleOperation = async (input: {
     0
   );
 
-  const precio = priceFor(input.operation, costUsd);
+  const suplemento = Math.max(0, Math.round(input.suplementoCop ?? 0));
+  const precio = priceFor(input.operation, costUsd, suplemento);
   const diferencia = precio - input.reserved;
 
   let balance = await balanceOf(input.firmId);
@@ -497,7 +547,7 @@ export const settleOperation = async (input: {
     amount_cop: -cobrado,
     balance_after_cop: balance,
     description:
-      cobrado > PRICE_COP[input.operation]
+      cobrado > PRICE_COP[input.operation] + suplemento
         ? `${input.description} (documento extenso)`
         : input.description,
     actor_email: input.userEmail

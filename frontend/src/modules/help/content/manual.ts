@@ -1041,8 +1041,9 @@ const A_PREGUNTAS_AUDIENCIA: ManualArticle = {
         'Registre a las personas en «Quién es quién». Al juez, al secretario, a los apoderados y al intérprete no se les pregunta.',
         'En «Preparar el interrogatorio», marque «A quién» va a interrogar.',
         'Si quiere, complete «Qué quiere probar» y «Tipo de audiencia».',
-        'Pulse preparar. Se descuenta saldo de la firma una vez por tanda.',
-        'Lea cada lista con la técnica indicada arriba. Cada pregunta dice qué busca establecer y, cuando corresponde, cita el material del caso.',
+        'Pulse preparar. Se descuenta saldo de la firma una vez por tanda: desde $2.000, más $1.000 por cada persona adicional. El botón dice la cifra antes de que usted lo pulse.',
+        'Lea cada lista con la técnica indicada arriba. Cada pregunta dice qué busca establecer, qué va a contestar probablemente esa persona, con qué repreguntar si lo contesta y —cuando el caso tiene documentos leídos— la cita con que se la contradice.',
+        'La tanda queda guardada en el expediente. Abrirla de nuevo no vuelve a cobrar.',
         'Llévese el interrogatorio con «Word» para seguir trabajándolo.'
       ]
     },

@@ -7,7 +7,8 @@ import {
   recordUsage,
   refundReservation,
   reserveForOperation,
-  settleOperation
+  settleOperation,
+  SUPLEMENTO_POR_PERSONA
 } from '../billing/billing.service';
 import { ENGINE, callOpenRouterWithUsage } from '../agent/openrouter.client';
 import { conLimite, LIMITE_LLAMADA_MS } from '../agent/review/documentReview.controller';
@@ -31,14 +32,22 @@ import {
  * Prepara el interrogatorio de personas CONCRETAS del expediente. Ver
  * `preguntasDelExpediente.ts` para el porqué de la forma.
  *
- * ─── SE COBRA COMO `CONSULTA_REVISION`, Y NO ES PEREZA ─────────────────────
+ * ─── POR QUÉ DEJÓ DE COBRARSE COMO `CONSULTA_REVISION` (16/09/2026) ────────
  *
- * Es la misma operación que cobraban las preguntas colgadas de una revisión
- * —el camino que este módulo reemplazó y que ya se retiró—, al mismo precio y
- * con el mismo nombre. Inventar una operación nueva partiría el histórico en
- * dos: los movimientos de crédito de antes seguirían diciendo «consulta de
- * revisión» y los de después otra cosa, para un trabajo que el abogado vive
- * como el mismo. Mientras el trabajo sea el mismo, el renglón también.
+ * Se cobraba con esa operación por continuidad del histórico: era la que
+ * cobraban las preguntas colgadas de una revisión, el camino que este módulo
+ * reemplazó. El argumento se cayó con una medición. Una consulta del taller
+ * tiene piso de $300; una tanda de interrogatorio con material del expediente
+ * cuesta $1.160 con una persona y $1.573 con dos. Y el piso NO es solo el
+ * precio: es lo que se RESERVA antes de llamar al motor, así que una firma con
+ * $300 de saldo lanzaba una operación de $1.500 y la diferencia la ponía la
+ * casa. Un histórico ordenado no vale un cobro que no se puede recaudar.
+ *
+ * Ahora tiene operación propia —`INTERROGATORIO`, piso $2.000— y cada persona
+ * después de la primera suma `SUPLEMENTO_POR_PERSONA`. La reserva, la
+ * devolución y el cobro usan el MISMO suplemento: reservar el piso a secas y
+ * cobrar el total dejaría un descubierto silencioso, y devolver el piso a
+ * secas dejaría cobrado el resto de una tanda que nunca llegó.
  *
  * ─── EL PRESUPUESTO DE SALIDA CRECE CON LA GENTE ───────────────────────────
  *
@@ -50,7 +59,11 @@ import {
  * pero sin avisar.
  */
 
-const OPERACION = 'CONSULTA_REVISION' as const;
+const OPERACION = 'INTERROGATORIO' as const;
+
+/** El piso de ESTA tanda: el de la operación más lo que suman las personas de más. */
+const suplementoDe = (personas: number): number => SUPLEMENTO_POR_PERSONA * Math.max(0, personas - 1);
+const pisoDeLaTanda = (personas: number): number => PRICE_COP[OPERACION] + suplementoDe(personas);
 
 /**
  * Por persona, medido sobre el tamaño de las listas del endpoint que ya existe.
@@ -87,7 +100,7 @@ const OPERACION = 'CONSULTA_REVISION' as const;
  * motor; y si aun así se corta, `objetoDeLaRespuesta` rescata las preguntas
  * completas y la pantalla dice que la lista quedó recortada.
  */
-const TOKENS_POR_PERSONA = 3_800;
+const TOKENS_POR_PERSONA = 6_500;
 /** El enfoque, la estructura del JSON y lo que el motor razona antes de escribir. */
 const TOKENS_DE_BASE = 1_200;
 
@@ -163,7 +176,12 @@ export const preguntasDelExpedienteController = async (req: Request, res: Respon
 
   let reservado = 0;
   try {
-    ({ reserved: reservado } = await reserveForOperation({ firmId, userEmail, operation: OPERACION }));
+    ({ reserved: reservado } = await reserveForOperation({
+      firmId,
+      userEmail,
+      operation: OPERACION,
+      suplementoCop: suplementoDe(aQuienes.length)
+    }));
   } catch (err) {
     if (err instanceof BillingError) {
       res.status(err.status).json({ success: false, error: err.code, message: err.message });
@@ -257,6 +275,7 @@ export const preguntasDelExpedienteController = async (req: Request, res: Respon
         firmId,
         userEmail,
         operation: OPERACION,
+        suplementoCop: suplementoDe(aQuienes.length),
         reason: 'la guía no produjo preguntas legibles'
       });
       res.status(502).json({
@@ -273,7 +292,11 @@ export const preguntasDelExpedienteController = async (req: Request, res: Respon
       operation: OPERACION,
       operationId,
       reserved: reservado,
-      description: `Interrogatorio: ${expediente.caratula}`
+      suplementoCop: suplementoDe(aQuienes.length),
+      description:
+        aQuienes.length > 1
+          ? `Interrogatorio de ${aQuienes.length} personas: ${expediente.caratula}`
+          : `Interrogatorio: ${expediente.caratula}`
     });
 
     /*
@@ -328,13 +351,14 @@ export const preguntasDelExpedienteController = async (req: Request, res: Respon
       guardado,
       cobradoCop: cobro.charged,
       saldoCop: cobro.balance,
-      precioCop: PRICE_COP[OPERACION]
+      precioCop: pisoDeLaTanda(aQuienes.length)
     });
   } catch (err) {
     await refundReservation({
       firmId,
       userEmail,
       operation: OPERACION,
+      suplementoCop: suplementoDe(aQuienes.length),
       reason: 'la guía no pudo completarse'
     });
     fallar(res, err, 'No se pudo preparar el interrogatorio. No se descontó saldo.');

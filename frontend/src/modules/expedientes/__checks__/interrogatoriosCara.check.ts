@@ -153,6 +153,37 @@ check('la cita va en mono, que es lo citable', PANEL_CODIGO.includes('cn-exp-mon
  * contrario es dejar que el colega llegue a la audiencia creyendo que el caso
  * no daba para más preguntas.
  */
+/* ─── EL PRECIO QUE SE ANUNCIA ES EL QUE EL SERVIDOR COBRA ──────────────── */
+
+/*
+ * La pantalla tiene que decir el precio ANTES de pulsar, y el servidor solo lo
+ * informa después de cobrar. Por eso la cifra está copiada en el frontend, y
+ * por eso esta guarda existe: una copia sin guarda es un botón que un día
+ * promete un precio viejo.
+ */
+const BACKEND_PRECIOS = join(SRC, '..', '..', 'backend', 'src', 'modules', 'billing', 'billing.service.ts');
+const PRECIOS = readFileSync(BACKEND_PRECIOS, 'utf8');
+const PRECIO_PANTALLA = readFileSync(join(SRC, 'modules', 'expedientes', 'services', 'precioDelInterrogatorio.ts'), 'utf8');
+const numeroDe = (fuente: string, patron: RegExp): number => Number((patron.exec(fuente)?.[1] ?? '').replace(/_/g, ''));
+
+const pisoServidor = numeroDe(PRECIOS, /INTERROGATORIO: ([\d_]+),/);
+const pisoPantalla = numeroDe(PRECIO_PANTALLA, /PISO_INTERROGATORIO_COP = ([\d_]+);/);
+const suplementoServidor = numeroDe(PRECIOS, /SUPLEMENTO_POR_PERSONA = ([\d_]+);/);
+const suplementoPantalla = numeroDe(PRECIO_PANTALLA, /SUPLEMENTO_POR_PERSONA_COP = ([\d_]+);/);
+
+check('el interrogatorio tiene piso propio en el servidor', pisoServidor > 0, `$${pisoServidor}`);
+check('y la pantalla anuncia ese mismo piso', pisoPantalla === pisoServidor, `pantalla $${pisoPantalla} · servidor $${pisoServidor}`);
+check(
+  'el suplemento por persona es el mismo a los dos lados',
+  suplementoPantalla === suplementoServidor && suplementoServidor > 0,
+  `pantalla $${suplementoPantalla} · servidor $${suplementoServidor}`
+);
+check(
+  'el aviso del cobro dice la cifra, no solo que consume saldo',
+  PANEL_CODIGO.includes('pisoDeLaTanda(escogidos.length)') && PANEL.includes('del saldo de la firma')
+);
+check('y el botón la repite, que es donde se pulsa', PANEL_CODIGO.includes('· desde ${pesos(')); 
+
 check(
   'si la tanda llegó recortada, la pantalla lo dice',
   PANEL_CODIGO.includes('abierto.preguntas.recortado &&') && PANEL.includes('Esta lista quedó recortada')

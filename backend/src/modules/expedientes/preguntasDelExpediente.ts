@@ -35,8 +35,23 @@ import { seLePregunta, type ActorDelExpediente, type ExpedienteConDetalle } from
  * hay que volver a preguntárselo en un formulario.
  */
 
+/**
+ * CUÁNTAS PREGUNTAS SON UN INTERROGATORIO DE VERDAD (16 de septiembre de 2026).
+ *
+ * El tope estaba en 12, y doce preguntas dejan al abogado terminando el guion
+ * en la sala. Un interrogatorio de audiencia recorre la identificación del
+ * declarante, por qué le consta, el hecho, sus circunstancias de tiempo, modo y
+ * lugar, y los flancos que hay que cerrar antes de que los abra el otro. Sube a
+ * 20 con la decisión expresa de cobrar lo que cueste: es preferible una tanda
+ * más cara que sirva a una barata que haya que completar a mano.
+ *
+ * EL MÍNIMO SE QUEDA EN 6 A PROPÓSITO. Es el suelo para el declarante del que
+ * el expediente casi no dice nada: exigirle veinte al motor ahí no produce
+ * veinte preguntas buenas, produce catorce de relleno que el abogado tiene que
+ * tachar una por una.
+ */
 export const MIN_PREGUNTAS_POR_PERSONA = 6;
-export const MAX_PREGUNTAS_POR_PERSONA = 12;
+export const MAX_PREGUNTAS_POR_PERSONA = 20;
 /** Cuántas personas caben en una sola llamada sin que el presupuesto de salida se agote. */
 export const MAX_PERSONAS_POR_TANDA = 4;
 export const MAX_QUIERE_PROBAR = 1_000;
