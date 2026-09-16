@@ -10877,6 +10877,7 @@
   border-color: var(--line);
 }
 
+
 /* ── Escritorio ancho: las tres zonas y la tabla ───────────────────────── */
 @media (min-width: 760px) {
   .cara-nueva .cn-exp-tabla-cabeza {
@@ -11123,6 +11124,164 @@
     border-top: 1px solid var(--line);
   }
 }
+/* ─── Interrogatorio: quién pregunta y quién contesta ──────────────────── */
+/*
+ * SE LEE COMO EL TRANSCRITO DE UNA AUDIENCIA, Y NO ES UN CAPRICHO.
+ *
+ * La primera forma ponía la pregunta, el «para qué», la respuesta probable, la
+ * repregunta y el «con qué» como cinco renglones seguidos, todos del mismo
+ * tamaño y con rótulos en negrita al principio. Con tres preguntas ya no se
+ * sabía quién decía qué: el ojo veía un párrafo largo con palabras en negrita
+ * sueltas, y en una audiencia eso es inservible — el abogado lee a saltos, de
+ * reojo, mientras el testigo habla.
+ *
+ * Lo que sí funciona ya estaba resuelto en Audiencias: UNA COLUMNA CON EL
+ * NOMBRE a la izquierda y lo dicho a la derecha, separado por un filete. Se
+ * copia la disposición, con la misma medida de 132 px, para que quien viene de
+ * un transcrito no tenga que aprender otra pantalla.
+ *
+ * LOS DOS FILETES NO SON DEL MISMO COLOR, y esa es toda la orientación que hace
+ * falta: lo que dice USTED lleva el filete de tinta; lo que contestaría EL
+ * DECLARANTE lo lleva punteado, porque es una hipótesis y no una cita. El
+ * «con qué» sí es cita: filete lleno en el color de marca, como el resto de lo
+ * citable del módulo.
+ */
+.cara-nueva .cn-int-persona {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+}
+.cara-nueva .cn-int-persona + .cn-int-persona {
+  margin-top: 16px;
+}
+.cara-nueva .cn-int-nombre {
+  font-size: 18px;
+  line-height: 26px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+/*
+ * LA TÉCNICA ES UNA ETIQUETA, NO UN PÁRRAFO. Su nombre —«interrogatorio
+ * directo», «contradicción del dictamen»— es lo que el abogado necesita de un
+ * vistazo; el resto explica la regla y se lee una vez.
+ */
+.cara-nueva .cn-int-tecnica {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 6px;
+  padding: 0 10px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--field);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.cara-nueva .cn-int-tecnica-detalle {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-int-preguntas {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 20px;
+}
+.cara-nueva .cn-int-pregunta + .cn-int-pregunta {
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+.cara-nueva .cn-int-turno {
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+}
+.cara-nueva .cn-int-turno:first-child {
+  margin-top: 0;
+}
+.cara-nueva .cn-int-quien {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--ink-4);
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-int-dicho {
+  min-width: 0;
+  padding-left: 14px;
+  border-left: 2px solid var(--ink-5);
+  font-size: 16px;
+  line-height: 25px;
+  color: var(--ink);
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+/* La respuesta probable es una HIPÓTESIS: filete punteado, como todo lo sin verificar. */
+.cara-nueva .cn-int-dicho--probable {
+  border-left-style: dashed;
+  color: var(--ink-2);
+}
+/* La cita sí está comprobada contra el expediente: filete lleno, color de marca. */
+.cara-nueva .cn-int-dicho--cita {
+  border-left-color: var(--brand);
+  color: var(--ink-2);
+}
+.cara-nueva .cn-int-numero {
+  display: inline-flex;
+  min-width: 26px;
+  height: 26px;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  padding: 0 7px;
+  border-radius: 8px;
+  background: var(--field);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-4);
+}
+/*
+ * EL «PARA QUÉ» Y EL «DEL MATERIAL» NO SON TURNOS: nadie los dice en la sala.
+ * Van bajo la pregunta, en la letra de las notas, sin filete y sin nombre, para
+ * que no compitan con lo que sí se lee en voz alta.
+ */
+.cara-nueva .cn-int-apunte {
+  margin-top: 6px;
+  padding-left: 14px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-5);
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 720px) {
+  /*
+   * Desde 720 px el nombre se va a su columna, como en el transcrito de
+   * Audiencias: la misma medida de 132 px y el mismo filete a la derecha. Por
+   * debajo se apila, que es lo único que cabe en un teléfono sin partir las
+   * palabras del declarante en dos letras por renglón.
+   */
+  .cara-nueva .cn-int-turno {
+    grid-template-columns: 132px minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+  .cara-nueva .cn-int-quien {
+    text-align: right;
+  }
+  .cara-nueva .cn-int-apunte {
+    margin-left: 148px;
+    padding-left: 0;
+  }
+}
+
 /* ─── Entrevistas ─── */
 /*
  * `public/handoff/app-audiencias-entrevistas.html`: «Nueva entrevista» (:78),

@@ -144,7 +144,47 @@ check(
 );
 check(
   'la frase de «sin con qué» solo se pinta con material del caso',
-  PANEL_CODIGO.includes('conMaterial && (') && PANEL_CODIGO.includes('{SIN_CON_QUE}')
+  PANEL_CODIGO.includes('conMaterial && <p className="cn-int-apunte">{SIN_CON_QUE}</p>')
+);
+
+/* ─── QUIÉN DICE CADA COSA ──────────────────────────────────────────────── */
+
+/*
+ * EL DEFECTO QUE ESTO VIGILA: los cinco renglones de una pregunta —pregunta,
+ * para qué, respuesta probable, repregunta y cita— se pintaban seguidos y del
+ * mismo tamaño, con el rótulo en negrita al principio. Con tres preguntas ya no
+ * se distinguía quién decía qué, y en una audiencia se lee a saltos. Ahora cada
+ * turno va con su nombre a un lado, como el transcrito de Audiencias.
+ */
+check('cada turno dice quién habla', PANEL_CODIGO.includes('cn-int-quien'));
+check(
+  'la pregunta y la repregunta son suyas, y lo dicen',
+  PANEL.includes('Usted pregunta') && PANEL.includes('Usted repregunta')
+);
+check(
+  'la respuesta probable la firma el declarante POR SU NOMBRE, no un rótulo genérico',
+  PANEL_CODIGO.includes('{persona.nombre} probablemente') && !PANEL.includes('Probablemente conteste:')
+);
+check(
+  'la hipótesis se pinta punteada y la cita comprobada, llena',
+  PANEL_CODIGO.includes('cn-int-dicho--probable') && PANEL_CODIGO.includes('cn-int-dicho--cita')
+);
+check(
+  'el «para qué» no finge ser un turno: nadie lo dice en la sala',
+  PANEL_CODIGO.includes('<p className="cn-int-apunte">Para: {p.paraQue}</p>')
+);
+const CSS_INT = readFileSync(join(SRC, 'design', 'cara-nueva.css'), 'utf8');
+check(
+  'la columna del nombre mide lo mismo que en el transcrito de Audiencias',
+  /\.cn-int-turno \{[^}]*grid-template-columns: 132px minmax\(0, 1fr\);/.test(CSS_INT)
+);
+check(
+  'y solo se abre en dos columnas cuando hay ancho para ello',
+  CSS_INT.indexOf('@media (min-width: 720px)') < CSS_INT.indexOf('132px minmax(0, 1fr)')
+);
+check(
+  'la hipótesis lleva el filete punteado de lo sin verificar',
+  /\.cn-int-dicho--probable \{[^}]*border-left-style: dashed;/.test(CSS_INT)
 );
 check('la cita va en mono, que es lo citable', PANEL_CODIGO.includes('cn-exp-mono'));
 /*

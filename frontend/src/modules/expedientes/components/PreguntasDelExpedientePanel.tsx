@@ -96,6 +96,24 @@ interface Abierto {
   audiencia: string;
 }
 
+/**
+ * LA TÉCNICA VIENE DEL SERVIDOR COMO «NOMBRE: la regla entera».
+ *
+ * Se parte por el primer dos puntos para pintar el nombre como etiqueta y la
+ * regla debajo. Si algún día llegara sin dos puntos, la etiqueta se queda con
+ * el texto completo y el detalle desaparece: se prefiere una etiqueta larga a
+ * una pantalla que pierde la técnica por una coma.
+ */
+export const tituloDeLaTecnica = (tecnica: string): string => {
+  const corte = tecnica.indexOf(':');
+  return corte > 0 ? tecnica.slice(0, corte).trim() : tecnica.trim();
+};
+
+export const detalleDeLaTecnica = (tecnica: string): string => {
+  const corte = tecnica.indexOf(':');
+  return corte > 0 ? tecnica.slice(corte + 1).trim() : '';
+};
+
 export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDetalle }> = ({
   expediente
 }) => {
@@ -563,68 +581,87 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
             </p>
           )}
           {abierto.preguntas.porPersona.map((persona) => (
-            <div key={persona.actorId} className="rounded-card border border-line-200 p-3">
-              <h3 className="text-body font-medium [overflow-wrap:anywhere]">{persona.nombre}</h3>
+            <div key={persona.actorId} className="cn-int-persona">
+              <h3 className="cn-int-nombre">{persona.nombre}</h3>
               {/*
                 LA TÉCNICA SE MUESTRA, y no es adorno. Un abogado que ve
                 «contrainterrogatorio: cerradas, una afirmación por pregunta»
                 entiende por qué esa lista no se parece a la de al lado, y puede
                 corregir el lado del actor si el sistema se equivocó.
+
+                SE PARTE EN DOS PORQUE SE LEE EN DOS MOMENTOS: el nombre de la
+                técnica se mira de reojo en plena audiencia; la regla que la
+                explica se lee una vez, preparando. Es un corte de presentación
+                sobre el mismo texto del servidor, no un texto distinto.
               */}
-              <p className="mt-0.5 text-meta text-ink-500 [overflow-wrap:anywhere]">{persona.tecnica}</p>
-              <ol className="mt-2 space-y-2">
+              <p>
+                <span className="cn-int-tecnica">{tituloDeLaTecnica(persona.tecnica)}</span>
+              </p>
+              {detalleDeLaTecnica(persona.tecnica) && (
+                <p className="cn-int-tecnica-detalle">{detalleDeLaTecnica(persona.tecnica)}</p>
+              )}
+              <ol className="cn-int-preguntas">
                 {persona.preguntas.map((p, i) => {
                   const documentId = p.conQue ? (documentosPorTitulo?.get(p.conQue.documento) ?? null) : null;
                   return (
-                    <li key={i} className="text-body">
-                      <p className="[overflow-wrap:anywhere]">
-                        <span className="text-ink-500">{i + 1}. </span>
-                        {p.pregunta}
-                      </p>
-                      {p.paraQue && (
-                        <p className="text-meta text-ink-500 [overflow-wrap:anywhere]">Para: {p.paraQue}</p>
-                      )}
-                      {p.delMaterial && (
-                        <p className="text-meta text-ink-500 [overflow-wrap:anywhere]">
-                          Del material: «{p.delMaterial}»
+                    <li key={i} className="cn-int-pregunta">
+                      {/*
+                        CADA TURNO DICE DE QUIÉN ES. «Usted pregunta» y el nombre
+                        del declarante son la única orientación que el abogado
+                        necesita leyendo a saltos mientras el testigo habla.
+                      */}
+                      <div className="cn-int-turno">
+                        <span className="cn-int-quien">Usted pregunta</span>
+                        <p className="cn-int-dicho">
+                          <span className="cn-int-numero">{i + 1}</span>
+                          {p.pregunta}
                         </p>
-                      )}
+                      </div>
+                      {p.paraQue && <p className="cn-int-apunte">Para: {p.paraQue}</p>}
+                      {p.delMaterial && <p className="cn-int-apunte">Del material: «{p.delMaterial}»</p>}
                       {p.respuestaProbable && (
-                        <p className="cn-exp-anticipa [overflow-wrap:anywhere]">
-                          <span className="cn-exp-anticipa-rotulo">Probablemente conteste:</span>{' '}
-                          {p.respuestaProbable}
-                        </p>
+                        <div className="cn-int-turno">
+                          {/*
+                            EL NOMBRE, Y NO «PROBABLEMENTE CONTESTE». Con dos o
+                            tres personas preparadas en la misma pantalla, el
+                            rótulo genérico obligaba a subir hasta la cabecera
+                            para saber quién contestaba eso.
+                          */}
+                          <span className="cn-int-quien">{persona.nombre} probablemente</span>
+                          <p className="cn-int-dicho cn-int-dicho--probable">{p.respuestaProbable}</p>
+                        </div>
                       )}
                       {p.repregunta && (
-                        <p className="cn-exp-anticipa [overflow-wrap:anywhere]">
-                          <span className="cn-exp-anticipa-rotulo">Si contesta eso:</span> {p.repregunta}
-                        </p>
+                        <div className="cn-int-turno">
+                          <span className="cn-int-quien">Usted repregunta</span>
+                          <p className="cn-int-dicho">{p.repregunta}</p>
+                        </div>
                       )}
                       {p.conQue ? (
-                        <p className="cn-exp-conque [overflow-wrap:anywhere]">
-                          <span className="cn-exp-anticipa-rotulo">Con qué:</span>{' '}
-                          {documentId ? (
-                            <button
-                              type="button"
-                              className="cn-exp-conque-doc"
-                              onClick={() => setLeyendo(documentId)}
-                            >
-                              {p.conQue.documento}
-                            </button>
-                          ) : (
-                            <span>{p.conQue.documento}</span>
-                          )}{' '}
-                          — <span className="cn-exp-mono">«{p.conQue.cita}»</span>
-                        </p>
+                        <div className="cn-int-turno">
+                          <span className="cn-int-quien">Con qué</span>
+                          <p className="cn-int-dicho cn-int-dicho--cita">
+                            {documentId ? (
+                              <button
+                                type="button"
+                                className="cn-exp-conque-doc"
+                                onClick={() => setLeyendo(documentId)}
+                              >
+                                {p.conQue.documento}
+                              </button>
+                            ) : (
+                              <span>{p.conQue.documento}</span>
+                            )}{' '}
+                            — <span className="cn-exp-mono">«{p.conQue.cita}»</span>
+                          </p>
+                        </div>
                       ) : (
                         /*
                           Solo cuando hubo pasajes que mirar. Sin ellos esta
                           frase sería un hallazgo sobre documentos que nadie
                           leyó: ver `conMaterial`.
                         */
-                        conMaterial && (
-                          <p className="cn-exp-sin-conque [overflow-wrap:anywhere]">{SIN_CON_QUE}</p>
-                        )
+                        conMaterial && <p className="cn-int-apunte">{SIN_CON_QUE}</p>
                       )}
                     </li>
                   );
