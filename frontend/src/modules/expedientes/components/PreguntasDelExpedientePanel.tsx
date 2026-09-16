@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, Check, Copy, Download, FolderOpen, Gavel, Loader2, Trash2 } from 'lucide-react';
+import { AlertCircle, Check, Copy, Download, FolderOpen, Gavel, Loader2, Maximize2, Trash2 } from 'lucide-react';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { useFuncionHabilitada } from '../../subscriptions/PlanContext';
 import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
@@ -21,6 +21,7 @@ import {
   type InterrogatorioEnLaLista,
   type PreguntasDelExpediente
 } from '../types';
+import { LecturaAmpliaDelInforme } from '../../workspace/components/LecturaAmpliaDelInforme';
 import { LeerDocumentoIndexado } from './LeerDocumentoIndexado';
 
 /**
@@ -104,6 +105,116 @@ interface Abierto {
  * el texto completo y el detalle desaparece: se prefiere una etiqueta larga a
  * una pantalla que pierde la técnica por una coma.
  */
+interface ListaDeTurnosProps {
+  preguntas: PreguntasDelExpediente;
+  /** Si hubo pasajes del caso que mirar: sin ellos no se afirma que no hay con qué. */
+  conMaterial: boolean;
+  documentosPorTitulo: Map<string, string> | null;
+  onLeerDocumento: (documentId: string) => void;
+}
+
+/**
+ * LAS PREGUNTAS, UNA SOLA VEZ Y EN UN SOLO SITIO.
+ *
+ * Se saca a su propio componente porque se pinta en DOS lugares —dentro del
+ * panel y en «Leer en grande»— y dos copias del mismo marcado divergen: la
+ * primera vez que alguien arregle un turno en una sola, el interrogatorio
+ * impreso y el de pantalla dejarán de decir lo mismo sin que nada falle.
+ */
+const ListaDeTurnos: React.FC<ListaDeTurnosProps> = ({ preguntas, conMaterial, documentosPorTitulo, onLeerDocumento }) => (
+    <>
+      {preguntas.porPersona.map((persona) => (
+            <div key={persona.actorId} className="cn-int-persona">
+              <h3 className="cn-int-nombre">{persona.nombre}</h3>
+              {/*
+                LA TÉCNICA SE MUESTRA, y no es adorno. Un abogado que ve
+                «contrainterrogatorio: cerradas, una afirmación por pregunta»
+                entiende por qué esa lista no se parece a la de al lado, y puede
+                corregir el lado del actor si el sistema se equivocó.
+
+                SE PARTE EN DOS PORQUE SE LEE EN DOS MOMENTOS: el nombre de la
+                técnica se mira de reojo en plena audiencia; la regla que la
+                explica se lee una vez, preparando. Es un corte de presentación
+                sobre el mismo texto del servidor, no un texto distinto.
+              */}
+              <p>
+                <span className="cn-int-tecnica">{tituloDeLaTecnica(persona.tecnica)}</span>
+              </p>
+              {detalleDeLaTecnica(persona.tecnica) && (
+                <p className="cn-int-tecnica-detalle">{detalleDeLaTecnica(persona.tecnica)}</p>
+              )}
+              <ol className="cn-int-preguntas">
+                {persona.preguntas.map((p, i) => {
+                  const documentId = p.conQue ? (documentosPorTitulo?.get(p.conQue.documento) ?? null) : null;
+                  return (
+                    <li key={i} className="cn-int-pregunta">
+                      {/*
+                        CADA TURNO DICE DE QUIÉN ES. «Usted pregunta» y el nombre
+                        del declarante son la única orientación que el abogado
+                        necesita leyendo a saltos mientras el testigo habla.
+                      */}
+                      <div className="cn-int-turno">
+                        <span className="cn-int-quien">Usted pregunta</span>
+                        <p className="cn-int-dicho">
+                          <span className="cn-int-numero">{i + 1}</span>
+                          {p.pregunta}
+                        </p>
+                      </div>
+                      {p.paraQue && <p className="cn-int-apunte">Para: {p.paraQue}</p>}
+                      {p.delMaterial && <p className="cn-int-apunte">Del material: «{p.delMaterial}»</p>}
+                      {p.respuestaProbable && (
+                        <div className="cn-int-turno">
+                          {/*
+                            EL NOMBRE, Y NO «PROBABLEMENTE CONTESTE». Con dos o
+                            tres personas preparadas en la misma pantalla, el
+                            rótulo genérico obligaba a subir hasta la cabecera
+                            para saber quién contestaba eso.
+                          */}
+                          <span className="cn-int-quien">{persona.nombre} probablemente</span>
+                          <p className="cn-int-dicho cn-int-dicho--probable">{p.respuestaProbable}</p>
+                        </div>
+                      )}
+                      {p.repregunta && (
+                        <div className="cn-int-turno">
+                          <span className="cn-int-quien">Usted repregunta</span>
+                          <p className="cn-int-dicho">{p.repregunta}</p>
+                        </div>
+                      )}
+                      {p.conQue ? (
+                        <div className="cn-int-turno">
+                          <span className="cn-int-quien">Con qué</span>
+                          <p className="cn-int-dicho cn-int-dicho--cita">
+                            {documentId ? (
+                              <button
+                                type="button"
+                                className="cn-exp-conque-doc"
+                                onClick={() => onLeerDocumento(documentId)}
+                              >
+                                {p.conQue.documento}
+                              </button>
+                            ) : (
+                              <span>{p.conQue.documento}</span>
+                            )}{' '}
+                            — <span className="cn-exp-mono">«{p.conQue.cita}»</span>
+                          </p>
+                        </div>
+                      ) : (
+                        /*
+                          Solo cuando hubo pasajes que mirar. Sin ellos esta
+                          frase sería un hallazgo sobre documentos que nadie
+                          leyó: ver `conMaterial`.
+                        */
+                        conMaterial && <p className="cn-int-apunte">{SIN_CON_QUE}</p>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+      ))}
+    </>
+);
+
 export const tituloDeLaTecnica = (tecnica: string): string => {
   const corte = tecnica.indexOf(':');
   return corte > 0 ? tecnica.slice(0, corte).trim() : tecnica.trim();
@@ -145,6 +256,8 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
    */
   const [documentosPorTitulo, setDocumentosPorTitulo] = React.useState<Map<string, string> | null>(null);
   const [leyendo, setLeyendo] = React.useState<string | null>(null);
+  /* «Leer en grande»: el mismo diálogo del taller, con las preguntas y sin nada más. */
+  const [lecturaAmplia, setLecturaAmplia] = React.useState(false);
 
   const habilitado = useFuncionHabilitada('EXPEDIENTES.PREGUNTAS_AUDIENCIA');
 
@@ -574,102 +687,83 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
               <Download className="h-3.5 w-3.5" />
               PDF
             </button>
+            {/*
+              LEER SIN LA PANTALLA DETRÁS. El interrogatorio se repasa entero
+              minutos antes de la audiencia, y en el panel convive con el
+              formulario de pedir otro, la lista de los ya preparados y el resto
+              del expediente. Es el mismo diálogo del taller, por la misma razón
+              y con el mismo nombre: quien ya lo usó allí no aprende otro.
+            */}
+            <button
+              type="button"
+              onClick={() => setLecturaAmplia(true)}
+              className="btn-neutral btn-sm gap-1.5"
+              title="Leer el interrogatorio a pantalla completa, sin el resto de la pantalla"
+            >
+              <Maximize2 className="h-3.5 w-3.5" />
+              Leer en grande
+            </button>
           </div>
           {abierto.preguntas.enfoque && (
             <p className="rounded-card border border-line-200 bg-canvas p-3 text-meta text-ink-700 [overflow-wrap:anywhere]">
               {abierto.preguntas.enfoque}
             </p>
           )}
-          {abierto.preguntas.porPersona.map((persona) => (
-            <div key={persona.actorId} className="cn-int-persona">
-              <h3 className="cn-int-nombre">{persona.nombre}</h3>
-              {/*
-                LA TÉCNICA SE MUESTRA, y no es adorno. Un abogado que ve
-                «contrainterrogatorio: cerradas, una afirmación por pregunta»
-                entiende por qué esa lista no se parece a la de al lado, y puede
-                corregir el lado del actor si el sistema se equivocó.
-
-                SE PARTE EN DOS PORQUE SE LEE EN DOS MOMENTOS: el nombre de la
-                técnica se mira de reojo en plena audiencia; la regla que la
-                explica se lee una vez, preparando. Es un corte de presentación
-                sobre el mismo texto del servidor, no un texto distinto.
-              */}
-              <p>
-                <span className="cn-int-tecnica">{tituloDeLaTecnica(persona.tecnica)}</span>
-              </p>
-              {detalleDeLaTecnica(persona.tecnica) && (
-                <p className="cn-int-tecnica-detalle">{detalleDeLaTecnica(persona.tecnica)}</p>
-              )}
-              <ol className="cn-int-preguntas">
-                {persona.preguntas.map((p, i) => {
-                  const documentId = p.conQue ? (documentosPorTitulo?.get(p.conQue.documento) ?? null) : null;
-                  return (
-                    <li key={i} className="cn-int-pregunta">
-                      {/*
-                        CADA TURNO DICE DE QUIÉN ES. «Usted pregunta» y el nombre
-                        del declarante son la única orientación que el abogado
-                        necesita leyendo a saltos mientras el testigo habla.
-                      */}
-                      <div className="cn-int-turno">
-                        <span className="cn-int-quien">Usted pregunta</span>
-                        <p className="cn-int-dicho">
-                          <span className="cn-int-numero">{i + 1}</span>
-                          {p.pregunta}
-                        </p>
-                      </div>
-                      {p.paraQue && <p className="cn-int-apunte">Para: {p.paraQue}</p>}
-                      {p.delMaterial && <p className="cn-int-apunte">Del material: «{p.delMaterial}»</p>}
-                      {p.respuestaProbable && (
-                        <div className="cn-int-turno">
-                          {/*
-                            EL NOMBRE, Y NO «PROBABLEMENTE CONTESTE». Con dos o
-                            tres personas preparadas en la misma pantalla, el
-                            rótulo genérico obligaba a subir hasta la cabecera
-                            para saber quién contestaba eso.
-                          */}
-                          <span className="cn-int-quien">{persona.nombre} probablemente</span>
-                          <p className="cn-int-dicho cn-int-dicho--probable">{p.respuestaProbable}</p>
-                        </div>
-                      )}
-                      {p.repregunta && (
-                        <div className="cn-int-turno">
-                          <span className="cn-int-quien">Usted repregunta</span>
-                          <p className="cn-int-dicho">{p.repregunta}</p>
-                        </div>
-                      )}
-                      {p.conQue ? (
-                        <div className="cn-int-turno">
-                          <span className="cn-int-quien">Con qué</span>
-                          <p className="cn-int-dicho cn-int-dicho--cita">
-                            {documentId ? (
-                              <button
-                                type="button"
-                                className="cn-exp-conque-doc"
-                                onClick={() => setLeyendo(documentId)}
-                              >
-                                {p.conQue.documento}
-                              </button>
-                            ) : (
-                              <span>{p.conQue.documento}</span>
-                            )}{' '}
-                            — <span className="cn-exp-mono">«{p.conQue.cita}»</span>
-                          </p>
-                        </div>
-                      ) : (
-                        /*
-                          Solo cuando hubo pasajes que mirar. Sin ellos esta
-                          frase sería un hallazgo sobre documentos que nadie
-                          leyó: ver `conMaterial`.
-                        */
-                        conMaterial && <p className="cn-int-apunte">{SIN_CON_QUE}</p>
-                      )}
-                    </li>
-                  );
-                })}
-              </ol>
-            </div>
-          ))}
+          <ListaDeTurnos
+            preguntas={abierto.preguntas}
+            conMaterial={conMaterial}
+            documentosPorTitulo={documentosPorTitulo}
+            onLeerDocumento={setLeyendo}
+          />
         </div>
+      )}
+
+      {/*
+        SE MONTA AQUÍ, con los demás diálogos del panel y no dentro de la zona
+        de la tanda, para que leer un documento del «con qué» ENCIMA de la
+        lectura amplia lo resuelva el mismo apilado que en el taller. Cuelga de
+        `abierto` porque sin tanda abierta no hay nada que leer.
+      */}
+      {abierto && (
+        <LecturaAmpliaDelInforme
+          abierto={lecturaAmplia}
+          onCerrar={() => setLecturaAmplia(false)}
+          titulo="Interrogatorio"
+          detalle={[aQuienCubre(abierto.preguntas.porPersona.map((p) => p.nombre)), expediente.caratula]
+            .filter(Boolean)
+            .join(' · ')}
+          acciones={
+            <>
+              <button
+                type="button"
+                onClick={() => void copiar(abierto.preguntas)}
+                className="btn-neutral btn-sm gap-1.5"
+                title="Copiar el interrogatorio completo como texto"
+              >
+                {copiado ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                {copiado ? 'Copiado' : 'Copiar'}
+              </button>
+              <button type="button" onClick={() => descargar('word', abierto.preguntas)} className="btn-neutral btn-sm gap-1.5">
+                <Download className="h-3.5 w-3.5" />
+                Word
+              </button>
+              <button type="button" onClick={() => descargar('pdf', abierto.preguntas)} className="btn-neutral btn-sm gap-1.5">
+                <Download className="h-3.5 w-3.5" />
+                PDF
+              </button>
+            </>
+          }
+        >
+          <div className="cara-nueva cn-exp cn-exp-piel">
+            {abierto.preguntas.enfoque && <p className="cn-int-tecnica-detalle">{abierto.preguntas.enfoque}</p>}
+            <ListaDeTurnos
+              preguntas={abierto.preguntas}
+              conMaterial={conMaterial}
+              documentosPorTitulo={documentosPorTitulo}
+              onLeerDocumento={setLeyendo}
+            />
+          </div>
+        </LecturaAmpliaDelInforme>
       )}
 
       <ConfirmarDialog confirmacion={confirmacionDeBorrado} onCerrar={() => setPorBorrar(null)} />

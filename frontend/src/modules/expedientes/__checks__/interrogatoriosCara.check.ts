@@ -157,6 +157,27 @@ check(
  * turno va con su nombre a un lado, como el transcrito de Audiencias.
  */
 check('cada turno dice quién habla', PANEL_CODIGO.includes('cn-int-quien'));
+
+/* ─── LEERLO SIN EL RESTO DE LA PANTALLA ────────────────────────────────── */
+
+/*
+ * El interrogatorio se repasa entero minutos antes de la audiencia, y en el
+ * panel convive con el formulario de pedir otro, la lista de los ya preparados
+ * y el resto del expediente. Se reusa el diálogo del taller —el mismo nombre y
+ * el mismo comportamiento— en vez de inventar otro.
+ */
+/* Sobre el código SIN comentarios: los comentarios de este mismo archivo nombran el botón y avalarían su ausencia. */
+check('hay «Leer en grande», como en el taller', PANEL_CODIGO.includes('Leer en grande'));
+check('y abre el diálogo del taller, no uno nuevo', PANEL_CODIGO.includes('<LecturaAmpliaDelInforme'));
+check(
+  'las preguntas se pintan UNA sola vez en el código y se usan en los dos sitios',
+  (PANEL_CODIGO.match(/<ListaDeTurnos\s*$/gm) ?? []).length === 2,
+  'dos usos del mismo componente'
+);
+check(
+  'el diálogo lleva las mismas descargas, que es a lo que se va desde ahí',
+  PANEL_CODIGO.includes('acciones={') && PANEL_CODIGO.includes("descargar('pdf', abierto.preguntas)")
+);
 check(
   'la pregunta y la repregunta son suyas, y lo dicen',
   PANEL.includes('Usted pregunta') && PANEL.includes('Usted repregunta')
