@@ -1,6 +1,6 @@
 import React from 'react';
 import { expedientesApi } from './services/expedientes.api';
-import type { Expediente } from './types';
+import type { CasoBuscable, Expediente } from './types';
 
 /**
  * LOS EXPEDIENTES DE LA FIRMA, PARA ESCOGER UNO.
@@ -30,8 +30,23 @@ import type { Expediente } from './types';
  * control. Nadie deja de redactar, de orientar ni de transcribir porque el
  * catálogo de casos no respondió: atar es un extra, el trabajo es el trabajo.
  */
-export const useExpedientes = (): Expediente[] => {
-  const [expedientes, setExpedientes] = React.useState<Expediente[]>([]);
+/**
+ * ─── DEVUELVE `CasoBuscable`, QUE ES LO QUE LA RUTA YA MANDABA ─────────────
+ *
+ * `GET /api/expedientes` trae desde siempre el documento del cliente y las
+ * personas de cada caso —son los datos con que «Mis casos» encuentra un asunto
+ * por cédula—, y este gancho los tiraba al tiparlos fuera. El selector
+ * compartido los necesita para que escribir una cédula o el nombre de un
+ * testigo encuentre el caso, igual que en la lista. No se pide nada más al
+ * servidor: se deja de esconder lo que ya venía.
+ *
+ * NO se promete el RESUMEN del caso (próximo término, documentos): eso lo pide
+ * «Mis casos» aparte, y prometerlo aquí es cómo se llega a leerlo sin
+ * comprobar. Todo consumidor de hoy lee solo campos de `Expediente`, así que
+ * ninguno cambia.
+ */
+export const useExpedientes = (): CasoBuscable[] => {
+  const [expedientes, setExpedientes] = React.useState<CasoBuscable[]>([]);
 
   React.useEffect(() => {
     let vivo = true;

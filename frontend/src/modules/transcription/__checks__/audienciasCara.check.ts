@@ -186,6 +186,10 @@ for (const [nombre, codigo] of Object.entries(MODULO)) {
 check('la lista no pinta una fila «Transcribiendo»', !/Transcribiendo/.test(LISTA));
 
 check('el diálogo de subir sigue usando el selector compartido del caso', SUBIR.includes('<SelectorDeExpediente'));
+/* Y con la cara nueva: sin la bandera el selector compartido vuelve al
+   `<select>` del sistema operativo, que es la interfaz vieja. */
+check('y el selector del caso va con la cara nueva', /<SelectorDeExpediente\s+cara="nueva"/.test(SUBIR));
+check('el diálogo no escribe a mano ninguna lista de casos', !/<select/.test(SUBIR));
 check('y conserva el campo de contexto que viaja al motor', SUBIR.includes('value={contexto}'));
 check('el límite se arma con el del servidor y los formatos del código', SUBIR.includes('limiteDeSubida(maxAudioBytes, SUPPORTED_AUDIO_EXTENSIONS)'));
 check('la línea de privacidad dice que la grabación no se guarda', SUBIR.includes('La grabación no se guarda'));

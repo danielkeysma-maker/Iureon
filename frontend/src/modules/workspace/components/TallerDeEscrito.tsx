@@ -40,6 +40,7 @@ import { MarcasDelHallazgo } from './ComprobacionAutomatica';
 import { InformeDelEscritoPropio } from './InformeDelEscritoPropio';
 import { LecturaAmpliaDelInforme } from './LecturaAmpliaDelInforme';
 import { normalizarInforme } from '../services/comprobaciones';
+import { cintaSeEscondeEnElTelefono } from '../services/cintaDelGuardado';
 import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
 
 /**
@@ -495,6 +496,12 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
    */
   const versionesGuardadas = React.useRef<VersionDelTexto[]>(datos.versiones);
   const [versionesNoCaben, setVersionesNoCaben] = React.useState(false);
+  /*
+   * LA CINTA, A UN TOQUE EN EL TELÉFONO. Cuando cede su altura al documento,
+   * el botón de la barra del escrito la vuelve a traer; al soltarlo, se va de
+   * nuevo. No se persiste: es una forma de mirar, no un estado del trabajo.
+   */
+  const [cintaALaVista, setCintaALaVista] = React.useState(false);
   const versionesParaEnviar = (instantanea: { texto: string; conversacion: TurnoDelTaller[]; anotaciones: Anotacion[]; versiones: VersionDelTexto[] }): VersionDelTexto[] | undefined => {
     if (instantanea.versiones === versionesGuardadas.current) return undefined;
     const caben = bytesDe(instantanea) <= LIMITE_DEL_GUARDADO;
@@ -824,8 +831,15 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
 
   /* ─── Piezas (funciones de render) ───────────────────────────────────────── */
 
+  const cintaCede = cintaSeEscondeEnElTelefono({
+    activo: guardado.activo,
+    estado: estadoGuardado,
+    versionesNoCaben,
+    hayAccion: Boolean(guardado.accion)
+  });
+
   const Cinta = () => (
-    <div className={`cn-tal-cinta ${guardado.activo ? 'cn-tal-cinta--nube' : 'cn-tal-cinta--sesion'}`}>
+    <div className={`cn-tal-cinta ${guardado.activo ? 'cn-tal-cinta--nube' : 'cn-tal-cinta--sesion'} ${cintaCede && !cintaALaVista ? 'cn-tal-cinta--oculta' : ''}`}>
       {guardado.activo ? <ShieldCheck className="cn-tal-cinta-icono" /> : <AlertTriangle className="cn-tal-cinta-icono" />}
       <span className="cn-tal-cinta-texto">
         {guardado.aviso}
@@ -994,6 +1008,28 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
           )}
         </span>
         <div className="cn-tal-herramientas-fin">
+          {/*
+            DONDE QUEDA EL TEXTO, A UN TOQUE Y SIN GASTAR ALTURA. La cinta cede
+            sus 83 px al documento en el teléfono, así que su frase vive aquí:
+            en la barra que ya existe, que en el teléfono es una sola fila que
+            se desliza y no crece con un botón más. El envoltorio lleva el
+            `display` —la regla del botón pondría el suyo encima—, y desde 640
+            px no hace falta: ahí la cinta nunca se fue.
+          */}
+          {cintaCede && (
+            <span className="inline-flex sm:hidden">
+              <button
+                type="button"
+                onClick={() => setCintaALaVista((v) => !v)}
+                aria-expanded={cintaALaVista}
+                className="cn-tal-icono-boton"
+                title="Dónde queda el texto"
+                aria-label="Dónde queda el texto"
+              >
+                <ShieldCheck className="h-5 w-5" />
+              </button>
+            </span>
+          )}
           <button type="button" onClick={() => tomarVersion('guardada a mano') || setError('El texto no cambió desde la última versión.')} className="cn-tal-boton cn-tal-boton--marca" title="Guardar una versión del texto tal como está">
             <Save className="cn-tal-boton-icono" />
             Guardar versión
@@ -1512,6 +1548,62 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
     </div>
   );
 
+  /*
+   * ─── PEDIR OTRA REVISIÓN: EL MISMO BOTÓN, DOS TALLAS ──────────────────────
+   *
+   * En el computador va donde siempre, en la cabecera, con su rótulo en un
+   * renglón. En el teléfono ese renglón obligaba a la cabecera a partirse en
+   * dos: la fila de acciones sumaba 44 px de botón más 8 px de separación —52
+   * px que salían del documento—. Así que en el teléfono el botón se va a la
+   * fila de «Escrito / Guía», que ya existe y no crece por acogerlo, y ahí se
+   * pinta en dos renglones —qué hace arriba, cuánto cuesta abajo— para caber
+   * al lado de los segmentos.
+   *
+   * EL PRECIO NO SE CAE NUNCA. En el teléfono el botón es el único lugar donde
+   * el abogado ve lo que va a costar antes de pagar; por eso la talla compacta
+   * pierde el punto medio pero no la cifra, y la dice como la dicen el diálogo
+   * y el manual: «desde», porque $2.000 es el piso, no el precio cerrado. El
+   * nombre accesible lo repite entero para quien no ve los dos renglones.
+   */
+  const rotuloDeRerevisar = informe ? 'Volver a revisar' : 'Revisión completa';
+  const BotonDeRerevisar = (compacto: boolean) =>
+    onRerevisar && precioRevisionCop !== undefined ? (
+      <button
+        type="button"
+        onClick={() =>
+          setConfirmacion({
+            titulo: informe ? 'Volver a revisar el escrito' : 'Pedir una revisión completa',
+            texto: (
+              <span className="cn-inf-dialogo-texto">
+                <span>
+                  La guía emitirá un informe {informe ? 'nuevo ' : ''}sobre el texto <span className="cn-inf-seleccionado">tal como está ahora</span>, con sus cambios.
+                  {informe ? ' El informe anterior queda en la conversación y el texto de ahora, en Versiones.' : ''} Se descuentan {pesos(precioRevisionCop)} del saldo de la firma.
+                </span>
+              </span>
+            ),
+            etiqueta: `${informe ? 'Revisar de nuevo' : 'Revisar'} · ${pesos(precioRevisionCop)}`,
+            onConfirmar: rerevisar
+          })
+        }
+        disabled={ocupado !== null || Boolean(cerradas?.rerevisar)}
+        title={cerradas?.rerevisar ? AVISO_FUNCION_DESHABILITADA : undefined}
+        aria-label={ocupado === 'revision' ? 'Revisando el escrito' : `${rotuloDeRerevisar}, desde ${pesos(precioRevisionCop)} de su saldo`}
+        className={`cn-tal-boton cn-tal-boton--marca ${compacto ? 'cn-tal-rerevisar--compacto' : ''}`}
+      >
+        <RefreshCw className={`cn-tal-boton-icono ${ocupado === 'revision' ? 'animate-spin' : ''}`} />
+        {ocupado === 'revision' ? (
+          'Revisando…'
+        ) : compacto ? (
+          <span className="cn-tal-rerevisar-apilado">
+            <span className="cn-tal-rerevisar-que">{rotuloDeRerevisar}</span>
+            <span className="cn-tal-rerevisar-costo">desde {pesos(precioRevisionCop)}</span>
+          </span>
+        ) : (
+          `${rotuloDeRerevisar} · ${pesos(precioRevisionCop)}`
+        )}
+      </button>
+    ) : null;
+
   return (
     <div className={`cara-nueva cn-tal flex min-h-0 min-w-0 flex-1 flex-col ${pantallaCompleta ? 'fixed inset-0 z-50' : ''}`}>
       <div className="cn-tal-cabeza">
@@ -1541,32 +1633,8 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
             {pantallaCompleta ? <Minimize2 className="cn-tal-boton-icono" /> : <Maximize2 className="cn-tal-boton-icono" />}
             <span className="hidden sm:inline">{pantallaCompleta ? 'Salir' : 'Pantalla completa'}</span>
           </button>
-          {onRerevisar && precioRevisionCop !== undefined && (
-            <button
-              type="button"
-              onClick={() =>
-                setConfirmacion({
-                  titulo: informe ? 'Volver a revisar el escrito' : 'Pedir una revisión completa',
-                  texto: (
-                    <span className="cn-inf-dialogo-texto">
-                      <span>
-                        La guía emitirá un informe {informe ? 'nuevo ' : ''}sobre el texto <span className="cn-inf-seleccionado">tal como está ahora</span>, con sus cambios.
-                        {informe ? ' El informe anterior queda en la conversación y el texto de ahora, en Versiones.' : ''} Se descuentan {pesos(precioRevisionCop)} del saldo de la firma.
-                      </span>
-                    </span>
-                  ),
-                  etiqueta: `${informe ? 'Revisar de nuevo' : 'Revisar'} · ${pesos(precioRevisionCop)}`,
-                  onConfirmar: rerevisar
-                })
-              }
-              disabled={ocupado !== null || Boolean(cerradas?.rerevisar)}
-              title={cerradas?.rerevisar ? AVISO_FUNCION_DESHABILITADA : undefined}
-              className="cn-tal-boton cn-tal-boton--marca"
-            >
-              <RefreshCw className={`cn-tal-boton-icono ${ocupado === 'revision' ? 'animate-spin' : ''}`} />
-              {ocupado === 'revision' ? 'Revisando…' : informe ? `Volver a revisar · ${pesos(precioRevisionCop)}` : `Revisión completa · ${pesos(precioRevisionCop)}`}
-            </button>
-          )}
+          {/* Desde 640 px el botón vive aquí, en un renglón; debajo de eso lo recoge la fila de «Escrito / Guía» y esta fila deja de existir. */}
+          <span className="hidden sm:inline-flex">{BotonDeRerevisar(false)}</span>
         </div>
       </div>
       {Cinta()}
@@ -1601,6 +1669,14 @@ export const TallerDeEscrito: React.FC<TallerDeEscritoProps> = ({
             </button>
           ))}
         </div>
+        {/*
+          LA TALLA COMPACTA VIAJA AQUÍ, y no a la barra del escrito: esta fila
+          se ve en las dos vistas del teléfono, y la del escrito desaparece en
+          cuanto el abogado pasa a «Guía». El envoltorio lo esconde desde 640 px
+          —el botón nunca lleva `display` propio, porque su regla le pondría el
+          suyo encima—.
+        */}
+        <span className="cn-tal-vistas-accion sm:hidden">{BotonDeRerevisar(true)}</span>
       </div>
 
       <div className="flex min-h-0 min-w-0 flex-1">

@@ -163,7 +163,11 @@ const LLAMADAS: Array<[string, string]> = [
   ['AgendaForm', 'agendaApi.crear({'],
   ['AgendaForm', 'agendaApi.previsualizar({'],
   ['AgendaForm', 'agendaApi.plazoDe(actuacionId)'],
-  ['AgendaForm', '<SelectorDeExpediente']
+  /* Con la bandera pegada: sin ella el selector compartido vuelve al
+     `<select>` del sistema operativo, la interfaz vieja que se reportó. Los
+     otros `<select>` del formulario —jurisdicción, estado— no son el caso y
+     por eso aquí se exige la bandera y no la ausencia de listas nativas. */
+  ['AgendaForm', '<SelectorDeExpediente cara="nueva"']
 ];
 /* Sin espacios: el formateador parte `toolsApi.parametros()` en dos renglones y la llamada sigue siendo la misma. */
 const junto = (texto: string): string => texto.replace(/\s+/g, '');

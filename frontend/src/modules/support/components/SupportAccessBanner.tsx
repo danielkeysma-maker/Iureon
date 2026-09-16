@@ -90,8 +90,16 @@ export const SupportAccessBanner: React.FC<SupportAccessBannerProps> = ({
     supportApi
       .estado()
       .then((d) => {
-        setDatos(d);
-        setMinutos(d.estado.minutosRestantes);
+        /*
+         * UNA RESPUESTA MALFORMADA NO PUEDE TUMBAR LA APLICACION. Esto se leia
+         * sin comprobar la forma, y `d.estado` ausente lanzaba durante el
+         * render: no una franja rota, sino la pantalla entera en blanco. Si lo
+         * que llega no trae `estado`, se conserva lo ultimo que dijo el
+         * servidor, igual que con un fallo de red.
+         */
+        if (!d || typeof d !== 'object' || !d.estado || typeof d.estado !== 'object') return;
+        setDatos({ ...d, lecturas: Array.isArray(d.lecturas) ? d.lecturas : [] });
+        setMinutos(typeof d.estado.minutosRestantes === 'number' ? d.estado.minutosRestantes : null);
         onEstado?.(d);
       })
       .catch(() => {
@@ -128,8 +136,8 @@ export const SupportAccessBanner: React.FC<SupportAccessBannerProps> = ({
     return () => window.clearInterval(t);
   }, []);
 
-  const activo = datos?.estado.activo ?? null;
-  const pendiente = datos?.estado.pendiente ?? null;
+  const activo = datos?.estado?.activo ?? null;
+  const pendiente = datos?.estado?.pendiente ?? null;
 
   const revocar = async () => {
     if (!activo) return;
@@ -216,7 +224,7 @@ export const SupportAccessBanner: React.FC<SupportAccessBannerProps> = ({
 
       {panelAbierto && (
         <div id={idPanel} className="cn-sop-franja-panel">
-          {datos && datos.lecturas.length === 0 ? (
+          {datos && (datos.lecturas?.length ?? 0) === 0 ? (
             <p className="cn-sop-franja-nota">
               No ha abierto nada todavía. El acceso está concedido, pero está vacío.
             </p>

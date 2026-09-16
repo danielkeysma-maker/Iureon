@@ -51,6 +51,18 @@ interface SelectorDelFormularioProps {
   cargando?: boolean;
   /** Apagada en las listas cortas: una lupa sobre cinco opciones es un paso de más. */
   conBusqueda?: boolean;
+  /**
+   * SOLO LLEGA AL ESCRITORIO, y es deliberado. Ver `SelectorEnCascada`.
+   *
+   * En el teléfono la lista es la NATIVA del sistema: se abre entera, se
+   * desplaza con el dedo y no pelea con el teclado, y por eso se conserva. Esa
+   * lista no admite una caja de búsqueda ni una fila de filtro dentro —el
+   * sistema la pinta— así que ahí no hay dónde poner esto. Lo que sí viaja son
+   * los GRUPOS, que van como `<optgroup>`, y el orden, que ya viene decidido en
+   * `opciones`: el teléfono conserva la agrupación por cliente y los casos
+   * recientes arriba, y pierde solo el filtrado, que es lo que no cabe.
+   */
+  busquedaControlada?: React.ComponentProps<typeof SelectorEnCascada>['busquedaControlada'];
 }
 
 export const SelectorDelFormulario: React.FC<SelectorDelFormularioProps> = ({
@@ -62,7 +74,8 @@ export const SelectorDelFormulario: React.FC<SelectorDelFormularioProps> = ({
   vacio = 'Elegir…',
   pie,
   cargando = false,
-  conBusqueda = true
+  conBusqueda = true,
+  busquedaControlada
 }) => {
   const ancha = useVentanaAncha();
 
@@ -77,6 +90,7 @@ export const SelectorDelFormulario: React.FC<SelectorDelFormularioProps> = ({
         pie={pie}
         cargando={cargando}
         conBusqueda={conBusqueda}
+        busquedaControlada={busquedaControlada}
         enLinea
       />
     );

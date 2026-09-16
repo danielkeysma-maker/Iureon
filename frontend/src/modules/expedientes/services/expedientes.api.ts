@@ -1,9 +1,12 @@
 import { httpClient } from '../../../config/httpClient';
 import type {
   ActorDelExpediente,
+  CasoBuscable,
   Expediente,
   MisCasos,
   ExpedienteConDetalle,
+  InterrogatorioEnLaLista,
+  InterrogatorioGuardado,
   LadoEnElExpediente,
   PapelEnElExpediente,
   PreguntasDelExpediente
@@ -71,8 +74,13 @@ export interface Candidato {
 }
 
 export const expedientesApi = {
-  async listar(): Promise<Expediente[]> {
-    const data = await httpClient.get<Respuesta & { expedientes: Expediente[] }>('/api/expedientes');
+  /**
+   * La lista para escoger un caso. Trae el documento del cliente y las personas
+   * de cada uno —que la ruta ya mandaba— porque el selector compartido busca
+   * por cédula y por nombre de persona con las MISMAS reglas que la lista.
+   */
+  async listar(): Promise<CasoBuscable[]> {
+    const data = await httpClient.get<Respuesta & { expedientes: CasoBuscable[] }>('/api/expedientes');
     return revisar(data, 'No se pudieron cargar los expedientes.').expedientes;
   },
 
@@ -371,14 +379,61 @@ export const expedientesApi = {
     revisar(data, 'No se pudo quitar el documento.');
   },
 
-  /** Prepara el interrogatorio. CUESTA SALDO: la pantalla lo dice antes de llamar. */
+  /**
+   * Prepara el interrogatorio. CUESTA SALDO: la pantalla lo dice antes de
+   * llamar. Es el ÚNICO método de este archivo que cobra; los tres de abajo
+   * leen y borran lo que ya se pagó.
+   *
+   * `guardado` trae la ficha de la tanda recién archivada, o `null` si el
+   * servidor no la pudo guardar. La pantalla lo dice en vez de enseñar una
+   * lista a la que le falta lo que el abogado acaba de pedir.
+   */
   async preguntas(
     expedienteId: string,
     body: { actorIds: string[]; quiereProbar?: string; audiencia?: string }
-  ): Promise<{ preguntas: PreguntasDelExpediente; cobradoCop: number; saldoCop: number }> {
+  ): Promise<{
+    preguntas: PreguntasDelExpediente;
+    guardado: InterrogatorioEnLaLista | null;
+    cobradoCop: number;
+    saldoCop: number;
+  }> {
     const data = await httpClient.post<
-      Respuesta & { preguntas: PreguntasDelExpediente; cobradoCop: number; saldoCop: number }
+      Respuesta & {
+        preguntas: PreguntasDelExpediente;
+        guardado?: InterrogatorioEnLaLista | null;
+        cobradoCop: number;
+        saldoCop: number;
+      }
     >(`/api/expedientes/${expedienteId}/preguntas`, { body });
-    return revisar(data, 'No se pudo preparar el interrogatorio.');
+    const ok = revisar(data, 'No se pudo preparar el interrogatorio.');
+    return { ...ok, guardado: ok.guardado ?? null };
+  },
+
+  /** Las tandas ya preparadas de un caso, la más nueva primero. No cuesta. */
+  async interrogatorios(expedienteId: string): Promise<InterrogatorioEnLaLista[]> {
+    const data = await httpClient.get<Respuesta & { interrogatorios: InterrogatorioEnLaLista[] }>(
+      `/api/expedientes/${expedienteId}/interrogatorios`
+    );
+    return revisar(data, 'No se pudieron leer los interrogatorios preparados.').interrogatorios;
+  },
+
+  /**
+   * Abre una tanda guardada. NO COBRA, y esa es toda su razón de ser: hasta hoy
+   * el abogado que recargaba la página tenía que volver a pagar para leer lo
+   * que ya había comprado.
+   */
+  async abrirInterrogatorio(expedienteId: string, interrogatorioId: string): Promise<InterrogatorioGuardado> {
+    const data = await httpClient.get<Respuesta & { interrogatorio: InterrogatorioGuardado }>(
+      `/api/expedientes/${expedienteId}/interrogatorios/${interrogatorioId}`
+    );
+    return revisar(data, 'No se pudo abrir el interrogatorio.').interrogatorio;
+  },
+
+  /** Elimina una tanda. Solo quien la preparó o un socio administrador. */
+  async borrarInterrogatorio(expedienteId: string, interrogatorioId: string): Promise<void> {
+    const data = await httpClient.delete<Respuesta>(
+      `/api/expedientes/${expedienteId}/interrogatorios/${interrogatorioId}`
+    );
+    revisar(data, 'No se pudo eliminar el interrogatorio.');
   }
 };

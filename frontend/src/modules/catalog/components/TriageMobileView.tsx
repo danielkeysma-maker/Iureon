@@ -288,9 +288,16 @@ export const TriageMobileView: React.FC<TriageMobileViewProps> = ({ onDraft, onL
             quien NO sabe todavía qué tiene, así que pedirle el expediente
             antes de contar el caso sería pedirle lo que quizá no existe. Va
             debajo, y solo si la firma tiene expedientes.
+
+            CON LA CARA NUEVA: en el teléfono el selector compartido pinta la
+            lista nativa con la piel de la cara nueva (`cn-red-select`), que es
+            lo que ya hacen las demás pantallas rediseñadas. No se pinta una
+            lista propia aquí: la del sistema se abre entera, se desplaza con
+            el dedo y no pelea con el teclado.
           */}
           <div className="cn-ori-selector">
             <SelectorDeExpediente
+              cara="nueva"
               valor={expedienteId}
               onCambio={setExpedienteId}
               id="expediente-de-la-orientacion-movil"

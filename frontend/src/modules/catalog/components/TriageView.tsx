@@ -380,9 +380,18 @@ export const TriageView: React.FC<TriageViewProps> = ({ onDraft, setMainView, on
             quien NO sabe todavía qué tiene, así que pedirle el expediente
             antes de contar el caso sería pedirle lo que quizá no existe. Va
             debajo, y solo si la firma tiene expedientes.
+
+            CON LA CARA NUEVA: el desplegable azul del sistema operativo era
+            justo lo que se reportó como interfaz vieja. Detrás de
+            `cara="nueva"` el selector compartido pinta en escritorio una lista
+            propia y buscable EN LÍNEA —esta pantalla se desplaza, y una lista
+            flotante quedaría recortada— y en el teléfono la lista nativa con
+            la piel de la cara nueva. La lista, el «Sin expediente» y el valor
+            que se envía siguen siendo los mismos.
           */}
           <div className="cn-ori-selector">
             <SelectorDeExpediente
+              cara="nueva"
               valor={expedienteId}
               onCambio={setExpedienteId}
               id="expediente-de-la-orientacion"

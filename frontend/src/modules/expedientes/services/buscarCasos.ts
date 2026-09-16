@@ -1,6 +1,13 @@
 import { BRANCH_LABELS } from '../../catalog/branchLabels';
 import { compararEnEspanol } from '../../workspace/services/fichaEnLaLista';
-import { NOMBRE_DE_PAPEL, type ExpedienteEnLista, type PersonaEnLista } from '../types';
+import {
+  NOMBRE_DE_PAPEL,
+  type CasoBuscable,
+  type ExpedienteEnLista,
+  type PersonaEnLista
+} from '../types';
+
+export type { CasoBuscable };
 
 /**
  * LA BÚSQUEDA Y LOS FILTROS DE LA LISTA DE EXPEDIENTES. Funciones puras.
@@ -128,9 +135,23 @@ export interface RegistroDelCaso {
   mes: number;
 }
 
+/**
+ * ─── LA MISMA REGLA SIRVE A LA LISTA Y AL SELECTOR ─────────────────────────
+ *
+ * El selector compartido de «De qué caso es» busca con estas mismas funciones.
+ * Escribir aquí una segunda búsqueda «para el selector» sería exactamente la
+ * copia que este módulo existe para impedir: la primera corrección de una regla
+ * —la cédula desde el primer dígito, el año del radicado— se haría en una y la
+ * otra se quedaría atrás, sin que nada fallara.
+ *
+ * Así que lo que se afloja es el TIPO DE ENTRADA (`CasoBuscable`), no la regla:
+ * quien traiga más campos los conserva —`CasoIndexado<T>` devuelve el caso tal
+ * como entró— y quien traiga los justos también entra.
+ */
+
 /** El caso con todo lo que la búsqueda compara ya normalizado: se calcula una vez por respuesta. */
-export interface CasoIndexado {
-  caso: ExpedienteEnLista;
+export interface CasoIndexado<T extends CasoBuscable = ExpedienteEnLista> {
+  caso: T;
   textos: CampoDeTexto[];
   documentos: CampoDeDocumento[];
   radicado: RadicadoIndexado | null;
@@ -139,8 +160,8 @@ export interface CasoIndexado {
   claveDeRama: string;
 }
 
-export interface ResultadoDeBusqueda {
-  caso: ExpedienteEnLista;
+export interface ResultadoDeBusqueda<T extends CasoBuscable = ExpedienteEnLista> {
+  caso: T;
   porQue: MotivoDeCoincidencia | null;
 }
 
@@ -194,7 +215,7 @@ export const registroEnBogota = (iso: string): RegistroDelCaso | null => {
   return { anio: d.getUTCFullYear(), mes: d.getUTCMonth() + 1 };
 };
 
-export const indexarCaso = (caso: ExpedienteEnLista): CasoIndexado => {
+export const indexarCaso = <T extends CasoBuscable>(caso: T): CasoIndexado<T> => {
   const textos: CampoDeTexto[] = [];
   const visible = (t: string | null | undefined) => {
     if (t?.trim()) textos.push({ norm: normalizar(t), motivo: null });
@@ -304,7 +325,7 @@ const porRadicado = (r: RadicadoIndexado, q: Consulta): PorRadicado => {
 };
 
 /** `undefined` si no coincide; `null` si coincide por algo que la tarjeta ya muestra. */
-const coincidencia = (x: CasoIndexado, q: Consulta): MotivoDeCoincidencia | null | undefined => {
+const coincidencia = (x: CasoIndexado<CasoBuscable>, q: Consulta): MotivoDeCoincidencia | null | undefined => {
   const radicado = x.radicado ? porRadicado(x.radicado, q) : null;
   if (radicado === 'visible') return null;
 
@@ -342,10 +363,13 @@ const coincidencia = (x: CasoIndexado, q: Consulta): MotivoDeCoincidencia | null
 };
 
 /** Los casos que coinciden, en el mismo orden en que llegaron, con el porqué. */
-export const buscarCasos = (indices: readonly CasoIndexado[], texto: string): ResultadoDeBusqueda[] => {
+export const buscarCasos = <T extends CasoBuscable>(
+  indices: readonly CasoIndexado<T>[],
+  texto: string
+): ResultadoDeBusqueda<T>[] => {
   const q = prepararConsulta(texto);
   if (q.palabras.length === 0) return indices.map((x) => ({ caso: x.caso, porQue: null }));
-  const resultados: ResultadoDeBusqueda[] = [];
+  const resultados: ResultadoDeBusqueda<T>[] = [];
   for (const x of indices) {
     const m = coincidencia(x, q);
     if (m !== undefined) resultados.push({ caso: x.caso, porQue: m });
@@ -376,17 +400,17 @@ export interface FiltroDeRegistro {
   mes: number | null;
 }
 
-export const filtrarPorRegistro = <T extends CasoIndexado>(indices: readonly T[], f: FiltroDeRegistro): T[] => {
+export const filtrarPorRegistro = <T extends CasoIndexado<CasoBuscable>>(indices: readonly T[], f: FiltroDeRegistro): T[] => {
   if (f.anio === null) return [...indices];
   return indices.filter((x) => x.registro?.anio === f.anio && (f.mes === null || x.registro.mes === f.mes));
 };
 
 /** Los años en que hay casos registrados, del más reciente al más antiguo. */
-export const aniosDeRegistro = (indices: readonly CasoIndexado[]): number[] =>
+export const aniosDeRegistro = (indices: readonly CasoIndexado<CasoBuscable>[]): number[] =>
   [...new Set(indices.map((x) => x.registro?.anio).filter((a): a is number => typeof a === 'number'))].sort((a, b) => b - a);
 
 /** Los meses de ese año en que hay casos, de enero a diciembre. */
-export const mesesDeRegistro = (indices: readonly CasoIndexado[], anio: number): number[] =>
+export const mesesDeRegistro = (indices: readonly CasoIndexado<CasoBuscable>[], anio: number): number[] =>
   [...new Set(indices.filter((x) => x.registro?.anio === anio).map((x) => x.registro!.mes))].sort((a, b) => a - b);
 
 /* ─── RAMA ────────────────────────────────────────────────────────────────── */
@@ -399,7 +423,7 @@ export interface OpcionDeRama {
 const etiquetaDeClave = (clave: string): string => (clave === CLAVE_SIN_RAMA ? SIN_RAMA : etiquetaDeRama(clave));
 
 /** `null` es «Todas». */
-export const filtrarPorRama = <T extends CasoIndexado>(indices: readonly T[], clave: string | null): T[] =>
+export const filtrarPorRama = <T extends CasoIndexado<CasoBuscable>>(indices: readonly T[], clave: string | null): T[] =>
   clave === null ? [...indices] : indices.filter((x) => x.claveDeRama === clave);
 
 /**
@@ -412,7 +436,7 @@ export const filtrarPorRama = <T extends CasoIndexado>(indices: readonly T[], cl
  * tenga: el filtro sobrevive al cambio de pestaña, y un control que no muestra
  * lo que está filtrando haría leer la lista vacía como «no hay casos».
  */
-export const opcionesDeRama = (indices: readonly CasoIndexado[], elegida: string | null): OpcionDeRama[] => {
+export const opcionesDeRama = (indices: readonly CasoIndexado<CasoBuscable>[], elegida: string | null): OpcionDeRama[] => {
   const claves = new Set(indices.map((x) => x.claveDeRama));
   if (elegida !== null) claves.add(elegida);
   const sinRama = claves.delete(CLAVE_SIN_RAMA);

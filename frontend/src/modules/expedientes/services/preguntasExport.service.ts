@@ -3,7 +3,7 @@ import { saveAs } from 'file-saver';
 import { jsPDF } from 'jspdf';
 import { registrarFuenteDelEscrito } from '../../documents/services/pdfFonts';
 import { getMarcaActual } from '../../tenant/services/branding.api';
-import type { PreguntaParaAlguien, PreguntasDelExpediente } from '../types';
+import { lineaDeConQue, type PreguntaParaAlguien, type PreguntasDelExpediente } from '../types';
 
 /**
  * El interrogatorio, fuera de la pantalla: como texto plano para el
@@ -56,6 +56,15 @@ export const preguntasComoTexto = (c: ContextoDelInterrogatorio, g: PreguntasDel
       lineas.push(`${i + 1}. ${q.pregunta}`);
       if (q.paraQue) lineas.push(`   Para qué: ${q.paraQue}`);
       if (q.delMaterial) lineas.push(`   Del material: «${q.delMaterial}»`);
+      /*
+       * LO QUE SE ANTICIPA VA EN LA HOJA IMPRESA, no solo en la pantalla. A la
+       * audiencia se entra con el papel: una hoja con la pregunta y sin la
+       * respuesta que va a recibir deja al colega sin la mitad que preparó.
+       */
+      if (q.respuestaProbable) lineas.push(`   Probablemente conteste: ${q.respuestaProbable}`);
+      if (q.repregunta) lineas.push(`   Si contesta eso: ${q.repregunta}`);
+      const conQue = lineaDeConQue(q, g.conMaterial);
+      if (conQue) lineas.push(`   ${conQue}`);
       lineas.push('');
     });
   }
@@ -118,6 +127,12 @@ export const exportarPreguntasAWord = async (
       hijos.push(p(`${i + 1}. ${q.pregunta}`, { bold: true, after: 40 }));
       if (q.paraQue) hijos.push(p(`Para qué: ${q.paraQue}`, { size: base - 2, color: gris, indent: 360, after: 40 }));
       if (q.delMaterial) hijos.push(p(`Del material: «${q.delMaterial}»`, { italics: true, size: base - 2, indent: 360, after: 40 }));
+      if (q.respuestaProbable)
+        hijos.push(p(`Probablemente conteste: ${q.respuestaProbable}`, { size: base - 2, color: gris, indent: 360, after: 40 }));
+      if (q.repregunta)
+        hijos.push(p(`Si contesta eso: ${q.repregunta}`, { size: base - 2, indent: 360, after: 40 }));
+      const conQue = lineaDeConQue(q, g.conMaterial);
+      if (conQue) hijos.push(p(conQue, { italics: true, size: base - 2, color: gris, indent: 360, after: 40 }));
       hijos.push(p('', { after: 80 }));
     });
   }
@@ -199,6 +214,12 @@ export const exportarPreguntasAPdf = async (
       escribir(`${i + 1}. ${q.pregunta}`, cuerpoPt, 'normal');
       if (q.paraQue) escribir(`Para qué: ${q.paraQue}`, cuerpoPt - 2, 'normal', 6, NOTA_COLOR);
       if (q.delMaterial) escribir(`Del material: «${q.delMaterial}»`, cuerpoPt - 2, 'italic', 6, NOTA_COLOR);
+      if (q.respuestaProbable)
+        escribir(`Probablemente conteste: ${q.respuestaProbable}`, cuerpoPt - 2, 'normal', 6, NOTA_COLOR);
+      /* La repregunta se lee en voz alta como la pregunta: va en tinta, no en nota. */
+      if (q.repregunta) escribir(`Si contesta eso: ${q.repregunta}`, cuerpoPt - 2, 'normal', 6, TINTA);
+      const conQue = lineaDeConQue(q, g.conMaterial);
+      if (conQue) escribir(conQue, cuerpoPt - 2, 'italic', 6, NOTA_COLOR);
       y += 1.5;
     });
   }

@@ -34,6 +34,7 @@ import type { ComprobacionesDelInforme } from '../services/review.api';
 import { marcasDelHallazgo } from '../services/comprobaciones';
 import { primerLugarMarcado } from '../components/ComprobacionAutomatica';
 import { destinoDelTabulador } from '../components/LecturaAmpliaDelInforme';
+import { cintaSeEscondeEnElTelefono } from '../services/cintaDelGuardado';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const SRC = join(AQUI, '..', '..', '..');
@@ -215,7 +216,8 @@ check(
     'Llevar a Redacción',
     'Pantalla completa',
     'Volver',
-    'Volver a revisar · ',
+    /* El rótulo, sin la cifra pegada: el precio va aparte porque la talla del teléfono lo pinta en su propio renglón. Que la cifra siga ahí lo vigila la sección 11. */
+    'Volver a revisar',
     'Restaurar esta versión',
     'Volver al actual',
     'Aplicar reemplazo',
@@ -373,6 +375,160 @@ check(
 );
 for (const id of ['amarillo', 'verde', 'azul', 'rosa', 'tachado']) {
   check(`el bloque pinta «${id}»`, bloque.includes(`.cara-nueva .cn-tal-capa--${id} {`));
+}
+
+/* ─── 9. EL DOCUMENTO CARGADO SE VE EN EL TELÉFONO ──────────────────────── */
+/*
+ * EL DEFECTO QUE ESTO VIGILA, MEDIDO. En 375×812, con la pestaña «Original»
+ * abierta, las dos barras del taller —la de los modos y la del visor— se
+ * envolvían en cuatro y dos renglones: 231 px y 123 px de los 430 px que la
+ * columna del escrito tiene en ese teléfono. Al documento le quedaban 77 px
+ * pegados al borde inferior. El PDF se pintaba; simplemente no había dónde
+ * verlo, y se reportó como «el visor no se ve en móvil».
+ *
+ * Se vigila la CAUSA, no el síntoma: que en el teléfono la barra sea una sola
+ * fila que se desliza y que ninguna de sus piezas encoja. Y se vigila que el
+ * arreglo no se cuele al computador, donde envolver está bien y donde la barra
+ * nunca ha tenido desplazamiento propio.
+ */
+const MOVIL = /@media \(max-width: 639px\) \{([\s\S]*?)\n\}/.exec(bloque)?.[1] ?? '';
+check('el bloque del taller trae su regla de teléfono', MOVIL !== '');
+check(
+  'en el teléfono la barra del taller es una sola fila que se desliza, no cuatro renglones apilados',
+  /\.cara-nueva \.cn-tal-herramientas \{[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;/.test(MOVIL)
+);
+check(
+  'ninguna pieza de esa barra encoge: lo que no cabe se alcanza deslizando',
+  /\.cara-nueva \.cn-tal-herramientas > \* \{[^}]*flex: none;/.test(MOVIL)
+);
+check(
+  'el nombre del archivo se recorta en vez de empujar las páginas y el zoom fuera de la pantalla',
+  /\.cara-nueva \.cn-tal-visor-nombre \{[^}]*max-width: 42vw;/.test(MOVIL)
+);
+check(
+  'el computador conserva sus barras envueltas y sin desplazamiento propio',
+  !/\.cara-nueva \.cn-tal-herramientas \{[^}]*overflow-x/.test(bloque.replace(MOVIL, ' '))
+);
+/*
+ * Y LO QUE NO SE PUEDE PINTAR SE DICE, CON LAS DOS SALIDAS QUE EL TELÉFONO SÍ
+ * TIENE. Un `.doc` de Word 97 no se abre en ningún navegador; dejar el área en
+ * blanco enseña que el visor está roto.
+ */
+check(
+  'el archivo sin visor lo dice y ofrece abrirlo en otra pestaña y descargarlo, nunca un área en blanco',
+  VISOR.includes('Este archivo no se puede mostrar aquí.') && VISOR.includes('Abrir en otra pestaña') && VISOR.includes('Descargar el archivo')
+);
+
+/* ─── 10. LA CINTA DEL GUARDADO CEDE ALTURA, PERO NUNCA ESCONDE MALAS NOTICIAS ─ */
+/*
+ * EL DEFECTO QUE ESTO VIGILA, MEDIDO. En 375×812 la cinta que dice dónde queda
+ * el texto ocupaba 83 px encima del documento, y en la pestaña «Original» esos
+ * 83 px salen del visor. El titular decidió el 16 de septiembre de 2026
+ * devolvérselos al documento en el teléfono, porque el taller guarda solo y
+ * repetir en cada renglón que guarda no le dice nada nuevo al abogado.
+ *
+ * La regla no es «esconder la cinta en el teléfono»: es esconderla SOLO cuando
+ * lo que dice es tranquilizador y cierto. En cuanto el estado cambia lo que el
+ * abogado puede dar por sentado —«solo en esta sesión», «no se pudo guardar»,
+ * «las versiones nuevas ya no caben»— o cuando la cinta trae un botón, la cinta
+ * se queda. Esconder ahí no sería ahorrar altura: sería ocultar la mala
+ * noticia.
+ *
+ * Por eso se vigila la FUNCIÓN PURA que decide, estado por estado, y no el
+ * dibujo: una regla de CSS que tapara `.cn-tal-cinta` en el teléfono pasaría
+ * cualquier inspección visual y escondería el «no se pudo guardar».
+ */
+const CINTA_SEGURA = { activo: true, versionesNoCaben: false, hayAccion: false } as const;
+for (const estado of ['quieto', 'guardando', 'guardado'] as const) {
+  check(`en el teléfono la cinta cede su altura cuando el texto sí se guarda («${estado}»)`, cintaSeEscondeEnElTelefono({ ...CINTA_SEGURA, estado }) === true);
+}
+check('la cinta se queda cuando no se pudo guardar el último cambio', cintaSeEscondeEnElTelefono({ ...CINTA_SEGURA, estado: 'fallo' }) === false);
+check('la cinta se queda cuando las versiones nuevas ya no caben', cintaSeEscondeEnElTelefono({ ...CINTA_SEGURA, versionesNoCaben: true, estado: 'guardado' }) === false);
+check('la cinta se queda cuando el texto vive solo en esta sesión', cintaSeEscondeEnElTelefono({ ...CINTA_SEGURA, activo: false, estado: 'quieto' }) === false);
+check('la cinta se queda cuando trae un botón que solo vive en ella', cintaSeEscondeEnElTelefono({ ...CINTA_SEGURA, hayAccion: true, estado: 'guardado' }) === false);
+/* El estado manda: el componente pinta la clase desde la función, no desde el ancho. */
+check('el taller decide con esa función y no con una regla que tape la cinta entera', TALLER.includes('cintaSeEscondeEnElTelefono({') && TALLER.includes('cn-tal-cinta--oculta'));
+check(
+  'la información queda a un toque: un botón en la barra del escrito vuelve a mostrar la cinta',
+  TALLER.includes('Dónde queda el texto') && TALLER.includes('aria-expanded={cintaALaVista}')
+);
+check('en el teléfono solo se tapa la cinta marcada, nunca todas', /\.cara-nueva \.cn-tal-cinta--oculta \{[^}]*display: none;/.test(MOVIL));
+check(
+  'ninguna regla tapa la cinta por el ancho solo',
+  !/\.cara-nueva \.cn-tal-cinta \{[^}]*display: none;/.test(bloque)
+);
+
+/* ─── 11. «VOLVER A REVISAR» CEDE ANCHO Y ALTO, PERO NUNCA EL PRECIO ────── */
+/*
+ * EL DEFECTO QUE ESTO VIGILA, MEDIDO. En 375×812 el botón medía 217 px en un
+ * solo renglón y no cabía en la cabecera junto a «Volver» y al título: la
+ * cabecera se partía en dos filas y la segunda —44 px de botón más 8 px de
+ * separación— salía del documento. El titular pidió el 16 de septiembre de 2026
+ * devolvérselos, como se le devolvieron los 83 px de la cinta. Medido ese día:
+ * `.cn-tal-mesa` pasó de 323 px a 375 px en 375×812, y de 175 px a 227 px en
+ * 390×664; la cabecera, de 118 px a 66 px.
+ *
+ * Los 52 px salen de MUDAR el botón, no de encogerlo donde estaba: en el
+ * teléfono se va a la fila de «Escrito / Guía», que ya existía, que se ve en
+ * las DOS vistas del teléfono —la barra del escrito desaparece al pasar a
+ * «Guía»— y que no crece por acogerlo. Ahí se pinta en dos renglones.
+ *
+ * LO QUE NO SE PUEDE PERDER POR GANAR ALTURA ES EL PRECIO. En el teléfono este
+ * botón es el único sitio donde el abogado ve lo que va a costar antes de
+ * autorizar el cobro. Por eso se vigila que la cifra siga saliendo del precio
+ * que llega por props —nunca escrita a mano—, que se diga como la dicen el
+ * diálogo y el manual («desde», porque $2.000 es el piso), y que llegue al
+ * NOMBRE ACCESIBLE y no solo al dibujo: un lector de pantalla no ve renglones.
+ */
+{
+  check(
+    'el botón de revisar se arma una sola vez y se pide en dos tallas',
+    TALLER.includes('const BotonDeRerevisar = (compacto: boolean)') && cuenta(TALLER, 'BotonDeRerevisar(') === 2
+  );
+  check(
+    'en el teléfono va la talla compacta, en la fila de «Escrito / Guía»; desde 640 px, la de siempre en la cabecera',
+    TALLER.includes('<span className="cn-tal-vistas-accion sm:hidden">{BotonDeRerevisar(true)}</span>') &&
+      TALLER.includes('<span className="hidden sm:inline-flex">{BotonDeRerevisar(false)}</span>')
+  );
+  check(
+    'la talla compacta apila qué hace y cuánto cuesta: ninguno de los dos renglones se cae',
+    TALLER.includes('<span className="cn-tal-rerevisar-que">{rotuloDeRerevisar}</span>') &&
+      TALLER.includes('<span className="cn-tal-rerevisar-costo">desde {pesos(precioRevisionCop)}</span>')
+  );
+  check(
+    'la cifra sale del precio que llega por props, nunca escrita a mano en el botón',
+    !/\$\s?2[.,]000/.test(TALLER) && cuenta(TALLER, 'pesos(precioRevisionCop)') >= 4
+  );
+  check(
+    'el nombre accesible dice qué hace y cuánto cuesta, en las dos tallas',
+    TALLER.includes("aria-label={ocupado === 'revision' ? 'Revisando el escrito' : `${rotuloDeRerevisar}, desde ${pesos(precioRevisionCop)} de su saldo`}")
+  );
+  check(
+    'la talla compacta no baja de 14 px en ninguno de sus dos renglones',
+    /\.cara-nueva \.cn-tal-rerevisar-que \{[^}]*font-size: 14px;/.test(bloque) && /\.cara-nueva \.cn-tal-rerevisar-costo \{[^}]*font-size: 14px;/.test(bloque)
+  );
+  const renglones = [...bloque.matchAll(/\.cara-nueva \.cn-tal-rerevisar-(?:que|costo) \{[^}]*line-height: (\d+)px;/g)].map((m) => Number(m[1]));
+  check(
+    'los dos renglones caben en los 44 px que la regla del pulgar le da al botón',
+    renglones.length === 2 && renglones.reduce((a, b) => a + b, 0) <= 44 && /@media \(pointer: coarse\) \{\s*\.cara-nueva \.cn-tal-boton,/.test(bloque),
+    renglones.join('+')
+  );
+  check(
+    'en el teléfono la cabecera vuelve a ser una sola fila y los textos ceden lo que les sobra',
+    /\.cara-nueva \.cn-tal-cabeza \{[^}]*flex-wrap: nowrap;/.test(MOVIL) && /\.cara-nueva \.cn-tal-cabeza-textos \{[^}]*flex: 1 1 auto;/.test(MOVIL)
+  );
+  check(
+    'en el teléfono la fila de «Escrito / Guía» acoge el botón sin crecer',
+    /\.cara-nueva \.cn-tal-vistas \{[^}]*display: flex;/.test(MOVIL) && /\.cara-nueva \.cn-tal-vistas-accion \{[^}]*display: contents;/.test(MOVIL)
+  );
+  /* Y NADA DE ESTO SE CUELA AL COMPUTADOR, donde la cabecera envuelve y la fila de vistas ni siquiera existe desde 1024 px. */
+  const SIN_MOVIL = bloque.replace(MOVIL, ' ');
+  check(
+    'el computador conserva su cabecera envuelta, su fila de vistas en bloque y sin envoltorio que borrar',
+    !/\.cara-nueva \.cn-tal-cabeza \{[^}]*nowrap/.test(SIN_MOVIL) &&
+      !/\.cara-nueva \.cn-tal-vistas \{[^}]*display: flex/.test(SIN_MOVIL) &&
+      !SIN_MOVIL.includes('cn-tal-vistas-accion')
+  );
 }
 
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);

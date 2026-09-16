@@ -88,6 +88,25 @@ for (const [nombre, codigo] of Object.entries(PANTALLAS)) {
   );
 }
 
+/* ─── 3 bis. EL SELECTOR DEL CASO, CON LA CARA NUEVA ─────────────────────
+  El defecto que se reportó con una captura: «De qué caso es» seguía abriendo
+  el desplegable azul del sistema operativo, que es la interfaz vieja dentro
+  de una pantalla rediseñada. La lista, el «Sin expediente» y el
+  `expedienteId` que se envía son los mismos; lo único que cambia es quién la
+  pinta, y sin la bandera vuelve el de antes sin que nada falle. */
+for (const [nombre, codigo] of Object.entries(PANTALLAS)) {
+  check(
+    `${nombre}: el selector del caso va con la cara nueva`,
+    /<SelectorDeExpediente\s+cara="nueva"/.test(codigo),
+    'sin `cara="nueva"` vuelve el desplegable del sistema operativo'
+  );
+  check(
+    `${nombre} no escribe a mano ninguna lista de casos`,
+    !/<select/.test(codigo),
+    'la lista del caso la pinta el selector compartido, no la pantalla'
+  );
+}
+
 const ESCRITORIO = PANTALLAS['TriageView.tsx'];
 check('el escritorio no calcula el plazo por su cuenta', !/plazoAnunciado\(/.test(ESCRITORIO));
 check('el escritorio conserva el orden por término más corto', /porTerminoMasCorto\(/.test(ESCRITORIO));

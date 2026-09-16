@@ -72,6 +72,37 @@ interface SelectorEnCascadaProps {
    * absoluta queda recortada por el contenedor y sus últimas filas no se ven.
    */
   enLinea?: boolean;
+  /**
+   * EL LLAMADOR SE QUEDA CON LA BÚSQUEDA, y entonces también con el filtrado.
+   *
+   * ─── POR QUÉ HIZO FALTA ──────────────────────────────────────────────────
+   *
+   * El filtro de esta lista es un «contiene» sobre el nombre y sobre
+   * `busqueda`. Para una actuación del catálogo eso es exacto. Para un caso no:
+   * una cédula se busca por dígitos y desde el principio, un radicado por
+   * segmentos y con o sin guiones, y el nombre de un testigo no está en la
+   * etiqueta de la fila. Esas reglas ya existen, probadas, en el módulo de
+   * Expedientes; meterlas aquí sería una segunda copia que se queda vieja.
+   *
+   * Con esta prop, el llamador entrega `opciones` YA FILTRADAS y esta lista no
+   * vuelve a filtrar —filtrar dos veces con reglas distintas descarta filas que
+   * la primera sí encontró—, pinta la caja de búsqueda contra su estado, y
+   * puede poner una fila suya bajo la lupa y su propio texto de «no hay
+   * ninguna». Sin la prop, todo sigue exactamente como estaba.
+   */
+  busquedaControlada?: {
+    valor: string;
+    onCambio: (texto: string) => void;
+    /** Cuántas opciones hay sin filtrar, solo para el contador «N de M». */
+    total: number;
+    /**
+     * Una fila del llamador justo bajo la lupa: un filtro de rama, el aviso de
+     * que nada coincide. Va ahí porque el llamador es el único que sabe POR QUÉ
+     * no quedó ninguna, y porque un filtro que salta debajo de los resultados
+     * deja de parecer un filtro.
+     */
+    encima?: React.ReactNode;
+  };
 }
 
 export const SelectorEnCascada: React.FC<SelectorEnCascadaProps> = ({
@@ -85,20 +116,25 @@ export const SelectorEnCascada: React.FC<SelectorEnCascadaProps> = ({
   conBusqueda = true,
   antesDeLaLista,
   anchoCampo = '',
-  enLinea = false
+  enLinea = false,
+  busquedaControlada
 }) => {
   const [abierto, setAbierto] = useState(false);
-  const [filtro, setFiltro] = useState('');
+  const [filtroPropio, setFiltroPropio] = useState('');
+  const filtro = busquedaControlada ? busquedaControlada.valor : filtroPropio;
+  const setFiltro = busquedaControlada ? busquedaControlada.onCambio : setFiltroPropio;
   const contenedor = useRef<HTMLDivElement>(null);
   const lista = useRef<HTMLDivElement>(null);
 
   const elegida = opciones.find((o) => o.valor === valor);
 
+  /* Con `busquedaControlada`, `opciones` ya viene filtrada: filtrar otra vez con
+     una regla distinta descartaría filas que la primera sí encontró. */
   const visibles = useMemo(() => {
     const q = filtro.trim().toLowerCase();
-    if (!q) return opciones;
+    if (busquedaControlada || !q) return opciones;
     return opciones.filter((o) => o.etiqueta.toLowerCase().includes(q) || Boolean(o.busqueda?.toLowerCase().includes(q)));
-  }, [opciones, filtro]);
+  }, [opciones, filtro, busquedaControlada]);
 
   useEffect(() => {
     if (!abierto) return;
@@ -119,6 +155,9 @@ export const SelectorEnCascada: React.FC<SelectorEnCascadaProps> = ({
   // Reabrir con la búsqueda anterior puesta hace creer que la lista se quedó corta.
   useEffect(() => {
     if (!abierto) setFiltro('');
+    /* `setFiltro` cambia de identidad con la prop del llamador; el disparo lo
+       manda `abierto`, y añadirla aquí limpiaría el filtro en cada render. */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [abierto]);
 
   /*
@@ -235,10 +274,15 @@ export const SelectorEnCascada: React.FC<SelectorEnCascadaProps> = ({
                 className="cn-red-buscar"
               />
               <span className="cn-red-buscar-cuenta">
-                {visibles.length} de {opciones.length}
+                {visibles.length} de {busquedaControlada?.total ?? opciones.length}
               </span>
             </div>
           )}
+
+          {/* La fila del llamador va PEGADA A LA LUPA y no se mueve al escribir:
+              un control de filtro que salta debajo de los resultados deja de
+              parecer un filtro. */}
+          {busquedaControlada?.encima}
 
           {/*
             EL ORDEN LO DECIDE EL FILTRO. Sin texto, el bloque aparte va antes de

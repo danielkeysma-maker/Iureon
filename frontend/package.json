@@ -20,6 +20,8 @@
     "check:expedientes-cara": "npx tsx src/modules/expedientes/__checks__/expedientesCara.check.ts",
     "check:buscar-casos": "npx tsx src/modules/expedientes/__checks__/buscarCasos.check.ts",
     "check:datos-del-caso": "npx tsx src/modules/expedientes/__checks__/datosDelCaso.check.ts",
+    "check:interrogatorios-cara": "npx tsx src/modules/expedientes/__checks__/interrogatoriosCara.check.ts",
+    "check:selector-de-casos": "npx tsx src/modules/expedientes/__checks__/selectorDeCasos.check.ts",
     "check:avisos-cara": "npx tsx src/modules/push/__checks__/avisosCara.check.ts",
     "check:audiencias-cara": "npx tsx src/modules/transcription/__checks__/audienciasCara.check.ts",
     "check:entrevistas-cara": "npx tsx src/modules/clients/__checks__/entrevistasCara.check.ts",

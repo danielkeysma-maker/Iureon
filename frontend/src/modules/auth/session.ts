@@ -86,11 +86,29 @@ export const readSession = (): StoredSession | null => {
   }
 };
 
+/**
+ * LO QUE MUERE CON LA SESIÓN.
+ *
+ * Además del token, las comodidades que este equipo guardó SOBRE EL TRABAJO DE
+ * ESTE USUARIO. Los casos abiertos hace poco —que ordenan el selector de «De
+ * qué caso es»— son el nombre de los asuntos de una firma: dejarlos en el
+ * equipo después de cerrar sesión los pondría delante de quien entre después,
+ * que puede ser de otra firma. Una comodidad no justifica eso.
+ *
+ * NO entra aquí lo que es del EQUIPO y no del trabajo —la barra colapsada, el
+ * modo de la lista de carpetas—: eso no dice nada de ningún cliente.
+ */
+export const CLAVE_DE_CASOS_RECIENTES = 'iureon:casos-recientes';
+
+const CLAVES_DE_LA_SESION = [KEY, CLAVE_DE_CASOS_RECIENTES];
+
 export const clearSession = (): void => {
-  try {
-    localStorage.removeItem(KEY);
-  } catch {
-    /* Nothing to do: the in-memory session is dropped by the caller regardless. */
+  for (const clave of CLAVES_DE_LA_SESION) {
+    try {
+      localStorage.removeItem(clave);
+    } catch {
+      /* Nothing to do: the in-memory session is dropped by the caller regardless. */
+    }
   }
 };
 

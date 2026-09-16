@@ -3259,23 +3259,15 @@
   margin: 14px -16px -16px;
 }
 
-/* ── Componentes compartidos montados aquí: solo se suben de escala ───── */
-.cara-nueva .cn-ori-selector select {
-  height: 44px;
-  border: none;
-  border-radius: 12px;
-  background: var(--field);
-  font-size: 15px;
-  color: var(--ink);
-}
-.cara-nueva .cn-ori-selector p {
-  font-family: inherit;
-  font-size: 14px;
-  line-height: 21px;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--ink-4);
-}
+/* ── Componentes compartidos montados aquí ─────────────────────────────
+  El selector del caso ya NO se sube de escala desde aquí. Antes venía con la
+  cara vieja —un `<select>` del sistema y un rótulo en versalitas mono— y esta
+  pantalla lo repintaba a mano. Ahora llega con `cara="nueva"`, que en
+  escritorio pinta su propia lista buscable y en el teléfono la lista nativa
+  con `cn-red-select`: repintarlo aquí le bajaría la altura del campo del
+  teléfono de 48 a 44 px y la letra de 16 a 15, que es justo lo que no debe
+  pasar. La separación con los campos vecinos ya la pone el `gap` de
+  `cn-ori-form`, así que aquí no queda ninguna regla. */
 .cara-nueva.cn-ori .notice-unverified {
   margin-top: 8px;
   padding: 14px 16px;
@@ -7084,6 +7076,42 @@
   height: 16px;
   flex: none;
 }
+/*
+ * ── «VOLVER A REVISAR» EN EL TELÉFONO: DOS RENGLONES, NINGUNA CIFRA MENOS ──
+ *
+ * En un renglón el botón mide 217 px y obligaba a la cabecera del taller a
+ * partirse en dos filas: 52 px que el documento no tenía. Apilado mide unos
+ * 160 px y cabe al lado de los segmentos «Escrito / Guía», en una fila que ya
+ * existía. Sigue con sus 44 px de alto para el pulgar —se los da la regla de
+ * `pointer: coarse`— porque los dos renglones suman 34 px de texto.
+ *
+ * El precio va en el segundo renglón, a 14 px, nunca más chico: en el teléfono
+ * este botón es el único sitio donde el abogado ve lo que va a costar antes de
+ * autorizarlo. Se distingue por el grosor, no por el color, para no tocar el
+ * contraste sobre el fondo de marca en ninguno de los dos modos.
+ */
+.cara-nueva .cn-tal-rerevisar--compacto {
+  gap: 6px;
+  padding: 0 10px;
+}
+.cara-nueva .cn-tal-rerevisar-apilado {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.cara-nueva .cn-tal-rerevisar-que {
+  font-size: 14px;
+  line-height: 17px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.cara-nueva .cn-tal-rerevisar-costo {
+  font-size: 14px;
+  line-height: 17px;
+  font-weight: 500;
+  white-space: nowrap;
+}
 .cara-nueva .cn-tal-icono-boton {
   display: grid;
   width: 40px;
@@ -8956,6 +8984,99 @@
   }
 }
 
+/*
+ * ─── EN EL TELÉFONO LAS BARRAS SE DESLIZAN; NO SE APILAN ──────────────────
+ *
+ * Medido en un teléfono de 375×812 con la pestaña «Original» abierta: la barra
+ * del taller —tres modos, el tamaño de letra, «Guardar versión», Word, PDF y
+ * «Llevar a Redacción»— se repartía en cuatro renglones y ocupaba 231 px; la
+ * barra del visor —nombre del archivo, páginas y zoom— sumaba otros 123 px.
+ * De los 430 px que la columna del escrito tiene en ese teléfono quedaban 77
+ * para el documento: una rendija por la que no se ve una página. Ese era el
+ * defecto que se reportó como «el visor no se ve en móvil»; el PDF sí se
+ * pintaba, y se pintaba dentro de una ranura de 77 px pegada al borde inferior.
+ *
+ * La causa es `flex-wrap: wrap` en una barra que en 375 px no cabe. Se quita
+ * SOLO en el teléfono y se sustituye por el mismo remedio que esta casa ya
+ * aplica a los segmentos y a la barra de marcar: una fila con desplazamiento
+ * propio donde ningún botón encoge. Un rótulo medio borrado —o una barra que
+ * se come la pantalla— es peor que una fila a la que hay que deslizarse.
+ *
+ * No se toca nada por encima de 640 px: el computador sigue envolviendo sus
+ * barras como hasta hoy.
+ */
+@media (max-width: 639px) {
+  .cara-nueva .cn-tal-herramientas {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  /* Cada pieza se niega a encoger: lo que no cabe se alcanza deslizando. */
+  .cara-nueva .cn-tal-herramientas > * {
+    flex: none;
+  }
+  .cara-nueva .cn-tal-herramientas-fin {
+    flex-wrap: nowrap;
+  }
+  /*
+   * El nombre del archivo se recorta con sus puntos suspensivos en vez de
+   * empujar las páginas y el zoom fuera del alcance del pulgar: un escrito
+   * escaneado llega con nombres de sesenta caracteres.
+   */
+  .cara-nueva .cn-tal-visor-nombre {
+    max-width: 42vw;
+  }
+  /*
+   * LA CINTA DEL GUARDADO CEDE SUS 83 PX AL DOCUMENTO, PERO SOLO CUANDO EL
+   * COMPONENTE LO AUTORIZA. Se tapa la cinta MARCADA, nunca `.cn-tal-cinta`
+   * entera: quien decide es el estado del guardado —`cintaSeEscondeEnElTelefono`
+   * en `TallerDeEscrito.tsx`—, porque una regla por el ancho escondería
+   * también el «no se pudo guardar» y el «solo en esta sesión». El botón de la
+   * barra del escrito la vuelve a traer.
+   */
+  .cara-nueva .cn-tal-cinta--oculta {
+    display: none;
+  }
+  /*
+   * ─── LA CABECERA VUELVE A SER UNA SOLA FILA ────────────────────────────
+   *
+   * Medido en 375×812: «Volver» (93 px) y los textos (220 px de base) llenaban
+   * la primera fila, así que la de acciones —pantalla completa y «Volver a
+   * revisar · $2.000», 267 px— se iba abajo y se llevaba 52 px del documento.
+   * Con el botón de revisar mudado a la fila de «Escrito / Guía» solo queda el
+   * de pantalla completa, 44 px, y las tres piezas caben en un renglón si los
+   * textos ceden lo que les sobra en vez de exigir sus 220 px. El título y el
+   * subtítulo ya se recortan con puntos suspensivos, así que ceder no borra
+   * nada: los deja más cortos.
+   */
+  .cara-nueva .cn-tal-cabeza {
+    flex-wrap: nowrap;
+  }
+  .cara-nueva .cn-tal-cabeza-textos {
+    flex: 1 1 auto;
+  }
+  /*
+   * Y LA FILA DE «ESCRITO / GUÍA» ACOGE EL BOTÓN SIN CRECER. El envoltorio se
+   * borra —`display: contents`— para que el botón sea hijo directo de la fila
+   * y los segmentos se repartan lo que quede; ninguno de los dos encoge de
+   * alto. Esto vive solo aquí: desde 640 px la fila vuelve a ser la de siempre
+   * y el envoltorio, a esconderse.
+   */
+  .cara-nueva .cn-tal-vistas {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cara-nueva .cn-tal-vistas .cn-tal-segmentos {
+    min-width: 0;
+    flex: 1 1 auto;
+    width: auto;
+  }
+  .cara-nueva .cn-tal-vistas-accion {
+    display: contents;
+  }
+}
+
 /* ─── Expedientes ─── */
 /*
  * `public/handoff/app-expedientes.html` («Mis casos», el caso en tres zonas,
@@ -10565,6 +10686,192 @@
 }
 .cara-nueva .cn-exp-piel .rounded-card {
   border-radius: 12px;
+}
+
+/*
+ * ── EL SELECTOR COMPARTIDO DE «DE QUÉ CASO ES» ─────────────────────────────
+ *
+ * Estas clases se pintan DENTRO del desplegable de Redacción (`cn-red-lista`),
+ * que es donde vive el selector: la fila de ramas va pegada a la lupa y el
+ * aviso de «ninguno coincide» justo debajo. Se nombran `cn-exp-` porque son del
+ * módulo de Expedientes, que es quien las monta; el desplegable solo les hace
+ * sitio.
+ */
+.cara-nueva .cn-exp-sel-detalle {
+  display: block;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-sel-ramas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.cara-nueva .cn-exp-sel-rama {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: var(--canvas);
+  /* 14 px es el piso del bloque, y lo vigila `check:expedientes-cara`: una
+     etiqueta más chica es ilegible justo donde hay que decidir rápido. */
+  font-size: 14px;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-sel-rama:hover {
+  background: var(--field);
+}
+.cara-nueva .cn-exp-sel-rama--puesta {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 600;
+}
+/*
+ * CON EL DEDO, 44 PX. Esta fila no existe en el teléfono —ahí la lista es la
+ * nativa del sistema— pero sí en una tableta en vertical, que entra por el
+ * mismo lado que el escritorio. Con ratón, 36 px: una fila de filtro compacta
+ * es lo que se pidió, y engordarla para todos por un caso costaría la mitad de
+ * la lista en una ventana de 768 de alto.
+ */
+@media (pointer: coarse) {
+  .cara-nueva .cn-exp-sel-rama {
+    min-height: 44px;
+  }
+}
+.cara-nueva .cn-exp-sel-vacio {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  text-wrap: pretty;
+}
+.cara-nueva .cn-exp-sel-ver-todos {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  background: var(--canvas);
+  font-size: 14px;
+  color: var(--brand);
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-sel-ver-todos:hover {
+  background: var(--field);
+}
+@media (pointer: coarse) {
+  .cara-nueva .cn-exp-sel-ver-todos {
+    min-height: 44px;
+  }
+}
+
+/*
+ * ── LOS INTERROGATORIOS YA PREPARADOS ──────────────────────────────────────
+ *
+ * Van ARRIBA del formulario, dentro de su propio recuadro: quien vuelve al caso
+ * viene a leer lo que ya pagó, no a volver a pagarlo. El recuadro existe para
+ * que esa lista no se lea como una parte más del formulario de abajo.
+ */
+.cara-nueva .cn-exp-interrogatorios {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--wash);
+}
+.cara-nueva .cn-exp-interrogatorios-lista {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+.cara-nueva .cn-exp-interrogatorio {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--canvas);
+}
+/*
+ * Los dos botones no se parten en dos filas a 375: «Abrir» y «Eliminar» son la
+ * misma decisión y separarlos hace pulsar el equivocado. Cada uno mantiene sus
+ * 44 px de alto por la piel de `.cn-exp-piel .btn-sm` — 40 px de botón más el
+ * área de la fila—, así que el dedo no falla.
+ */
+.cara-nueva .cn-exp-interrogatorio-acciones {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  min-height: 44px;
+  align-items: center;
+}
+
+/*
+ * ── LO QUE SE ANTICIPA BAJO CADA PREGUNTA ──────────────────────────────────
+ *
+ * La respuesta probable y la repregunta se leen en el mismo tamaño que el
+ * cuerpo y NO en letra de nota: se dicen en voz alta en la audiencia, igual que
+ * la pregunta. El filete a la izquierda las ata a su pregunta sin sangrarlas
+ * tanto que se pierdan en una columna estrecha.
+ */
+.cara-nueva .cn-exp-anticipa {
+  margin-top: 4px;
+  padding-left: 10px;
+  border-left: 2px solid var(--line-2);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+.cara-nueva .cn-exp-anticipa-rotulo {
+  font-weight: 600;
+  color: var(--ink-4);
+}
+.cara-nueva .cn-exp-conque {
+  margin-top: 4px;
+  padding-left: 10px;
+  border-left: 2px solid var(--brand);
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+/* El nombre del documento abre el lector cuando se pudo identificar. */
+.cara-nueva .cn-exp-conque-doc {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.cara-nueva .cn-exp-conque-doc:hover {
+  color: var(--brand-fill-hover);
+}
+/*
+ * «El expediente no tiene con qué contradecirlo» es una AFIRMACIÓN, no una
+ * advertencia: va en el gris de las notas y sin icono. Pintarla de ámbar la
+ * convertiría en una alarma por algo que es, casi siempre, normal.
+ */
+.cara-nueva .cn-exp-sin-conque {
+  margin-top: 4px;
+  padding-left: 10px;
+  border-left: 2px solid var(--line-2);
+  font-size: 14px;
+  line-height: 21px;
+  color: var(--ink-4);
+  text-wrap: pretty;
 }
 .cara-nueva .cn-exp-piel .border-line-200 {
   border-color: var(--line);

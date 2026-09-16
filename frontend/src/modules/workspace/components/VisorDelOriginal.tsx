@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, ChevronLeft, ChevronRight, Download, FileUp, Highlighter, Loader2, ZoomIn, ZoomOut } from 'lucide-react';
+import { AlertTriangle, ChevronLeft, ChevronRight, Download, ExternalLink, FileUp, Highlighter, Loader2, ZoomIn, ZoomOut } from 'lucide-react';
 import {
   claseDelOriginal,
   cargarOriginal,
@@ -541,14 +541,29 @@ export const VisorDelOriginal: React.FC<VisorDelOriginalProps> = ({
       );
     }
 
+    /*
+      ─── UN FORMATO SIN VISOR NO DEJA UN ÁREA EN BLANCO ───────────────────
+      Se dice que no se puede mostrar, por qué, y se ofrecen las dos salidas
+      que el teléfono sí tiene: abrirlo en otra pestaña —donde el lector del
+      sistema puede saber abrirlo aunque este visor no— y descargarlo. Las dos
+      salen del MISMO `blob:` ya traído: pedir otra vez el enlace firmado
+      descargaría el archivo por segunda vez.
+    */
     return (
       <div className="cn-tal-vacio">
         <AlertTriangle className="cn-tal-vacio-icono cn-tal-vacio-icono--aviso" />
+        <p className="cn-tal-vacio-titulo">Este archivo no se puede mostrar aquí.</p>
         <p className="cn-tal-vacio-texto">{porQueNoHayVisor(o.tipo, o.nombre)}</p>
-        <a href={urlDelArchivo ?? '#'} download={o.nombre} className="cn-tal-boton cn-tal-boton--marca">
-          <Download className="cn-tal-boton-icono" />
-          Descargar el archivo
-        </a>
+        <div className="cn-tal-fila-botones justify-center">
+          <a href={urlDelArchivo ?? '#'} target="_blank" rel="noreferrer" className="cn-tal-boton cn-tal-boton--marca">
+            <ExternalLink className="cn-tal-boton-icono" />
+            Abrir en otra pestaña
+          </a>
+          <a href={urlDelArchivo ?? '#'} download={o.nombre} className="cn-tal-boton">
+            <Download className="cn-tal-boton-icono" />
+            Descargar el archivo
+          </a>
+        </div>
       </div>
     );
   };

@@ -238,6 +238,19 @@ export interface DatosDeBusquedaDelCaso {
 
 export type ExpedienteEnLista = Expediente & ResumenDelCaso & DatosDeBusquedaDelCaso;
 
+/**
+ * LO MÍNIMO CON QUE SE PUEDE BUSCAR UN CASO, y lo que promete
+ * `expedientesApi.listar()`.
+ *
+ * El expediente con sus datos de búsqueda, SIN el resumen: el próximo término y
+ * el conteo de documentos son de «Mis casos», que los pide para pintar
+ * tarjetas, y el selector de «De qué caso es» no los necesita. Tipar la lista
+ * del selector como `ExpedienteEnLista` prometería unos campos que esa
+ * respuesta no siempre trae — y prometerlos en el tipo es cómo se llega a
+ * leerlos sin comprobar.
+ */
+export type CasoBuscable = Expediente & DatosDeBusquedaDelCaso;
+
 /** Ids ya ordenados por el servidor. `estaSemana` ⊂ `activos`; null si la agenda no se leyó. */
 export interface PestanasDeMisCasos {
   estaSemana: string[] | null;
@@ -280,10 +293,27 @@ export interface ExpedienteConDetalle extends Expediente, Partial<ResumenDelCaso
   posicionSugerida?: PapelEnElExpediente | null;
 }
 
+/**
+ * Con qué del expediente se le contradice. El servidor ya comprobó que la cita
+ * está LITERALMENTE en un pasaje del caso y tomó el nombre del documento de ese
+ * pasaje, no del que el motor dijo: lo que llega aquí no hay que volver a
+ * dudarlo, y lo que no llega es porque no se pudo comprobar.
+ */
+export interface ConQueSeAtaca {
+  documento: string;
+  cita: string;
+}
+
 export interface PreguntaParaAlguien {
   pregunta: string;
   paraQue: string;
   delMaterial?: string;
+  /** Qué contestará probablemente. Falta en tandas guardadas antes del campo. */
+  respuestaProbable?: string;
+  /** Qué preguntar después si contesta eso. */
+  repregunta?: string;
+  /** Ausente = el expediente no tiene con qué. Ver `ConQueSeAtaca`. */
+  conQue?: ConQueSeAtaca;
 }
 
 export interface PreguntasParaUnaPersona {
@@ -298,7 +328,75 @@ export interface PreguntasDelExpediente {
   porPersona: PreguntasParaUnaPersona[];
   generadoEl: string;
   por: string;
+  /**
+   * Si la tanda tuvo pasajes del expediente indexado con los que cotejar.
+   *
+   * MANDA SOBRE LO QUE LA PANTALLA SE ATREVE A DECIR. Solo con esto en `true`
+   * una pregunta sin «con qué» puede afirmar que el expediente no tiene con qué
+   * contradecirlo; sin material, eso sería un hallazgo inventado sobre unos
+   * documentos que nadie leyó. Falta en tandas guardadas antes del campo.
+   */
+  conMaterial?: boolean;
 }
+
+/**
+ * Una tanda guardada, tal como la enseña la lista del caso. SIN las preguntas:
+ * la lista no las necesita y traerlas todas para pintar cuatro renglones sería
+ * bajar el expediente entero cada vez que se abre la pestaña.
+ */
+export interface InterrogatorioEnLaLista {
+  id: string;
+  creadoEl: string;
+  creadoPor: string;
+  queSeQueriaProbar: string | null;
+  audiencia: string | null;
+  /** Los nombres de quienes se prepararon, en el orden en que salieron. */
+  personas: string[];
+  cobradoCop: number | null;
+}
+
+/** La tanda entera, al abrirla. Abrirla NO cuesta saldo. */
+export interface InterrogatorioGuardado extends InterrogatorioEnLaLista {
+  preguntas: PreguntasDelExpediente;
+  modelo: string | null;
+}
+
+/**
+ * LO QUE SE DICE CUANDO EL EXPEDIENTE NO TIENE CON QUÉ.
+ *
+ * Se dice, no se calla: un hueco en blanco bajo la respuesta probable se lee
+ * como «todavía no se ha cargado», y el abogado entra a la audiencia creyendo
+ * que en alguna parte hay un papel que lo contradice. La frase es una
+ * AFIRMACIÓN sobre el expediente —no tiene con qué— y por eso solo se publica
+ * cuando de verdad hubo pasajes que mirar (`conMaterial`).
+ */
+export const SIN_CON_QUE = 'El expediente no tiene con qué contradecirlo.';
+
+/**
+ * El «con qué» de una pregunta, en una línea, para el texto plano y las
+ * exportaciones. `null` cuando no hay nada que decir con fundamento: ni cita
+ * comprobada, ni material del caso con el que afirmar que no la hay.
+ */
+export const lineaDeConQue = (
+  pregunta: PreguntaParaAlguien,
+  conMaterial: boolean | undefined
+): string | null => {
+  if (pregunta.conQue) return `Con qué: ${pregunta.conQue.documento} — «${pregunta.conQue.cita}»`;
+  return conMaterial ? SIN_CON_QUE : null;
+};
 
 /** Cuántas personas caben en una tanda. Espejo de `MAX_PERSONAS_POR_TANDA`. */
 export const MAX_PERSONAS_POR_TANDA = 4;
+
+/**
+ * La lista del caso, siempre en el mismo orden: la más nueva primero.
+ *
+ * SE ORDENA TAMBIÉN AQUÍ, y no solo en el `ORDER BY` del servidor. No es
+ * desconfianza: la tanda que se acaba de preparar se añade a la lista que ya
+ * está en pantalla sin volver a preguntar, y una lista que se reordena sola al
+ * recargar —la nueva arriba hoy, abajo hasta que uno recargue— es de las cosas
+ * que hacen dudar al abogado de si la aplicación guardó lo que dijo.
+ */
+export const interrogatoriosMasNuevoPrimero = <T extends { creadoEl: string }>(
+  lista: readonly T[]
+): T[] => [...lista].sort((a, b) => b.creadoEl.localeCompare(a.creadoEl));
