@@ -192,6 +192,25 @@ const rotulo = (a: ActorDelExpediente): string => {
 export const interrogables = (expediente: ExpedienteConDetalle): ActorDelExpediente[] =>
   expediente.listaDeActores.filter((a) => seLePregunta(a.papel));
 
+/**
+ * ─── DOS PASADAS, Y LA PRIMERA ES LA DE SIEMPRE (16/09/2026) ───────────────
+ *
+ * Pedirle al motor la pregunta Y su respuesta probable Y la repregunta Y la
+ * cita en un solo turno empeoró la pregunta, que es el producto. Comparado
+ * contra el mismo caso con el prompt anterior: aparecieron preguntas
+ * COMPUESTAS —«¿Cuándo ocurrió la entrega y cómo recuerda esa fecha?»— que este
+ * mismo prompt prohíbe, dos que se solapaban y una que preguntaba por lo que el
+ * testigo acababa de decir. La lista de antes, de doce, no tenía ninguna: la
+ * pregunta había dejado de ser el producto para ser el encabezado de otras tres
+ * cosas.
+ *
+ * Así que la primera pasada vuelve a ser la de antes: solo preguntas. La
+ * anticipación se pide APARTE (`buildAnticipacionSystemPrompt`) sobre las
+ * preguntas ya escritas, y —esto es lo que la hace una garantía y no una
+ * esperanza— EL SERVIDOR NO LEE EL TEXTO DE LA PREGUNTA DE ESA SEGUNDA
+ * RESPUESTA: se queda con el suyo y solo toma los campos nuevos, emparejados
+ * por número. La segunda llamada no puede reescribir una pregunta ni queriendo.
+ */
 export const buildPreguntasSystemPrompt = (): string =>
   `Eres un litigante senior con años de audiencias, y ayudas a un colega a preparar el interrogatorio de una audiencia. Trabajas sobre UN EXPEDIENTE: conoces el asunto, quiénes son sus actores y, cuando el colega lo adjunta, una pieza del proceso. Lo que no esté en ese material no lo afirmas.
 
@@ -207,18 +226,11 @@ REGLAS PARA TODAS:
 - NO cites normas, artículos, sentencias, autos ni radicados. NO afirmes hechos que el material no traiga. NO des consejos fuera de las preguntas.
 - Entre ${MIN_PREGUNTAS_POR_PERSONA} y ${MAX_PREGUNTAS_POR_PERSONA} preguntas por persona, de la más importante a la menos. Si el material da para menos con alguien, entrega las que tengan sustento y ninguna de relleno.
 
-PREPARAR ES ANTICIPAR LA RESPUESTA, NO SOLO ESCRIBIR LA PREGUNTA. Una lista de preguntas sin más deja al colega de pie en la audiencia cuando el testigo contesta lo que le conviene. Por eso cada pregunta trae, además:
-- "respuestaProbable": qué va a contestar ESA persona, en una o dos frases, dado su lado, su papel y lo que el expediente dice de ella. Escríbela como la diría quien declara, no como te gustaría que contestara.
-- "repregunta": qué preguntar A CONTINUACIÓN si contesta eso. Una sola pregunta, lista para leerse en voz alta, con la misma técnica que se le indicó para esa persona.
-- "conQue": el pasaje del material adjunto que CONTRADICE o SOSTIENE esa respuesta probable, con {"documento": el nombre del archivo tal como aparece entre corchetes al principio del pasaje, "cita": el fragmento COPIADO LITERAL de ese pasaje, de 5 a 50 palabras, sin corregirlo ni resumirlo}.
-
-LA REGLA DURA DE "conQue", Y EL SERVIDOR LA APLICA. La "cita" tiene que estar, palabra por palabra, dentro del material adjunto: el servidor la busca allí y TIRA el "conQue" entero si no la encuentra, así que una cita reconstruida de memoria no llega al colega, solo se pierde el trabajo. Cuando el material no tenga nada con qué contradecir esa respuesta, OMITE "conQue" por completo; no lo rellenes con un pasaje que hable de otra cosa. Sin material adjunto, no hay "conQue" en ninguna pregunta.
-
 RESPONDE ÚNICAMENTE CON UN OBJETO JSON, sin texto antes ni después, sin cercas de código. "enfoque" va PRIMERO: una o dos frases con lo que este asunto exige probar y la audiencia en la que se preguntará, sin citar normas. En "porPersona", devuelve el MISMO "actorId" que se te entregó, sin cambiarlo:
 {
   "enfoque": "…",
   "porPersona": [
-    {"actorId": "…", "preguntas": [{"pregunta": "…", "paraQue": "…", "delMaterial": "…", "respuestaProbable": "…", "repregunta": "…", "conQue": {"documento": "…", "cita": "…"}}]}
+    {"actorId": "…", "preguntas": [{"pregunta": "…", "paraQue": "…", "delMaterial": "…"}]}
   ]
 }`;
 
@@ -375,6 +387,113 @@ const aPregunta = (v: unknown, pasajes: readonly PasajeParaCotejar[]): PreguntaP
     ...(repregunta ? { repregunta } : {}),
     ...(conQue ? { conQue } : {})
   };
+};
+
+/* ─── SEGUNDA PASADA: QUÉ VA A CONTESTAR, SOBRE LAS PREGUNTAS YA ESCRITAS ── */
+
+export const buildAnticipacionSystemPrompt = (): string =>
+  `Eres un litigante senior preparando con un colega una audiencia. Las preguntas YA ESTÁN ESCRITAS y no se tocan: tu trabajo es anticipar qué va a pasar cuando se formulen.
+
+NO REESCRIBAS NINGUNA PREGUNTA, no propongas otras y no cambies su orden. Te llegan numeradas y devuelves lo tuyo con el MISMO número.
+
+Por cada pregunta devuelves:
+- "respuestaProbable": qué va a contestar ESA persona, en una o dos frases, dado su lado, su papel y lo que el expediente dice de ella. Escríbela como la diría quien declara, no como te gustaría que contestara.
+- "repregunta": qué preguntar A CONTINUACIÓN si contesta eso. Una sola pregunta, una sola idea, lista para leerse en voz alta, con la misma técnica que se indica para esa persona.
+- "conQue": el pasaje del material adjunto que CONTRADICE o SOSTIENE esa respuesta probable, con {"cita": el fragmento COPIADO LITERAL de ese pasaje, de 5 a 50 palabras, sin corregirlo ni resumirlo}.
+
+LA REGLA DURA DE "conQue", Y EL SERVIDOR LA APLICA. La "cita" tiene que estar, palabra por palabra, dentro del material adjunto: el servidor la busca allí y TIRA el "conQue" entero si no la encuentra, así que una cita reconstruida de memoria no llega al colega, solo se pierde el trabajo. El nombre del archivo lo pone el servidor, no tú. Cuando el material no tenga nada con qué contradecir esa respuesta, OMITE "conQue"; no lo rellenes con un pasaje que hable de otra cosa. Sin material adjunto, no hay "conQue" en ninguna.
+
+Si de alguna pregunta no puedes decir nada honesto, omítela entera: una anticipación inventada es peor que ninguna, porque el colega la lleva a la sala creyéndola.
+
+RESPONDE ÚNICAMENTE CON UN OBJETO JSON, sin texto antes ni después, sin cercas de código:
+{
+  "anticipacion": [
+    {"actorId": "…", "n": 1, "respuestaProbable": "…", "repregunta": "…", "conQue": {"cita": "…"}}
+  ]
+}`;
+
+export const buildAnticipacionUserPrompt = (input: {
+  expediente: ExpedienteConDetalle;
+  listas: PreguntasParaUnaPersona[];
+  material?: { que: string; texto: string; truncado: boolean } | null;
+}): string => {
+  const e = input.expediente;
+  const cabecera = [
+    `EXPEDIENTE: ${e.caratula}`,
+    e.rama ? `RAMA: ${e.rama}` : null,
+    e.clienteNombre ? `CLIENTE DEL COLEGA: ${e.clienteNombre}` : null,
+    e.contraparte ? `CONTRAPARTE: ${e.contraparte}` : null
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  const listas = input.listas
+    .map((l) =>
+      [
+        `### actorId: ${l.actorId}`,
+        `QUIÉN: ${l.nombre}`,
+        `CÓMO SE LE PREGUNTA: ${l.tecnica}`,
+        'PREGUNTAS:',
+        ...l.preguntas.map((q, i) => `${i + 1}. ${q.pregunta}${q.paraQue ? ` (busca: ${q.paraQue})` : ''}`)
+      ].join('\n')
+    )
+    .join('\n\n');
+
+  const material = input.material
+    ? `\n\nMATERIAL DEL EXPEDIENTE (${input.material.que}):\n${input.material.texto}`
+    : `\n\n(sin material del expediente: no hay "conQue" en ninguna)`;
+
+  return `${cabecera}\n\n${listas}${material}`;
+};
+
+/**
+ * Mete la anticipación en las preguntas QUE YA ESTABAN, y en ninguna otra.
+ *
+ * ─── LA GARANTÍA ES QUE AQUÍ NO SE LEE NINGUNA PREGUNTA ────────────────────
+ *
+ * De la segunda respuesta solo salen `respuestaProbable`, `repregunta` y la
+ * cita del `conQue`; el texto de la pregunta, su «para qué» y su orden vienen
+ * de la primera pasada y no se tocan. Por eso separar las dos llamadas no
+ * puede degradar la redacción: el modelo de la segunda no tiene por dónde
+ * cambiarla aunque devuelva una pregunta distinta.
+ *
+ * El emparejamiento es por `actorId` + número, y lo que no case se descarta
+ * sin ruido: una anticipación pegada a la pregunta equivocada se lee igual de
+ * bien que una correcta y se descubre en la audiencia.
+ */
+export const conLaAnticipacion = (
+  crudo: string,
+  listas: PreguntasParaUnaPersona[],
+  pasajes: readonly PasajeParaCotejar[]
+): PreguntasParaUnaPersona[] => {
+  const leido = objetoDeLaRespuesta(crudo);
+  if (!leido) return listas;
+
+  const filas = Array.isArray(leido.objeto.anticipacion) ? (leido.objeto.anticipacion as unknown[]) : [];
+  const porClave = new Map<string, Record<string, unknown>>();
+  for (const bruto of filas) {
+    const o = (bruto ?? {}) as Record<string, unknown>;
+    const n = Number(o.n);
+    if (!Number.isInteger(n) || n < 1) continue;
+    porClave.set(`${cadena(o.actorId)}#${n}`, o);
+  }
+
+  return listas.map((l) => ({
+    ...l,
+    preguntas: l.preguntas.map((q, i) => {
+      const o = porClave.get(`${l.actorId}#${i + 1}`);
+      if (!o) return q;
+      const respuestaProbable = cadena(o.respuestaProbable);
+      const repregunta = cadena(o.repregunta);
+      const conQue = aConQue(o.conQue, pasajes);
+      return {
+        ...q,
+        ...(respuestaProbable ? { respuestaProbable } : {}),
+        ...(repregunta ? { repregunta } : {}),
+        ...(conQue ? { conQue } : {})
+      };
+    })
+  }));
 };
 
 /**

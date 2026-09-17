@@ -17,6 +17,9 @@ import { ExpedienteError, obtenerExpediente } from './expedientes.service';
 import { guardarInterrogatorio } from './interrogatorios.service';
 import { buscarPasajesDelExpediente } from './materialDelExpediente';
 import {
+  buildAnticipacionSystemPrompt,
+  buildAnticipacionUserPrompt,
+  conLaAnticipacion,
   MAX_AUDIENCIA,
   MAX_PERSONAS_POR_TANDA,
   MAX_QUIERE_PROBAR,
@@ -78,7 +81,15 @@ const OPERACION = 'INTERROGATORIO' as const;
  * suyo, por debajo del de la función para que corte ESTE código —y devuelva la
  * reserva diciendo por qué— y no la plataforma en seco.
  */
-const LIMITE_DEL_INTERROGATORIO_MS = 240_000;
+const LIMITE_DEL_INTERROGATORIO_MS = 150_000;
+/*
+ * LA SEGUNDA PASADA TIENE EL SUYO, Y LOS DOS JUNTOS CABEN EN LA FUNCIÓN. Son
+ * llamadas SEGUIDAS, no simultáneas: si cada una pudiera tomarse el plazo
+ * entero, entre las dos se pasarían de los 300 s de `vercel.json` y a quien
+ * cortaría sería la plataforma, en seco y sin devolver la reserva. 150 + 100
+ * dejan 50 s de margen para la recuperación de pasajes, el cobro y el guardado.
+ */
+const LIMITE_DE_LA_ANTICIPACION_MS = 100_000;
 
 /** El piso de ESTA tanda: el de la operación más lo que suman las personas de más. */
 const suplementoDe = (personas: number): number => SUPLEMENTO_POR_PERSONA * Math.max(0, personas - 1);
@@ -119,7 +130,14 @@ const pisoDeLaTanda = (personas: number): number => PRICE_COP[OPERACION] + suple
  * motor; y si aun así se corta, `objetoDeLaRespuesta` rescata las preguntas
  * completas y la pantalla dice que la lista quedó recortada.
  */
-const TOKENS_POR_PERSONA = 6_500;
+const TOKENS_POR_PERSONA = 3_000;
+/**
+ * LA SEGUNDA PASADA ESCRIBE MÁS QUE LA PRIMERA, y por eso tiene su propio
+ * presupuesto: por cada pregunta ya escrita devuelve la respuesta probable, la
+ * repregunta y una cita literal. Medido sobre el formato, son unos 145 tokens
+ * por pregunta contra los ~90 que cuesta escribirla, y el tope son veinte.
+ */
+const TOKENS_ANTICIPACION_POR_PERSONA = 4_000;
 /** El enfoque, la estructura del JSON y lo que el motor razona antes de escribir. */
 const TOKENS_DE_BASE = 1_200;
 
@@ -307,6 +325,39 @@ export const preguntasDelExpedienteController = async (req: Request, res: Respon
       });
       return;
     }
+
+    /*
+     * ─── SEGUNDA PASADA: LO QUE VA A CONTESTAR ─────────────────────────────
+     *
+     * Va aparte porque pedir la pregunta y su anticipación en el mismo turno
+     * empeoraba la pregunta (ver `buildPreguntasSystemPrompt`). Y va DESPUÉS de
+     * tener la lista, no en paralelo, porque se le entregan las preguntas ya
+     * escritas: es lo que impide que las reescriba.
+     *
+     * NO PUEDE TUMBAR LA TANDA. Si falla, si tarda o si vuelve ilegible, el
+     * colega recibe sus preguntas sin anticipación —que es exactamente lo que
+     * recibía antes de que esto existiera— y lo que se cobra es lo consumido.
+     * Al revés sería tirar un interrogatorio entero por el adorno.
+     */
+    let listas = preguntas.porPersona;
+    try {
+      const segunda = await conLimite(
+        callOpenRouterWithUsage(
+          ENGINE.OPUS,
+          buildAnticipacionSystemPrompt(),
+          buildAnticipacionUserPrompt({ expediente, listas, material }),
+          TOKENS_ANTICIPACION_POR_PERSONA * aQuienes.length,
+          undefined,
+          { timeoutMs: LIMITE_DE_LA_ANTICIPACION_MS - 10_000 }
+        ),
+        LIMITE_DE_LA_ANTICIPACION_MS
+      );
+      await recordUsage({ firmId, userEmail, operation: OPERACION, operationId, usage: segunda.usage ?? null });
+      if (segunda.text) listas = conLaAnticipacion(segunda.text, listas, pasajes);
+    } catch (err) {
+      console.error('[EXPEDIENTES/PREGUNTAS] La anticipacion no llego; se entregan las preguntas solas:', err);
+    }
+    preguntas.porPersona = listas;
 
     const cobro = await settleOperation({
       firmId,

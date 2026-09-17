@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   MINIMO_DE_CITA,
+  conLaAnticipacion,
   documentoDeLaCita,
   leerPreguntas,
   objetoDeLaRespuesta,
@@ -292,10 +293,22 @@ const PRESUPUESTO = sinComentarios(leer('modules/expedientes/preguntas.controlle
 const porPersona = /const TOKENS_POR_PERSONA = ([\d_]+);/.exec(PRESUPUESTO);
 const deBase = /const TOKENS_DE_BASE = ([\d_]+);/.exec(PRESUPUESTO);
 const tokens = (m: RegExpExecArray | null): number => Number((m?.[1] ?? '0').replace(/_/g, ''));
+/*
+ * LAS DOS PASADAS TIENEN PRESUPUESTO PROPIO, y el de cada una se mide sobre lo
+ * que ESA escribe. Medido el 16/09/2026 con una persona y material del caso:
+ * las preguntas solas consumen 1.905 tokens y la anticipación de diecinueve de
+ * ellas, 2.978.
+ */
 check(
-  'el presupuesto por persona cubre con margen los 3.102 tokens medidos con material',
-  tokens(porPersona) >= 3_700,
+  'el presupuesto de las preguntas cubre con margen los 1.905 tokens medidos',
+  tokens(porPersona) >= 2_500,
   `${tokens(porPersona)} por persona`
+);
+const anticipacion = /const TOKENS_ANTICIPACION_POR_PERSONA = ([\d_]+);/.exec(PRESUPUESTO);
+check(
+  'y el de la anticipación, los 2.978 que ella escribe',
+  tokens(anticipacion) >= 3_500,
+  `${tokens(anticipacion)} por persona`
 );
 check('y la base deja sitio para lo que el motor razona antes de escribir', tokens(deBase) >= 1_000, `${tokens(deBase)} de base`);
 
@@ -345,6 +358,76 @@ check(
   BILLING.includes('const piso = base + Math.max(0, Math.round(suplementoCop));') &&
     BILLING.includes('return Math.max(piso, medido);')
 );
+
+/* ─── 5 quinquies. LA SEGUNDA PASADA NO PUEDE REESCRIBIR UNA PREGUNTA ───── */
+
+/*
+ * EL DEFECTO QUE ESTO VIGILA, y se vio en las dos listas puestas una al lado de
+ * la otra: pidiendo la pregunta Y su respuesta probable Y la repregunta Y la
+ * cita en el mismo turno, aparecieron preguntas COMPUESTAS —«¿Cuándo ocurrió la
+ * entrega y cómo recuerda esa fecha?»—, dos que se solapaban y una que
+ * preguntaba por lo que el testigo acababa de decir. La pregunta había dejado
+ * de ser el producto. Separadas, la garantía no es que el segundo modelo se
+ * porte bien: es que el servidor NO LEE de su respuesta el texto de la pregunta.
+ */
+const PROMPTS = leer('modules/expedientes/preguntasDelExpediente.ts');
+const sistemaDePreguntas = PROMPTS.slice(
+  PROMPTS.indexOf('export const buildPreguntasSystemPrompt'),
+  PROMPTS.indexOf('export const buildPreguntasUserPrompt')
+);
+for (const campo of ['respuestaProbable', 'repregunta', 'conQue']) {
+  check(`el prompt de las preguntas ya no pide "${campo}"`, !sistemaDePreguntas.includes(`"${campo}"`));
+}
+check('hay un prompt aparte para la anticipación', PROMPTS.includes('export const buildAnticipacionSystemPrompt'));
+check(
+  'y le prohíbe tocar las preguntas',
+  PROMPTS.includes('NO REESCRIBAS NINGUNA PREGUNTA') && PROMPTS.includes('con el MISMO número')
+);
+
+const listasDeJuguete = [
+  {
+    actorId: TESTIGO.id,
+    nombre: TESTIGO.nombre,
+    tecnica: 'CONTRAINTERROGATORIO',
+    preguntas: [
+      { pregunta: 'Usted estuvo en la entrega, ¿verdad?', paraQue: 'Fijar su presencia.' },
+      { pregunta: 'El acta la firmó usted, ¿cierto?', paraQue: 'Fijar la firma.' }
+    ]
+  }
+];
+/* El modelo devuelve OTRA pregunta a propósito: es el ataque que la separación tiene que resistir. */
+const anticipado = conLaAnticipacion(
+  JSON.stringify({
+    anticipacion: [
+      {
+        actorId: TESTIGO.id,
+        n: 1,
+        pregunta: 'ESTA PREGUNTA LA ESCRIBIÓ LA SEGUNDA PASADA',
+        respuestaProbable: 'Dirá que sí estuvo.',
+        repregunta: 'Diga a qué hora llegó.',
+        conQue: { cita: 'El inmueble fue entregado el quince de marzo' }
+      },
+      { actorId: 'otro', n: 2, respuestaProbable: 'De otra persona, no entra.' }
+    ]
+  }),
+  listasDeJuguete,
+  PASAJES
+);
+check(
+  'la pregunta sigue siendo la de la primera pasada, no la que devolvió la segunda',
+  anticipado[0].preguntas[0].pregunta === 'Usted estuvo en la entrega, ¿verdad?'
+);
+check('la anticipación sí entra', anticipado[0].preguntas[0].respuestaProbable === 'Dirá que sí estuvo.');
+check(
+  'y su cita se coteja contra los pasajes, con el documento que pone el código',
+  anticipado[0].preguntas[0].conQue?.documento === 'Acta de entrega.pdf'
+);
+check(
+  'lo que viene para otro actor no se pega a esta lista',
+  anticipado[0].preguntas[1].respuestaProbable === undefined
+);
+/* Si la segunda pasada no llega, el colega recibe sus preguntas: no se pierde la tanda. */
+check('una segunda respuesta ilegible devuelve las listas intactas', conLaAnticipacion('no es json', listasDeJuguete, PASAJES) === listasDeJuguete);
 
 /* ─── 5 quater. EL RELOJ DE LA TANDA ────────────────────────────────────── */
 
