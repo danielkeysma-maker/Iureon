@@ -800,7 +800,8 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
                 />
                 <p className="mt-1.5 text-meta text-ink-500">
                   Cada consulta cuesta desde {pesos(PRECIO_DE_LA_CONSULTA_COP)} del saldo de la firma. La guía
-                  responde sobre estas preguntas; no las cambia por su cuenta.
+                  responde solo sobre este expediente y estas preguntas —no las cambia por su cuenta, y no propone
+                  preguntas sobre lo que el caso no traiga—.
                 </p>
                 <button
                   type="button"

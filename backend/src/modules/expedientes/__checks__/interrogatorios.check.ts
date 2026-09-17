@@ -500,6 +500,36 @@ check(
   'el prompt de la consulta prohíbe citar normas, que es lo que no está verificado',
   PROMPT_CONSULTA.includes('NO cites normas, artículos, sentencias, autos ni radicados')
 );
+/*
+ * EL ALCANCE ES UNA EXIGENCIA DEL DUEÑO, 16/09/2026: la guía contesta sobre
+ * ESTE expediente y ESTE interrogatorio, y no inventa preguntas sobre lo que el
+ * caso no traiga. Una pregunta sin apoyo en el expediente se lee tan bien como
+ * una buena, y el abogado la formula en la sala.
+ */
+check(
+  'el prompt le prohíbe salir del expediente y del interrogatorio',
+  PROMPT_CONSULTA.includes('NO SALES DE ESTE EXPEDIENTE NI DE ESTE INTERROGATORIO')
+);
+check(
+  'toda pregunta que proponga tiene que apoyarse en algo del caso',
+  PROMPT_CONSULTA.includes('tiene que apoyarse en algo de aquí') &&
+    PROMPT_CONSULTA.includes('no la escribas')
+);
+/*
+ * MANDAR A UNA PANTALLA QUE NO EXISTE se lee igual de bien que una indicación
+ * correcta, y el colega la descubre buscándola. Probado contra el motor: sin
+ * esta regla mandaba a un «módulo de consulta jurídica o de investigación
+ * normativa» que esta aplicación no tiene.
+ */
+check(
+  'solo puede nombrar módulos que existen de verdad',
+  PROMPT_CONSULTA.includes('SOLO puedes nombrar estos módulos de la aplicación') &&
+    ['«Redacción»', '«Orientación»', '«Buscador»'].every((m) => PROMPT_CONSULTA.includes(m))
+);
+check(
+  'y lo que falte se pide, no se inventa',
+  PROMPT_CONSULTA.includes('No inventes hechos, personas, fechas, sumas ni documentos que no estén')
+);
 check(
   'no todos los turnos viajan al motor: el interrogatorio no puede quedarse fuera del contexto',
   PROMPT_CONSULTA.includes('TURNOS_QUE_VIAJAN') && PROMPT_CONSULTA.includes('.slice(-TURNOS_QUE_VIAJAN)')
