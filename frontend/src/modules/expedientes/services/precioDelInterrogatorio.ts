@@ -24,3 +24,12 @@ export const SUPLEMENTO_POR_PERSONA_COP = 1000;
  */
 export const pisoDeLaTanda = (personas: number): number =>
   PISO_INTERROGATORIO_COP + SUPLEMENTO_POR_PERSONA_COP * Math.max(0, personas - 1);
+
+/**
+ * Lo que cuesta UN turno de conversación sobre una tanda ya preparada.
+ *
+ * Es el piso de `CONSULTA_REVISION`, no el del interrogatorio, y la diferencia
+ * no es arbitraria: preparar escribe una lista nueva y consultar responde sobre
+ * la que ya existe. El mismo trabajo que un turno del taller, el mismo precio.
+ */
+export const PRECIO_DE_LA_CONSULTA_COP = 300;

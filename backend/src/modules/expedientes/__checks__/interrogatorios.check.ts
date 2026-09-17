@@ -458,6 +458,71 @@ check(
   PREGUNTAS_CTRL.includes("error: 'QUESTIONS_TIMEOUT'") && PREGUNTAS_CTRL.includes('con menos personas por tanda')
 );
 
+/* ─── 5 sexies. LA CONVERSACIÓN SOBRE UNA TANDA YA PREPARADA ────────────── */
+
+/*
+ * Lo que esto vigila no es que el chat funcione —eso se ve—, sino las cuatro
+ * formas en que un chat cobrado se convierte en un problema: que conteste sobre
+ * un interrogatorio que no es el guardado, que cobre el precio de preparar uno
+ * nuevo, que se lleve a la auditoría la estrategia del caso, o que cobre por
+ * una respuesta que nunca llegó.
+ */
+const CONSULTA = sinComentarios(leer('modules/expedientes/consultaInterrogatorio.controller.ts'));
+
+check(
+  'las preguntas se leen de la fila, no de lo que mande el navegador',
+  CONSULTA.includes('obtenerInterrogatorio(firmId, expedienteId, interrogatorioId)') &&
+    !/req\.body[^\n]*preguntas/.test(CONSULTA)
+);
+check(
+  'consultar cuesta lo que una consulta del taller, no lo que preparar una tanda',
+  CONSULTA.includes("const OPERACION = 'CONSULTA_REVISION' as const;")
+);
+check(
+  'la misma puerta del plan que preparar el interrogatorio',
+  CONSULTA.includes("exigirFuncion(firmId, 'EXPEDIENTES.PREGUNTAS_AUDIENCIA')")
+);
+check(
+  'si la guía no responde, se devuelve el saldo ANTES de contestar',
+  CONSULTA.indexOf('refundReservation') < CONSULTA.indexOf("error: 'CONSULTA_FAILED'")
+);
+check('un plazo agotado también se devuelve y se dice aparte', CONSULTA.includes("error: 'CONSULTA_TIMEOUT'"));
+check(
+  'la auditoría registra que se consultó, nunca qué se preguntó',
+  CONSULTA.includes("action: 'EXPEDIENTE_INTERROGATORIO_CONSULTA'") && !/resource:[^\n]*mensaje/.test(CONSULTA)
+);
+check(
+  'y la pantalla se entera de si la conversación quedó escrita',
+  CONSULTA.includes('const guardado = await anotarConsulta(') && CONSULTA.includes('guardado,')
+);
+const PROMPT_CONSULTA = leer('modules/expedientes/consultaDelInterrogatorio.ts');
+check(
+  'el prompt de la consulta prohíbe citar normas, que es lo que no está verificado',
+  PROMPT_CONSULTA.includes('NO cites normas, artículos, sentencias, autos ni radicados')
+);
+check(
+  'no todos los turnos viajan al motor: el interrogatorio no puede quedarse fuera del contexto',
+  PROMPT_CONSULTA.includes('TURNOS_QUE_VIAJAN') && PROMPT_CONSULTA.includes('.slice(-TURNOS_QUE_VIAJAN)')
+);
+const SERVICIO_CONSULTA = sinComentarios(leer('modules/expedientes/interrogatorios.service.ts'));
+check(
+  'guardar la conversación filtra por firma y por expediente, como toda lectura',
+  (SERVICIO_CONSULTA.match(/\.eq\('firm_id', d\.firmId\)/g) ?? []).length >= 3
+);
+check(
+  'y la tanda abierta trae lo que ya se habló, tolerando la columna que aún no exista',
+  SERVICIO_CONSULTA.includes('conversacion: Array.isArray(fila.conversacion) ? fila.conversacion : []')
+);
+const MIGRACION_CHARLA = readFileSync(
+  join(process.cwd(), '..', 'supabase', 'migration-interrogatorio-conversacion.sql'),
+  'utf8'
+);
+check(
+  'la columna nace con valor por defecto: una tanda vieja no se abre rota',
+  MIGRACION_CHARLA.includes('ADD COLUMN IF NOT EXISTS conversacion JSONB NOT NULL') &&
+    MIGRACION_CHARLA.includes("DEFAULT '[]'::jsonb")
+);
+
 /* ─── 6. QUIÉN PUEDE BORRAR UNA TANDA ───────────────────────────────────── */
 
 const DE = 'autora@firma.co';

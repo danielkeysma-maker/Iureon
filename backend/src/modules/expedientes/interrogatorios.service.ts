@@ -1,5 +1,6 @@
 import { supabase } from '../../config/supabase.config';
 import { ExpedienteError } from './expedientes.service';
+import type { TurnoDelInterrogatorio } from './consultaDelInterrogatorio';
 import type { PreguntasDelExpediente } from './preguntasDelExpediente';
 
 /**
@@ -53,6 +54,8 @@ export interface InterrogatorioEnLaLista {
 export interface InterrogatorioGuardado extends InterrogatorioEnLaLista {
   preguntas: PreguntasDelExpediente;
   modelo: string | null;
+  /** Lo que se habló con la guía sobre esta tanda. Vacío mientras nadie pregunte. */
+  conversacion: TurnoDelInterrogatorio[];
 }
 
 interface FilaDeInterrogatorio {
@@ -64,6 +67,7 @@ interface FilaDeInterrogatorio {
   personas: PreguntasDelExpediente;
   modelo: string | null;
   cobrado_cop: number | null;
+  conversacion: TurnoDelInterrogatorio[] | null;
 }
 
 /** Las columnas de la lista. Sin `personas`, que es el objeto entero. */
@@ -208,7 +212,7 @@ export const obtenerInterrogatorio = async (
 ): Promise<InterrogatorioGuardado> => {
   const { data, error } = await db()
     .from(TABLA)
-    .select(`${COLUMNAS_DE_LA_LISTA}, personas, modelo`)
+    .select(`${COLUMNAS_DE_LA_LISTA}, personas, modelo, conversacion`)
     .eq('firm_id', firmId)
     .eq('expediente_id', expedienteId)
     .eq('id', id)
@@ -225,7 +229,79 @@ export const obtenerInterrogatorio = async (
     );
   }
   const fila = data as FilaDeInterrogatorio;
-  return { ...aLaLista(fila), preguntas: fila.personas, modelo: fila.modelo };
+  return {
+    ...aLaLista(fila),
+    preguntas: fila.personas,
+    modelo: fila.modelo,
+    /*
+     * TOLERA LA COLUMNA AUSENTE. Si el despliegue va por delante de
+     * `migration-interrogatorio-conversacion.sql`, la tanda se abre igual y la
+     * conversación sale vacía, en vez de que reabrir un interrogatorio pagado
+     * falle por una columna que todavía no existe.
+     */
+    conversacion: Array.isArray(fila.conversacion) ? fila.conversacion : []
+  };
+};
+
+/**
+ * Añade los dos turnos de una consulta a la conversación de la tanda.
+ *
+ * ─── SE LEE Y SE ESCRIBE ENTERA, Y ESTÁ BIEN ───────────────────────────────
+ *
+ * No hay `jsonb_array_append` aquí: se trae el arreglo, se le pegan los dos
+ * turnos y se guarda. Es una carrera si dos personas de la firma consultan la
+ * MISMA tanda en el mismo segundo, y el precio de perderla es un turno que no
+ * queda escrito —el colega ya tiene la respuesta en pantalla—. Una tabla aparte
+ * con una fila por turno lo evitaría, y costaría una FK más en el borrado de la
+ * firma, que es donde esta casa ya se equivocó una vez.
+ *
+ * NUNCA LANZA. La respuesta de la guía ya está pagada y ya va de camino a la
+ * pantalla: negársela porque la base no aceptó la fila sería cobrar dos veces
+ * por lo mismo. Lo que no se pudo guardar se dice en el log y lo dice también
+ * la pantalla, que recibe `guardado: false`.
+ */
+export const anotarConsulta = async (d: {
+  firmId: string;
+  expedienteId: string;
+  id: string;
+  turnos: TurnoDelInterrogatorio[];
+}): Promise<boolean> => {
+  if (!supabase) return false;
+  try {
+    const { data, error: leyendo } = await supabase
+      .from(TABLA)
+      .select('conversacion')
+      .eq('firm_id', d.firmId)
+      .eq('expediente_id', d.expedienteId)
+      .eq('id', d.id)
+      .maybeSingle();
+
+    if (leyendo || !data) return false;
+    const previa = (data as { conversacion: TurnoDelInterrogatorio[] | null }).conversacion;
+    const conversacion = [...(Array.isArray(previa) ? previa : []), ...d.turnos];
+
+    const { error } = await supabase
+      .from(TABLA)
+      .update({ conversacion })
+      .eq('firm_id', d.firmId)
+      .eq('expediente_id', d.expedienteId)
+      .eq('id', d.id);
+
+    if (error) {
+      console.error(
+        '[EXPEDIENTES/INTERROGATORIOS] No se pudo guardar la consulta; el abogado la ve pero no quedará al reabrir. Puede faltar correr supabase/migration-interrogatorio-conversacion.sql:',
+        error.message
+      );
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error(
+      '[EXPEDIENTES/INTERROGATORIOS] Fallo inesperado al guardar la consulta:',
+      err instanceof Error ? err.message : err
+    );
+    return false;
+  }
 };
 
 /**

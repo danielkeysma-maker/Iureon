@@ -365,6 +365,30 @@ export interface InterrogatorioEnLaLista {
 export interface InterrogatorioGuardado extends InterrogatorioEnLaLista {
   preguntas: PreguntasDelExpediente;
   modelo: string | null;
+  /** Lo que ya se habló con la guía sobre esta tanda. Vacío mientras nadie pregunte. */
+  conversacion?: TurnoDelInterrogatorio[];
+}
+
+/**
+ * UN TURNO DE LA CONVERSACIÓN SOBRE UNA TANDA.
+ *
+ * Mismos nombres de campo que la conversación del taller, a propósito: la
+ * pantalla no tiene por qué aprender dos formas de lo mismo.
+ */
+export interface TurnoDelInterrogatorio {
+  rol: 'abogado' | 'guia';
+  texto: string;
+  fecha: string;
+}
+
+/** Lo que responde el servidor a una consulta: los dos turnos y lo que costó. */
+export interface RespuestaDeLaConsulta {
+  turnos: TurnoDelInterrogatorio[];
+  /** `false` cuando la conversación no quedó escrita en el expediente. Se dice. */
+  guardado: boolean;
+  cobradoCop: number;
+  saldoCop: number;
+  precioCop: number;
 }
 
 /**

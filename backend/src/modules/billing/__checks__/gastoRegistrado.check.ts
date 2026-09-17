@@ -51,7 +51,9 @@ const COMO_SE_REGISTRA: Record<string, string> = {
   'modules/agent/review/documentReview.controller.ts': 'llama a recordUsage',
   'modules/agent/review/escritoChat.controller.ts': 'llama a recordUsage',
   'modules/expedientes/preguntas.controller.ts':
-    'llama a recordUsage con la operación CONSULTA_REVISION que heredó del camino de revisiones, hoy retirado',
+    'llama a recordUsage con la operación INTERROGATORIO, una vez por cada una de sus dos pasadas',
+  'modules/expedientes/consultaInterrogatorio.controller.ts':
+    'llama a recordUsage con la operación CONSULTA_REVISION, una vez por turno de la conversación',
   'modules/agent/adjuntos/leerAdjuntos.ts': 'llama a recordUsage',
   'modules/agent/review/verificarGlosa.ts':
     'devuelve RevisionDeGlosa.usos y lo registra openrouter.service.ts',

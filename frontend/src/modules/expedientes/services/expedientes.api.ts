@@ -7,6 +7,7 @@ import type {
   ExpedienteConDetalle,
   InterrogatorioEnLaLista,
   InterrogatorioGuardado,
+  RespuestaDeLaConsulta,
   LadoEnElExpediente,
   PapelEnElExpediente,
   PreguntasDelExpediente
@@ -427,6 +428,25 @@ export const expedientesApi = {
       `/api/expedientes/${expedienteId}/interrogatorios/${interrogatorioId}`
     );
     return revisar(data, 'No se pudo abrir el interrogatorio.').interrogatorio;
+  },
+
+  /**
+   * Una consulta sobre una tanda ya preparada. SÍ COBRA, un turno cada vez.
+   *
+   * La tanda no viaja: el servidor la lee de la fila. Aquí solo va el mensaje,
+   * y por eso la conversación no puede acabar hablando de un interrogatorio
+   * distinto del que está guardado.
+   */
+  async consultarInterrogatorio(
+    expedienteId: string,
+    interrogatorioId: string,
+    mensaje: string
+  ): Promise<RespuestaDeLaConsulta> {
+    const data = await httpClient.post<Respuesta & RespuestaDeLaConsulta>(
+      `/api/expedientes/${expedienteId}/interrogatorios/${interrogatorioId}/consulta`,
+      { body: { mensaje } }
+    );
+    return revisar(data, 'No se pudo consultar a la guía.');
   },
 
   /** Elimina una tanda. Solo quien la preparó o un socio administrador. */

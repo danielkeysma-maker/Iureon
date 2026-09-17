@@ -283,12 +283,44 @@ check(
 const REGISTRO = leer('modules/audit/registro.ts');
 check('la acción nueva tiene nombre en español', REGISTRO.includes("EXPEDIENTE_INTERROGATORIO: 'Preparó un interrogatorio'"));
 check(
-  'y entra en la vista de audiencias, junto con su borrado',
-  REGISTRO.includes("'EXPEDIENTE_INTERROGATORIO', 'EXPEDIENTE_INTERROGATORIO_DELETED'] }")
+  'y entra en la vista de audiencias, con la consulta y el borrado',
+  REGISTRO.includes(
+    "'EXPEDIENTE_INTERROGATORIO', 'EXPEDIENTE_INTERROGATORIO_CONSULTA', 'EXPEDIENTE_INTERROGATORIO_DELETED'] }"
+  )
+);
+check(
+  'consultar a la guia tambien tiene nombre en espanol',
+  REGISTRO.includes("EXPEDIENTE_INTERROGATORIO_CONSULTA: 'Consultó a la guía sobre un interrogatorio'")
 );
 check(
   'eliminar un interrogatorio también tiene nombre en español: es material pagado y sin papelera',
   REGISTRO.includes("EXPEDIENTE_INTERROGATORIO_DELETED: 'Eliminó un interrogatorio preparado'")
+);
+
+/* ─── SEGUIR HABLANDO CON LA GUÍA ───────────────────────────────────────── */
+
+check('hay dónde consultarle a la guía sobre la tanda', PANEL.includes('Consultarle a la guía'));
+check(
+  'y el precio del turno se dice ANTES de preguntar, en el aviso y en el botón',
+  PANEL_CODIGO.includes('pesos(PRECIO_DE_LA_CONSULTA_COP)') && PANEL.includes('Preguntar · desde')
+);
+check(
+  'el precio del turno es el mismo que cobra el servidor',
+  numeroDe(PRECIO_PANTALLA, /PRECIO_DE_LA_CONSULTA_COP = ([\d_]+);/) ===
+    numeroDe(PRECIOS, /CONSULTA_REVISION: ([\d_]+),/),
+  `pantalla $${numeroDe(PRECIO_PANTALLA, /PRECIO_DE_LA_CONSULTA_COP = ([\d_]+);/)}`
+);
+check(
+  'los turnos que se pintan son los que devolvió el servidor, no el propio al enviarlo',
+  PANEL_CODIGO.includes('conversacion: [...antes.conversacion, ...r.turnos]')
+);
+check(
+  'sin tanda guardada no se ofrece conversar: el servidor lee las preguntas de la fila',
+  PANEL_CODIGO.includes('abierto.id ? (') && PANEL.includes('no hay sobre qué conversar')
+);
+check(
+  'y si la consulta no se pudo guardar, se dice en vez de prometer que estará al volver',
+  PANEL_CODIGO.includes('setConsultaSinGuardar(!r.guardado)') && PANEL.includes('no se pudo guardar en el expediente')
 );
 
 console.log('');

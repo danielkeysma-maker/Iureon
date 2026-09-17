@@ -78,7 +78,19 @@ check('sin total: una página llena puede tener más detrás', hayMasEventos({ d
 check('sin total: una página corta es la última', hayMasEventos({ desde: 0, recibidos: 37, limite: 200, total: null }) === false);
 
 /* ─── 3. EL SERVICIO Y EL CONTROLADOR, COMO TEXTO ───────────────────────── */
-const sinComentarios = (s: string): string => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+/*
+ * SE NORMALIZAN LOS FINALES DE LÍNEA ANTES DE MIRAR EL TEXTO. Más abajo, el
+ * cuerpo de `leerPagina` se recorta buscando un literal con saltos de línea, y
+ * en un árbol de trabajo de Windows el archivo llega con CRLF: el recorte salía
+ * vacío y dos comprobaciones fallaban señalando defectos que no existían. Es el
+ * peor desenlace posible de un check, porque manda a arreglar código que está
+ * bien y enseña a desconfiar de la batería.
+ */
+const sinComentarios = (s: string): string =>
+  s
+    .replace(/\r\n/g, '\n')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^\s*\/\/.*$/gm, '');
 const AQUI = join(__dirname, '..');
 const servicio = sinComentarios(readFileSync(join(AQUI, 'audit.service.ts'), 'utf8'));
 const controlador = sinComentarios(readFileSync(join(AQUI, 'audit.controller.ts'), 'utf8'));

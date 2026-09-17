@@ -46,6 +46,7 @@ export type AuditAction =
    * un registro pensado para que un socio vigile poderes.
    */
   | 'EXPEDIENTE_INTERROGATORIO'
+  | 'EXPEDIENTE_INTERROGATORIO_CONSULTA'
   /*
    * Se eliminó una tanda de interrogatorio. Material privilegiado, PAGADO y sin
    * papelera: quien vuelva a buscarlo y no lo encuentre tiene derecho a saber

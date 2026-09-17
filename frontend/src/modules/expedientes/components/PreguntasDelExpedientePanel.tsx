@@ -1,11 +1,16 @@
 import React from 'react';
-import { AlertCircle, Check, Copy, Download, FolderOpen, Gavel, Loader2, Maximize2, Trash2 } from 'lucide-react';
+import { AlertCircle, Check, Copy, Download, FolderOpen, Gavel, Loader2, Maximize2, MessageSquare, Trash2 } from 'lucide-react';
 import { ConfirmarDialog, type Confirmacion } from '../../../design/ConfirmarDialog';
 import { useFuncionHabilitada } from '../../subscriptions/PlanContext';
 import { AVISO_FUNCION_DESHABILITADA } from '../../subscriptions/types';
 import { pesos } from '../../billing/recargaEnPantalla';
 import { expedientesApi } from '../services/expedientes.api';
-import { PISO_INTERROGATORIO_COP, SUPLEMENTO_POR_PERSONA_COP, pisoDeLaTanda } from '../services/precioDelInterrogatorio';
+import {
+  PISO_INTERROGATORIO_COP,
+  PRECIO_DE_LA_CONSULTA_COP,
+  SUPLEMENTO_POR_PERSONA_COP,
+  pisoDeLaTanda
+} from '../services/precioDelInterrogatorio';
 import {
   exportarPreguntasAPdf,
   exportarPreguntasAWord,
@@ -19,6 +24,7 @@ import {
   interrogatoriosMasNuevoPrimero,
   type ExpedienteConDetalle,
   type InterrogatorioEnLaLista,
+  type TurnoDelInterrogatorio,
   type PreguntasDelExpediente
 } from '../types';
 import { LecturaAmpliaDelInforme } from '../../workspace/components/LecturaAmpliaDelInforme';
@@ -95,6 +101,8 @@ interface Abierto {
   preguntas: PreguntasDelExpediente;
   queSeQueriaProbar: string;
   audiencia: string;
+  /** Lo que ya se habló con la guía sobre ella. */
+  conversacion: TurnoDelInterrogatorio[];
 }
 
 /**
@@ -258,6 +266,11 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
   const [leyendo, setLeyendo] = React.useState<string | null>(null);
   /* «Leer en grande»: el mismo diálogo del taller, con las preguntas y sin nada más. */
   const [lecturaAmplia, setLecturaAmplia] = React.useState(false);
+  /* La consulta sobre la tanda abierta: lo que se escribe, si está en vuelo y qué falló. */
+  const [consulta, setConsulta] = React.useState('');
+  const [consultando, setConsultando] = React.useState(false);
+  const [errorConsulta, setErrorConsulta] = React.useState('');
+  const [consultaSinGuardar, setConsultaSinGuardar] = React.useState(false);
 
   const habilitado = useFuncionHabilitada('EXPEDIENTES.PREGUNTAS_AUDIENCIA');
 
@@ -361,7 +374,8 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
         id: r.guardado?.id ?? null,
         preguntas: r.preguntas,
         queSeQueriaProbar: quiereProbar,
-        audiencia
+        audiencia,
+        conversacion: []
       });
       if (r.guardado) {
         const ficha = r.guardado;
@@ -377,6 +391,35 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
   };
 
   /* ABRIR NO COBRA: es un GET de lo que ya se pagó. */
+  /**
+   * UNA CONSULTA SOBRE LA TANDA ABIERTA. Cobra un turno cada vez.
+   *
+   * SOLO CON LA TANDA GUARDADA (`abierto.id`): el servidor lee las preguntas de
+   * la fila, no del navegador, así que una tanda que no se pudo guardar no
+   * tiene sobre qué conversar. Se dice en la pantalla en vez de mandar una
+   * petición que el servidor va a rechazar con un 404 sin explicación útil.
+   *
+   * LOS TURNOS QUE DEVUELVE EL SERVIDOR son los que se pintan —los dos, el suyo
+   * y el de la guía—, en vez de pintar el propio al enviarlo: así lo que se ve
+   * en pantalla es exactamente lo que quedó escrito en el expediente.
+   */
+  const preguntarALaGuia = async (): Promise<void> => {
+    const texto = consulta.trim();
+    if (!texto || !abierto?.id || consultando) return;
+    setConsultando(true);
+    setErrorConsulta('');
+    try {
+      const r = await expedientesApi.consultarInterrogatorio(expediente.id, abierto.id, texto);
+      setAbierto((antes) => (antes ? { ...antes, conversacion: [...antes.conversacion, ...r.turnos] } : antes));
+      setConsulta('');
+      setConsultaSinGuardar(!r.guardado);
+    } catch (err) {
+      setErrorConsulta((err as Error).message);
+    } finally {
+      setConsultando(false);
+    }
+  };
+
   const abrir = async (ficha: InterrogatorioEnLaLista): Promise<void> => {
     setAbriendo(ficha.id);
     setError('');
@@ -387,7 +430,8 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
         id: t.id,
         preguntas: t.preguntas,
         queSeQueriaProbar: t.queSeQueriaProbar ?? '',
-        audiencia: t.audiencia ?? ''
+        audiencia: t.audiencia ?? '',
+        conversacion: t.conversacion ?? []
       });
     } catch (err) {
       setError((err as Error).message);
@@ -715,6 +759,72 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
             documentosPorTitulo={documentosPorTitulo}
             onLeerDocumento={setLeyendo}
           />
+
+          {/*
+            ─── SEGUIR HABLANDO CON LA GUÍA ────────────────────────────────
+            Va DEBAJO de las preguntas y no encima: primero se lee lo que se
+            compró. Y solo con la tanda guardada, porque el servidor lee las
+            preguntas de la fila y no del navegador.
+          */}
+          <section className="cn-int-consulta">
+            <h3 className="cn-exp-rotulo">Consultarle a la guía</h3>
+            {abierto.conversacion.length > 0 && (
+              <ol className="cn-int-charla">
+                {abierto.conversacion.map((t, i) => (
+                  <li key={`${t.fecha}-${i}`} className="cn-int-turno">
+                    <span className="cn-int-quien">{t.rol === 'abogado' ? 'Usted' : 'La guía'}</span>
+                    <p className={`cn-int-dicho ${t.rol === 'guia' ? 'cn-int-dicho--guia' : ''}`}>{t.texto}</p>
+                  </li>
+                ))}
+              </ol>
+            )}
+            {consultaSinGuardar && (
+              <p className="notice text-meta [text-wrap:pretty]">
+                Esta consulta se cobró y la tiene arriba, pero no se pudo guardar en el expediente: no
+                estará al volver a abrir el interrogatorio. Cópiela si la necesita.
+              </p>
+            )}
+            {abierto.id ? (
+              <>
+                <label className="sr-only" htmlFor="consulta-interrogatorio">
+                  Qué quiere preguntarle a la guía sobre este interrogatorio
+                </label>
+                <textarea
+                  id="consulta-interrogatorio"
+                  className="cn-exp-entrada cn-int-consulta-caja"
+                  rows={3}
+                  value={consulta}
+                  onChange={(e) => setConsulta(e.target.value)}
+                  disabled={consultando || !habilitado}
+                  placeholder="Afíneme la 7, que me suena sugestiva"
+                />
+                <p className="mt-1.5 text-meta text-ink-500">
+                  Cada consulta cuesta desde {pesos(PRECIO_DE_LA_CONSULTA_COP)} del saldo de la firma. La guía
+                  responde sobre estas preguntas; no las cambia por su cuenta.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => void preguntarALaGuia()}
+                  disabled={consultando || consulta.trim().length === 0 || !habilitado}
+                  className="btn-primary btn-sm mt-1.5 gap-1.5"
+                >
+                  {consultando ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <MessageSquare className="h-3.5 w-3.5" />}
+                  {consultando ? 'Preguntando…' : `Preguntar · desde ${pesos(PRECIO_DE_LA_CONSULTA_COP)}`}
+                </button>
+                {errorConsulta && (
+                  <p className="mt-2 flex items-start gap-2 text-meta text-ink-700">
+                    <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                    <span className="[overflow-wrap:anywhere]">{errorConsulta}</span>
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="mt-1 text-meta text-ink-500 [text-wrap:pretty]">
+                Este interrogatorio no se pudo guardar en el expediente, así que no hay sobre qué conversar.
+                Prepare otra tanda cuando quiera consultarle a la guía.
+              </p>
+            )}
+          </section>
         </div>
       )}
 

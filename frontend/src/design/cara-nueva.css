@@ -11261,6 +11261,28 @@
   overflow-wrap: anywhere;
 }
 
+.cara-nueva .cn-int-consulta {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.cara-nueva .cn-int-charla {
+  margin: 10px 0 14px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 14px;
+}
+/* Lo que contesta la guía es texto corrido, con sus párrafos: se respetan los saltos. */
+.cara-nueva .cn-int-dicho--guia {
+  white-space: pre-wrap;
+}
+.cara-nueva .cn-int-consulta-caja {
+  margin-top: 10px;
+  min-height: 76px;
+  resize: vertical;
+}
+
 @media (min-width: 720px) {
   /*
    * Desde 720 px el nombre se va a su columna, como en el transcrito de

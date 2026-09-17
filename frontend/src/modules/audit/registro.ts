@@ -25,6 +25,7 @@ export const ACCIONES: Record<string, string> = {
   REVIEW_TEXT_STORAGE_AUTHORIZED: 'Autorizó conservar los escritos del taller',
   HEARING_QUESTIONS_GENERATED: 'Preguntas para la audiencia',
   EXPEDIENTE_INTERROGATORIO: 'Preparó un interrogatorio',
+  EXPEDIENTE_INTERROGATORIO_CONSULTA: 'Consultó a la guía sobre un interrogatorio',
   EXPEDIENTE_INTERROGATORIO_DELETED: 'Eliminó un interrogatorio preparado',
   TRANSCRIPTION_CREATED: 'Transcribió',
   TRANSCRIPTION_DELETED: 'Eliminó transcripción',
@@ -93,7 +94,7 @@ export const VISTAS: ReadonlyArray<{ etiqueta: string; acciones: readonly string
   { etiqueta: 'Escritos y revisiones', acciones: ['DRAFT_GENERATED', 'DOCUMENT_REVIEWED', 'DOCUMENT_REREVIEWED', 'REVIEW_CHAT', 'REVIEW_TEXT_STORAGE_AUTHORIZED'] },
   { etiqueta: 'Expedientes', acciones: ['EXPEDIENTE_CREATED', 'EXPEDIENTE_UPDATED', 'EXPEDIENTE_DELETED', 'EXPEDIENTE_INDEXED', 'EXPEDIENTE_DOCUMENT_RENAMED', 'EXPEDIENTE_CARPETA_CREATED', 'EXPEDIENTE_CARPETA_RENAMED', 'EXPEDIENTE_CARPETA_MOVED', 'EXPEDIENTE_CARPETA_DELETED'] },
   { etiqueta: 'Catálogo y estilo', acciones: ['CATALOG_TERM_VERIFIED', 'FIRM_ACTUACION_CREATED', 'FIRM_ACTUACION_DELETED', 'ESTILO_ENSENADO', 'ESTILO_RETIRADO'] },
-  { etiqueta: 'Audiencias y entrevistas', acciones: ['TRANSCRIPTION_CREATED', 'TRANSCRIPTION_DELETED', 'ACTA_LISTA', 'INTERVIEW_DECIDED', 'HEARING_QUESTIONS_GENERATED', 'EXPEDIENTE_INTERROGATORIO', 'EXPEDIENTE_INTERROGATORIO_DELETED'] },
+  { etiqueta: 'Audiencias y entrevistas', acciones: ['TRANSCRIPTION_CREATED', 'TRANSCRIPTION_DELETED', 'ACTA_LISTA', 'INTERVIEW_DECIDED', 'HEARING_QUESTIONS_GENERATED', 'EXPEDIENTE_INTERROGATORIO', 'EXPEDIENTE_INTERROGATORIO_CONSULTA', 'EXPEDIENTE_INTERROGATORIO_DELETED'] },
   {
     etiqueta: 'Accesos y contraseñas',
     acciones: [

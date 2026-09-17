@@ -29,6 +29,7 @@ import {
   borrarInterrogatorioController,
   listarInterrogatoriosController
 } from './interrogatorios.controller';
+import { consultaDelInterrogatorioController } from './consultaInterrogatorio.controller';
 import { indexarEnExpedienteController } from './indexar.controller';
 
 /**
@@ -79,6 +80,11 @@ router.post('/expedientes/:id/preguntas', bloquearSiPlanVencido, preguntasDelExp
  */
 router.get('/expedientes/:id/interrogatorios', listarInterrogatoriosController as any);
 router.get('/expedientes/:id/interrogatorios/:interrogatorioId', abrirInterrogatorioController as any);
+/* Seguir hablando con la guía sobre una tanda ya preparada. Cobra por turno: ver el controlador. */
+router.post(
+  '/expedientes/:id/interrogatorios/:interrogatorioId/consulta',
+  consultaDelInterrogatorioController as any
+);
 router.delete(
   '/expedientes/:id/interrogatorios/:interrogatorioId',
   bloquearSiPlanVencido,
