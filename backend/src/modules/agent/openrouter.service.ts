@@ -7,6 +7,7 @@ import {
   PLAZO_GLOSA_MS,
   PLAZO_VIGENCIA_MS,
   conPresupuesto,
+  esfuerzoDeLaRedaccion,
   relojDeEtapa
 } from './presupuestoDeTiempo';
 import { recordUsage } from '../billing/billing.service';
@@ -991,6 +992,11 @@ export class OpenRouterService {
      * (`PLAZO_REDACCION_MS`); con `medium` el riesgo ya no sería un escrito más
      * caro, sino uno que no llega.
      *
+     * ACTUALIZADO EL MISMO DÍA: `medium` sí cabe en un escrito nuevo sin
+     * adjuntos ni expediente —127,8 s de 138, medido con estos mismos prompts—,
+     * y solo ahí se usa. Con material o sobre un borrador existente, `low`.
+     * La regla y sus razones, en `esfuerzoDeLaRedaccion`.
+     *
      * El plazo de la llamada es el presupuesto de la etapa: quien corta es este
      * código, y por debajo del tope de la plataforma.
      */
@@ -1000,7 +1006,14 @@ export class OpenRouterService {
       userMessage,
       req.maxDraftTokens,
       undefined,
-      { reasoningEffort: 'low', timeoutMs: PLAZO_REDACCION_MS }
+      {
+        reasoningEffort: esfuerzoDeLaRedaccion({
+          adjuntos: req.bloqueAdjuntos,
+          expediente: req.bloqueExpediente,
+          borradorExistente: req.existingDraft
+        }),
+        timeoutMs: PLAZO_REDACCION_MS
+      }
     );
 
     await recordUsage({

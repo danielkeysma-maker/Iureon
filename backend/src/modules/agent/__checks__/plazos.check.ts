@@ -47,6 +47,7 @@ import {
   TOPE_DE_FUNCION_MS,
   TiempoDeRedaccionAgotado,
   conPresupuesto,
+  esfuerzoDeLaRedaccion,
   relojDeEtapa,
   sumaDePresupuestos
 } from '../presupuestoDeTiempo';
@@ -360,6 +361,27 @@ const pruebas = async (): Promise<void> => {
   check(
     'la glosa se juzga sobre el texto que salió del motor, no sobre el ya anotado',
     /verificarGlosaDelEscrito\(legalText,/.test(servicio)
+  );
+
+  /*
+   * ─── EL ESFUERZO DE LA REDACCIÓN ────────────────────────────────────────
+   *
+   * `medium` cabe en un escrito nuevo sin material —127,8 s de 138, medido el
+   * 22/09/2026— y en nada más: con adjuntos, expediente o un borrador que
+   * corregir el escrito sale más largo y diez segundos de margen no alcanzan.
+   * Si esta regla se afloja, un escrito con anexos puede no llegar.
+   */
+  check('un escrito nuevo sin material se redacta en medio', esfuerzoDeLaRedaccion({}) === 'medium');
+  check('con adjuntos, en low', esfuerzoDeLaRedaccion({ adjuntos: 'ADJUNTO: contrato.pdf' }) === 'low');
+  check('con material del expediente, en low', esfuerzoDeLaRedaccion({ expediente: 'PASAJES DEL CASO' }) === 'low');
+  check('corrigiendo un borrador existente, en low', esfuerzoDeLaRedaccion({ borradorExistente: 'PRIMERO. ...' }) === 'low');
+  check(
+    'un bloque vacío o de espacios no cuenta como material',
+    esfuerzoDeLaRedaccion({ adjuntos: '   ', expediente: '', borradorExistente: null }) === 'medium'
+  );
+  check(
+    'y la llamada de la redacción usa la regla, no un esfuerzo fijo',
+    /reasoningEffort: esfuerzoDeLaRedaccion\(\{/.test(servicio) && !/reasoningEffort: 'low', timeoutMs: PLAZO_REDACCION_MS/.test(servicio)
   );
 
   console.log(fallos === 0 ? `\nTODO BIEN (${suma} ms de ${TOPE_DE_FUNCION_MS} ms)` : `\n${fallos} FALLO(S)`);

@@ -271,3 +271,36 @@ export const relojDeEtapa = (presupuestoMs: number): { restante: () => number } 
   const inicio = Date.now();
   return { restante: () => Math.max(0, presupuestoMs - (Date.now() - inicio)) };
 };
+
+/**
+ * CON QUÉ ESFUERZO REDACTA OPUS, según lo que trae el caso.
+ *
+ * ─── LA MEDICIÓN QUE LO DECIDE (22 de septiembre de 2026) ──────────────────
+ *
+ * Opus 5.5 en `medium`, con los prompts reales de esta etapa y un caso normal
+ * de cinco hechos sin adjuntos: 127,8 s, 23.626 caracteres, US$0,29, terminado.
+ * Cabe en `PLAZO_REDACCION_MS` (138 s), pero con DIEZ segundos de margen.
+ *
+ * Lo que consume ese reloj es ESCRIBIR, no leer: Opus escribe a unos cien
+ * tokens por segundo y la entrada pesa poco. Un caso con adjuntos o con
+ * material del expediente trae más hechos, fechas y documentos, y el escrito
+ * sale más largo —quien sea que los haya extraído—. Lo mismo una corrección
+ * sobre un borrador existente: se reescribe el escrito entero, con el viejo
+ * como base. En esos tres casos diez segundos no alcanzan, y si el reloj se
+ * agota el escrito no llega: se devuelve el saldo, pero el abogado se queda
+ * sin nada.
+ *
+ * Así que `medium` solo donde la medición lo respalda —un escrito nuevo sin
+ * adjuntos ni expediente—, y `low` en lo demás, que es lo que ya corría y
+ * termina con holgura. Decisión del dueño, 22/09/2026.
+ */
+export const esfuerzoDeLaRedaccion = (caso: {
+  adjuntos?: string | null;
+  expediente?: string | null;
+  borradorExistente?: string | null;
+}): 'low' | 'medium' => {
+  const traeMaterial = [caso.adjuntos, caso.expediente, caso.borradorExistente].some(
+    (x) => typeof x === 'string' && x.trim().length > 0
+  );
+  return traeMaterial ? 'low' : 'medium';
+};
