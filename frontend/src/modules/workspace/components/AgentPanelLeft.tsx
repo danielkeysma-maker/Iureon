@@ -95,6 +95,12 @@ interface AgentPanelLeftProps {
   handleSendPrompt: (e: React.FormEvent) => void | Promise<void>;
   logs: AgentLog[];
   activeDraftText?: string | null;
+  /**
+   * Corregir algo PUNTUAL del borrador cargado, en el taller: la guía propone
+   * ediciones y solo cambia lo que el abogado pida. Ver el aviso de
+   * «Continuando un borrador» para el porqué.
+   */
+  onCorregirEnTaller?: () => void;
   onClearActiveDraft?: () => void;
   /**
    * Lo decide App: con un borrador a la vista el asistente se OCULTA, no se
@@ -149,6 +155,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
   handleSendPrompt,
   logs,
   activeDraftText,
+  onCorregirEnTaller,
   onClearActiveDraft,
   oculto = false,
   onSaldoCambiado,
@@ -349,6 +356,25 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
                 </button>
               </div>
             )}
+            {/*
+              CORREGIR NO ES CONTINUAR. Generar sobre un borrador cargado corre
+              el pipeline entero y el redactor ENTREGA EL ESCRITO COMPLETO otra
+              vez: sirve para terminarlo o proyectarlo, pero para «corrige el
+              hecho tercero» es la herramienta equivocada —se cobra como un
+              borrador nuevo y puede reformular párrafos que estaban bien, que
+              nadie relee enteros para encontrarlos—. El taller propone
+              ediciones y toca solo lo pedido. Se ofrece aquí, donde el abogado
+              está a punto de escribir la corrección.
+            */}
+            {activeDraftText && onCorregirEnTaller && (
+              <p className="cn-red-corregir">
+                ¿Quiere corregir algo puntual? Hágalo en el taller: la guía propone la edición y solo cambia lo
+                que usted pida.{' '}
+                <button type="button" onClick={onCorregirEnTaller} className="cn-red-corregir-boton">
+                  Corregir en el taller
+                </button>
+              </p>
+            )}
 
             <label className="cn-red-rotulo" htmlFor="que-debe-hacer-este-escrito">
               Qué debe hacer este escrito
@@ -364,7 +390,7 @@ export const AgentPanelLeft: React.FC<AgentPanelLeftProps> = ({
               }}
               placeholder={
                 activeDraftText
-                  ? 'Qué corregir, continuar o ampliar del borrador cargado…'
+                  ? 'Qué continuar, ampliar o proyectar del borrador cargado…'
                   : 'Cuente el caso como se lo contó el cliente: hechos, pretensiones, lo que quiere que sostenga. No hace falta lenguaje jurídico.'
               }
               className="cn-red-hechos"

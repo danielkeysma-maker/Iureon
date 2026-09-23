@@ -4982,6 +4982,37 @@
   line-height: 22px;
   color: var(--ink);
 }
+/*
+ * «Corregir en el taller» va como FRASE, no como otra tarjeta: es la
+ * aclaración de qué hace el botón de abajo, dicha justo donde el abogado va a
+ * escribir la corrección. El botón es un enlace en color de marca y mide 44 px
+ * de alto al tacto por su relleno, sin agrandar el renglón.
+ */
+.cara-nueva .cn-red-corregir {
+  margin: 8px 0 0;
+  font-size: 14.5px;
+  line-height: 22px;
+  color: var(--ink-3);
+  text-wrap: pretty;
+}
+.cara-nueva .cn-red-corregir-boton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin: -11px 0;
+  padding: 0 2px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.cara-nueva .cn-red-corregir-boton:hover {
+  color: var(--brand-fill-hover);
+}
 .cara-nueva .cn-red-continuando-icono {
   width: 16px;
   height: 16px;

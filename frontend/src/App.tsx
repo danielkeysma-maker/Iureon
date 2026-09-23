@@ -885,6 +885,29 @@ export function App() {
     return saveDraft({ ...workflow.generatedDraft, legalText: updatedText });
   };
 
+  /*
+   * EL TALLER DEL BORRADOR SE ABRE POR UN SOLO CAMINO, venga del lienzo o del
+   * panel de instrucciones («Corregir en el taller»). Dos copias de este bloque
+   * terminarían abriendo el taller con conversaciones o versiones distintas
+   * según el botón que se pulsó.
+   */
+  const abrirTallerDelBorrador = (textoActual: string) => {
+    if (!workflow.generatedDraft) return;
+    const entrada = savedDrafts.find((d) => d.id === loadedDraftId) ?? null;
+    setTallerBorrador({
+      titulo: workflow.generatedDraft.title,
+      documentType: workflow.documentType,
+      legalBranch: workflow.legalBranch,
+      texto: textoActual,
+      conversacion: (entrada?.conversacion as TurnoDelTaller[] | undefined) ?? [],
+      anotaciones: (entrada?.anotaciones as Anotacion[] | undefined) ?? [],
+      versiones: (entrada?.versiones as VersionDelTexto[] | undefined) ?? [],
+      draftId: loadedDraftId
+    });
+    recordar(PANTALLAS.tallerBorrador, loadedDraftId);
+    setMainView('taller');
+  };
+
   // ═══ Cargar borrador para edición ═══
   const handleLoadDraft = (entry: SavedDraftEntry) => {
     workflow.setGeneratedDraft(entry.draft);
@@ -1623,6 +1646,9 @@ export function App() {
                   onRedactar={irARedactar}
                   activeDraftText={workflow.activeDraftText}
                   onClearActiveDraft={() => workflow.setActiveDraftText(null)}
+                  onCorregirEnTaller={
+                    workflow.generatedDraft ? () => abrirTallerDelBorrador(workflow.generatedDraft?.legalText ?? '') : undefined
+                  }
                 />
 
               {workflow.generatedDraft && (
@@ -1644,22 +1670,7 @@ export function App() {
                 rolDelTaller={userRole}
                 puedeEnsenarFormato={session?.user.role === 'FIRM_ADMIN' || session?.user.role === 'SUPER_ADMIN'}
                 onSaldoCambiado={() => void refreshBalance()}
-                onAbrirTaller={(textoActual) => {
-                  if (!workflow.generatedDraft) return;
-                  const entrada = savedDrafts.find((d) => d.id === loadedDraftId) ?? null;
-                  setTallerBorrador({
-                    titulo: workflow.generatedDraft.title,
-                    documentType: workflow.documentType,
-                    legalBranch: workflow.legalBranch,
-                    texto: textoActual,
-                    conversacion: (entrada?.conversacion as TurnoDelTaller[] | undefined) ?? [],
-                    anotaciones: (entrada?.anotaciones as Anotacion[] | undefined) ?? [],
-                    versiones: (entrada?.versiones as VersionDelTexto[] | undefined) ?? [],
-                    draftId: loadedDraftId
-                  });
-                  recordar(PANTALLAS.tallerBorrador, loadedDraftId);
-                  setMainView('taller');
-                }}
+                onAbrirTaller={abrirTallerDelBorrador}
               />
               )}
               </div>

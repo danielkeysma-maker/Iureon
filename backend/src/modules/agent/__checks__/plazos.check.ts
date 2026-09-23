@@ -315,6 +315,19 @@ const pruebas = async (): Promise<void> => {
    */
   const rutaPrompt = path.resolve(__dirname, '../claudeDraft.prompt.ts');
   const prompt = fs.readFileSync(rutaPrompt, 'utf8');
+  /*
+   * EN MODO CONTINUACIÓN SE ENTREGA EL ESCRITO ENTERO, y eso deja abierta una
+   * puerta: que el redactor «mejore» párrafos que nadie le pidió tocar. El
+   * abogado no relee el escrito completo para encontrarlos, y lo firma.
+   */
+  check(
+    'en modo continuación, lo que no se pidió cambiar se conserva literal',
+    prompt.includes('LO QUE EL USUARIO NO PIDIÓ CAMBIAR SE CONSERVA LITERAL')
+  );
+  check(
+    'y el modo ya no se presenta como el camino para corregir',
+    prompt.includes('MODO CONTINUACIÓN:') && !prompt.includes('MODO CONTINUACIÓN/CORRECCIÓN')
+  );
   check(
     'el esquema entra al prompt de Opus rotulado como propuesta NO VERIFICADA',
     /PROPUESTA NO VERIFICADA/.test(prompt)

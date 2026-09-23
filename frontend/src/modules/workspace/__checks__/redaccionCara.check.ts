@@ -451,5 +451,27 @@ check(
 );
 check('el rojo de peligro no se usa en el bloque', !/var\(--danger\)(?!-bg)/.test(bloque), '#8C2F26 solo para lo destructivo');
 
+/* ─── CORREGIR NO ES CONTINUAR ──────────────────────────────────────────── */
+/*
+ * Generar sobre un borrador cargado entrega el escrito COMPLETO otra vez: sirve
+ * para continuarlo o proyectarlo. Para una corrección puntual es la herramienta
+ * equivocada —se cobra como un borrador nuevo y puede reformular párrafos que
+ * estaban bien—, así que el panel no la invita y ofrece el taller.
+ */
+check(
+  'con un borrador cargado, el cuadro ya no invita a «corregir» por el camino que reescribe',
+  !PANEL.includes('Qué corregir, continuar o ampliar') && PANEL.includes('Qué continuar, ampliar o proyectar')
+);
+check(
+  'y ofrece corregir en el taller, donde solo cambia lo que se pida',
+  PANEL.includes('Corregir en el taller') && PANEL.includes('activeDraftText && onCorregirEnTaller && (')
+);
+check(
+  'el taller del borrador se abre por UN solo camino, desde el lienzo y desde el panel',
+  APP.includes('const abrirTallerDelBorrador = (textoActual: string) =>') &&
+    APP.includes('onAbrirTaller={abrirTallerDelBorrador}') &&
+    APP.includes('abrirTallerDelBorrador(workflow.generatedDraft?.legalText')
+);
+
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

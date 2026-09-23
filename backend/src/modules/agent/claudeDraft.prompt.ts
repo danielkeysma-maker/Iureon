@@ -193,7 +193,7 @@ export const buildClaudeDraftPrompt = ({
       : catalogGuidance;
   const estructuraObligatoria = guidance ?? resolveDocumentStructure(documentType);
   const continuationBlock = existingDraft
-    ? `\nMODO CONTINUACIÓN/CORRECCIÓN: El usuario tiene un borrador previo que quiere que continúes, corrijas o proyectes. Tu tarea es tomar ese borrador como base y aplicar las instrucciones del usuario. Entrega el documento COMPLETO resultante (no solo la parte modificada).\n\nBORRADOR EXISTENTE:\n"""\n${existingDraft}\n"""\n`
+    ? `\nMODO CONTINUACIÓN: El usuario tiene un borrador previo que quiere que continúes, amplíes o proyectes. Tu tarea es tomar ese borrador como base y aplicar las instrucciones del usuario. Entrega el documento COMPLETO resultante (no solo la parte modificada). LO QUE EL USUARIO NO PIDIÓ CAMBIAR SE CONSERVA LITERAL: mismas palabras, mismo orden, misma puntuación. No mejores la redacción de un párrafo que nadie te pidió tocar: el abogado no relee el escrito entero para encontrar lo que cambiaste por tu cuenta, y lo firma.\n\nBORRADOR EXISTENTE:\n"""\n${existingDraft}\n"""\n`
     : '';
   /*
    * Only when something was read. The rule names the attachments as a source,
