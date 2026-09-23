@@ -142,7 +142,7 @@ export const PLAZO_VIGENCIA_MS = 20_000;
 export const PLAZO_GLOSA_MS = 25_000;
 
 /**
- * Etapa 2 — esquema dogmático (GPT-5.6 Sol).
+ * Etapa 2 — esquema dogmático (GPT-6 Sol).
  *
  * ─── POR QUÉ VUELVE A TENER PARTIDA ─────────────────────────────────────────
  *

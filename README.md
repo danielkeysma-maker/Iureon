@@ -41,8 +41,8 @@
 
 9. **🤖 Pipeline de Inteligencia Artificial de 3 Motores (OpenRouter API)**:
    - ⚡ **Fase 1 — Gemini 3.6 Flash** (max 1024 tokens): Extracción concisa de hechos, partes procesales y pretensiones. En modo continuación: identifica solo los cambios solicitados (max 768 tokens).
-   - 🧠 **Fase 2 — GPT-5.6 Sol** (max 1536 tokens): Esquema dogmático procesal: problema jurídico, excepciones, normas clave y estrategia de sustentación. En modo continuación: solo esquema de correcciones (max 1024 tokens).
-   - ✍️ **Fase 3 — Claude Opus 5** (sin límite de tokens, 120s timeout): Redacción solemne del documento jurídico completo. Recibe el esquema de GPT como guía estructural. En modo continuación: toma el borrador existente como base y aplica las correcciones.
+   - 🧠 **Fase 2 — GPT-6 Sol** (max 1536 tokens): Esquema dogmático procesal: problema jurídico, excepciones, normas clave y estrategia de sustentación. En modo continuación: solo esquema de correcciones (max 1024 tokens).
+   - ✍️ **Fase 3 — Claude Opus 5.5** (sin límite de tokens, 120s timeout): Redacción solemne del documento jurídico completo. Recibe el esquema de GPT como guía estructural. En modo continuación: toma el borrador existente como base y aplica las correcciones.
    - **Eficiencia de tokens**: Cada motor gasta solo los tokens necesarios para su tarea específica. Gemini y GPT no redactan; Claude no extrae hechos.
 
 10. **📋 10 Ramas del Derecho × 2 Roles = Cobertura Total**:

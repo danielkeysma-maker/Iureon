@@ -71,7 +71,7 @@ export const MARCA_DE_ESQUEMA_CORTADO = '[[ESQUEMA CORTADO POR LONGITUD]]';
  *
  * ─── POR QUÉ VA ROTULADO, Y POR QUÉ CON ESTAS PALABRAS ──────────────────────
  *
- * El esquema lo produce GPT-5.6 Sol DE MEMORIA: no consulta el texto de
+ * El esquema lo produce GPT-6 Sol DE MEMORIA: no consulta el texto de
  * ninguna norma, no ve la ficha del catálogo y no tiene forma de comprobar
  * nada. Medido el 10 de septiembre de 2026, en una sola corrida, el esquema
  * citó «Ley 2220 de 2022, art. 68» donde la ficha verificada dice **art. 146**,

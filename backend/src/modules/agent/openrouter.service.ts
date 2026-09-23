@@ -191,7 +191,7 @@ const DRAFT_CONTEXT_CHARS = 3000;
 /**
  * Three-engine drafting pipeline over OpenRouter.
  *
- * Gemini reads the facts and the attachments, GPT-5.6 Sol structures them into
+ * Gemini reads the facts and the attachments, GPT-6 Sol structures them into
  * a dogmatic outline, and Claude Opus writes the document from both plus the
  * catalogue ficha and the verified jurisprudence. Each stage reports progress
  * through onStepLog so the frontend can stream the console.
@@ -326,7 +326,7 @@ export class OpenRouterService {
     onStepLog({
       stage: 'STAGE_3_REDACCION',
       engine: 'CLAUDE',
-      message: `[Claude Opus 5] Redacción finalizada exitosamente en ${Date.now() - startTime}ms.`,
+      message: `[Claude Opus 5.5] Redacción finalizada exitosamente en ${Date.now() - startTime}ms.`,
       timestamp: new Date().toISOString()
     });
 
@@ -793,7 +793,7 @@ export class OpenRouterService {
   }
 
   /**
-   * Phase 2 — GPT-5.6 Sol. Produces the dogmatic outline: legal problem,
+   * Phase 2 — GPT-6 Sol. Produces the dogmatic outline: legal problem,
    * defences, governing norms and argumentative strategy. It never drafts.
    *
    * ─── SE RETIRÓ EL 9 DE SEPTIEMBRE DE 2026 Y SE REPUSO EL 10 ───────────────
@@ -833,7 +833,7 @@ export class OpenRouterService {
     onStepLog({
       stage: 'STAGE_2_LOGIC',
       engine: 'GPT',
-      message: `[GPT-5.6 Sol] Formulación del problema jurídico y esquema dogmático para ${req.documentType}...`,
+      message: `[GPT-6 Sol] Formulación del problema jurídico y esquema dogmático para ${req.documentType}...`,
       timestamp: new Date().toISOString()
     });
 
@@ -878,7 +878,7 @@ export class OpenRouterService {
     });
 
     console.log(
-      `[PIPELINE] GPT-5.6 Sol: ${structure.length} caracteres de esquema.` +
+      `[PIPELINE] GPT-6 Sol: ${structure.length} caracteres de esquema.` +
         (truncated ? ' CORTADO POR LONGITUD.' : '')
     );
 
@@ -906,7 +906,7 @@ export class OpenRouterService {
   }
 
   /**
-   * Phase 3 — Claude Opus 5. Writes the complete document from Gemini's facts,
+   * Phase 3 — Claude Opus 5.5. Writes the complete document from Gemini's facts,
    * GPT's dogmatic outline, the catalogue ficha and the verified
    * jurisprudence. When the call yields
    * nothing usable the stage FAILS: the empty canvas is honest, and the static
@@ -924,8 +924,8 @@ export class OpenRouterService {
       stage: 'STAGE_3_REDACCION',
       engine: 'CLAUDE',
       message: req.existingDraft
-        ? '[Claude Opus 5] Continuación/corrección sobre borrador existente con sustentación legal...'
-        : '[Claude Opus 5] Redacción de pieza procesal con lenguaje jurídico formal y sustentación legal...',
+        ? '[Claude Opus 5.5] Continuación/corrección sobre borrador existente con sustentación legal...'
+        : '[Claude Opus 5.5] Redacción de pieza procesal con lenguaje jurídico formal y sustentación legal...',
       timestamp: new Date().toISOString()
     });
 
@@ -983,6 +983,13 @@ export class OpenRouterService {
      * títulos de sección en negrita y su petición. `medium` compra un escrito
      * más largo por cuarenta segundos más y un 37% más de costo, y cuarenta
      * segundos es la mitad del reloj entero de la función. Se toma `low`.
+     *
+     * Y CON OPUS 5.5 SIGUE SIENDO `low` (22 de septiembre de 2026). Medido con
+     * un mismo escrito largo: en `low` terminó en 141 s —Opus 5 tardó 213 s—,
+     * pero en `medium` razona bastante más que Opus 5 y NO terminó en 280 s.
+     * Esta etapa tiene lo que le queda del reloj de la función tras las demás
+     * (`PLAZO_REDACCION_MS`); con `medium` el riesgo ya no sería un escrito más
+     * caro, sino uno que no llega.
      *
      * El plazo de la llamada es el presupuesto de la etapa: quien corta es este
      * código, y por debajo del tope de la plataforma.

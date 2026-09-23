@@ -111,7 +111,7 @@ export function useLegalAgentWorkflow(formatoDeFirma?: string, expedienteId?: st
        */
       legalText: `⏳ REDACTANDO PIEZA PROCESAL EN TIEMPO REAL...
 
-Gemini 3.8 Flash extrae los hechos, se buscan precedentes verificados en el corpus, GPT-5.6 Sol formula el problema jurídico y el esquema, y Claude Opus 5 redacta el escrito con la ficha del catálogo.
+Gemini 3.8 Flash extrae los hechos, se buscan precedentes verificados en el corpus, GPT-6 Sol formula el problema jurídico y el esquema, y Claude Opus 5.5 redacta el escrito con la ficha del catálogo.
 
 Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
       // Zero, not 4820. This placeholder is shown BEFORE the request leaves the

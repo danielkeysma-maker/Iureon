@@ -17,8 +17,28 @@ export const ENGINE = {
    * asi que el cambio no mueve el costo por operacion.
    */
   GEMINI: 'google/gemini-3.8-flash',
-  GPT: 'openai/gpt-5.6-sol',
-  OPUS: 'anthropic/claude-opus-5'
+  /*
+   * GPT-6 Sol, cambiado el 22 de septiembre de 2026, el día que salió.
+   * Verificado en el catálogo de OpenRouter ese día: US$2/M de entrada y
+   * US$10/M de salida, EXACTAMENTE lo mismo que 5.6 Sol. La mitad es la
+   * variante `:batch`, que entrega en diferido y no sirve para una etapa que
+   * corre mientras el abogado espera su escrito. Se cambia por ser el modelo
+   * nuevo al mismo precio, no por un ahorro.
+   */
+  GPT: 'openai/gpt-6-sol',
+  /*
+   * Opus 5.5, cambiado el 22 de septiembre de 2026. Catálogo de OpenRouter ese
+   * día: US$4/M de entrada y US$20/M de salida, contra US$5 y US$25 de Opus 5
+   * —20% menos—, mismo contexto de 1M. Medido con el mismo escrito y el mismo
+   * esfuerzo (`low`): 141 s contra 213 s y US$0,31 contra US$0,40, o sea 34% más
+   * rápido y 24% más barato.
+   *
+   * OJO CON EL ESFUERZO MEDIO: en `medium` razona bastante más que Opus 5 y el
+   * mismo escrito NO terminó en 280 s. Por eso la Redacción sigue en `low` (ver
+   * `openrouter.service.ts`); el resto de la app ya usaba `medium` por defecto y
+   * sus respuestas son cortas.
+   */
+  OPUS: 'anthropic/claude-opus-5.5'
 } as const;
 
 export type EngineModel = (typeof ENGINE)[keyof typeof ENGINE];
