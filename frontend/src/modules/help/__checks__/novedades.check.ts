@@ -186,5 +186,30 @@ const botones = [...BLOQUE.matchAll(/([^{}]*(?:boton|chip|fila)[^{}]*)\{([^}]*)\
   .map((m) => ({ s: m[1].trim(), alto: Number(/min-height:\s*(\d+)px/.exec(m[2])?.[1] ?? 0) }));
 check('botones, chips y filas miden 44 px o más', botones.length > 0 && botones.every((b) => b.alto >= 44), botones.filter((b) => b.alto < 44).map((b) => b.s).join(' | '));
 
+/* ─── «VISTO» SOBREVIVE A RECARGAR Y A CERRAR LA PESTAÑA ────────────────── */
+/*
+ * Solo se marcaba al desmontar la pantalla, y recargar o cerrar la pestaña no
+ * desmonta nada: quien leía y recargaba veía todo otra vez como no leído.
+ */
+const VISTA_NOVEDADES = leer('modules/help/components/NovedadesView.tsx');
+check(
+  'al recargar o cerrar la pestaña también queda visto',
+  VISTA_NOVEDADES.includes("window.addEventListener('pagehide', marcarNovedadesVistas)")
+);
+check(
+  'y al pasar a otra pestaña o minimizar en el teléfono',
+  VISTA_NOVEDADES.includes("document.addEventListener('visibilitychange', alOcultarse)") &&
+    VISTA_NOVEDADES.includes("document.visibilityState === 'hidden'")
+);
+check(
+  'los oyentes se retiran al salir, y salir sigue marcando',
+  VISTA_NOVEDADES.includes("window.removeEventListener('pagehide', marcarNovedadesVistas)") &&
+    VISTA_NOVEDADES.includes("document.removeEventListener('visibilitychange', alOcultarse)")
+);
+check(
+  'y NO se marca al entrar: apagaría el contador antes de leer',
+  !/useEffect\(\(\) => \{\s*marcarNovedadesVistas\(\)/.test(VISTA_NOVEDADES)
+);
+
 console.log(fallos === 0 ? '\nALL CHECKS PASSED' : `\n${fallos} CHECKS FAILED`);
 process.exitCode = fallos === 0 ? 0 : 1;

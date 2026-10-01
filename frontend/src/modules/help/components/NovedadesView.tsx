@@ -105,7 +105,32 @@ export const NovedadesView: React.FC<NovedadesViewProps> = ({
   const masReciente = React.useMemo(() => fechaMasReciente(todas), [todas]);
 
   const [vistasAntes, setVistasAntes] = React.useState<string | null>(() => vistasHasta());
-  React.useEffect(() => () => marcarNovedadesVistas(), []);
+  /*
+   * «VISTO» SE ESCRIBE AL SALIR, Y SALIR NO ES SOLO DESMONTAR.
+   *
+   * Solo se marcaba en el desmontaje, y el desmontaje no ocurre cuando se
+   * recarga la página o se cierra la pestaña: el navegador se va sin correr la
+   * limpieza de React. Quien leía las novedades y recargaba volvía a verlas
+   * todas como no leídas —el defecto que reportó el dueño—, y con las
+   * direcciones limpias, recargar en /novedades lo repetía cada vez.
+   *
+   * `pagehide` cubre la recarga y el cierre; `visibilitychange` a oculto cubre
+   * cambiar de pestaña o minimizar en el teléfono, donde `pagehide` a veces no
+   * llega. Sigue sin marcarse AL ENTRAR, por la razón de siempre: apagaría el
+   * contador del panel antes de que nadie leyera nada.
+   */
+  React.useEffect(() => {
+    const alOcultarse = (): void => {
+      if (document.visibilityState === 'hidden') marcarNovedadesVistas();
+    };
+    window.addEventListener('pagehide', marcarNovedadesVistas);
+    document.addEventListener('visibilitychange', alOcultarse);
+    return () => {
+      window.removeEventListener('pagehide', marcarNovedadesVistas);
+      document.removeEventListener('visibilitychange', alOcultarse);
+      marcarNovedadesVistas();
+    };
+  }, []);
 
   const [modulo, setModulo] = React.useState<MainView | null>(null);
   const [soloLeAfecta, setSoloLeAfecta] = React.useState(false);

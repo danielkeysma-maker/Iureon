@@ -35,6 +35,110 @@ export type { Novedad } from '../types';
  */
 
 export const NOVEDADES: readonly Novedad[] = [
+  /* ── 1 de octubre de 2026 ──────────────────────────────────────────────── */
+  {
+    id: 'redaccion-mas-razonada',
+    fecha: '2026-10-01',
+    modulos: ['workspace'],
+    titulo: 'Escritos con más argumentación jurídica',
+    queCambio:
+      'La Redacción analiza más el caso antes de escribir: los escritos salen más completos y con mejor sustento jurídico. El esquema del problema jurídico, las excepciones y la estrategia lo arma ahora Claude Sonnet 5.5, y el escrito lo redacta Claude Opus 5.5. Un escrito tarda algo más en generarse.',
+    tipo: 'mejora',
+    comoUsarlo: 'primer-escrito'
+  },
+  {
+    id: 'precios-octubre',
+    fecha: '2026-10-01',
+    modulos: ['workspace', 'taller', 'audiencias', 'expedientes'],
+    titulo: 'Precios por uso actualizados',
+    queCambio:
+      'Un escrito nuevo cuesta desde $3.200, con la redacción más razonada; la revisión sigue desde $2.000. Cada mensaje a la guía del taller o sobre un interrogatorio cuesta desde $1.400, y un resumen de audiencia o «Leer el formato», desde $150. Cada botón dice la cifra antes de que usted lo pulse.',
+    tipo: 'mejora',
+    comoUsarlo: 'roles-saldo'
+  },
+  {
+    id: 'novedades-quedan-leidas',
+    fecha: '2026-10-01',
+    modulos: ['novedades'],
+    titulo: 'Las novedades leídas ya no vuelven a salir como nuevas',
+    queCambio:
+      'Si leía las novedades y luego recargaba la página o cerraba la pestaña, volvían a aparecer como no leídas. Ahora quedan marcadas al salir, de la forma que sea.',
+    tipo: 'correccion'
+  },
+  {
+    id: 'progreso-nombra-bien-el-motor',
+    fecha: '2026-10-01',
+    modulos: ['workspace'],
+    titulo: 'El avance de la Redacción nombra bien cada paso',
+    queCambio:
+      'Mientras se generaba el escrito, el avance mostraba un nombre de modelo distinto en el primer y el segundo paso. Ahora cada paso dice el modelo que de verdad está trabajando.',
+    tipo: 'correccion'
+  },
+
+  /* ── 22 de septiembre de 2026 ──────────────────────────────────────────── */
+  {
+    id: 'corregir-en-el-taller',
+    fecha: '2026-09-22',
+    modulos: ['workspace', 'taller'],
+    titulo: 'Corregir un borrador sin reescribirlo',
+    queCambio:
+      'Con un borrador cargado en Redacción, «Generar» sirve para continuarlo o proyectarlo, y entrega el escrito completo. Para corregir algo puntual está «Corregir en el taller»: la guía propone la edición y solo cambia lo que usted pida, sin tocar el resto del escrito.',
+    tipo: 'mejora',
+    comoUsarlo: 'primer-escrito'
+  },
+
+  /* ── 16 de septiembre de 2026 ──────────────────────────────────────────── */
+  {
+    id: 'interrogatorio-respuesta-probable',
+    fecha: '2026-09-16',
+    modulos: ['expedientes'],
+    titulo: 'El interrogatorio anticipa lo que van a contestar',
+    queCambio:
+      'Debajo de cada pregunta aparece lo que esa persona probablemente conteste, la repregunta si lo hace y, cuando el caso tiene documentos leídos, la cita con que se la contradice. Cada tanda queda guardada en el expediente y se abre de nuevo sin pagar. Cuesta desde $2.000, más $1.000 por cada persona adicional.',
+    tipo: 'nuevo',
+    comoUsarlo: 'preguntas-audiencia'
+  },
+  {
+    id: 'interrogatorio-mejor-redactado',
+    fecha: '2026-09-16',
+    modulos: ['expedientes'],
+    titulo: 'Preguntas mejor redactadas, hasta veinte por persona',
+    queCambio:
+      'Las preguntas se escriben primero y la anticipación se prepara después, sobre ellas: así no salen preguntas compuestas ni repetidas. Cada persona puede tener hasta veinte preguntas, según lo que el caso sostenga.',
+    tipo: 'mejora',
+    comoUsarlo: 'preguntas-audiencia'
+  },
+  {
+    id: 'interrogatorio-se-lee-como-transcrito',
+    fecha: '2026-09-16',
+    modulos: ['expedientes'],
+    titulo: 'El interrogatorio se lee como un transcrito',
+    queCambio:
+      'Cada línea dice quién habla: lo que usted pregunta, lo que la persona probablemente conteste y la cita del expediente, como en Audiencias. «Leer en grande» lo abre a pantalla completa, sin el resto del expediente.',
+    tipo: 'mejora',
+    comoUsarlo: 'preguntas-audiencia'
+  },
+  {
+    id: 'interrogatorio-consultar-a-la-guia',
+    fecha: '2026-09-16',
+    modulos: ['expedientes'],
+    titulo: 'Consultarle a la guía sobre un interrogatorio',
+    queCambio:
+      'Debajo de las preguntas puede seguir conversando con la guía: afinar una pregunta o ver por dónde seguir si le contestan algo. La guía solo trabaja sobre ese expediente y ese interrogatorio, no lo cambia por su cuenta y no propone preguntas sobre lo que el caso no traiga. La conversación queda guardada con la tanda.',
+    tipo: 'nuevo',
+    comoUsarlo: 'preguntas-audiencia'
+  },
+  {
+    id: 'visor-del-taller-en-el-telefono',
+    fecha: '2026-09-16',
+    modulos: ['taller'],
+    titulo: 'El documento del taller se ve en el teléfono',
+    queCambio:
+      'En el teléfono, las barras del taller ocupaban casi toda la pantalla y el documento revisado apenas se veía. Ahora ocupan una sola fila y el documento tiene el espacio. Si un archivo no se puede mostrar, el taller lo dice y ofrece abrirlo o descargarlo.',
+    tipo: 'correccion',
+    comoUsarlo: 'revisar-escrito'
+  },
+
   /* ── 14 de septiembre de 2026 ──────────────────────────────────────────── */
   {
     id: 'redaccion-tres-pasos',
