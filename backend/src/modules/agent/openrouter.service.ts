@@ -992,10 +992,10 @@ export class OpenRouterService {
      * (`PLAZO_REDACCION_MS`); con `medium` el riesgo ya no sería un escrito más
      * caro, sino uno que no llega.
      *
-     * ACTUALIZADO EL MISMO DÍA: `medium` sí cabe en un escrito nuevo sin
-     * adjuntos ni expediente —127,8 s de 138, medido con estos mismos prompts—,
-     * y solo ahí se usa. Con material o sobre un borrador existente, `low`.
-     * La regla y sus razones, en `esfuerzoDeLaRedaccion`.
+     * Y DESDE EL 1 DE OCTUBRE VA SIEMPRE EN `medium`: los escritos en `low`
+     * salían flojos de lenguaje jurídico, y el techo de la función subió a 480 s
+     * para que medio quepa con holgura también con adjuntos. La decisión y sus
+     * números, en `esfuerzoDeLaRedaccion` y `TOPE_DE_FUNCION_MS`.
      *
      * El plazo de la llamada es el presupuesto de la etapa: quien corta es este
      * código, y por debajo del tope de la plataforma.
@@ -1007,11 +1007,7 @@ export class OpenRouterService {
       req.maxDraftTokens,
       undefined,
       {
-        reasoningEffort: esfuerzoDeLaRedaccion({
-          adjuntos: req.bloqueAdjuntos,
-          expediente: req.bloqueExpediente,
-          borradorExistente: req.existingDraft
-        }),
+        reasoningEffort: esfuerzoDeLaRedaccion(),
         timeoutMs: PLAZO_REDACCION_MS
       }
     );

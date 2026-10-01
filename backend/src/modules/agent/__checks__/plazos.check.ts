@@ -385,17 +385,20 @@ const pruebas = async (): Promise<void> => {
    * corregir el escrito sale más largo y diez segundos de margen no alcanzan.
    * Si esta regla se afloja, un escrito con anexos puede no llegar.
    */
-  check('un escrito nuevo sin material se redacta en medio', esfuerzoDeLaRedaccion({}) === 'medium');
-  check('con adjuntos, en low', esfuerzoDeLaRedaccion({ adjuntos: 'ADJUNTO: contrato.pdf' }) === 'low');
-  check('con material del expediente, en low', esfuerzoDeLaRedaccion({ expediente: 'PASAJES DEL CASO' }) === 'low');
-  check('corrigiendo un borrador existente, en low', esfuerzoDeLaRedaccion({ borradorExistente: 'PRIMERO. ...' }) === 'low');
+  check('la redacción va en esfuerzo medio', esfuerzoDeLaRedaccion() === 'medium');
+  /*
+   * MEDIO SOLO ES SEGURO CON EL TECHO NUEVO. Lo medido en medio sobre un caso
+   * normal son 127,8 s; un caso con anexos puede doblarlo. Si alguien baja el
+   * techo de la función sin volver a `low`, el escrito con anexos no llega.
+   */
   check(
-    'un bloque vacío o de espacios no cuenta como material',
-    esfuerzoDeLaRedaccion({ adjuntos: '   ', expediente: '', borradorExistente: null }) === 'medium'
+    'y la etapa tiene sitio para el doble de lo medido en medio (2 x 127,8 s)',
+    PLAZO_REDACCION_MS >= 2 * 127_800,
+    `${Math.round(PLAZO_REDACCION_MS / 1000)} s`
   );
   check(
     'y la llamada de la redacción usa la regla, no un esfuerzo fijo',
-    /reasoningEffort: esfuerzoDeLaRedaccion\(\{/.test(servicio) && !/reasoningEffort: 'low', timeoutMs: PLAZO_REDACCION_MS/.test(servicio)
+    /reasoningEffort: esfuerzoDeLaRedaccion\(\)/.test(servicio) && !/reasoningEffort: 'low', timeoutMs: PLAZO_REDACCION_MS/.test(servicio)
   );
 
   /*

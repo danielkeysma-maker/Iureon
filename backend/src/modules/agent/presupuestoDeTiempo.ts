@@ -44,8 +44,20 @@
  * costar el borrador: esas fallan abiertas y lo declaran.
  */
 
-/** Espejo de `maxDuration` en `vercel.json`. Hobby: 60 s. Pro: 300 s. */
-export const TOPE_DE_FUNCION_MS = 300_000;
+/**
+ * Espejo de `maxDuration` en `vercel.json`. Hobby: 60 s. Pro: hasta 800 s.
+ *
+ * 480 DESDE EL 1 DE OCTUBRE DE 2026, para que la Redacción pueda ir en esfuerzo
+ * medio. Verificado en la documentación de Vercel ese día: Pro admite hasta
+ * 800 s de forma general. Los 180 s de más van enteros a `PLAZO_REDACCION_MS`,
+ * que es el remanente: pasa de 138 s a 318 s, contra 127,8 s medidos con Opus
+ * 5.5 en medio sobre un caso normal sin adjuntos.
+ *
+ * Alargar el techo casi no cuesta: mientras la función espera al motor no se
+ * factura CPU activa. Y no se lleva a 800 porque un techo también sirve para
+ * cortar lo que se colgó; con 480 cabe el doble de lo medido.
+ */
+export const TOPE_DE_FUNCION_MS = 480_000;
 
 /**
  * Lo que queda reservado DESPUÉS de la última etapa: cobrar la operación,
@@ -273,34 +285,17 @@ export const relojDeEtapa = (presupuestoMs: number): { restante: () => number } 
 };
 
 /**
- * CON QUÉ ESFUERZO REDACTA OPUS, según lo que trae el caso.
+ * CON QUÉ ESFUERZO REDACTA OPUS: SIEMPRE `medium` (1 de octubre de 2026).
  *
- * ─── LA MEDICIÓN QUE LO DECIDE (22 de septiembre de 2026) ──────────────────
+ * Hasta ese día iba en `medium` solo cuando el caso no traía adjuntos,
+ * expediente ni borrador previo, porque la etapa tenía 138 s y lo medido en
+ * medio eran 127,8: diez segundos de margen que un caso con anexos no
+ * respetaba. El dueño leyó escritos en `low` y los encontró flojos —«le hace
+ * falta el verbo jurídico»—, y la salida no era aceptar el riesgo sino quitarlo:
+ * el techo de la función subió a 480 s (`TOPE_DE_FUNCION_MS`) y la etapa tiene
+ * ahora 318 s. Medio cabe con el doble de lo medido.
  *
- * Opus 5.5 en `medium`, con los prompts reales de esta etapa y un caso normal
- * de cinco hechos sin adjuntos: 127,8 s, 23.626 caracteres, US$0,29, terminado.
- * Cabe en `PLAZO_REDACCION_MS` (138 s), pero con DIEZ segundos de margen.
- *
- * Lo que consume ese reloj es ESCRIBIR, no leer: Opus escribe a unos cien
- * tokens por segundo y la entrada pesa poco. Un caso con adjuntos o con
- * material del expediente trae más hechos, fechas y documentos, y el escrito
- * sale más largo —quien sea que los haya extraído—. Lo mismo una corrección
- * sobre un borrador existente: se reescribe el escrito entero, con el viejo
- * como base. En esos tres casos diez segundos no alcanzan, y si el reloj se
- * agota el escrito no llega: se devuelve el saldo, pero el abogado se queda
- * sin nada.
- *
- * Así que `medium` solo donde la medición lo respalda —un escrito nuevo sin
- * adjuntos ni expediente—, y `low` en lo demás, que es lo que ya corría y
- * termina con holgura. Decisión del dueño, 22/09/2026.
+ * Se deja como función, y no como un literal en la llamada, para que el día que
+ * vuelva a hacer falta una regla tenga dónde vivir y su guarda.
  */
-export const esfuerzoDeLaRedaccion = (caso: {
-  adjuntos?: string | null;
-  expediente?: string | null;
-  borradorExistente?: string | null;
-}): 'low' | 'medium' => {
-  const traeMaterial = [caso.adjuntos, caso.expediente, caso.borradorExistente].some(
-    (x) => typeof x === 'string' && x.trim().length > 0
-  );
-  return traeMaterial ? 'low' : 'medium';
-};
+export const esfuerzoDeLaRedaccion = (): 'medium' => 'medium';
