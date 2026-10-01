@@ -32,7 +32,7 @@ import type {
  * Es el piso: el servidor cobra el mayor entre el piso y lo que midió, y un
  * escrito ordinario no pasa del piso.
  */
-export const PRECIO_LEER_FORMATO_COP = 100;
+export const PRECIO_LEER_FORMATO_COP = 150;
 
 const pesos = (n: number): string => `$${String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
 

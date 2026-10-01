@@ -1991,7 +1991,7 @@ export function App() {
               key={tallerBorrador.draftId ?? 'borrador-sesion'}
               datos={tallerBorrador}
               formatoDeFirma={firmBranding}
-              precioConsultaCop={300}
+              precioConsultaCop={1400}
               precioRevisionCop={2000}
               onGuardar={async (texto, conversacion, anotaciones, versiones) => {
                 if (!tallerBorrador.draftId) return false;
@@ -2040,7 +2040,7 @@ export function App() {
                 datos={tallerActivo}
                 formatoDeFirma={firmBranding}
                 esAdminDeFirma={session?.user.role === 'FIRM_ADMIN' || session?.user.role === 'SUPER_ADMIN'}
-                precioConsultaCop={300}
+                precioConsultaCop={1400}
                 precioRevisionCop={2000}
                 onCerrar={cerrarTallerDeRevision}
                 onSaldoCambiado={() => void refreshBalance()}

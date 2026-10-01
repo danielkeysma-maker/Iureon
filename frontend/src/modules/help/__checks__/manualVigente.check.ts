@@ -84,7 +84,15 @@ const CURADAS: ReadonlyArray<readonly [string, string, readonly string[]]> = [
   ['exportar', 'documents', ['Trabajar el escrito']],
   ['exportar', 'estilo', ['Guardar el formato', 'Qué se guarda', 'Qué no se guarda']],
   ['borradores', 'documents', ['Datos del proceso', 'Marcar radicado', 'Exportar lista']],
-  ['revisar-escrito', 'workspace', ['Leer en grande', 'Ir al punto', 'Lo que exige la norma', 'Criterio del revisor', 'Restaurar esta versión', '¿Conservar el escrito y su trabajo?', 'Desde $2.000 de su saldo']],
+  /*
+   * «Desde $2.000 de su saldo» SALIÓ DE ESTA LISTA el 1/10/2026. El botón de
+   * revisar lo arma con el precio dentro (`Desde {pesos(precioCop)} de su
+   * saldo`), así que nunca está literal en el código: este check lo
+   * encontraba por coincidencia en el pie de Redacción, que decía lo mismo con
+   * otro fin, y dejó de encontrarlo cuando el escrito pasó a $3.200. Un check
+   * que pasa por casualidad no vigila nada.
+   */
+  ['revisar-escrito', 'workspace', ['Leer en grande', 'Ir al punto', 'Lo que exige la norma', 'Criterio del revisor', 'Restaurar esta versión', '¿Conservar el escrito y su trabajo?']],
   ['documento-recibido', 'workspace', ['Según el propio documento', 'Esta carga no es suya.', '¿Y con qué lo ataco?', 'Llevar los flancos a la guía de actuaciones']],
   ['orientacion', 'catalog', ['Los hechos, como se los contaría a un colega', 'Qué pedirle al motor', 'Cupo gratuito de hoy agotado', 'Leerlo primero: qué le exige y para cuándo']],
   ['verificar', 'catalog', ['Guardar verificación', 'Revertir al catálogo base', 'Fuente donde lo verificó']],

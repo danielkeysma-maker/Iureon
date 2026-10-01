@@ -136,7 +136,7 @@ check(
 
 /* ─── 4. Lo que lo reemplaza: precio y borrado de firma ────────────────── */
 
-check('«Leer el formato» tiene piso de $100 (decisión del 14/09/2026)', PRICE_COP.ESTILO === 100, `$${PRICE_COP.ESTILO}`);
+check('«Leer el formato» tiene piso de $150 (decisión del 1/10/2026; era $100)', PRICE_COP.ESTILO === 150, `$${PRICE_COP.ESTILO}`);
 
 const migracionBorrado = readFileSync(join(RAIZ, 'supabase', 'migration-borrar-firma-estilo.sql'), 'utf8');
 check(

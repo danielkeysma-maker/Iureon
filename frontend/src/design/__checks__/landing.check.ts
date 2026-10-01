@@ -138,7 +138,8 @@ check(
  * Ninguna otra cifra en pesos se cuela: si la página muestra un monto, es un
  * precio de plan o una de las dos tarifas de saldo.
  */
-const TARIFAS_DE_SALDO = ['$2.000', '$300'];
+/* Tarifas del 1/10/2026: escrito $3.200, revisión $2.000, consulta $1.400. */
+const TARIFAS_DE_SALDO = ['$3.200', '$2.000', '$1.400'];
 const permitidos = new Set([...PLANES.flatMap((p) => [precios[p]?.mensual, precios[p]?.anual]), ...TARIFAS_DE_SALDO]);
 const montos = [...VISIBLE.matchAll(/\$\s?\d{1,3}(?:\.\d{3})*/g)].map((m) => m[0].replace(/\s/g, ''));
 const intrusos = montos.filter((m) => !permitidos.has(m));

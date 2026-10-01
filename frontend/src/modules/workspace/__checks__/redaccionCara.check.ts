@@ -299,7 +299,7 @@ check(
   check('el hook enciende «generando» al empezar', /setIsProcessing\(true\)/.test(leer('modules/workspace/hooks/useLegalAgentWorkflow.ts')));
   check(
     'el asistente trae su título, sus pasos y el precio con «desde»',
-    ['Redactar un escrito', 'titulo="Qué va a presentar"', 'titulo="Los hechos y las pruebas"', 'Desde $2.000 de su saldo; un escrito largo cuesta lo que mida.'].every((t) =>
+    ['Redactar un escrito', 'titulo="Qué va a presentar"', 'titulo="Los hechos y las pruebas"', 'Desde $3.200 de su saldo; un escrito largo cuesta lo que mida.'].every((t) =>
       PANEL.includes(t)
     )
   );

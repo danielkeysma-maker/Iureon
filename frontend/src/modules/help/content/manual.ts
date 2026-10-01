@@ -178,7 +178,7 @@ const A_PRIMER_ESCRITO: ManualArticle = {
         '«Redactar sin actuación» sirve cuando tampoco sabe el nombre. Escriba en «¿Qué debe lograr este escrito?» entre 15 y 107 caracteres, revise «Quedará en la lista como» y pulse «Guardar y redactar». Queda como «Sin nombre — …», y el escrito declara que su término no está verificado.',
         'En «Los hechos y las pruebas», cuente en «Qué debe hacer este escrito» los hechos y la pretensión en lenguaje corriente. Con «Adjuntar sentencias, pruebas o fotos» puede sumar hasta 8 archivos y 20 MB.',
         'Si aparece «Cómo escribe su firma», revise el interruptor «Usar el formato y la jerga que su firma enseñó». Apagarlo afecta solo ese borrador.',
-        'Pulse «Generar escrito» o use ⌘↵ en Mac y Ctrl+↵ en Windows. El botón dice «Proyectar providencia» si firma un juez y «Generar acto» si firma la secretaría. Junto a él se lee «Desde $2.000 de su saldo; un escrito largo cuesta lo que mida.». Mientras se genera, la consola «Ejecución» muestra el avance. Si el motor falla, el aviso sale ahí mismo y la reserva de saldo vuelve a la cuenta.',
+        'Pulse «Generar escrito» o use ⌘↵ en Mac y Ctrl+↵ en Windows. El botón dice «Proyectar providencia» si firma un juez y «Generar acto» si firma la secretaría. Junto a él se lee «Desde $3.200 de su saldo; un escrito largo cuesta lo que mida.». Mientras se genera, la consola «Ejecución» muestra el avance. Si el motor falla, el aviso sale ahí mismo y la reserva de saldo vuelve a la cuenta.',
         'Lea el escrito. Arriba del papel está la barra del borrador con «Word», «PDF» y «Copiar». A la derecha, «Lo que respalda este escrito» muestra la norma, la autoridad, el término, «Ver la norma» y las secciones que pide la ficha, cada una «encontrada» o «no se encontró el rótulo», con «Ir al párrafo».',
         'El escrito se guarda como borrador de la firma al generarse. Si lo corrige en el papel, pulse «Guardar» en «Trabajar el escrito».'
       ]
@@ -410,7 +410,7 @@ const A_EXPORTAR: ManualArticle = {
     {
       kind: 'lista',
       items: [
-        '«Enseñar este formato» toma el escrito como modelo de cómo escribe su firma para ese rol de firmante. Solo un socio administrador puede hacerlo. «Leer el formato · $100» descuenta $100 del saldo y muestra «Esto es lo que se guardaría», con «Qué se guarda» y «Qué no se guarda». Nada queda guardado hasta que pulse «Guardar el formato»; «Cancelar» descarta la lectura. Desde entonces se usa en los próximos borradores.',
+        '«Enseñar este formato» toma el escrito como modelo de cómo escribe su firma para ese rol de firmante. Solo un socio administrador puede hacerlo. «Leer el formato · $150» descuenta desde $150 del saldo y muestra «Esto es lo que se guardaría», con «Qué se guarda» y «Qué no se guarda». Nada queda guardado hasta que pulse «Guardar el formato»; «Cancelar» descarta la lectura. Desde entonces se usa en los próximos borradores.',
         'Lo enseñado se ve y se quita en «Ajustes», «Estilo de la firma».',
         '«Sugerir jerga» busca en el borrador las palabras que su firma prefiere decir de otra forma y propone el reemplazo. Es gratis y no usa el modelo. No toca normas, sentencias, texto entre comillas ni marcadores entre corchetes. Puede reemplazar una aparición o todas.'
       ]
@@ -567,7 +567,7 @@ const A_AUDIENCIA: ManualArticle = {
     {
       kind: 'parrafo',
       texto:
-        'En «Resumen y hechos relevantes», «Generar el resumen» produce unas frases sobre lo tratado y los hechos dichos, con el minuto. Resume lo que se dijo y no toma decisiones. Queda guardado. Cada vez que pulsa «Generar el resumen» o «Regenerar» se descuentan $50 del saldo.'
+        'En «Resumen y hechos relevantes», «Generar el resumen» produce unas frases sobre lo tratado y los hechos dichos, con el minuto. Resume lo que se dijo y no toma decisiones. Queda guardado. Cada vez que pulsa «Generar el resumen» o «Regenerar» se descuentan desde $150 del saldo.'
     },
     {
       kind: 'nota',
@@ -724,12 +724,12 @@ const A_ROLES_SALDO: ManualArticle = {
     {
       kind: 'lista',
       items: [
-        'Cada escrito generado: desde $2.000; un escrito largo cuesta lo que mida.',
+        'Cada escrito generado: desde $3.200; un escrito largo cuesta lo que mida.',
         'Cada revisión, de un escrito suyo o de un documento recibido, y cada «Volver a revisar»: desde $2.000.',
-        'Cada mensaje a la guía del taller: $300.',
-        'Cada resumen de audiencia o entrevista: $50.',
+        'Cada mensaje a la guía del taller: desde $1.400.',
+        'Cada resumen de audiencia o entrevista: desde $150.',
         'Cada orientación después de las 10 gratis del día: $150.',
-        'Leer un formato para enseñarlo: $100.',
+        'Leer un formato para enseñarlo: desde $150.',
         'No consumen saldo: transcribir, buscar jurisprudencia, las herramientas, «Sugerir jerga», crear casos y escribir a soporte.'
       ]
     },
@@ -810,7 +810,7 @@ const A_REVISAR: ManualArticle = {
         'Use «Subir PDF, Word o texto» (hasta 15 MB, con anexos) o pegue el texto. En «Cliente o proceso» indique de qué asunto se trata.',
         'En «Qué actuación es», elija la rama y la actuación. Si no sabe cuál es, pulse «Que la guía diga qué actuación es»: lee el archivo en su navegador, no cuesta nada y propone candidatas. Primero debe elegir la rama.',
         '«Qué quiere saber» es opcional y solo orienta el énfasis.',
-        'Pulse el botón de revisar, que muestra «Desde $2.000 de su saldo». Si el revisor no responde, no se cobra.',
+        'Pulse el botón de revisar: muestra el precio, desde $2.000, antes de que lo pulse. Si el revisor no responde, no se cobra.',
         'La primera vez, la aplicación pregunta «¿Conservar el escrito y su trabajo?». «Sí, conservar» guarda el archivo como lo subió, la conversación, los comentarios y las versiones. «Solo el informe» guarda solo el informe. Se decide una vez para toda la firma, lo decide un socio administrador y se puede cambiar en «Revisiones» con «Retirar autorización».'
       ]
     },
@@ -832,7 +832,7 @@ const A_REVISAR: ManualArticle = {
         'El papel tiene tres vistas: «Con marcas», «Editar» y «Original», que muestra el archivo tal como se subió, con su diagramación y sus tablas.',
         'Toque un pasaje señalado: verá «Por qué», el «Reemplazo propuesto» y «Aplicar reemplazo».',
         'Seleccione texto para resaltarlo, tacharlo o «Comentar». Sus marcas y comentarios viajan con cada mensaje a la guía. «Limpiar» quita sus marcas.',
-        'Los paneles de la derecha son «Guía», «Comentarios», «Informe» y «Versiones». En «Guía», cada mensaje cuesta $300.',
+        'Los paneles de la derecha son «Guía», «Comentarios», «Informe» y «Versiones». En «Guía», cada mensaje cuesta desde $1.400.',
         '«Guardar versión» deja un punto de retorno. En «Versiones» puede compararla con el texto actual y usar «Restaurar esta versión». Ninguna versión se sobrescribe: restaurar también crea una versión.',
         'Con la autorización de la firma, el taller se guarda solo y la cinta de arriba dice «Guardando…» o «Guardado hace un momento». Sin autorización, se pierde al cerrar la pestaña, y el informe sí queda.',
         '«Volver a revisar» emite un informe nuevo sobre el texto actual, desde $2.000. «Llevar a Redacción» guarda el texto como un borrador nuevo de la firma, sin tocar la revisión.',

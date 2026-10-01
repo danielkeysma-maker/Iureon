@@ -65,7 +65,18 @@ export class BillingError extends Error {
  * five-page memorial, and it is worth more.
  */
 export const PRICE_COP: Record<Operation, number> = {
-  BORRADOR: 2000,
+  /*
+   * $3.200 DESDE EL 1 DE OCTUBRE DE 2026. Decisión del dueño, el mismo día que
+   * la Redacción pasó a Opus 5.5 en esfuerzo MEDIO: un escrito normal cuesta
+   * unos US$0,29 de motor, que al margen estándar son ≈ $2.668, ya por encima
+   * del piso de $2.000. Con $3.200 el caso común vuelve a tener un precio
+   * fijo y predecible, y solo un escrito largo se cobra por lo medido.
+   *
+   * La REVISIÓN sigue en $2.000: es otra operación y no cambió de motor ni de
+   * esfuerzo. Por eso los textos que decían «un escrito o una revisión desde
+   * $2.000» se partieron en dos.
+   */
+  BORRADOR: 3200,
   /*
    * LA TRANSCRIPCION NO SE COBRA. Decision del 29 de agosto de 2026.
    *
@@ -103,7 +114,12 @@ export const PRICE_COP: Record<Operation, number> = {
    * una firma que esta trabajando. Regenerar cobra otra vez, a proposito: es
    * otra llamada, y el abogado la pide con un boton que lo dice.
    */
-  RESUMEN: 50,
+  /*
+   * $150 DESDE EL 1 DE OCTUBRE DE 2026 (era $50). El único resumen medido en
+   * septiembre costó US$0,011 —≈ $101 al margen estándar—: el piso de $50 era la
+   * mitad de lo que cuesta, y es lo que se reservaba antes de llamar al motor.
+   */
+  RESUMEN: 150,
   /*
    * Lo que cuesta una orientación PASADO el cupo diario gratuito.
    *
@@ -147,7 +163,16 @@ export const PRICE_COP: Record<Operation, number> = {
    * porque el precio sube con el costo real (priceFor). Una revision completa
    * nueva sigue siendo REVISION.
    */
-  CONSULTA_REVISION: 300,
+  /*
+   * $1.400 DESDE EL 1 DE OCTUBRE DE 2026 (era $300). Decisión del dueño: «no
+   * podemos estar por debajo porque nos genera costos». Medido en `ai_usage`
+   * durante septiembre: 28 consultas, US$3,70, o sea ≈ US$0,132 cada una —
+   * ≈ $1.214 al margen estándar—. Ya se cobraban por lo medido, pero el piso es
+   * lo que se RESERVA antes de llamar al motor: se reservaban $300 de una
+   * operación de $1.200, y con poco saldo el excedente no se podía cobrar.
+   * Cubre también la consulta sobre un interrogatorio, que usa esta operación.
+   */
+  CONSULTA_REVISION: 1400,
   /*
    * «Leer el formato» de «Enseñar estilo»: el motor lee UN escrito de la firma
    * y devuelve su forma anonimizada. Decisión del dueño, 14/09/2026: piso de
@@ -176,7 +201,13 @@ export const PRICE_COP: Record<Operation, number> = {
    * repregunta y la cita del expediente con que se contradice.
    */
   INTERROGATORIO: 2000,
-  ESTILO: 100
+  /*
+   * $150 DESDE EL 1 DE OCTUBRE DE 2026 (era $100), misma regla que la consulta:
+   * el piso no puede quedar por debajo de lo que la lectura cuesta, que medida
+   * en Gemini Flash rondaba los $101 al margen estándar, y lo que se reserva
+   * antes de llamar al motor es el piso.
+   */
+  ESTILO: 150
 };
 
 /**

@@ -32,4 +32,4 @@ export const pisoDeLaTanda = (personas: number): number =>
  * no es arbitraria: preparar escribe una lista nueva y consultar responde sobre
  * la que ya existe. El mismo trabajo que un turno del taller, el mismo precio.
  */
-export const PRECIO_DE_LA_CONSULTA_COP = 300;
+export const PRECIO_DE_LA_CONSULTA_COP = 1400;

@@ -13,7 +13,7 @@
  * la conversión salga de los mismos números con que se le cobra al cliente. El
  * día que cambie el margen o la tasa, esto tiene que moverse solo.
  */
-import { COP_PER_USD, MARKUP, priceFor } from '../../billing/billing.service';
+import { COP_PER_USD, MARKUP, PRICE_COP, priceFor } from '../../billing/billing.service';
 import { COP_POR_USD_DE_CREDITO } from '../runway.service';
 
 let fallos = 0;
@@ -67,7 +67,7 @@ check(
 // Y el piso sigue siendo el piso: un borrador barato no se cobra más barato.
 check(
   'un borrador ordinario se cobra al piso y no por medición',
-  priceFor('BORRADOR', costoDeUnBorradorAlPiso / 2) === 2000,
+  priceFor('BORRADOR', costoDeUnBorradorAlPiso / 2) === PRICE_COP.BORRADOR,
   String(priceFor('BORRADOR', costoDeUnBorradorAlPiso / 2))
 );
 

@@ -84,7 +84,7 @@ check('el éxito dice «Guardado»', MENSAJE_GUARDADO === 'Guardado. Se usará d
 const billing = readFileSync(join(BACKEND, 'modules', 'billing', 'billing.service.ts'), 'utf8');
 const pisoServidor = Number(/ESTILO:\s*(\d+)/.exec(billing)?.[1] ?? NaN);
 check('el precio de la pantalla es el piso del servidor', PRECIO_LEER_FORMATO_COP === pisoServidor, `pantalla ${PRECIO_LEER_FORMATO_COP} · servidor ${pisoServidor}`);
-check('el botón dice «Leer el formato · $100»', TEXTO_BOTON_LEER === 'Leer el formato · $100');
+check('el botón dice «Leer el formato · $150» (precio del 1/10/2026)', TEXTO_BOTON_LEER === 'Leer el formato · $150');
 check('el diálogo no escribe el precio a mano', DIALOGO.includes('TEXTO_BOTON_LEER') && !/\$\s?100\b/.test(DIALOGO));
 
 /* ─── 3. Los estados del diálogo ────────────────────────────────────────── */

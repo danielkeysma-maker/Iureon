@@ -337,7 +337,7 @@ export const plantillaDeSuscripcion = (d: DatosDeSuscripcion): Plantilla => {
         }
       ]),
       nota(
-        `El plan incluye ${usuariosDe(def.maxUsuarios)}. El uso de inteligencia artificial se paga aparte, con recargas de saldo dentro de la aplicación: un escrito o una revisión desde ${pesos(PRICE_COP.BORRADOR)} y una consulta a la guía del taller ${pesos(PRICE_COP.CONSULTA_REVISION)}. Si paga antes del vencimiento se suma el periodo, nunca se pierden días.`
+        `El plan incluye ${usuariosDe(def.maxUsuarios)}. El uso de inteligencia artificial se paga aparte, con recargas de saldo dentro de la aplicación: un escrito desde ${pesos(PRICE_COP.BORRADOR)}, una revisión desde ${pesos(PRICE_COP.REVISION)} y una consulta a la guía del taller ${pesos(PRICE_COP.CONSULTA_REVISION)}. Si paga antes del vencimiento se suma el periodo, nunca se pierden días.`
       ),
       nota(
         'Adjuntamos la cuenta de cobro en PDF. No es factura electrónica de venta validada por la DIAN y no discrimina IVA.'

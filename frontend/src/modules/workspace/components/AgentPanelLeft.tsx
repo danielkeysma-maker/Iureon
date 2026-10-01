@@ -71,7 +71,7 @@ const SUBMIT_LABEL: Record<ActuacionRole, string> = {
  * la frase dice «desde» y que un escrito largo cuesta lo que mida. Si el piso
  * cambia allá, esta frase miente hasta que alguien la cambie aquí.
  */
-const PRECIO_DESDE = 'Desde $2.000 de su saldo; un escrito largo cuesta lo que mida.';
+const PRECIO_DESDE = 'Desde $3.200 de su saldo; un escrito largo cuesta lo que mida.';
 
 /** Qué se le dice al abogado por cada estado de un adjunto. */
 const ETIQUETA_ESTADO: Record<EstadoDeAdjunto, string> = {

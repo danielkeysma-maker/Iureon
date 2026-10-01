@@ -473,9 +473,10 @@ check('la recarga lleva a la aplicación, no a una ruta inventada', recarga.html
  * `max(piso, costo medido)`: anunciar el piso como precio fijo prometería un
  * cobro que el sistema no hace.
  */
-check('el precio del borrador sale del código', recarga.html.includes(pesos(PRICE_COP.BORRADOR)) && PRICE_COP.BORRADOR === 2000);
+/* Precios del 1/10/2026, decisión del dueño: escrito $3.200, consulta $1.400; la revisión sigue en $2.000. */
+check('el precio del borrador sale del código', recarga.html.includes(pesos(PRICE_COP.BORRADOR)) && PRICE_COP.BORRADOR === 3200);
 check('el precio de la revisión sale del código', recarga.html.includes(pesos(PRICE_COP.REVISION)) && PRICE_COP.REVISION === 2000);
-check('el precio de la consulta sale del código', recarga.html.includes(pesos(PRICE_COP.CONSULTA_REVISION)) && PRICE_COP.CONSULTA_REVISION === 300);
+check('el precio de la consulta sale del código', recarga.html.includes(pesos(PRICE_COP.CONSULTA_REVISION)) && PRICE_COP.CONSULTA_REVISION === 1400);
 check('los precios se anuncian como piso, no como tarifa fija', recarga.html.includes(`desde ${pesos(PRICE_COP.BORRADOR)}`) && recarga.html.includes('cuesta más'));
 check('no publica un precio para lo que no se cobra', !/transcrip\w+:\s*\$/i.test(recarga.html) && PRICE_COP.TRANSCRIPCION === 0);
 check(
