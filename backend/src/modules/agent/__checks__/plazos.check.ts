@@ -52,6 +52,7 @@ import {
   sumaDePresupuestos
 } from '../presupuestoDeTiempo';
 import { desenlaceDeFallo } from '../agent.controller';
+import { nombreDelMotor } from '../openrouter.client';
 
 let fallos = 0;
 const check = (n: string, ok: boolean, d = ''): void => {
@@ -395,6 +396,24 @@ const pruebas = async (): Promise<void> => {
   check(
     'y la llamada de la redacción usa la regla, no un esfuerzo fijo',
     /reasoningEffort: esfuerzoDeLaRedaccion\(\{/.test(servicio) && !/reasoningEffort: 'low', timeoutMs: PLAZO_REDACCION_MS/.test(servicio)
+  );
+
+  /*
+   * ─── EL NOMBRE DEL MOTOR QUE VE EL ABOGADO ──────────────────────────────
+   *
+   * El progreso decía «Gemini 3.6 Flash» con el motor ya en 3.8: el rótulo
+   * vivía aparte del `ENGINE`. Ahora sale del identificador, y el servicio no
+   * puede volver a escribir un nombre de modelo a mano.
+   */
+  check('Gemini se nombra desde su identificador', nombreDelMotor('google/gemini-3.8-flash') === 'Gemini 3.8 Flash');
+  check('Claude, igual', nombreDelMotor('anthropic/claude-sonnet-5.5') === 'Claude Sonnet 5.5');
+  check('y GPT con su guion de marca', nombreDelMotor('openai/gpt-6.1-sol') === 'GPT-6.1 Sol');
+  const mensajesDelServicio = servicio.split('\n').filter((l) => /message: /.test(l) || /\[PIPELINE\]/.test(l));
+  const aMano = mensajesDelServicio.filter((l) => /\[(Gemini|GPT|Claude)[ -]/.test(l) || /\] ?(Gemini|GPT-|Claude) [\d.]/.test(l) || /\[PIPELINE\] (Gemini|GPT|Claude)/.test(l));
+  check(
+    'ningún mensaje del pipeline escribe el nombre de un modelo a mano',
+    aMano.length === 0,
+    aMano.map((l) => l.trim().slice(0, 70)).join(' | ')
   );
 
   console.log(fallos === 0 ? `\nTODO BIEN (${suma} ms de ${TOPE_DE_FUNCION_MS} ms)` : `\n${fallos} FALLO(S)`);

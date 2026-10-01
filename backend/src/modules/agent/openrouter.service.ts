@@ -1,4 +1,4 @@
-import { ENGINE, callOpenRouterWithUsage } from './openrouter.client';
+import { ENGINE, callOpenRouterWithUsage, nombreDelMotor } from './openrouter.client';
 import {
   PLAZO_ESQUEMA_MS,
   PLAZO_HECHOS_MS,
@@ -327,7 +327,7 @@ export class OpenRouterService {
     onStepLog({
       stage: 'STAGE_3_REDACCION',
       engine: 'CLAUDE',
-      message: `[Claude Opus 5.5] Redacción finalizada exitosamente en ${Date.now() - startTime}ms.`,
+      message: `[${nombreDelMotor(ENGINE.OPUS)}] Redacción finalizada exitosamente en ${Date.now() - startTime}ms.`,
       timestamp: new Date().toISOString()
     });
 
@@ -528,7 +528,7 @@ export class OpenRouterService {
   }
 
   /**
-   * Phase 1 — Gemini 3.6 Flash. Extracts facts, parties and claims only; in
+   * Phase 1 — Gemini (`ENGINE.GEMINI`). Extracts facts, parties and claims only; in
    * continuation mode it lists the requested changes instead of re-reading the
    * whole case.
    */
@@ -536,7 +536,7 @@ export class OpenRouterService {
     onStepLog({
       stage: 'STAGE_1_INGESTION',
       engine: 'GEMINI',
-      message: '[Gemini 3.6 Flash] Extracción de hechos fácticos, partes procesales y pretensiones del caso...',
+      message: `[${nombreDelMotor(ENGINE.GEMINI)}] Extracción de hechos fácticos, partes procesales y pretensiones del caso...`,
       timestamp: new Date().toISOString()
     });
 
@@ -594,7 +594,7 @@ export class OpenRouterService {
       usage
     });
 
-    console.log(`[PIPELINE] Gemini 3.6 Flash: ${extraction.length} caracteres extraídos.`);
+    console.log(`[PIPELINE] ${nombreDelMotor(ENGINE.GEMINI)}: ${extraction.length} caracteres extraídos.`);
     return extraction;
   }
 
@@ -834,7 +834,7 @@ export class OpenRouterService {
     onStepLog({
       stage: 'STAGE_2_LOGIC',
       engine: 'GPT',
-      message: `[GPT-6 Sol] Formulación del problema jurídico y esquema dogmático para ${req.documentType}...`,
+      message: `[${nombreDelMotor(ENGINE.GPT)}] Formulación del problema jurídico y esquema dogmático para ${req.documentType}...`,
       timestamp: new Date().toISOString()
     });
 
@@ -879,7 +879,7 @@ export class OpenRouterService {
     });
 
     console.log(
-      `[PIPELINE] GPT-6 Sol: ${structure.length} caracteres de esquema.` +
+      `[PIPELINE] ${nombreDelMotor(ENGINE.GPT)}: ${structure.length} caracteres de esquema.` +
         (truncated ? ' CORTADO POR LONGITUD.' : '')
     );
 
@@ -925,8 +925,8 @@ export class OpenRouterService {
       stage: 'STAGE_3_REDACCION',
       engine: 'CLAUDE',
       message: req.existingDraft
-        ? '[Claude Opus 5.5] Continuación/corrección sobre borrador existente con sustentación legal...'
-        : '[Claude Opus 5.5] Redacción de pieza procesal con lenguaje jurídico formal y sustentación legal...',
+        ? `[${nombreDelMotor(ENGINE.OPUS)}] Continuación sobre borrador existente con sustentación legal...`
+        : `[${nombreDelMotor(ENGINE.OPUS)}] Redacción de pieza procesal con lenguaje jurídico formal y sustentación legal...`,
       timestamp: new Date().toISOString()
     });
 

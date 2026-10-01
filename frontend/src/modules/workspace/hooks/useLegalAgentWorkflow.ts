@@ -128,7 +128,7 @@ Por favor espere unos segundos mientras se finaliza la redacción solemne.`,
         id: Date.now().toString(),
         timestamp: requestTimestamp,
         engine: 'GEMINI',
-        message: `[Etapa 1] Gemini 3.8 Flash procesando indicación procesal e insumos fácticos del caso...`,
+        message: `[Etapa 1] Procesando la indicación procesal y los insumos fácticos del caso...`,
         type: 'info'
       }
     ]);

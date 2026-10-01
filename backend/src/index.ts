@@ -1,4 +1,5 @@
 import express, { Express, Request, Response } from 'express';
+import { ENGINE, nombreDelMotor } from './modules/agent/openrouter.client';
 import cors from 'cors';
 import { config } from './config/env.config';
 import { authMiddleware, optionalAuthMiddleware } from './modules/auth/auth.middleware';
@@ -178,7 +179,9 @@ app.listen(config.port, () => {
   console.log(`=======================================================`);
   console.log(`🚀 Iureon API Modular iniciada en el puerto ${config.port}`);
   console.log(`🛡️ Módulo Tenant: x-firm-id middleware activo`);
-  console.log(`🤖 Módulo Agent: Gemini 3.8 Flash -> GPT-6 Sol -> Claude Opus 5.5`);
+  console.log(
+    `🤖 Módulo Agent: ${nombreDelMotor(ENGINE.GEMINI)} -> ${nombreDelMotor(ENGINE.GPT)} -> ${nombreDelMotor(ENGINE.OPUS)}`
+  );
   console.log(`🔍 Módulo Search: Glosario & Buscador de Leyes/Sentencias`);
   console.log(`📦 Módulo Documents: Backblaze B2 Vault Storage`);
   console.log(

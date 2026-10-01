@@ -43,6 +43,28 @@ export const ENGINE = {
 
 export type EngineModel = (typeof ENGINE)[keyof typeof ENGINE];
 
+/**
+ * EL NOMBRE QUE VE EL ABOGADO SALE DEL IDENTIFICADOR, no se escribe a mano.
+ *
+ * El progreso de la Redacción decía «Gemini 3.6 Flash» semanas después de que
+ * el motor pasara a 3.8: el rótulo estaba escrito aparte del `ENGINE`, y cada
+ * cambio de modelo exigía acordarse de él. Desde aquí, cambiar el modelo cambia
+ * lo que se ve, y no hay un segundo sitio que pueda quedarse viejo.
+ *
+ *   'google/gemini-3.8-flash'     → 'Gemini 3.8 Flash'
+ *   'anthropic/claude-sonnet-5.5' → 'Claude Sonnet 5.5'
+ *   'openai/gpt-6.1-sol'          → 'GPT-6.1 Sol'
+ */
+export const nombreDelMotor = (id: string): string => {
+  const modelo = id.includes('/') ? id.slice(id.indexOf('/') + 1) : id;
+  const mayuscula = (s: string): string => (/^\d/.test(s) ? s : s.charAt(0).toUpperCase() + s.slice(1));
+  const gpt = /^gpt-([\d.]+)-?(.*)$/.exec(modelo);
+  if (gpt) {
+    return [`GPT-${gpt[1]}`, ...gpt[2].split('-').filter(Boolean).map(mayuscula)].join(' ');
+  }
+  return modelo.split('-').filter(Boolean).map(mayuscula).join(' ');
+};
+
 /** Opus writes whole documents, so it needs far longer than the analysis engines. */
 const OPUS_TIMEOUT_MS = 120_000;
 const DEFAULT_TIMEOUT_MS = 20_000;
