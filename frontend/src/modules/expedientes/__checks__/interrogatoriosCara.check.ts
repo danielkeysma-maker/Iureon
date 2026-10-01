@@ -180,11 +180,37 @@ check(
 );
 check(
   'la pregunta y la repregunta son suyas, y lo dicen',
-  PANEL.includes('Usted pregunta') && PANEL.includes('Usted repregunta')
+  PANEL_CODIGO.includes('<Quien nombre="Usted" accion="pregunta" />') &&
+    PANEL_CODIGO.includes('<Quien nombre="Usted" accion="repregunta" />')
 );
 check(
   'la respuesta probable la firma el declarante POR SU NOMBRE, no un rótulo genérico',
-  PANEL_CODIGO.includes('{persona.nombre} probablemente') && !PANEL.includes('Probablemente conteste:')
+  PANEL_CODIGO.includes('<Quien nombre={persona.nombre} accion="probablemente contesta" />') &&
+    !PANEL.includes('Probablemente conteste:')
+);
+/*
+ * QUIÉN ES QUIÉN DE UN VISTAZO, COMO EN AUDIENCIAS: pedido del dueño. Con el
+ * rótulo entero en el mismo gris, los turnos se separaban pero no se
+ * distinguían. El nombre va en negrita y cada voz lleva su color.
+ */
+const CSS_VOCES = readFileSync(join(SRC, 'design', 'cara-nueva.css'), 'utf8');
+check(
+  'el nombre de quien habla va en negrita y en tinta',
+  /\.cn-int-quien-nombre \{[^}]*font-weight: 700;[^}]*color: var\(--ink\);/.test(CSS_VOCES)
+);
+check(
+  'cada voz tiene su color, con los tonos del transcrito de Audiencias',
+  CSS_VOCES.includes('.cn-int-turno--usted {\n  --int-voz: #1d4ed8;') &&
+    CSS_VOCES.includes('.cn-int-turno--declarante {\n  --int-voz: #047857;') &&
+    CSS_VOCES.includes('.cn-int-turno--guia {\n  --int-voz: #d97706;')
+);
+check(
+  'el filete toma el color de la voz',
+  /\.cn-int-dicho \{[^}]*border-left: 3px solid var\(--int-voz/.test(CSS_VOCES)
+);
+check(
+  'y en la conversación con la guía también se distingue quién habla',
+  PANEL_CODIGO.includes("t.rol === 'abogado' ? 'cn-int-turno--usted' : 'cn-int-turno--guia'")
 );
 check(
   'la hipótesis se pinta punteada y la cita comprobada, llena',

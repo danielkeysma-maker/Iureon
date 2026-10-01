@@ -11236,17 +11236,64 @@
 .cara-nueva .cn-int-turno:first-child {
   margin-top: 0;
 }
+/*
+ * CADA VOZ TIENE SU COLOR, COMO EN AUDIENCIAS. Los mismos tonos del
+ * transcrito (`speakerColors.ts`), en el mismo orden: usted es la primera voz
+ * —azul—, la persona interrogada la segunda —verde— y la guía la tercera
+ * —ámbar—. El color va en el punto y en el filete; el nombre, en tinta y
+ * negrita, para que se lea igual en claro y en oscuro.
+ *
+ * El «con qué» no es una voz: es el expediente. Conserva el color de marca de
+ * lo citable y un punto hueco, para no confundirlo con alguien que habla.
+ */
+.cara-nueva .cn-int-turno--usted {
+  --int-voz: #1d4ed8;
+}
+.cara-nueva .cn-int-turno--declarante {
+  --int-voz: #047857;
+}
+.cara-nueva .cn-int-turno--guia {
+  --int-voz: #d97706;
+}
+.cara-nueva .cn-int-turno--cita {
+  --int-voz: var(--brand);
+}
 .cara-nueva .cn-int-quien {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.cara-nueva .cn-int-quien-nombre {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.cara-nueva .cn-int-quien-punto {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border-radius: 999px;
+  background: var(--int-voz, var(--ink-5));
+}
+.cara-nueva .cn-int-turno--cita .cn-int-quien-punto {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--int-voz);
+}
+.cara-nueva .cn-int-quien-accion {
   font-size: 14px;
   line-height: 20px;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--ink-4);
-  overflow-wrap: anywhere;
 }
 .cara-nueva .cn-int-dicho {
   min-width: 0;
   padding-left: 14px;
-  border-left: 2px solid var(--ink-5);
+  border-left: 3px solid var(--int-voz, var(--ink-5));
   font-size: 16px;
   line-height: 25px;
   color: var(--ink);
@@ -11260,7 +11307,6 @@
 }
 /* La cita sí está comprobada contra el expediente: filete lleno, color de marca. */
 .cara-nueva .cn-int-dicho--cita {
-  border-left-color: var(--brand);
   color: var(--ink-2);
 }
 .cara-nueva .cn-int-numero {
@@ -11327,6 +11373,7 @@
     align-items: start;
   }
   .cara-nueva .cn-int-quien {
+    align-items: flex-end;
     text-align: right;
   }
   .cara-nueva .cn-int-apunte {

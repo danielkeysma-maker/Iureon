@@ -113,6 +113,25 @@ interface Abierto {
  * el texto completo y el detalle desaparece: se prefiere una etiqueta larga a
  * una pantalla que pierde la técnica por una coma.
  */
+/**
+ * QUIÉN HABLA, COMO EN EL TRANSCRITO DE AUDIENCIAS.
+ *
+ * El nombre en negrita y en tinta, con el punto del color de su voz, y debajo
+ * —en gris y más pequeño— lo que está haciendo. Pedido del dueño: aunque los
+ * turnos ya iban separados, con todo el rótulo en el mismo gris no se
+ * distinguía de un vistazo quién era quién; Audiencias y Entrevistas lo
+ * resuelven así y el abogado ya lo sabe leer.
+ */
+const Quien: React.FC<{ nombre: string; accion?: string }> = ({ nombre, accion }) => (
+  <span className="cn-int-quien">
+    <span className="cn-int-quien-nombre">
+      <span className="cn-int-quien-punto" aria-hidden />
+      {nombre}
+    </span>
+    {accion && <span className="cn-int-quien-accion">{accion}</span>}
+  </span>
+);
+
 interface ListaDeTurnosProps {
   preguntas: PreguntasDelExpediente;
   /** Si hubo pasajes del caso que mirar: sin ellos no se afirma que no hay con qué. */
@@ -161,8 +180,8 @@ const ListaDeTurnos: React.FC<ListaDeTurnosProps> = ({ preguntas, conMaterial, d
                         del declarante son la única orientación que el abogado
                         necesita leyendo a saltos mientras el testigo habla.
                       */}
-                      <div className="cn-int-turno">
-                        <span className="cn-int-quien">Usted pregunta</span>
+                      <div className="cn-int-turno cn-int-turno--usted">
+                        <Quien nombre="Usted" accion="pregunta" />
                         <p className="cn-int-dicho">
                           <span className="cn-int-numero">{i + 1}</span>
                           {p.pregunta}
@@ -171,26 +190,26 @@ const ListaDeTurnos: React.FC<ListaDeTurnosProps> = ({ preguntas, conMaterial, d
                       {p.paraQue && <p className="cn-int-apunte">Para: {p.paraQue}</p>}
                       {p.delMaterial && <p className="cn-int-apunte">Del material: «{p.delMaterial}»</p>}
                       {p.respuestaProbable && (
-                        <div className="cn-int-turno">
+                        <div className="cn-int-turno cn-int-turno--declarante">
                           {/*
                             EL NOMBRE, Y NO «PROBABLEMENTE CONTESTE». Con dos o
                             tres personas preparadas en la misma pantalla, el
                             rótulo genérico obligaba a subir hasta la cabecera
                             para saber quién contestaba eso.
                           */}
-                          <span className="cn-int-quien">{persona.nombre} probablemente</span>
+                          <Quien nombre={persona.nombre} accion="probablemente contesta" />
                           <p className="cn-int-dicho cn-int-dicho--probable">{p.respuestaProbable}</p>
                         </div>
                       )}
                       {p.repregunta && (
-                        <div className="cn-int-turno">
-                          <span className="cn-int-quien">Usted repregunta</span>
+                        <div className="cn-int-turno cn-int-turno--usted">
+                          <Quien nombre="Usted" accion="repregunta" />
                           <p className="cn-int-dicho">{p.repregunta}</p>
                         </div>
                       )}
                       {p.conQue ? (
-                        <div className="cn-int-turno">
-                          <span className="cn-int-quien">Con qué</span>
+                        <div className="cn-int-turno cn-int-turno--cita">
+                          <Quien nombre="Con qué" accion="del expediente" />
                           <p className="cn-int-dicho cn-int-dicho--cita">
                             {documentId ? (
                               <button
@@ -771,8 +790,11 @@ export const PreguntasDelExpedientePanel: React.FC<{ expediente: ExpedienteConDe
             {abierto.conversacion.length > 0 && (
               <ol className="cn-int-charla">
                 {abierto.conversacion.map((t, i) => (
-                  <li key={`${t.fecha}-${i}`} className="cn-int-turno">
-                    <span className="cn-int-quien">{t.rol === 'abogado' ? 'Usted' : 'La guía'}</span>
+                  <li
+                    key={`${t.fecha}-${i}`}
+                    className={`cn-int-turno ${t.rol === 'abogado' ? 'cn-int-turno--usted' : 'cn-int-turno--guia'}`}
+                  >
+                    <Quien nombre={t.rol === 'abogado' ? 'Usted' : 'La guía'} />
                     <p className={`cn-int-dicho ${t.rol === 'guia' ? 'cn-int-dicho--guia' : ''}`}>{t.texto}</p>
                   </li>
                 ))}
