@@ -18,14 +18,21 @@ export const ENGINE = {
    */
   GEMINI: 'google/gemini-3.8-flash',
   /*
-   * GPT-6 Sol, cambiado el 22 de septiembre de 2026, el día que salió.
-   * Verificado en el catálogo de OpenRouter ese día: US$2/M de entrada y
-   * US$10/M de salida, EXACTAMENTE lo mismo que 5.6 Sol. La mitad es la
-   * variante `:batch`, que entrega en diferido y no sirve para una etapa que
-   * corre mientras el abogado espera su escrito. Se cambia por ser el modelo
-   * nuevo al mismo precio, no por un ahorro.
+   * EL ESQUEMA DOGMÁTICO: Claude Sonnet 5.5 desde el 1 de octubre de 2026, en
+   * lugar de GPT-6 Sol. Decisión del dueño. Catálogo de OpenRouter ese día:
+   * US$2/M de entrada y US$10/M de salida, EXACTAMENTE lo mismo que GPT-6 Sol y
+   * GPT-6.1 Sol, así que el cambio no mueve el costo.
+   *
+   * LO QUE SE PIERDE, Y QUEDA DICHO PARA QUIEN LO REVISE: el esquema venía de
+   * otro proveedor que el redactor —una segunda cabeza—, y una caída de
+   * Anthropic ahora alcanza al esquema y a la redacción a la vez. Lo segundo no
+   * tumba el escrito: si esta etapa falla, el pipeline sigue sin esquema, que es
+   * como estaba diseñado.
+   *
+   * Sin esfuerzo de razonamiento explícito, como iba GPT: el cliente solo lo
+   * pone por defecto a los Opus (`isOpus`), y esta etapa vive de su plazo.
    */
-  GPT: 'openai/gpt-6-sol',
+  SONNET: 'anthropic/claude-sonnet-5.5',
   /*
    * Opus 5.5, cambiado el 22 de septiembre de 2026. Catálogo de OpenRouter ese
    * día: US$4/M de entrada y US$20/M de salida, contra US$5 y US$25 de Opus 5

@@ -180,7 +180,7 @@ app.listen(config.port, () => {
   console.log(`🚀 Iureon API Modular iniciada en el puerto ${config.port}`);
   console.log(`🛡️ Módulo Tenant: x-firm-id middleware activo`);
   console.log(
-    `🤖 Módulo Agent: ${nombreDelMotor(ENGINE.GEMINI)} -> ${nombreDelMotor(ENGINE.GPT)} -> ${nombreDelMotor(ENGINE.OPUS)}`
+    `🤖 Módulo Agent: ${nombreDelMotor(ENGINE.GEMINI)} -> ${nombreDelMotor(ENGINE.SONNET)} -> ${nombreDelMotor(ENGINE.OPUS)}`
   );
   console.log(`🔍 Módulo Search: Glosario & Buscador de Leyes/Sentencias`);
   console.log(`📦 Módulo Documents: Backblaze B2 Vault Storage`);

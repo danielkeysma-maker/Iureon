@@ -163,12 +163,12 @@ const MAX_TOKENS = {
    * `stop` cuando termina el esquema, así que el tope solo se paga si de verdad
    * hacía falta.
    */
-  GPT_NEW: 4096,
+  ESQUEMA_NEW: 4096,
   /*
    * La continuación pide «máximo 400 palabras» (~2.800 caracteres), dos tercios
    * de lo anterior. Mismo cálculo, misma proporción: 2.560.
    */
-  GPT_CONTINUATION: 2560
+  ESQUEMA_CONTINUATION: 2560
 } as const;
 
 /**
@@ -192,7 +192,7 @@ const DRAFT_CONTEXT_CHARS = 3000;
 /**
  * Three-engine drafting pipeline over OpenRouter.
  *
- * Gemini reads the facts and the attachments, GPT-6 Sol structures them into
+ * Gemini reads the facts and the attachments, Sonnet structures them into
  * a dogmatic outline, and Claude Opus writes the document from both plus the
  * catalogue ficha and the verified jurisprudence. Each stage reports progress
  * through onStepLog so the frontend can stream the console.
@@ -794,7 +794,7 @@ export class OpenRouterService {
   }
 
   /**
-   * Phase 2 — GPT-6 Sol. Produces the dogmatic outline: legal problem,
+   * Phase 2 — Sonnet (`ENGINE.SONNET`). Produces the dogmatic outline: legal problem,
    * defences, governing norms and argumentative strategy. It never drafts.
    *
    * ─── SE RETIRÓ EL 9 DE SEPTIEMBRE DE 2026 Y SE REPUSO EL 10 ───────────────
@@ -834,7 +834,7 @@ export class OpenRouterService {
     onStepLog({
       stage: 'STAGE_2_LOGIC',
       engine: 'GPT',
-      message: `[${nombreDelMotor(ENGINE.GPT)}] Formulación del problema jurídico y esquema dogmático para ${req.documentType}...`,
+      message: `[${nombreDelMotor(ENGINE.SONNET)}] Formulación del problema jurídico y esquema dogmático para ${req.documentType}...`,
       timestamp: new Date().toISOString()
     });
 
@@ -862,10 +862,10 @@ export class OpenRouterService {
       usage,
       truncated
     } = await callOpenRouterWithUsage(
-      ENGINE.GPT,
+      ENGINE.SONNET,
       systemPrompt,
       userPrompt,
-      req.existingDraft ? MAX_TOKENS.GPT_CONTINUATION : MAX_TOKENS.GPT_NEW,
+      req.existingDraft ? MAX_TOKENS.ESQUEMA_CONTINUATION : MAX_TOKENS.ESQUEMA_NEW,
       undefined,
       { timeoutMs: PLAZO_ESQUEMA_MS }
     );
@@ -879,7 +879,7 @@ export class OpenRouterService {
     });
 
     console.log(
-      `[PIPELINE] ${nombreDelMotor(ENGINE.GPT)}: ${structure.length} caracteres de esquema.` +
+      `[PIPELINE] ${nombreDelMotor(ENGINE.SONNET)}: ${structure.length} caracteres de esquema.` +
         (truncated ? ' CORTADO POR LONGITUD.' : '')
     );
 

@@ -253,7 +253,7 @@ const pruebas = async (): Promise<void> => {
   const servicio = fs.readFileSync(rutaServicio, 'utf8');
   const conPresupuestos = (servicio.match(/conPresupuesto\(/g) ?? []).length;
 
-  check('el pipeline vuelve a llamar al motor del esquema dogmático', /ENGINE\.GPT/.test(servicio));
+  check('el pipeline vuelve a llamar al motor del esquema dogmático', /ENGINE\.SONNET/.test(servicio));
   check(
     'y el registro de ejecución vuelve a anunciar la etapa que sí corre',
     /STAGE_2_LOGIC/.test(servicio)
@@ -291,8 +291,8 @@ const pruebas = async (): Promise<void> => {
    */
   check(
     'el tope de tokens del esquema deja que termine (con 1.536 se cortaba)',
-    /GPT_NEW: (?:[4-9]|[1-9]\d)\d{3}/.test(servicio),
-    (servicio.match(/GPT_NEW: \d+/) ?? ['sin GPT_NEW'])[0]
+    /ESQUEMA_NEW: (?:[4-9]|[1-9]\d)\d{3}/.test(servicio),
+    (servicio.match(/ESQUEMA_NEW: \d+/) ?? ['sin ESQUEMA_NEW'])[0]
   );
   /*
    * Y SI AUN ASÍ SE CORTA, SE DECLARA. Un esquema truncado presentado como

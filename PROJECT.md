@@ -36,14 +36,14 @@ Cada motor gasta SOLO los tokens de su tarea. No hay redundancia.
 | Motor | Tarea | max_tokens |
 |---|---|---|
 | **Gemini 3.6 Flash** | Extraer hechos, partes y pretensiones en lista concisa | 1024 |
-| **GPT-6 Sol** | Esquema dogmático: problema jurídico, excepciones, normas, estrategia | 1536 |
+| **Claude Sonnet 5.5** | Esquema dogmático: problema jurídico, excepciones, normas, estrategia | 1536 |
 | **Claude Opus 5.5** | Redactar documento jurídico COMPLETO y solemne | Sin límite |
 
 #### Modo Continuación (con borrador cargado):
 | Motor | Tarea | max_tokens |
 |---|---|---|
 | **Gemini 3.6 Flash** | Identificar SOLO qué cambiar (máx. 5 puntos) | 768 |
-| **GPT-6 Sol** | Esquema de CORRECCIONES (no completo) | 1024 |
+| **Claude Sonnet 5.5** | Esquema de CORRECCIONES (no completo) | 1024 |
 | **Claude Opus 5.5** | Aplicar correcciones al borrador existente | Sin límite |
 
 - **Regla de formato para Claude**: NO usar `##` headings markdown ni `---` separadores. Usar `**negritas**` ÚNICAMENTE para: títulos de secciones, numerales resolutivos (PRIMERO:, SEGUNDO:), nombres propios y verbos clave (CONCEDER, NEGAR, TUTELAR, ORDENAR).
